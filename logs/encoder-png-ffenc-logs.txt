@@ -1,0 +1,102 @@
+*** encoder-png-ffenc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:35 ***
+
+
+*** Subtest "encoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/sky.jpg  -o ./results/temp/test.png -graph -stats -blacklist=pngenc" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -200859776
+
+Filter stats - 6 filters
+	Filter fin (src=./media/auxiliary_files/sky.jpg) : 0 input pids 1 output pids 4 tasks 684 us process time
+		2 packets sent 6496 bytes sent (2923.98 pck/sec 75.9766 mbps)
+		* output PID sky.jpg: 2 packets sent
+	Filter fout (dst=./results/temp/test.png) : 1 input pids 0 output pids 3 tasks 258 us process time
+		1 packets processed 80569 bytes processed (3875.97 pck/sec 2498.26 mbps)
+		* input PID sky.jpg: 1 packets received
+	Filter rfimg : 1 input pids 1 output pids 7 tasks 361 us process time
+		1 packets processed 6496 bytes processed (2770.08 pck/sec 143.956 mbps)
+		1 packets sent 6496 bytes sent (2770.08 pck/sec 143.956 mbps)
+		* input PID sky.jpg: 1 frames (2 packets) received
+		* output PID sky.jpg: 1 packets sent
+	Filter imgdec "imgdec:libjpeg" : 1 input pids 1 output pids 5 tasks 743 us process time
+		1 packets processed 6496 bytes processed (1345.9 pck/sec 69.9435 mbps)
+		1 packets sent 240000 bytes sent (1345.9 pck/sec 2584.12 mbps)
+		* input PID sky.jpg: 1 packets received
+		* output PID sky.jpg: 1 packets sent
+	Filter ffenc "ffenc:png" : 1 input pids 1 output pids 5 tasks 7498 us process time
+		1 packets processed 240000 bytes processed (133.369 pck/sec 256.068 mbps)
+		1 packets sent 80569 bytes sent (133.369 pck/sec 85.9632 mbps)
+		* input PID sky.jpg: 1 packets received
+		* output PID sky.jpg: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 5 tasks 79 us process time
+		1 packets processed 80569 bytes processed (12658.2 pck/sec 8158.89 mbps)
+		1 packets sent 80569 bytes sent (12658.2 pck/sec 8158.89 mbps)
+		* input PID sky.jpg: 1 packets received
+		* output PID sky.jpg: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 9657 us active_time 9643 us nb_tasks 35
+
+Total: run_time 9657 us active_time 9643 us nb_tasks 35
+
+Filters connected:
+fin (src=./media/auxiliary_files/sky.jpg) (ptr=0x55ada493ef70)
+-(PID sky.jpg) rfimg (ptr=0x55ada4959520)
+--(PID sky.jpg) imgdec "imgdec:libjpeg" (ptr=0x55ada49603a0)
+---(PID sky.jpg) ffenc "ffenc:png" (ptr=0x55ada4961420)
+----(PID sky.jpg) writegen (ptr=0x55ada4962720)
+-----(PID sky.jpg) fout (dst=./results/temp/test.png) (ptr=0x55ada4956920)
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.png inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump.txt:test=encx" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): BD279A81B27FCD0EF802A0E69600D9545A9279BC
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "encoder-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4  -o ./results/temp/mp4-test.png -graph -stats -blacklist=pngenc" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -5992576
+
+Filter stats - 6 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 6 tasks 675 us process time
+		1 packets sent 5000 bytes sent (1481.48 pck/sec 59.2593 mbps)
+		* output PID in.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/mp4-test.png) : 1 input pids 0 output pids 3 tasks 219 us process time
+		1 packets processed 80569 bytes processed (4566.21 pck/sec 2943.16 mbps)
+		* input PID in.mp4: 1 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 9 tasks 706 us process time
+		2 packets processed 5000 bytes processed (2832.86 pck/sec 56.6572 mbps)
+		1 packets sent 6496 bytes sent (1416.43 pck/sec 73.6091 mbps)
+		* input PID in.mp4: 2 packets received
+		* output PID in.mp4: 1 packets sent
+	Filter imgdec "imgdec:libjpeg" : 1 input pids 1 output pids 5 tasks 737 us process time
+		1 packets processed 6496 bytes processed (1356.85 pck/sec 70.5129 mbps)
+		1 packets sent 240000 bytes sent (1356.85 pck/sec 2605.16 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 1 packets sent
+	Filter ffenc "ffenc:png" : 1 input pids 1 output pids 5 tasks 7354 us process time
+		1 packets processed 240000 bytes processed (135.98 pck/sec 261.082 mbps)
+		1 packets sent 80569 bytes sent (135.98 pck/sec 87.6465 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 5 tasks 83 us process time
+		1 packets processed 80569 bytes processed (12048.2 pck/sec 7765.69 mbps)
+		1 packets sent 80569 bytes sent (12048.2 pck/sec 7765.69 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 9801 us active_time 9790 us nb_tasks 38
+
+Total: run_time 9801 us active_time 9790 us nb_tasks 38
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x55d93dab4f70)
+-(PID in.mp4) mp4dmx (ptr=0x55d93dacf510)
+--(PID in.mp4) imgdec "imgdec:libjpeg" (ptr=0x55d93dad8390)
+---(PID in.mp4) ffenc "ffenc:png" (ptr=0x55d93dad9410)
+----(PID in.mp4) writegen (ptr=0x55d93dada710)
+-----(PID in.mp4) fout (dst=./results/temp/mp4-test.png) (ptr=0x55d93dacc920)
+
+
+*** Subtest "inspect-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/mp4-test.png inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump2.txt:test=encx" ***
+
+Computing ./results/temp/dump2.txt  (inspect-mp4) hash: 
+File hash (SHA-1): 6ED2EB75AF25A8D39F87DDD7FC639AF0A9B586E1
+Hash OK for ./results/temp/dump2.txt

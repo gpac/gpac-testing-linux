@@ -1,0 +1,32 @@
+*** raw-vid-xrgb logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:50 ***
+
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/vid.mp4 -o ./results/temp/raw.xrgb -blacklist=vtbdec,nvdec,ohevcdec" ***
+[swscaler @ 0x55a0d11829a0] No accelerated colorspace conversion found from yuv420p to argb.
+[swscaler @ 0x55a0d11d3320] No accelerated colorspace conversion found from yuv420p to argb.
+
+Computing ./results/temp/raw.xrgb  (dump) hash: 
+File hash (SHA-1): 873FE3688BA6E887A4F26453061BC1E5F7FC80D7
+Hash OK for ./results/temp/raw.xrgb
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.xrgb:size=128x128 inspect:fmt=@pn@-@cts@-@bo@@lf@:log=./results/temp/dump.txt" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 5C76C0558F179B50BE17E3F8396EFE0B02A6D18D
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "gpu_dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.xrgb:size=128x128 vout:dumpframes=20:out=./results/temp/gpudump.rgb" ***
+Type 'h' in window for command list
+
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.xrgb:size=128x128 vcrop:wnd=32x10x64x64 @ -o ./results/temp/dumpcrop.xrgb" ***
+
+Computing ./results/temp/dumpcrop.xrgb  (crop) hash: 
+File hash (SHA-1): 1799EE044CDC5DECD671667C9403E4B04963DABD
+Hash OK for ./results/temp/dumpcrop.xrgb
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.xrgb:size=128x128 vcrop:copy:wnd=32x10x64x64 @ -o ./results/temp/dumpcropcp.xrgb" ***
+
+Computing ./results/temp/dumpcropcp.xrgb  (crop) hash: 
+File hash (SHA-1): 1799EE044CDC5DECD671667C9403E4B04963DABD
+Hash OK for ./results/temp/dumpcropcp.xrgb

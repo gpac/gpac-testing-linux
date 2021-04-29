@@ -1,0 +1,43 @@
+*** reframer-usac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:58 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_30s_audio.usac reframer @ -o ./results/temp/dump.mp4  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -736297088
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/counter/counter_30s_audio.usac) : 0 input pids 1 output pids 26 tasks 896 us process time
+		23 packets sent 112511 bytes sent (25669.6 pck/sec 1004.56 mbps)
+		* output PID counter_30s_audio.usac: 23 packets sent
+	Filter reframer ID _0x560f742ad020_ : 1 input pids 1 output pids 27 tasks 1436 us process time
+		1293 packets processed 105766 bytes processed (900418 pck/sec 589.226 mbps)
+		1293 packets sent 105766 bytes sent (900418 pck/sec 589.226 mbps)
+		* input PID counter_30s_audio.usac: 1293 packets received
+		* output PID counter_30s_audio.usac: 1293 packets sent
+	Filter fout (dst=./results/temp/dump.mp4) : 1 input pids 0 output pids 25 tasks 308 us process time
+		23 packets processed 111735 bytes processed (74675.3 pck/sec 2902.21 mbps)
+		* input PID counter_30s_audio.usac: 23 packets received
+	Filter rflatm : 1 input pids 1 output pids 34 tasks 9568 us process time
+		23 packets processed 112511 bytes processed (2403.85 pck/sec 94.0727 mbps)
+		1293 packets sent 105766 bytes sent (135138 pck/sec 88.4331 mbps)
+		* input PID counter_30s_audio.usac: 23 packets received
+		* output PID counter_30s_audio.usac: 1293 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 1297 tasks 2484 us process time
+		1293 packets processed 105766 bytes processed (520531 pck/sec 340.631 mbps)
+		23 packets sent 111735 bytes sent (9259.26 pck/sec 359.855 mbps)
+		* input PID counter_30s_audio.usac: 1293 packets received
+		* output PID counter_30s_audio.usac: 23 packets sent
+Session stats - threads 1
+	Thread 1: run_time 14829 us active_time 14754 us nb_tasks 1456
+
+Total: run_time 14829 us active_time 14754 us nb_tasks 1456
+
+Filters connected:
+fin (src=./external_media/counter/counter_30s_audio.usac) (ptr=0x560f742aa7f0)
+-(PID counter_30s_audio.usac) rflatm (ptr=0x560f742b2420)
+--(PID counter_30s_audio.usac) reframer (ID=_0x560f742ad020_)
+---(PID counter_30s_audio.usac) mp4mx (ptr=0x560f742b9cb0)
+----(PID counter_30s_audio.usac) fout (dst=./results/temp/dump.mp4) (ptr=0x560f742ae230)
+
+Computing ./results/temp/dump.mp4  (rewrite) hash: 
+File hash (SHA-1): 19EC0BB059B0B4D888ABE1ED8344624C0296EBF4
+Hash OK for ./results/temp/dump.mp4

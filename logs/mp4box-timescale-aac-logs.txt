@@ -1,0 +1,35 @@
+*** mp4box-timescale-aac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:42 ***
+
+
+*** Subtest "moovts-from-raw": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_audio.aac:moovts=-1 -new ./results/temp/test.mp4" ***
+Track Importing AAC  - SampleRate 48000 Num Channels 2
+
+Computing ./results/temp/test.mp4  (moovts-from-raw) hash: 
+File hash (SHA-1): 0713E55CC53CFBC7E6AA69F6C6559487FAB1504D
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "moovts-from-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/src.mp4:moovts=-1 -new ./results/temp/test2.mp4" ***
+IsoMedia import src.mp4 - track ID 1 - Audio (SR 48000 - 2 channels)
+
+Computing ./results/temp/test2.mp4  (moovts-from-mp4) hash: 
+File hash (SHA-1): 0713E55CC53CFBC7E6AA69F6C6559487FAB1504D
+Hash OK for ./results/temp/test2.mp4
+Computing ./results/temp/src_dashinit.mp4  (dash-sscale-init) hash: 
+File hash (SHA-1): FA5FCA7766DDBF4E718D2F21192F325F9BF17395
+Hash OK for ./results/temp/src_dashinit.mp4
+
+*** Subtest "dash-sscale": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 ./results/temp/src.mp4:sscale -bound -profile onDemand -out ./results/temp/test.mpd" ***
+[Dasher] No template assigned, using $File$$FS$_dash
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 0.981333 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.984 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.98667 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 3.98933 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 4.992 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 5.99467 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 6.99733 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 7.04 end 9
+[MPD] Generating MPD at time 2021-04-29T23:39:43.244Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+

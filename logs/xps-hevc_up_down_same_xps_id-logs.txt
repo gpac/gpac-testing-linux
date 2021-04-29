@@ -1,0 +1,38 @@
+*** xps-hevc_up_down_same_xps_id logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:47:36 ***
+
+
+*** Subtest "create-oob": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/hevc_up_down_same_xps_id.hvc -o ./results/temp/file_oob.mp4" ***
+
+Computing ./results/temp/file_oob.mp4  (create-oob) hash: 
+File hash (SHA-1): AF04C1301A8E0E276B1379191E07F31453F0214B
+Hash OK for ./results/temp/file_oob.mp4
+
+*** Subtest "create-ib": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/hevc_up_down_same_xps_id.hvc -o ./results/temp/file_ib.mp4:xps_inband=all" ***
+
+Computing ./results/temp/file_ib.mp4  (create-ib) hash: 
+File hash (SHA-1): 566404CDCEE8EA601194CF4EB362395F5FC70DF9
+Hash OK for ./results/temp/file_ib.mp4
+Computing ./results/temp/file.mpd  (dash-ib-mpd) hash: 
+File hash (SHA-1): 3B29BA17E7FE2984962F03339EC7785910525F3C
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/file_ib_dashinit.mp4  (dash-ib-seg) hash: 
+File hash (SHA-1): 49DD03C509FD0DB02E47075AF6A77C5C02CDC72F
+Hash OK for ./results/temp/file_ib_dashinit.mp4
+
+*** Subtest "dash-ib": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file_ib.mp4 -o ./results/temp/file.mpd:profile=onDemand" ***
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file_ib.mp4 inspect:deep:log=./results/temp/inspect.xml" ***
+
+Computing ./results/temp/inspect.xml  (inspect) hash: 
+File hash (SHA-1): B311D1A27CDEB419F21F156DF2E0762E570C6FF5
+Hash OK for ./results/temp/inspect.xml
+
+*** Subtest "decode": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/hevc_up_down_same_xps_id.hvc -o null:ext=yuv -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+
+*** Subtest "create-both": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/hevc_up_down_same_xps_id.hvc -o ./results/temp/file_both.mp4:xps_inband=both" ***
+
+Computing ./results/temp/file_both.mp4  (create-both) hash: 
+File hash (SHA-1): 686598E51D5EB607724A867563007F26DD13D33E
+Hash OK for ./results/temp/file_both.mp4

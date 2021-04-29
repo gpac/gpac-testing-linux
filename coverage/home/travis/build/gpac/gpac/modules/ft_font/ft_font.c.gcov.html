@@ -1,0 +1,916 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - /home/travis/build/gpac/gpac/modules/ft_font/ft_font.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../../../index.html">top level</a> - <a href="index.html">home/travis/build/gpac/gpac/modules/ft_font</a> - ft_font.c<span style="font-size: 80%;"> (source / <a href="ft_font.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">311</td>
+            <td class="headerCovTableEntry">377</td>
+            <td class="headerCovTableEntryMed">82.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryHi">95.5 %</td>
+          </tr>
+          <tr><td><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2012
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / FreeType font engine module
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/modules/font.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/list.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/utf.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;gpac/tools.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #if !defined(__GNUC__)
+<span class="lineNum">      33 </span>            : # if defined(_WIN32_WCE)
+<span class="lineNum">      34 </span>            : #  pragma comment(lib, &quot;freetype&quot;)
+<span class="lineNum">      35 </span>            : # elif defined (WIN32)
+<span class="lineNum">      36 </span>            : #  pragma comment(lib, &quot;freetype&quot;)
+<span class="lineNum">      37 </span>            : # endif
+<span class="lineNum">      38 </span>            : #endif
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : #include &lt;ft2build.h&gt;
+<span class="lineNum">      42 </span>            : #include FT_FREETYPE_H
+<span class="lineNum">      43 </span>            : #include FT_GLYPH_H
+<span class="lineNum">      44 </span>            : #include FT_OUTLINE_H
+<span class="lineNum">      45 </span>            : /*TrueType tables*/
+<span class="lineNum">      46 </span>            : #include FT_TRUETYPE_TABLES_H
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : typedef struct
+<span class="lineNum">      49 </span>            : {
+<span class="lineNum">      50 </span>            :         FT_Library library;
+<span class="lineNum">      51 </span>            :         FT_Face active_face;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :         GF_List *font_dirs;
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :         GF_List *loaded_fonts;
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :         /*default fonts*/
+<span class="lineNum">      58 </span>            :         char *font_serif, *font_sans, *font_fixed, *font_default;
+<span class="lineNum">      59 </span>            :         Bool cache_checked;
+<span class="lineNum">      60 </span>            : } FTBuilder;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : static const char * BEST_FIXED_FONTS[] = {
+<span class="lineNum">      63 </span>            :         &quot;Courier New&quot;,
+<span class="lineNum">      64 </span>            :         &quot;Courier&quot;,
+<span class="lineNum">      65 </span>            :         &quot;Monaco&quot;,
+<span class="lineNum">      66 </span>            :         &quot;Bitstream Vera Monospace&quot;,
+<span class="lineNum">      67 </span>            :         &quot;Droid Sans Mono&quot;,
+<span class="lineNum">      68 </span>            :         NULL
+<span class="lineNum">      69 </span>            : };
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            : static const char * BEST_SERIF_FONTS[] = {
+<span class="lineNum">      72 </span>            :         &quot;Times New Roman&quot;,
+<span class="lineNum">      73 </span>            :         &quot;Bitstream Vera&quot;,
+<span class="lineNum">      74 </span>            :         &quot;Times&quot;,
+<span class="lineNum">      75 </span>            :         &quot;Droid Serif&quot;,
+<span class="lineNum">      76 </span>            :         NULL
+<span class="lineNum">      77 </span>            : };
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : static const char * BEST_SANS_FONTS[] = {
+<span class="lineNum">      80 </span>            :         &quot;Arial&quot;,
+<span class="lineNum">      81 </span>            :         &quot;Tahoma&quot;,
+<span class="lineNum">      82 </span>            :         &quot;Verdana&quot;,
+<span class="lineNum">      83 </span>            :         &quot;Helvetica&quot;,
+<span class="lineNum">      84 </span>            :         &quot;Bitstream Vera Sans&quot;,
+<span class="lineNum">      85 </span>            :         &quot;Frutiger&quot;,
+<span class="lineNum">      86 </span>            :         &quot;Droid Sans&quot;,
+<span class="lineNum">      87 </span>            :         NULL
+<span class="lineNum">      88 </span>            : };
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : /**
+<a name="91"><span class="lineNum">      91 </span>            :  * Choose the best font in the list of fonts</a>
+<span class="lineNum">      92 </span>            :  */
+<span class="lineNum">      93 </span><span class="lineCov">      16180 : static Bool isBestFontFor(const char * listOfFonts[], const char * currentBestFont, const char * fontName) {</span>
+<span class="lineNum">      94 </span>            :         u32 i;
+<span class="lineNum">      95 </span>            :         assert( fontName );
+<span class="lineNum">      96 </span>            :         assert( listOfFonts );
+<span class="lineNum">      97 </span><span class="lineCov">     103451 :         for (i = 0 ; listOfFonts[i]; i++) {</span>
+<span class="lineNum">      98 </span>            :                 const char * best = listOfFonts[i];
+<span class="lineNum">      99 </span><span class="lineCov">      87271 :                 if (!stricmp(best, fontName))</span>
+<span class="lineNum">     100 </span>            :                         return GF_TRUE;
+<span class="lineNum">     101 </span><span class="lineCov">      87271 :                 if (currentBestFont &amp;&amp; !stricmp(best, currentBestFont))</span>
+<span class="lineNum">     102 </span>            :                         return GF_FALSE;
+<span class="lineNum">     103 </span>            :         }
+<span class="lineNum">     104 </span>            :         /* Nothing has been found, the font is the best if none has been choosen before */
+<span class="lineNum">     105 </span><span class="lineCov">      16180 :         return currentBestFont == NULL;</span>
+<a name="106"><span class="lineNum">     106 </span>            : }</a>
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineCov">       9304 : void setBestFont(const char * listOfFonts[], char ** currentBestFont, const char * fontName) {</span>
+<span class="lineNum">     109 </span><span class="lineCov">       9304 :         if (isBestFontFor(listOfFonts, *currentBestFont, fontName)) {</span>
+<span class="lineNum">     110 </span><span class="lineCov">       1855 :                 if (*currentBestFont)</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                         gf_free(*currentBestFont);</span>
+<span class="lineNum">     112 </span><span class="lineCov">       1855 :                 *currentBestFont = NULL;</span>
+<span class="lineNum">     113 </span>            :         }
+<span class="lineNum">     114 </span><span class="lineCov">       9304 :         if (! (*currentBestFont)) {</span>
+<span class="lineNum">     115 </span><span class="lineCov">       1855 :                 *currentBestFont = gf_strdup(fontName);</span>
+<span class="lineNum">     116 </span>            :         }
+<a name="117"><span class="lineNum">     117 </span><span class="lineCov">       9304 : }</span></a>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineCov">      12674 : static Bool ft_enum_fonts(void *cbck, char *file_name, char *file_path, GF_FileEnumInfo *file_info)</span>
+<span class="lineNum">     120 </span>            : {
+<span class="lineNum">     121 </span>            :         char *szfont;
+<span class="lineNum">     122 </span>            :         FT_Face face;
+<span class="lineNum">     123 </span>            :         u32 num_faces, i;
+<span class="lineNum">     124 </span>            :         GF_FontReader *dr = cbck;
+<span class="lineNum">     125 </span><span class="lineCov">      12674 :         FTBuilder *ftpriv = dr-&gt;udta;</span>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">      12674 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_PARSER, (&quot;[FreeType] Enumerating font %s (%s)\n&quot;, file_name, file_path));</span>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span><span class="lineCov">      12674 :         if (FT_New_Face(ftpriv-&gt;library, file_path, 0, &amp; face )) return 0;</span>
+<span class="lineNum">     130 </span><span class="lineCov">      12674 :         if (!face || !face-&gt;family_name) return 0;</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">      12674 :         num_faces = (u32) face-&gt;num_faces;</span>
+<span class="lineNum">     133 </span>            :         /*locate right font in collection if several*/
+<span class="lineNum">     134 </span><span class="lineCov">      12674 :         for (i=0; i&lt;num_faces; i++) {</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            :                 /*only scan scalable fonts*/
+<span class="lineNum">     137 </span><span class="lineCov">      12674 :                 if (face-&gt;face_flags &amp; FT_FACE_FLAG_SCALABLE) {</span>
+<span class="lineNum">     138 </span>            :                         Bool bold, italic;
+<span class="lineNum">     139 </span><span class="lineCov">      12674 :                         szfont = gf_malloc(sizeof(char)* (strlen(face-&gt;family_name)+100));</span>
+<span class="lineNum">     140 </span><span class="lineCov">      12674 :                         if (!szfont) continue;</span>
+<span class="lineNum">     141 </span><span class="lineCov">      12674 :                         strcpy(szfont, face-&gt;family_name);</span>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :                         /*remember first font found which looks like a alphabetical one*/
+<span class="lineNum">     144 </span><span class="lineCov">      12674 :                         if (!ftpriv-&gt;font_default) {</span>
+<span class="lineNum">     145 </span>            :                                 u32 gidx;
+<span class="lineNum">     146 </span><span class="lineCov">        641 :                                 FT_Select_Charmap(face, FT_ENCODING_UNICODE);</span>
+<span class="lineNum">     147 </span><span class="lineCov">        641 :                                 gidx = FT_Get_Char_Index(face, (u32) 'a');</span>
+<span class="lineNum">     148 </span><span class="lineCov">        641 :                                 if (gidx) gidx = FT_Get_Char_Index(face, (u32) 'z');</span>
+<span class="lineNum">     149 </span><span class="lineCov">        641 :                                 if (gidx) gidx = FT_Get_Char_Index(face, (u32) '1');</span>
+<span class="lineNum">     150 </span><span class="lineCov">        641 :                                 if (gidx) gidx = FT_Get_Char_Index(face, (u32) '@');</span>
+<span class="lineNum">     151 </span><span class="lineCov">        641 :                                 if (gidx) ftpriv-&gt;font_default = gf_strdup(szfont);</span>
+<span class="lineNum">     152 </span>            :                         }
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :                         bold = italic = 0;
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span><span class="lineCov">      12674 :                         if (face-&gt;style_name) {</span>
+<span class="lineNum">     157 </span><span class="lineCov">      12674 :                                 char *name = gf_strdup(face-&gt;style_name);</span>
+<span class="lineNum">     158 </span><span class="lineCov">      12674 :                                 strupr(name);</span>
+<span class="lineNum">     159 </span><span class="lineCov">      12674 :                                 if (strstr(name, &quot;BOLD&quot;)) bold = 1;</span>
+<span class="lineNum">     160 </span><span class="lineCov">      12674 :                                 if (strstr(name, &quot;ITALIC&quot;)) italic = 1;</span>
+<span class="lineNum">     161 </span>            :                                 /*if font is not regular style, append all styles blindly*/
+<span class="lineNum">     162 </span><span class="lineCov">      12674 :                                 if (!strstr(name, &quot;REGULAR&quot;)) {</span>
+<span class="lineNum">     163 </span>            :                                         strcat(szfont, &quot; &quot;);
+<span class="lineNum">     164 </span><span class="lineCov">      10314 :                                         strcat(szfont, face-&gt;style_name);</span>
+<span class="lineNum">     165 </span>            :                                 }
+<span class="lineNum">     166 </span><span class="lineCov">      12674 :                                 gf_free(name);</span>
+<span class="lineNum">     167 </span>            :                         } else {
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                                 if (face-&gt;style_flags &amp; FT_STYLE_FLAG_BOLD) bold = 1;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                                 if (face-&gt;style_flags &amp; FT_STYLE_FLAG_ITALIC) italic = 1;</span>
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :                                 if (bold) strcat(szfont, &quot; Bold&quot;);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :                                 if (italic) strcat(szfont, &quot; Italic&quot;);</span>
+<span class="lineNum">     173 </span>            :                         }
+<span class="lineNum">     174 </span><span class="lineCov">      12674 :                         gf_opts_set_key(&quot;FontCache&quot;, szfont, file_path);</span>
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            :                         /*try to assign default fixed fonts*/
+<span class="lineNum">     177 </span><span class="lineCov">      12674 :                         if (!bold &amp;&amp; !italic) {</span>
+<span class="lineNum">     178 </span><span class="lineCov">       4079 :                                 strcpy(szfont, face-&gt;family_name);</span>
+<span class="lineNum">     179 </span><span class="lineCov">       4079 :                                 strlwr(szfont);</span>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">       4079 :                                 if (face-&gt;face_flags &amp; FT_FACE_FLAG_FIXED_WIDTH) {</span>
+<span class="lineNum">     182 </span><span class="lineCov">       1146 :                                         setBestFont(BEST_FIXED_FONTS, &amp;(ftpriv-&gt;font_fixed), face-&gt;family_name);</span>
+<span class="lineNum">     183 </span>            :                                 }
+<span class="lineNum">     184 </span><span class="lineCov">       4079 :                                 setBestFont(BEST_SERIF_FONTS, &amp;(ftpriv-&gt;font_serif), face-&gt;family_name);</span>
+<span class="lineNum">     185 </span><span class="lineCov">       4079 :                                 setBestFont(BEST_SANS_FONTS, &amp;(ftpriv-&gt;font_sans), face-&gt;family_name);</span>
+<span class="lineNum">     186 </span>            :                         }
+<span class="lineNum">     187 </span><span class="lineCov">      12674 :                         gf_free(szfont);</span>
+<span class="lineNum">     188 </span>            :                 }
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineCov">      12674 :                 FT_Done_Face(face);</span>
+<span class="lineNum">     191 </span><span class="lineCov">      12674 :                 if (i+1==num_faces) return 0;</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :                 /*load next font in collection*/
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                 if (FT_New_Face(ftpriv-&gt;library, file_path, i+1, &amp; face )) return 0;</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :                 if (!face) return 0;</span>
+<span class="lineNum">     196 </span>            :         }
+<span class="lineNum">     197 </span>            :         return 0;
+<a name="198"><span class="lineNum">     198 </span>            : }</a>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineCov">       1719 : static Bool ft_enum_fonts_dir(void *cbck, char *file_name, char *file_path, GF_FileEnumInfo *file_info)</span>
+<span class="lineNum">     201 </span>            : {
+<span class="lineNum">     202 </span><span class="lineCov">       1719 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_PARSER, (&quot;[FreeType] Scanning directory %s (%s)\n&quot;, file_name, file_path));</span>
+<span class="lineNum">     203 </span><span class="lineCov">       1719 :         gf_enum_directory(file_path, 0, ft_enum_fonts, cbck, &quot;ttf;ttc&quot;);</span>
+<span class="lineNum">     204 </span><span class="lineCov">       1719 :         return (gf_enum_directory(file_path, 1, ft_enum_fonts_dir, cbck, NULL)==GF_OK) ? GF_FALSE : GF_TRUE;</span>
+<span class="lineNum">     205 </span>            : }
+<a name="206"><span class="lineNum">     206 </span>            : </a>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineCov">        641 : static void ft_rescan_fonts(GF_FontReader *dr)</span>
+<span class="lineNum">     209 </span>            : {
+<span class="lineNum">     210 </span>            :         u32 i, count;
+<span class="lineNum">     211 </span><span class="lineCov">        641 :         FTBuilder *ftpriv = (FTBuilder *)dr-&gt;udta;</span>
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span><span class="lineCov">        641 :         ftpriv-&gt;cache_checked = GF_TRUE;</span>
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineCov">        641 :         GF_LOG(GF_LOG_INFO, GF_LOG_PARSER, (&quot;[FreeType] Rescaning %d font directories\n&quot;, gf_list_count(ftpriv-&gt;font_dirs) ));</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineCov">        641 :         gf_opts_del_section(&quot;FontCache&quot;);</span>
+<span class="lineNum">     218 </span><span class="lineCov">        641 :         gf_opts_del_section(&quot;temp_freetype&quot;);</span>
+<span class="lineNum">     219 </span><span class="lineCov">        641 :         gf_opts_set_key(&quot;core&quot;, &quot;rescan-fonts&quot;, &quot;no&quot;);</span>
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span><span class="lineCov">        641 :         if (ftpriv-&gt;font_fixed) gf_free(ftpriv-&gt;font_fixed);</span>
+<span class="lineNum">     222 </span><span class="lineCov">        641 :         ftpriv-&gt;font_fixed = NULL;</span>
+<span class="lineNum">     223 </span><span class="lineCov">        641 :         if (ftpriv-&gt;font_sans) gf_free(ftpriv-&gt;font_sans);</span>
+<span class="lineNum">     224 </span><span class="lineCov">        641 :         ftpriv-&gt;font_sans = NULL;</span>
+<span class="lineNum">     225 </span><span class="lineCov">        641 :         if (ftpriv-&gt;font_serif) gf_free(ftpriv-&gt;font_serif);</span>
+<span class="lineNum">     226 </span><span class="lineCov">        641 :         ftpriv-&gt;font_serif = NULL;</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">        641 :         if (ftpriv-&gt;font_default) gf_free(ftpriv-&gt;font_default);</span>
+<span class="lineNum">     229 </span><span class="lineCov">        641 :         ftpriv-&gt;font_default = NULL;</span>
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineCov">        641 :         count = gf_list_count(ftpriv-&gt;font_dirs);</span>
+<span class="lineNum">     233 </span><span class="lineCov">       1282 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     234 </span><span class="lineCov">        641 :                 char *font_dir = gf_list_get(ftpriv-&gt;font_dirs, i);</span>
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineCov">        641 :                 if (gf_dir_exists(font_dir)) {</span>
+<span class="lineNum">     237 </span><span class="lineCov">        641 :                         gf_enum_directory(font_dir, 0, ft_enum_fonts, dr, &quot;ttf;ttc&quot;);</span>
+<span class="lineNum">     238 </span><span class="lineCov">        641 :                         gf_enum_directory(font_dir, 1, ft_enum_fonts_dir, dr, NULL);</span>
+<span class="lineNum">     239 </span>            :                 }
+<span class="lineNum">     240 </span>            :         }
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">        641 :         if (ftpriv-&gt;font_fixed) gf_free(ftpriv-&gt;font_fixed);</span>
+<span class="lineNum">     243 </span><span class="lineCov">        641 :         ftpriv-&gt;font_fixed = NULL;</span>
+<span class="lineNum">     244 </span><span class="lineCov">        641 :         if (ftpriv-&gt;font_sans) gf_free(ftpriv-&gt;font_sans);</span>
+<span class="lineNum">     245 </span><span class="lineCov">        641 :         ftpriv-&gt;font_sans = NULL;</span>
+<span class="lineNum">     246 </span><span class="lineCov">        641 :         if (ftpriv-&gt;font_serif) gf_free(ftpriv-&gt;font_serif);</span>
+<span class="lineNum">     247 </span><span class="lineCov">        641 :         ftpriv-&gt;font_serif = NULL;</span>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :         /* let's check we have fonts that match our default Bold/Italic/BoldItalic conventions*/
+<span class="lineNum">     250 </span><span class="lineCov">        641 :         count = gf_opts_get_key_count(&quot;FontCache&quot;);</span>
+<span class="lineNum">     251 </span><span class="lineCov">      13315 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     252 </span>            :                 const char *opt;
+<span class="lineNum">     253 </span>            :                 char fkey[GF_MAX_PATH];
+<span class="lineNum">     254 </span><span class="lineCov">      12674 :                 const char *key = gf_opts_get_key_name(&quot;FontCache&quot;, i);</span>
+<span class="lineNum">     255 </span><span class="lineCov">      12674 :                 opt = gf_opts_get_key(&quot;FontCache&quot;, key);</span>
+<span class="lineNum">     256 </span><span class="lineCov">      23056 :                 if (!strchr(opt, '/') &amp;&amp; !strchr(opt, '\\')) continue;</span>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span><span class="lineCov">      12674 :                 if (strstr(key, &quot;Bold&quot;)) continue;</span>
+<span class="lineNum">     259 </span><span class="lineCov">       6371 :                 if (strstr(key, &quot;Italic&quot;)) continue;</span>
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            :                 strcpy(fkey, key);
+<span class="lineNum">     262 </span>            :                 strcat(fkey, &quot; Italic&quot;);
+<span class="lineNum">     263 </span><span class="lineCov">       4079 :                 opt = gf_opts_get_key(&quot;FontCache&quot;, fkey);</span>
+<span class="lineNum">     264 </span><span class="lineCov">       4079 :                 if (!opt) continue;</span>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :                 strcpy(fkey, key);
+<span class="lineNum">     267 </span>            :                 strcat(fkey, &quot; Bold&quot;);
+<span class="lineNum">     268 </span><span class="lineCov">       2292 :                 opt = gf_opts_get_key(&quot;FontCache&quot;, fkey);</span>
+<span class="lineNum">     269 </span><span class="lineCov">       2292 :                 if (!opt) continue;</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :                 strcpy(fkey, key);
+<span class="lineNum">     272 </span>            :                 strcat(fkey, &quot; Bold Italic&quot;);
+<span class="lineNum">     273 </span><span class="lineCov">       2292 :                 opt = gf_opts_get_key(&quot;FontCache&quot;, fkey);</span>
+<span class="lineNum">     274 </span><span class="lineCov">       2292 :                 if (!opt) continue;</span>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :                 strcpy(fkey, key);
+<span class="lineNum">     277 </span><span class="lineCov">       2292 :                 strlwr(fkey);</span>
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            :                 /*this font is suited for our case*/
+<span class="lineNum">     280 </span><span class="lineCov">       2292 :                 if (isBestFontFor(BEST_FIXED_FONTS, ftpriv-&gt;font_fixed, key) || (!ftpriv-&gt;font_fixed &amp;&amp; (strstr(fkey, &quot;fixed&quot;) || strstr(fkey, &quot;mono&quot;)) ) ) {</span>
+<span class="lineNum">     281 </span><span class="lineCov">        573 :                         if (ftpriv-&gt;font_fixed) gf_free(ftpriv-&gt;font_fixed);</span>
+<span class="lineNum">     282 </span><span class="lineCov">        573 :                         ftpriv-&gt;font_fixed = gf_strdup(key);</span>
+<span class="lineNum">     283 </span>            :                 }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">       2292 :                 if (isBestFontFor(BEST_SANS_FONTS, ftpriv-&gt;font_sans, key) || (!ftpriv-&gt;font_sans &amp;&amp; strstr(fkey, &quot;sans&quot;)) ) {</span>
+<span class="lineNum">     286 </span><span class="lineCov">        573 :                         if (ftpriv-&gt;font_sans) gf_free(ftpriv-&gt;font_sans);</span>
+<span class="lineNum">     287 </span><span class="lineCov">        573 :                         ftpriv-&gt;font_sans = gf_strdup(key);</span>
+<span class="lineNum">     288 </span>            :                 }
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span><span class="lineCov">       2292 :                 if (isBestFontFor(BEST_SERIF_FONTS, ftpriv-&gt;font_serif, key) || (!ftpriv-&gt;font_serif &amp;&amp; strstr(fkey, &quot;serif&quot;)) ) {</span>
+<span class="lineNum">     291 </span><span class="lineCov">        573 :                         if (ftpriv-&gt;font_serif) gf_free(ftpriv-&gt;font_serif);</span>
+<span class="lineNum">     292 </span><span class="lineCov">        573 :                         ftpriv-&gt;font_serif = gf_strdup(key);</span>
+<span class="lineNum">     293 </span>            :                 }
+<span class="lineNum">     294 </span>            :         }
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineCov">        641 :         if (!ftpriv-&gt;font_serif) ftpriv-&gt;font_serif = gf_strdup(ftpriv-&gt;font_default ? ftpriv-&gt;font_default : &quot;&quot;);</span>
+<span class="lineNum">     297 </span><span class="lineCov">        641 :         if (!ftpriv-&gt;font_sans) ftpriv-&gt;font_sans = gf_strdup(ftpriv-&gt;font_default ? ftpriv-&gt;font_default : &quot;&quot;);</span>
+<span class="lineNum">     298 </span><span class="lineCov">        641 :         if (!ftpriv-&gt;font_fixed) ftpriv-&gt;font_fixed = gf_strdup(ftpriv-&gt;font_default ? ftpriv-&gt;font_default : &quot;&quot;);</span>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">        641 :         gf_opts_set_key(&quot;FontCache&quot;, &quot;FontFixed&quot;, ftpriv-&gt;font_fixed);</span>
+<span class="lineNum">     301 </span><span class="lineCov">        641 :         gf_opts_set_key(&quot;FontCache&quot;, &quot;FontSerif&quot;, ftpriv-&gt;font_serif);</span>
+<span class="lineNum">     302 </span><span class="lineCov">        641 :         gf_opts_set_key(&quot;FontCache&quot;, &quot;FontSans&quot;, ftpriv-&gt;font_sans);</span>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span><span class="lineCov">        641 :         GF_LOG(GF_LOG_INFO, GF_LOG_PARSER, (&quot;[FreeType] Font directories scanned\n&quot;));</span>
+<span class="lineNum">     305 </span><span class="lineCov">        641 : }</span>
+<span class="lineNum">     306 </span>            : 
+<a name="307"><span class="lineNum">     307 </span>            : </a>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineCov">        641 : static GF_Err ft_init_font_engine(GF_FontReader *dr)</span>
+<span class="lineNum">     310 </span>            : {
+<span class="lineNum">     311 </span>            :         const char *sOpt;
+<span class="lineNum">     312 </span>            :         u32 rescan = 0;
+<span class="lineNum">     313 </span>            :         GF_Err e;
+<span class="lineNum">     314 </span><span class="lineCov">        641 :         FTBuilder *ftpriv = (FTBuilder *)dr-&gt;udta;</span>
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :         /*inits freetype*/
+<span class="lineNum">     317 </span><span class="lineCov">        641 :         if (FT_Init_FreeType(&amp;ftpriv-&gt;library) ) {</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[FreeType] Cannot initialize FreeType\n&quot;));</span>
+<span class="lineNum">     319 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     320 </span>            :         }
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">        641 :         if (!gf_opts_get_key_count(&quot;FontCache&quot;))</span>
+<span class="lineNum">     323 </span>            :                 rescan = 1;
+<span class="lineNum">     324 </span>            :         else {
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :                 sOpt = gf_opts_get_key(&quot;core&quot;, &quot;rescan-fonts&quot;);</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :                 if (!sOpt || !strcmp(sOpt, &quot;yes&quot;) )</span>
+<span class="lineNum">     327 </span>            :                         rescan = 1;
+<span class="lineNum">     328 </span>            :         }
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 : rescan_font_dirs:</span>
+<span class="lineNum">     331 </span><span class="lineCov">        641 :         sOpt = gf_opts_get_key(&quot;core&quot;, &quot;font-dirs&quot;);</span>
+<span class="lineNum">     332 </span><span class="lineCov">        641 :         if (!sOpt) {</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[FreeType] No fonts directory indicated!&quot;));</span>
+<span class="lineNum">     334 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     335 </span>            :         }
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span><span class="lineCov">        641 :         while (sOpt) {</span>
+<span class="lineNum">     338 </span>            :                 char dir[GF_MAX_PATH];
+<span class="lineNum">     339 </span><span class="lineCov">        641 :                 char *sep = (char *) strchr(sOpt, ',');</span>
+<span class="lineNum">     340 </span><span class="lineCov">        641 :                 if (sep) sep[0] = 0;</span>
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span>            :                 strcpy(dir, sOpt);
+<span class="lineNum">     343 </span><span class="lineCov">        641 :                 while ( (dir[strlen(dir)-1] == '\n') || (dir[strlen(dir)-1] == '\r') )</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :                         dir[strlen(dir)-1] = 0;</span>
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span><span class="lineCov">        641 :                 if (dir[strlen(dir)-1] != GF_PATH_SEPARATOR) {</span>
+<span class="lineNum">     347 </span>            :                         char ext[2];
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                         ext[0] = GF_PATH_SEPARATOR;</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                         ext[1] = 0;</span>
+<span class="lineNum">     350 </span>            :                         strcat(dir, ext);
+<span class="lineNum">     351 </span>            :                 }
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span><span class="lineCov">        641 :                 gf_list_add(ftpriv-&gt;font_dirs, gf_strdup(dir) );</span>
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span><span class="lineCov">        641 :                 if (!sep) break;</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                 sep[0] = ',';</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                 sOpt = sep+1;</span>
+<span class="lineNum">     358 </span>            :         }
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 : rescan_fonts:</span>
+<span class="lineNum">     361 </span><span class="lineCov">        641 :         if (rescan)</span>
+<span class="lineNum">     362 </span><span class="lineCov">        641 :                 ft_rescan_fonts(dr);</span>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineCov">        641 :         if (!ftpriv-&gt;font_serif) {</span>
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :                 sOpt = gf_opts_get_key(&quot;FontCache&quot;, &quot;FontSerif&quot;);</span>
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :                 ftpriv-&gt;font_serif = gf_strdup(sOpt ? sOpt : &quot;&quot;);</span>
+<span class="lineNum">     367 </span>            :         }
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span><span class="lineCov">        641 :         if (!ftpriv-&gt;font_sans) {</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                 sOpt = gf_opts_get_key(&quot;FontCache&quot;, &quot;FontSans&quot;);</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :                 ftpriv-&gt;font_sans = gf_strdup(sOpt ? sOpt : &quot;&quot;);</span>
+<span class="lineNum">     372 </span>            :         }
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span><span class="lineCov">        641 :         if (!ftpriv-&gt;font_fixed) {</span>
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :                 sOpt = gf_opts_get_key(&quot;FontCache&quot;, &quot;FontFixed&quot;);</span>
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :                 ftpriv-&gt;font_fixed = gf_strdup(sOpt ? sOpt : &quot;&quot;);</span>
+<span class="lineNum">     377 </span>            :         }
+<span class="lineNum">     378 </span><span class="lineCov">        641 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_PARSER, (&quot;[FreeType] Init OK - %d font directory (first %s)\n&quot;, gf_list_count(ftpriv-&gt;font_dirs), gf_list_get(ftpriv-&gt;font_dirs, 0) ));</span>
+<span class="lineNum">     379 </span>            : 
+<span class="lineNum">     380 </span><span class="lineCov">        641 :         e = dr-&gt;set_font(dr, ftpriv-&gt;font_serif, 0);</span>
+<span class="lineNum">     381 </span><span class="lineCov">        641 :         if (!e) e = dr-&gt;set_font(dr, ftpriv-&gt;font_sans, 0);</span>
+<span class="lineNum">     382 </span><span class="lineCov">        641 :         if (!e) e = dr-&gt;set_font(dr, ftpriv-&gt;font_fixed, 0);</span>
+<span class="lineNum">     383 </span><span class="lineCov">        641 :         if (!e) return GF_OK;</span>
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :         if (rescan==3)</span>
+<span class="lineNum">     386 </span>            :                 return e;
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :         if (ftpriv-&gt;font_serif) gf_free(ftpriv-&gt;font_serif);</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :         ftpriv-&gt;font_serif = NULL;</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :         if (ftpriv-&gt;font_sans) gf_free(ftpriv-&gt;font_sans);</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :         ftpriv-&gt;font_sans = NULL;</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :         if (ftpriv-&gt;font_fixed) gf_free(ftpriv-&gt;font_fixed);</span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :         ftpriv-&gt;font_fixed = NULL;</span>
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span>            :         //error and we rescanned font dirs, restore default fonts
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :         if (e &amp;&amp; ftpriv-&gt;cache_checked)</span>
+<span class="lineNum">     397 </span>            :                 rescan = 2;
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :         if (!rescan) {</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :                 sOpt = gf_opts_get_key(&quot;core&quot;, &quot;font-dirs&quot;);</span>
+<span class="lineNum">     401 </span>            :                 rescan = 2;
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :                 if (sOpt) {</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_PARSER, (&quot;[FreeType] Default fonts not valid, rescanning font directories %s\n&quot;, sOpt));</span>
+<span class="lineNum">     404 </span>            :                         goto rescan_fonts;
+<span class="lineNum">     405 </span>            :                 }
+<span class="lineNum">     406 </span>            :         }
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :         if (rescan==2) {</span>
+<span class="lineNum">     408 </span>            :                 void gf_get_default_font_dir(char szPath[GF_MAX_PATH]);
+<span class="lineNum">     409 </span>            :                 
+<span class="lineNum">     410 </span>            :                 char szPath[GF_MAX_PATH];
+<span class="lineNum">     411 </span>            :                 //check if font directory is default one, if not reset and rescan
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :                 gf_get_default_font_dir(szPath);</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :                 sOpt = gf_opts_get_key(&quot;core&quot;, &quot;font-dirs&quot;);</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :                 if (sOpt &amp;&amp; !strcmp(sOpt, szPath))</span>
+<span class="lineNum">     415 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_PARSER, (&quot;[FreeType] No fonts found in %s, restoring default directories %s and rescanning\n&quot;, sOpt, szPath));</span>
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :                 gf_opts_set_key(&quot;core&quot;, &quot;font-dirs&quot;, szPath);</span>
+<span class="lineNum">     419 </span>            :                 rescan = 3;
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :                 while (gf_list_count(ftpriv-&gt;font_dirs)) {</span>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :                         gf_free(gf_list_pop_back(ftpriv-&gt;font_dirs));</span>
+<span class="lineNum">     422 </span>            :                 }
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :                 goto rescan_font_dirs;</span>
+<span class="lineNum">     424 </span>            :         }
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            :         return GF_OK;
+<a name="427"><span class="lineNum">     427 </span>            : }</a>
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span><span class="lineCov">        640 : static GF_Err ft_shutdown_font_engine(GF_FontReader *dr)</span>
+<span class="lineNum">     430 </span>            : {
+<span class="lineNum">     431 </span><span class="lineCov">        640 :         FTBuilder *ftpriv = (FTBuilder *)dr-&gt;udta;</span>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineCov">        640 :         ftpriv-&gt;active_face = NULL;</span>
+<span class="lineNum">     434 </span>            :         /*reset loaded fonts*/
+<span class="lineNum">     435 </span><span class="lineCov">       1958 :         while (gf_list_count(ftpriv-&gt;loaded_fonts)) {</span>
+<span class="lineNum">     436 </span><span class="lineCov">        678 :                 FT_Face face = gf_list_pop_front(ftpriv-&gt;loaded_fonts);</span>
+<span class="lineNum">     437 </span><span class="lineCov">        678 :                 FT_Done_Face(face);</span>
+<span class="lineNum">     438 </span>            :         }
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            :         /*exit FT*/
+<span class="lineNum">     441 </span><span class="lineCov">        640 :         if (ftpriv-&gt;library) FT_Done_FreeType(ftpriv-&gt;library);</span>
+<span class="lineNum">     442 </span><span class="lineCov">        640 :         ftpriv-&gt;library = NULL;</span>
+<span class="lineNum">     443 </span><span class="lineCov">        640 :         return GF_OK;</span>
+<span class="lineNum">     444 </span>            : }
+<a name="445"><span class="lineNum">     445 </span>            : </a>
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span><span class="lineCov">       5465 : static Bool ft_check_face(FT_Face font, const char *fontName, u32 styles)</span>
+<span class="lineNum">     448 </span>            : {
+<span class="lineNum">     449 </span>            :         u32 ft_style, loc_styles;
+<span class="lineNum">     450 </span>            :         char *name;
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span><span class="lineCov">       5465 :         if (fontName &amp;&amp; stricmp(font-&gt;family_name, fontName)) return 0;</span>
+<span class="lineNum">     453 </span>            :         ft_style = 0;
+<span class="lineNum">     454 </span><span class="lineCov">       5434 :         if (font-&gt;style_name) {</span>
+<span class="lineNum">     455 </span><span class="lineCov">       5434 :                 name = gf_strdup(font-&gt;style_name);</span>
+<span class="lineNum">     456 </span><span class="lineCov">       5434 :                 strupr(name);</span>
+<span class="lineNum">     457 </span><span class="lineCov">       5434 :                 if (strstr(name, &quot;BOLD&quot;)) ft_style |= GF_FONT_WEIGHT_BOLD;</span>
+<span class="lineNum">     458 </span><span class="lineCov">       5434 :                 if (strstr(name, &quot;ITALIC&quot;)) ft_style |= GF_FONT_ITALIC;</span>
+<span class="lineNum">     459 </span><span class="lineCov">       5434 :                 gf_free(name);</span>
+<span class="lineNum">     460 </span>            :         } else {
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :                 if (font-&gt;style_flags &amp; FT_STYLE_FLAG_BOLD) ft_style |= GF_FONT_WEIGHT_BOLD;</span>
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :                 if (font-&gt;style_flags &amp; FT_STYLE_FLAG_ITALIC) ft_style |= GF_FONT_ITALIC;</span>
+<span class="lineNum">     463 </span>            :         }
+<span class="lineNum">     464 </span><span class="lineCov">       5434 :         name = gf_strdup(font-&gt;family_name);</span>
+<span class="lineNum">     465 </span><span class="lineCov">       5434 :         strupr(name);</span>
+<span class="lineNum">     466 </span><span class="lineCov">       5434 :         if (strstr(name, &quot;BOLD&quot;)) ft_style |= GF_FONT_WEIGHT_BOLD;</span>
+<span class="lineNum">     467 </span><span class="lineCov">       5434 :         if (strstr(name, &quot;ITALIC&quot;)) ft_style |= GF_FONT_ITALIC;</span>
+<span class="lineNum">     468 </span><span class="lineCov">       5434 :         gf_free(name);</span>
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span><span class="lineCov">       5434 :         loc_styles = styles &amp; GF_FONT_WEIGHT_MASK;</span>
+<span class="lineNum">     471 </span><span class="lineCov">       5434 :         if (loc_styles&gt;=GF_FONT_WEIGHT_BOLD)</span>
+<span class="lineNum">     472 </span><span class="lineCov">         72 :                 styles = (styles &amp; 0x00000007) | GF_FONT_WEIGHT_BOLD;</span>
+<span class="lineNum">     473 </span>            :         else
+<span class="lineNum">     474 </span><span class="lineCov">       5362 :                 styles = (styles &amp; 0x00000007);</span>
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span><span class="lineCov">       5434 :         if (ft_style==styles)</span>
+<span class="lineNum">     477 </span>            :                 return 1;
+<span class="lineNum">     478 </span><span class="lineCov">         96 :         return 0;</span>
+<a name="479"><span class="lineNum">     479 </span>            : }</a>
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span><span class="lineCov">       6048 : static FT_Face ft_font_in_cache(FTBuilder *ft, const char *fontName, u32 styles)</span>
+<span class="lineNum">     482 </span>            : {
+<span class="lineNum">     483 </span><span class="lineCov">       6048 :         u32 i=0;</span>
+<span class="lineNum">     484 </span>            :         FT_Face font;
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span><span class="lineCov">       6175 :         while ((font = gf_list_enum(ft-&gt;loaded_fonts, &amp;i))) {</span>
+<span class="lineNum">     487 </span><span class="lineCov">       5465 :                 if (ft_check_face(font, fontName, styles)) return font;</span>
+<span class="lineNum">     488 </span>            :         }
+<span class="lineNum">     489 </span>            :         return NULL;
+<span class="lineNum">     490 </span>            : }
+<span class="lineNum">     491 </span>            : 
+<a name="492"><span class="lineNum">     492 </span>            : </a>
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span><span class="lineCov">       7200 : static GF_Err ft_set_font(GF_FontReader *dr, const char *OrigFontName, u32 styles)</span>
+<span class="lineNum">     495 </span>            : {
+<span class="lineNum">     496 </span>            :         char *fname;
+<span class="lineNum">     497 </span>            :         char *fontName;
+<span class="lineNum">     498 </span>            :         const char *opt;
+<span class="lineNum">     499 </span>            :         Bool is_def_font = GF_FALSE;
+<span class="lineNum">     500 </span><span class="lineCov">       7200 :         FTBuilder *ftpriv = (FTBuilder *)dr-&gt;udta;</span>
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            :         fontName = (char *) OrigFontName;
+<span class="lineNum">     503 </span><span class="lineCov">       7200 :         ftpriv-&gt;active_face = NULL;</span>
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span><span class="lineCov">       7200 :         opt = gf_opts_get_key(&quot;temp_freetype&quot;, OrigFontName);</span>
+<span class="lineNum">     506 </span><span class="lineCov">       7200 :         if (opt) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span><span class="lineCov">       6048 :         if (!fontName || !strlen(fontName) || !stricmp(fontName, &quot;SERIF&quot;)) {</span>
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :                 fontName = ftpriv-&gt;font_serif;</span>
+<span class="lineNum">     510 </span>            :                 is_def_font = GF_TRUE;
+<span class="lineNum">     511 </span><span class="lineNoCov">          0 :                 OrigFontName = &quot;&quot;;</span>
+<span class="lineNum">     512 </span>            :         }
+<span class="lineNum">     513 </span><span class="lineCov">       6048 :         else if (!stricmp(fontName, &quot;SANS&quot;) || !stricmp(fontName, &quot;sans-serif&quot;)) {</span>
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :                 fontName = ftpriv-&gt;font_sans;</span>
+<span class="lineNum">     515 </span>            :                 is_def_font = GF_TRUE;
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :                 OrigFontName = &quot;SANS&quot;;</span>
+<span class="lineNum">     517 </span>            :         }
+<span class="lineNum">     518 </span><span class="lineCov">       6048 :         else if (!stricmp(fontName, &quot;TYPEWRITER&quot;) || !stricmp(fontName, &quot;monospace&quot;)) {</span>
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 :                 fontName = ftpriv-&gt;font_fixed;</span>
+<span class="lineNum">     520 </span>            :                 is_def_font = GF_TRUE;
+<span class="lineNum">     521 </span>            :                 OrigFontName = &quot;TYPEWRITER&quot;;
+<span class="lineNum">     522 </span>            :         }
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            :         /*first look in loaded fonts*/
+<span class="lineNum">     525 </span><span class="lineCov">       6048 :         ftpriv-&gt;active_face = ft_font_in_cache(ftpriv, fontName, styles);</span>
+<span class="lineNum">     526 </span><span class="lineCov">       6048 :         if (ftpriv-&gt;active_face) return GF_OK;</span>
+<span class="lineNum">     527 </span>            : 
+<span class="lineNum">     528 </span>            :         //we likely have a problem with the font cache, rebuild if
+<span class="lineNum">     529 </span><span class="lineCov">        710 :         if (!fontName || !strlen(fontName)) {</span>
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :                 if (is_def_font &amp;&amp; !ftpriv-&gt;cache_checked) {</span>
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_PARSER, (&quot;[FreeType] No default font set, rescanning fonts\n&quot;));</span>
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :                         ft_rescan_fonts(dr);</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :                         return ft_set_font(dr, OrigFontName, styles);</span>
+<span class="lineNum">     534 </span>            :                 }
+<span class="lineNum">     535 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     536 </span>            :         }
+<span class="lineNum">     537 </span><span class="lineCov">        710 :         fname = gf_malloc(sizeof(char) * (strlen(fontName) + 50));</span>
+<span class="lineNum">     538 </span>            : 
+<span class="lineNum">     539 </span>            :         {
+<span class="lineNum">     540 </span><span class="lineCov">        710 :                 int checkStyles = (styles &amp; GF_FONT_WEIGHT_BOLD) | (styles &amp; GF_FONT_ITALIC);</span>
+<span class="lineNum">     541 </span>            : checkFont:
+<span class="lineNum">     542 </span>            :                 strcpy(fname, fontName);
+<span class="lineNum">     543 </span><span class="lineCov">        758 :                 if (styles &amp; GF_FONT_WEIGHT_BOLD &amp; checkStyles) strcat(fname, &quot; Bold&quot;);</span>
+<span class="lineNum">     544 </span><span class="lineCov">        758 :                 if (styles &amp; GF_FONT_ITALIC &amp; checkStyles) strcat(fname, &quot; Italic&quot;);</span>
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span><span class="lineCov">        758 :                 opt = gf_opts_get_key(&quot;FontCache&quot;, fname);</span>
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span><span class="lineCov">        758 :                 if (opt) {</span>
+<span class="lineNum">     549 </span>            :                         FT_Face face;
+<span class="lineNum">     550 </span><span class="lineCov">        679 :                         gf_free(fname);</span>
+<span class="lineNum">     551 </span><span class="lineCov">        679 :                         if (FT_New_Face(ftpriv-&gt;library, opt, 0, &amp; face )) return GF_IO_ERR;</span>
+<span class="lineNum">     552 </span><span class="lineCov">        679 :                         if (!face) return GF_IO_ERR;</span>
+<span class="lineNum">     553 </span><span class="lineCov">        679 :                         gf_list_add(ftpriv-&gt;loaded_fonts, face);</span>
+<span class="lineNum">     554 </span><span class="lineCov">        679 :                         ftpriv-&gt;active_face = face;</span>
+<span class="lineNum">     555 </span><span class="lineCov">        679 :                         return GF_OK;</span>
+<span class="lineNum">     556 </span>            :                 }
+<span class="lineNum">     557 </span><span class="lineCov">         79 :                 if (checkStyles) {</span>
+<span class="lineNum">     558 </span>            :                         /* If we tried font + bold + italic -&gt; we will try font + [bold | italic]
+<span class="lineNum">     559 </span>            :                            If we tried font + [bold | italic] -&gt; we try font
+<span class="lineNum">     560 </span>            :                              */
+<span class="lineNum">     561 </span><span class="lineCov">         48 :                         if (checkStyles == (GF_FONT_WEIGHT_BOLD | GF_FONT_ITALIC))</span>
+<span class="lineNum">     562 </span>            :                                 checkStyles = GF_FONT_WEIGHT_BOLD;
+<span class="lineNum">     563 </span><span class="lineCov">         39 :                         else if (checkStyles == GF_FONT_WEIGHT_BOLD &amp;&amp; (styles &amp; GF_FONT_ITALIC))</span>
+<span class="lineNum">     564 </span>            :                                 checkStyles = GF_FONT_ITALIC;
+<span class="lineNum">     565 </span><span class="lineCov">         30 :                         else if (checkStyles == GF_FONT_WEIGHT_BOLD || checkStyles == GF_FONT_ITALIC)</span>
+<span class="lineNum">     566 </span>            :                                 checkStyles = 0;
+<span class="lineNum">     567 </span>            :                         goto checkFont;
+<span class="lineNum">     568 </span>            :                 }
+<span class="lineNum">     569 </span>            :         }
+<span class="lineNum">     570 </span>            : 
+<span class="lineNum">     571 </span><span class="lineCov">         31 :         GF_LOG(GF_LOG_INFO, GF_LOG_PARSER, (&quot;[FreeType] Font %s (%s) not found\n&quot;, fontName, fname));</span>
+<span class="lineNum">     572 </span><span class="lineCov">         31 :         gf_free(fname);</span>
+<span class="lineNum">     573 </span><span class="lineCov">         31 :         gf_opts_set_key(&quot;temp_freetype&quot;, OrigFontName, &quot;not found&quot;);</span>
+<span class="lineNum">     574 </span><span class="lineCov">         31 :         return GF_NOT_SUPPORTED;</span>
+<a name="575"><span class="lineNum">     575 </span>            : }</a>
+<span class="lineNum">     576 </span>            : 
+<span class="lineNum">     577 </span><span class="lineCov">        692 : static GF_Err ft_get_font_info(GF_FontReader *dr, char **font_name, u32 *em_size, s32 *ascent, s32 *descent, s32 *underline, s32 *line_spacing, s32 *max_advance_h, s32 *max_advance_v)</span>
+<span class="lineNum">     578 </span>            : {
+<span class="lineNum">     579 </span><span class="lineCov">        692 :         FTBuilder *ftpriv = (FTBuilder *)dr-&gt;udta;</span>
+<span class="lineNum">     580 </span><span class="lineCov">        692 :         if (!ftpriv-&gt;active_face) return GF_BAD_PARAM;</span>
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span><span class="lineCov">        692 :         *em_size = ftpriv-&gt;active_face-&gt;units_per_EM;</span>
+<span class="lineNum">     583 </span><span class="lineCov">        692 :         *ascent = ftpriv-&gt;active_face-&gt;ascender;</span>
+<span class="lineNum">     584 </span><span class="lineCov">        692 :         *descent = ftpriv-&gt;active_face-&gt;descender;</span>
+<span class="lineNum">     585 </span><span class="lineCov">        692 :         *underline = ftpriv-&gt;active_face-&gt;underline_position;</span>
+<span class="lineNum">     586 </span><span class="lineCov">        692 :         *line_spacing = ftpriv-&gt;active_face-&gt;height;</span>
+<span class="lineNum">     587 </span><span class="lineCov">        692 :         *font_name = gf_strdup(ftpriv-&gt;active_face-&gt;family_name);</span>
+<span class="lineNum">     588 </span><span class="lineCov">        692 :         *max_advance_h = ftpriv-&gt;active_face-&gt;max_advance_width;</span>
+<span class="lineNum">     589 </span><span class="lineCov">        692 :         *max_advance_v = ftpriv-&gt;active_face-&gt;max_advance_height;</span>
+<span class="lineNum">     590 </span><span class="lineCov">        692 :         return GF_OK;</span>
+<span class="lineNum">     591 </span>            : }
+<a name="592"><span class="lineNum">     592 </span>            : </a>
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span><span class="lineCov">       3999 : static GF_Err ft_get_glyphs(GF_FontReader *dr, const char *utf_string, u32 *glyph_buffer, u32 *io_glyph_buffer_size, const char *xml_lang, Bool *is_rtl)</span>
+<span class="lineNum">     595 </span>            : {
+<span class="lineNum">     596 </span>            :         size_t _len;
+<span class="lineNum">     597 </span>            :         u32 len;
+<span class="lineNum">     598 </span>            :         u32 i;
+<span class="lineNum">     599 </span>            :         u16 *conv;
+<span class="lineNum">     600 </span><span class="lineCov">       3999 :         char *utf8 = (char*) utf_string;</span>
+<span class="lineNum">     601 </span><span class="lineCov">       3999 :         FTBuilder *ftpriv = (FTBuilder *)dr-&gt;udta;</span>
+<span class="lineNum">     602 </span>            : 
+<span class="lineNum">     603 </span><span class="lineCov">       3999 :         if (!ftpriv-&gt;active_face) return GF_BAD_PARAM;</span>
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span>            :         /*TODO: glyph substitution / ligature */
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span><span class="lineCov">       3999 :         len = utf_string ? (u32) strlen(utf_string) : 0;</span>
+<span class="lineNum">     608 </span><span class="lineCov">       3999 :         if (!len) {</span>
+<span class="lineNum">     609 </span><span class="lineNoCov">          0 :                 *io_glyph_buffer_size = 0;</span>
+<span class="lineNum">     610 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     611 </span>            :         }
+<span class="lineNum">     612 </span><span class="lineCov">       3999 :         if (*io_glyph_buffer_size &lt; len+1) {</span>
+<span class="lineNum">     613 </span><span class="lineCov">        169 :                 *io_glyph_buffer_size = len+1;</span>
+<span class="lineNum">     614 </span><span class="lineCov">        169 :                 return GF_BUFFER_TOO_SMALL;</span>
+<span class="lineNum">     615 </span>            :         }
+<span class="lineNum">     616 </span><span class="lineCov">       3830 :         _len = gf_utf8_mbstowcs((u16*) glyph_buffer, *io_glyph_buffer_size, (const char **) &amp;utf8);</span>
+<span class="lineNum">     617 </span><span class="lineCov">       3830 :         if (_len==(size_t)-1) return GF_IO_ERR;</span>
+<span class="lineNum">     618 </span><span class="lineCov">       3829 :         len = (u32) _len;</span>
+<span class="lineNum">     619 </span><span class="lineCov">       3829 :         if (utf8) return GF_IO_ERR;</span>
+<span class="lineNum">     620 </span>            : 
+<span class="lineNum">     621 </span>            :         /*perform bidi relayout*/
+<span class="lineNum">     622 </span>            :         conv = (u16*) glyph_buffer;
+<span class="lineNum">     623 </span><span class="lineCov">       3829 :         *is_rtl = gf_utf8_reorder_bidi(conv, len);</span>
+<span class="lineNum">     624 </span>            :         /*move 16bit buffer to 32bit*/
+<span class="lineNum">     625 </span><span class="lineCov">     279936 :         for (i=len; i&gt;0; i--) {</span>
+<span class="lineNum">     626 </span><span class="lineCov">     272278 :                 glyph_buffer[i-1] = (u32) conv[i-1];</span>
+<span class="lineNum">     627 </span>            :         }
+<span class="lineNum">     628 </span><span class="lineCov">       3829 :         *io_glyph_buffer_size = len;</span>
+<span class="lineNum">     629 </span><span class="lineCov">       3829 :         return GF_OK;</span>
+<span class="lineNum">     630 </span>            : }
+<span class="lineNum">     631 </span>            : 
+<span class="lineNum">     632 </span>            : 
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            : 
+<span class="lineNum">     635 </span>            : 
+<span class="lineNum">     636 </span>            : typedef struct
+<span class="lineNum">     637 </span>            : {
+<span class="lineNum">     638 </span>            :         FTBuilder *ftpriv;
+<span class="lineNum">     639 </span>            :         GF_Path *path;
+<span class="lineNum">     640 </span>            :         s32 last_x, last_y;
+<span class="lineNum">     641 </span>            : } ft_outliner;
+<span class="lineNum">     642 </span>            : 
+<span class="lineNum">     643 </span>            : #if defined(GPAC_CONFIG_IOS) || defined(GPAC_CONFIG_ANDROID)
+<span class="lineNum">     644 </span>            : #define FTCST
+<span class="lineNum">     645 </span>            : #else
+<span class="lineNum">     646 </span>            : #define FTCST const
+<span class="lineNum">     647 </span>            : #endif
+<span class="lineNum">     648 </span>            : 
+<a name="649"><span class="lineNum">     649 </span>            : </a>
+<span class="lineNum">     650 </span>            : 
+<span class="lineNum">     651 </span><span class="lineCov">       6992 : static int ft_move_to(FTCST FT_Vector *to, void *user)</span>
+<span class="lineNum">     652 </span>            : {
+<span class="lineNum">     653 </span>            :         ft_outliner *ftol = (ft_outliner *)user;
+<span class="lineNum">     654 </span><span class="lineCov">       6992 :         gf_path_add_move_to(ftol-&gt;path, INT2FIX(to-&gt;x), INT2FIX(to-&gt;y) );</span>
+<span class="lineNum">     655 </span><span class="lineCov">       6992 :         ftol-&gt;last_x = (s32) to-&gt;x;</span>
+<span class="lineNum">     656 </span><span class="lineCov">       6992 :         ftol-&gt;last_y = (s32) to-&gt;y;</span>
+<span class="lineNum">     657 </span><span class="lineCov">       6992 :         return 0;</span>
+<a name="658"><span class="lineNum">     658 </span>            : }</a>
+<span class="lineNum">     659 </span>            : 
+<span class="lineNum">     660 </span><span class="lineCov">      50817 : static int ft_line_to(FTCST FT_Vector *to, void *user)</span>
+<span class="lineNum">     661 </span>            : {
+<span class="lineNum">     662 </span>            :         ft_outliner *ftol = (ft_outliner *)user;
+<span class="lineNum">     663 </span><span class="lineCov">      50817 :         if ( (ftol-&gt;last_x == to-&gt;x) &amp;&amp; (ftol-&gt;last_y == to-&gt;y)) {</span>
+<span class="lineNum">     664 </span><span class="lineCov">       3851 :                 gf_path_close(ftol-&gt;path);</span>
+<span class="lineNum">     665 </span>            :         } else {
+<span class="lineNum">     666 </span><span class="lineCov">      46966 :                 gf_path_add_line_to(ftol-&gt;path, INT2FIX(to-&gt;x), INT2FIX(to-&gt;y) );</span>
+<span class="lineNum">     667 </span>            :         }
+<span class="lineNum">     668 </span><span class="lineCov">      50817 :         return 0;</span>
+<a name="669"><span class="lineNum">     669 </span>            : }</a>
+<span class="lineNum">     670 </span>            : 
+<span class="lineNum">     671 </span><span class="lineCov">      83032 : static int ft_conic_to(FTCST FT_Vector * control, FTCST FT_Vector *to, void *user)</span>
+<span class="lineNum">     672 </span>            : {
+<span class="lineNum">     673 </span>            :         ft_outliner *ftol = (ft_outliner *)user;
+<span class="lineNum">     674 </span><span class="lineCov">      83032 :         gf_path_add_quadratic_to(ftol-&gt;path, INT2FIX(control-&gt;x), INT2FIX(control-&gt;y), INT2FIX(to-&gt;x), INT2FIX(to-&gt;y) );</span>
+<span class="lineNum">     675 </span><span class="lineCov">      83032 :         if ( (ftol-&gt;last_x == to-&gt;x) &amp;&amp; (ftol-&gt;last_y == to-&gt;y)) gf_path_close(ftol-&gt;path);</span>
+<span class="lineNum">     676 </span><span class="lineCov">      83032 :         return 0;</span>
+<a name="677"><span class="lineNum">     677 </span>            : }</a>
+<span class="lineNum">     678 </span>            : 
+<span class="lineNum">     679 </span><span class="lineNoCov">          0 : static int ft_cubic_to(FTCST FT_Vector *c1, FTCST FT_Vector *c2, FTCST FT_Vector *to, void *user)</span>
+<span class="lineNum">     680 </span>            : {
+<span class="lineNum">     681 </span>            :         ft_outliner *ftol = (ft_outliner *)user;
+<span class="lineNum">     682 </span><span class="lineNoCov">          0 :         gf_path_add_cubic_to(ftol-&gt;path, INT2FIX(c1-&gt;x), INT2FIX(c1-&gt;y), INT2FIX(c2-&gt;x), INT2FIX(c2-&gt;y), INT2FIX(to-&gt;x), INT2FIX(to-&gt;y) );</span>
+<span class="lineNum">     683 </span><span class="lineNoCov">          0 :         if ( (ftol-&gt;last_x == to-&gt;x) &amp;&amp; (ftol-&gt;last_y == to-&gt;y)) gf_path_close(ftol-&gt;path);</span>
+<span class="lineNum">     684 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">     685 </span>            : }
+<a name="686"><span class="lineNum">     686 </span>            : </a>
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span><span class="lineCov">       5047 : static GF_Glyph *ft_load_glyph(GF_FontReader *dr, u32 glyph_name)</span>
+<span class="lineNum">     689 </span>            : {
+<span class="lineNum">     690 </span>            :         GF_Glyph *glyph;
+<span class="lineNum">     691 </span>            :         u32 glyph_idx;
+<span class="lineNum">     692 </span>            :         FT_BBox bbox;
+<span class="lineNum">     693 </span>            :         FT_OutlineGlyph outline;
+<span class="lineNum">     694 </span>            :         ft_outliner outl;
+<span class="lineNum">     695 </span>            :         FT_Outline_Funcs ft_outl_funcs;
+<span class="lineNum">     696 </span>            : 
+<span class="lineNum">     697 </span><span class="lineCov">       5047 :         FTBuilder *ftpriv = (FTBuilder *)dr-&gt;udta;</span>
+<span class="lineNum">     698 </span><span class="lineCov">       5047 :         if (!ftpriv-&gt;active_face || !glyph_name) return NULL;</span>
+<span class="lineNum">     699 </span>            : 
+<span class="lineNum">     700 </span><span class="lineCov">       5047 :         FT_Select_Charmap(ftpriv-&gt;active_face, FT_ENCODING_UNICODE);</span>
+<span class="lineNum">     701 </span>            : 
+<span class="lineNum">     702 </span><span class="lineCov">       5047 :         glyph_idx = FT_Get_Char_Index(ftpriv-&gt;active_face, glyph_name);</span>
+<span class="lineNum">     703 </span>            :         /*missing glyph*/
+<span class="lineNum">     704 </span><span class="lineCov">       5047 :         if (!glyph_idx) {</span>
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_PARSER, (&quot;[FreeType] Glyph not found for char %d in font %s (style %s)\n&quot;, glyph_name, ftpriv-&gt;active_face-&gt;family_name, ftpriv-&gt;active_face-&gt;style_name));</span>
+<span class="lineNum">     706 </span>            :                 return NULL;
+<span class="lineNum">     707 </span>            :         }
+<span class="lineNum">     708 </span>            : 
+<span class="lineNum">     709 </span>            :         /*work in design units*/
+<span class="lineNum">     710 </span><span class="lineCov">       5047 :         FT_Load_Glyph(ftpriv-&gt;active_face, glyph_idx, FT_LOAD_NO_SCALE | FT_LOAD_NO_BITMAP);</span>
+<span class="lineNum">     711 </span>            : 
+<span class="lineNum">     712 </span><span class="lineCov">       5047 :         FT_Get_Glyph(ftpriv-&gt;active_face-&gt;glyph, (FT_Glyph*)&amp;outline);</span>
+<span class="lineNum">     713 </span>            : 
+<span class="lineNum">     714 </span>            :         /*oops not vectorial...*/
+<span class="lineNum">     715 </span><span class="lineCov">       5047 :         if (outline-&gt;root.format==FT_GLYPH_FORMAT_BITMAP) return NULL;</span>
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span>            : 
+<span class="lineNum">     718 </span><span class="lineCov">       5047 :         GF_SAFEALLOC(glyph, GF_Glyph);</span>
+<span class="lineNum">     719 </span><span class="lineCov">       5047 :         if (!glyph) return NULL;</span>
+<span class="lineNum">     720 </span><span class="lineCov">       5047 :         GF_SAFEALLOC(glyph-&gt;path, GF_Path);</span>
+<span class="lineNum">     721 </span><span class="lineCov">       5047 :         if (!glyph-&gt;path) {</span>
+<span class="lineNum">     722 </span><span class="lineNoCov">          0 :                 gf_free(glyph);</span>
+<span class="lineNum">     723 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     724 </span>            :         }
+<span class="lineNum">     725 </span>            :         /*setup outliner*/
+<span class="lineNum">     726 </span><span class="lineCov">       5047 :         ft_outl_funcs.shift = 0;</span>
+<span class="lineNum">     727 </span><span class="lineCov">       5047 :         ft_outl_funcs.delta = 0;</span>
+<span class="lineNum">     728 </span><span class="lineCov">       5047 :         ft_outl_funcs.move_to = ft_move_to;</span>
+<span class="lineNum">     729 </span><span class="lineCov">       5047 :         ft_outl_funcs.line_to = ft_line_to;</span>
+<span class="lineNum">     730 </span><span class="lineCov">       5047 :         ft_outl_funcs.conic_to = ft_conic_to;</span>
+<span class="lineNum">     731 </span><span class="lineCov">       5047 :         ft_outl_funcs.cubic_to = ft_cubic_to;</span>
+<span class="lineNum">     732 </span><span class="lineCov">       5047 :         outl.path = glyph-&gt;path;</span>
+<span class="lineNum">     733 </span><span class="lineCov">       5047 :         outl.ftpriv = ftpriv;</span>
+<span class="lineNum">     734 </span>            : 
+<span class="lineNum">     735 </span>            :         /*FreeType is marvelous and gives back the right advance on space char !!!*/
+<span class="lineNum">     736 </span><span class="lineCov">       5047 :         FT_Outline_Decompose(&amp;outline-&gt;outline, &amp;ft_outl_funcs, &amp;outl);</span>
+<span class="lineNum">     737 </span>            : 
+<span class="lineNum">     738 </span><span class="lineCov">       5047 :         FT_Glyph_Get_CBox((FT_Glyph) outline, ft_glyph_bbox_unscaled, &amp;bbox);</span>
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span><span class="lineCov">       5047 :         glyph-&gt;ID = glyph_name;</span>
+<span class="lineNum">     741 </span><span class="lineCov">       5047 :         glyph-&gt;utf_name = glyph_name;</span>
+<span class="lineNum">     742 </span><span class="lineCov">       5047 :         glyph-&gt;horiz_advance = (s32) ftpriv-&gt;active_face-&gt;glyph-&gt;metrics.horiAdvance;</span>
+<span class="lineNum">     743 </span><span class="lineCov">       5047 :         glyph-&gt;vert_advance = (s32) ftpriv-&gt;active_face-&gt;glyph-&gt;metrics.vertAdvance;</span>
+<span class="lineNum">     744 </span>            :         /*
+<span class="lineNum">     745 </span>            :                 glyph-&gt;x = bbox.xMin;
+<span class="lineNum">     746 </span>            :                 glyph-&gt;y = bbox.yMax;
+<span class="lineNum">     747 </span>            :         */
+<span class="lineNum">     748 </span><span class="lineCov">       5047 :         glyph-&gt;width = (u32) ftpriv-&gt;active_face-&gt;glyph-&gt;metrics.width;</span>
+<span class="lineNum">     749 </span><span class="lineCov">       5047 :         glyph-&gt;height = (u32) ftpriv-&gt;active_face-&gt;glyph-&gt;metrics.height;</span>
+<span class="lineNum">     750 </span><span class="lineCov">       5047 :         FT_Done_Glyph((FT_Glyph) outline);</span>
+<span class="lineNum">     751 </span><span class="lineCov">       5047 :         return glyph;</span>
+<span class="lineNum">     752 </span>            : }
+<a name="753"><span class="lineNum">     753 </span>            : </a>
+<span class="lineNum">     754 </span>            : 
+<span class="lineNum">     755 </span><span class="lineCov">        648 : static GF_FontReader *ft_load()</span>
+<span class="lineNum">     756 </span>            : {
+<span class="lineNum">     757 </span>            :         GF_FontReader *dr;
+<span class="lineNum">     758 </span>            :         FTBuilder *ftpriv;
+<span class="lineNum">     759 </span><span class="lineCov">        648 :         dr = gf_malloc(sizeof(GF_FontReader));</span>
+<span class="lineNum">     760 </span>            :         memset(dr, 0, sizeof(GF_FontReader));
+<span class="lineNum">     761 </span><span class="lineCov">        648 :         GF_REGISTER_MODULE_INTERFACE(dr, GF_FONT_READER_INTERFACE, &quot;FreeType Font Reader&quot;, &quot;gpac distribution&quot;);</span>
+<span class="lineNum">     762 </span>            : 
+<span class="lineNum">     763 </span><span class="lineCov">        648 :         ftpriv = gf_malloc(sizeof(FTBuilder));</span>
+<span class="lineNum">     764 </span>            :         memset(ftpriv, 0, sizeof(FTBuilder));
+<span class="lineNum">     765 </span>            : 
+<span class="lineNum">     766 </span><span class="lineCov">        648 :         ftpriv-&gt;font_dirs = gf_list_new();</span>
+<span class="lineNum">     767 </span>            : 
+<span class="lineNum">     768 </span><span class="lineCov">        648 :         ftpriv-&gt;loaded_fonts = gf_list_new();</span>
+<span class="lineNum">     769 </span>            : 
+<span class="lineNum">     770 </span><span class="lineCov">        648 :         dr-&gt;udta = ftpriv;</span>
+<span class="lineNum">     771 </span>            : 
+<span class="lineNum">     772 </span>            : 
+<span class="lineNum">     773 </span><span class="lineCov">        648 :         dr-&gt;init_font_engine = ft_init_font_engine;</span>
+<span class="lineNum">     774 </span><span class="lineCov">        648 :         dr-&gt;shutdown_font_engine = ft_shutdown_font_engine;</span>
+<span class="lineNum">     775 </span><span class="lineCov">        648 :         dr-&gt;set_font = ft_set_font;</span>
+<span class="lineNum">     776 </span><span class="lineCov">        648 :         dr-&gt;get_font_info = ft_get_font_info;</span>
+<span class="lineNum">     777 </span><span class="lineCov">        648 :         dr-&gt;get_glyphs = ft_get_glyphs;</span>
+<span class="lineNum">     778 </span><span class="lineCov">        648 :         dr-&gt;load_glyph = ft_load_glyph;</span>
+<span class="lineNum">     779 </span><span class="lineCov">        648 :         return dr;</span>
+<span class="lineNum">     780 </span>            : }
+<a name="781"><span class="lineNum">     781 </span>            : </a>
+<span class="lineNum">     782 </span>            : 
+<span class="lineNum">     783 </span><span class="lineCov">        647 : static void ft_delete(GF_BaseInterface *ifce)</span>
+<span class="lineNum">     784 </span>            : {
+<span class="lineNum">     785 </span>            :         GF_FontReader *dr = (GF_FontReader *) ifce;
+<span class="lineNum">     786 </span><span class="lineCov">        647 :         FTBuilder *ftpriv = dr-&gt;udta;</span>
+<span class="lineNum">     787 </span>            : 
+<span class="lineNum">     788 </span><span class="lineCov">       1934 :         while (gf_list_count(ftpriv-&gt;font_dirs)) {</span>
+<span class="lineNum">     789 </span><span class="lineCov">        640 :                 char *font = gf_list_pop_back(ftpriv-&gt;font_dirs);</span>
+<span class="lineNum">     790 </span><span class="lineCov">        640 :                 if (font)</span>
+<span class="lineNum">     791 </span><span class="lineCov">        640 :                         gf_free(font);</span>
+<span class="lineNum">     792 </span>            :         }
+<span class="lineNum">     793 </span>            : 
+<span class="lineNum">     794 </span><span class="lineCov">        647 :         gf_list_del(ftpriv-&gt;font_dirs);</span>
+<span class="lineNum">     795 </span>            : 
+<span class="lineNum">     796 </span><span class="lineCov">        647 :         if (ftpriv-&gt;font_serif) gf_free(ftpriv-&gt;font_serif);</span>
+<span class="lineNum">     797 </span><span class="lineCov">        647 :         if (ftpriv-&gt;font_sans) gf_free(ftpriv-&gt;font_sans);</span>
+<span class="lineNum">     798 </span><span class="lineCov">        647 :         if (ftpriv-&gt;font_fixed) gf_free(ftpriv-&gt;font_fixed);</span>
+<span class="lineNum">     799 </span><span class="lineCov">        647 :         if (ftpriv-&gt;font_default) gf_free(ftpriv-&gt;font_default);</span>
+<span class="lineNum">     800 </span>            :         assert(!gf_list_count(ftpriv-&gt;loaded_fonts) );
+<span class="lineNum">     801 </span>            : 
+<span class="lineNum">     802 </span><span class="lineCov">        647 :         gf_list_del(ftpriv-&gt;loaded_fonts);</span>
+<span class="lineNum">     803 </span>            : 
+<span class="lineNum">     804 </span><span class="lineCov">        647 :         gf_free(dr-&gt;udta);</span>
+<span class="lineNum">     805 </span><span class="lineCov">        647 :         gf_free(dr);</span>
+<span class="lineNum">     806 </span><span class="lineCov">        647 : }</span>
+<span class="lineNum">     807 </span>            : 
+<span class="lineNum">     808 </span>            : #ifndef GPAC_STANDALONE_RENDER_2D
+<a name="809"><span class="lineNum">     809 </span>            : </a>
+<span class="lineNum">     810 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">     811 </span><span class="lineCov">       1290 : const u32 *QueryInterfaces()</span>
+<span class="lineNum">     812 </span>            : {
+<span class="lineNum">     813 </span>            :         static u32 si [] = {
+<span class="lineNum">     814 </span>            :                 GF_FONT_READER_INTERFACE,
+<span class="lineNum">     815 </span>            :                 0
+<span class="lineNum">     816 </span>            :         };
+<span class="lineNum">     817 </span><span class="lineCov">       1290 :         return si;</span>
+<span class="lineNum">     818 </span>            : }
+<a name="819"><span class="lineNum">     819 </span>            : </a>
+<span class="lineNum">     820 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">     821 </span><span class="lineCov">        648 : GF_BaseInterface *LoadInterface(u32 InterfaceType)</span>
+<span class="lineNum">     822 </span>            : {
+<span class="lineNum">     823 </span><span class="lineCov">        648 :         if (InterfaceType == GF_FONT_READER_INTERFACE) return (GF_BaseInterface *)ft_load();</span>
+<span class="lineNum">     824 </span>            :         return NULL;
+<span class="lineNum">     825 </span>            : }
+<a name="826"><span class="lineNum">     826 </span>            : </a>
+<span class="lineNum">     827 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">     828 </span><span class="lineCov">        647 : void ShutdownInterface(GF_BaseInterface *ifce)</span>
+<span class="lineNum">     829 </span>            : {
+<span class="lineNum">     830 </span><span class="lineCov">        647 :         switch (ifce-&gt;InterfaceType) {</span>
+<span class="lineNum">     831 </span><span class="lineCov">        647 :         case GF_FONT_READER_INTERFACE:</span>
+<span class="lineNum">     832 </span><span class="lineCov">        647 :                 ft_delete(ifce);</span>
+<span class="lineNum">     833 </span><span class="lineCov">        647 :                 break;</span>
+<span class="lineNum">     834 </span>            :         }
+<span class="lineNum">     835 </span><span class="lineCov">        647 : }</span>
+<span class="lineNum">     836 </span>            : 
+<span class="lineNum">     837 </span>            : GPAC_MODULE_STATIC_DECLARATION( ftfont )
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span>            : #endif
+<span class="lineNum">     840 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

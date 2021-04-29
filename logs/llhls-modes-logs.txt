@@ -1,0 +1,53 @@
+*** llhls-modes logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:37:03 ***
+
+
+*** Subtest "gen-br": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_30s_I25_baseline_640x360_192kbps.264:#ClampDur=4 -o ./results/temp/live_br.m3u8:segdur=2:cdur=0.2:dmode=dynamic:llhls=br" ***
+
+Computing ./results/temp/live_br_1.m3u8  (manifest-br) hash: 
+File hash (SHA-1): 49ACBC726124B081B9DC10D341AB53046F98D20B
+Hash OK for ./results/temp/live_br_1.m3u8
+
+*** Subtest "inspect-br": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/live_br.m3u8 inspect:deep:dur=1:log=./results/temp/inspect-br.txt" ***
+
+Computing ./results/temp/inspect-br.txt  (inspect-br) hash: 
+File hash (SHA-1): 9A10F91D8D8246DA6C3818BA05E50FF52E2E802A
+Hash OK for ./results/temp/inspect-br.txt
+
+*** Subtest "gen-sf": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_30s_I25_baseline_640x360_192kbps.264:#ClampDur=4 -o ./results/temp/live_sf.m3u8:segdur=2:cdur=0.2:dmode=dynamic:llhls=sf" ***
+
+Computing ./results/temp/live_sf_1.m3u8  (manifest-sf) hash: 
+File hash (SHA-1): 83492C366DE23D80A86C9CD9FF12F205D7FBC6CD
+Hash OK for ./results/temp/live_sf_1.m3u8
+
+*** Subtest "inspect-sf": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/live_br.m3u8 inspect:deep:dur=1:log=./results/temp/inspect-sf.txt" ***
+
+Computing ./results/temp/inspect-sf.txt  (inspect-sf) hash: 
+File hash (SHA-1): 9A10F91D8D8246DA6C3818BA05E50FF52E2E802A
+Hash OK for ./results/temp/inspect-sf.txt
+Computing ./results/temp/live_brsf_1.m3u8  (chilpl1-brsf) hash: 
+File hash (SHA-1): 49ACBC726124B081B9DC10D341AB53046F98D20B
+Hash OK for ./results/temp/live_brsf_1.m3u8
+Computing ./results/temp/live_brsf_1_IF.m3u8  (chilpl2-brsf) hash: 
+File hash (SHA-1): 83492C366DE23D80A86C9CD9FF12F205D7FBC6CD
+Hash OK for ./results/temp/live_brsf_1_IF.m3u8
+
+*** Subtest "gen-brsf": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_30s_I25_baseline_640x360_192kbps.264:#ClampDur=4 -o ./results/temp/live_brsf.m3u8:segdur=2:cdur=0.2:dmode=dynamic:llhls=brsf" ***
+
+Computing ./results/temp/live_brsf.m3u8  (manifest1-brsf) hash: 
+File hash (SHA-1): C344CD0B995213E27E1BB5357F91C96637345BB5
+Hash fail, ref hash ./hash_refs/llhls-modes-manifest1-brsf.hash was A49D20378EB6096CFE2201EBC2F68B4603231026
+Computing ./results/temp/live_brsf_IF.m3u8  (manifest2-brsf) hash: 
+File hash (SHA-1): 1FB3C9B96C7E4FBF4F8AFA9D1D230EDB9A40384C
+Hash fail, ref hash ./hash_refs/llhls-modes-manifest2-brsf.hash was 4FA0D1D23FE6F44CF6076066C97E4ED12F69ED0B
+
+*** Subtest "inspect-brsf-br": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/live_brsf.m3u8 inspect:deep:dur=1:log=./results/temp/inspect-brsf-br.txt" ***
+
+Computing ./results/temp/inspect-brsf-br.txt  (inspect-brsf-br) hash: 
+File hash (SHA-1): 9A10F91D8D8246DA6C3818BA05E50FF52E2E802A
+Hash OK for ./results/temp/inspect-brsf-br.txt
+
+*** Subtest "inspect-brsf-sf": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/live_brsf_IF.m3u8 inspect:deep:dur=1:log=./results/temp/inspect-brsf-sf.txt" ***
+
+Computing ./results/temp/inspect-brsf-sf.txt  (inspect-brsf-sf) hash: 
+File hash (SHA-1): 9A10F91D8D8246DA6C3818BA05E50FF52E2E802A
+Hash OK for ./results/temp/inspect-brsf-sf.txt

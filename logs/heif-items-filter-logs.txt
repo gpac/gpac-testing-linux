@@ -1,0 +1,52 @@
+*** heif-items-filter logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:44 ***
+
+
+*** Subtest "create-heif": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add-image ./media/auxiliary_files/counter.hvc:time=-1:@@reframer:saps=1 -ab heic -new ./results/temp/file.heic" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2546 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+Adding sample at time 0.000 as item 1
+Adding sample at time 1.000 as item 2
+Adding sample at time 2.000 as item 3
+Adding sample at time 3.000 as item 4
+Adding sample at time 4.000 as item 5
+Adding sample at time 5.000 as item 6
+Adding sample at time 6.000 as item 7
+Adding sample at time 7.000 as item 8
+Adding sample at time 8.000 as item 9
+Adding sample at time 9.000 as item 10
+Adding sample at time 10.000 as item 11
+
+Computing ./results/temp/file.heic  (create-heif) hash: 
+File hash (SHA-1): DD69C4476E4E76DFF0B61B1B1E7CDEA80323B10F
+Hash OK for ./results/temp/file.heic
+
+*** Subtest "dump-heif-items": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.heic -o ./results/temp/item_$ItemID$.hvc:clone" ***
+
+Computing ./results/temp/item_10.hvc  (dump-item10) hash: 
+File hash (SHA-1): C3AEBF401C2467FEB5DB6D209DA7826F2EE8B046
+Hash fail, ref hash ./hash_refs/heif-items-filter-dump-item10.hash was B69F10CF664C70A9304D0620BF030D61FD109044
+Computing ./results/temp/item_1.hvc  (dump-item1) hash: 
+File hash (SHA-1): 66AF6F72C238747452871D257D8B10143EEFF244
+Hash fail, ref hash ./hash_refs/heif-items-filter-dump-item1.hash was 2785B477F61C5163A67429991298AAAB49D9B29E
+
+*** Subtest "dump-mp4box": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dump-item 1:path=./results/temp/dump.hvc ./results/temp/file.heic" ***
+
+Computing ./results/temp/dump.hvc  (dump-mp4box) hash: 
+File hash (SHA-1): D058EF88063232972C4BD44A54A8F21BC773F88B
+Hash OK for ./results/temp/dump.hvc
+
+*** Subtest "dump-heif-items-itt": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.heic:itt -o ./results/temp/itt_$num$.hvc:clone:split" ***
+
+Computing ./results/temp/itt_10.hvc  (dump-itt10) hash: 
+File hash (SHA-1): C3AEBF401C2467FEB5DB6D209DA7826F2EE8B046
+Hash fail, ref hash ./hash_refs/heif-items-filter-dump-itt10.hash was B69F10CF664C70A9304D0620BF030D61FD109044
+Computing ./results/temp/itt_1.hvc  (dump-itt1) hash: 
+File hash (SHA-1): 66AF6F72C238747452871D257D8B10143EEFF244
+Hash fail, ref hash ./hash_refs/heif-items-filter-dump-itt1.hash was 2785B477F61C5163A67429991298AAAB49D9B29E
+
+*** Subtest "dump-heif-track": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.heic:itt -o ./results/temp/itt_track.hvc" ***
+
+Computing ./results/temp/itt_track.hvc  (dump-itt_track) hash: 
+File hash (SHA-1): B62299DF10931E91DC68FE534CFE50E80987EC30
+Hash fail, ref hash ./hash_refs/heif-items-filter-dump-itt_track.hash was 92E7263A37EFBBFF0E70110EB25E94CC24FEB9C3

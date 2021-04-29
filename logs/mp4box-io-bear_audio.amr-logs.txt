@@ -1,0 +1,71 @@
+*** mp4box-io-bear_audio.amr logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:47 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/bear_audio.amr" ***
+Import probing results for ./external_media/import/bear_audio.amr:
+File has 1 tracks
+- Track 1 type: Audio - Codec AMR Audio
+	SampleRate 8000 - 1 channels
+
+For more details, use `gpac -i bear_audio.amr inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/bear_audio.amr.mp4  (add) hash: 
+File hash (SHA-1): AB410C00FA2A332656E209D3BD8235A40B7EB856
+Hash OK for ./results/temp/bear_audio.amr.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/bear_audio.amr -new ./results/temp/bear_audio.amr.mp4" ***
+Track Importing AMR - SampleRate 8000 Num Channels 1
+
+Computing ./results/temp/bear_audio.amr.1.tmp  (diso) hash: 
+File hash (SHA-1): C431DB340DED3977BA5CB9167E1F04DABEB99D1B
+Hash OK for ./results/temp/bear_audio.amr.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/bear_audio.amr.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:29.940
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 8000
+Media Duration 00:00:29.940 
+Media Info: Language "Undetermined (und)" - Type "soun:samr" - 1497 samples
+	3GPP AMR stream - Sample Rate 8000 - 1 channel(s) 16 bps
+	RFC6381 Codec Parameters: samr
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 160 / 8000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/bear_audio.amr.mp4 -out ./results/temp/bear_audio.amr.1.tmp" ***
+
+Computing ./results/temp/bear_audio.amr.2.tmp  (dts) hash: 
+File hash (SHA-1): F47C7544FE1C424F9F9CBFE2803D0795DBFDE551
+Hash OK for ./results/temp/bear_audio.amr.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/bear_audio.amr.mp4 -out ./results/temp/bear_audio.amr.2.tmp" ***
+
+Computing ./results/temp/bear_audio.amr.mp4.hint  (hint) hash: 
+File hash (SHA-1): 0C29119F2ABE901B5890E200756A05A46557D97B
+Hash OK for ./results/temp/bear_audio.amr.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/bear_audio.amr.mp4 inspect:nobr:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 585C1753B9A782E1A7DF815FD1B3210F714B5218
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/bear_audio.amr.mp4 -out ./results/temp/bear_audio.amr.mp4.hint" ***
+Hinting track ID 1 - Type "samr:samr" (AMR) - BW 13 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/bear_audio.amr.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/bear_audio.amr.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 82DAC8E5924893AC22B003CDFC345DFF68EF612F
+Hash OK for ./results/temp/bear_audio.amr.mp4.hint

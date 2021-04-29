@@ -1,0 +1,281 @@
+*** gpac-h-props logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:19 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -h props" ***
+Built-in property types
+sint : signed 32 bit integer
+uint : unsigned 32 bit integer
+lsint : signed 64 bit integer
+luint : unsigned 32 bit integer
+bool : boolean
+frac : 32/32 bit fraction
+lfrac : 64/64 bit fraction
+flt : 32 bit float number
+dbl : 64 bit float number
+v2di : 2D 32-bit integer vector
+v2d : 2D 64-bit float vector
+v3di : 3D 32-bit integer vector
+v4di : 4D 32-bit integer vector
+str : UTF-8 string
+mem : data buffer
+cstr : const UTF-8 string
+cmem : const data buffer
+ptr : 32 or 64 bit pointer
+strl : UTF-8 string list
+uintl : unsigned 32 bit integer list
+sintl : signed 32 bit integer list
+v2il : 2D 32-bit integer vector list
+4cc : Four character code
+4ccl : four-character codes list
+pfmt : raw pixel format
+afmt : raw audio format
+cprm : color primaries, string or int value from ISO/IEC 23091-2
+ctfc : color transfer characteristics, string or int value from ISO/IEC 23091-2
+cmxc : color matrix coefficients, string or int value from ISO/IEC 23091-2
+
+
+Built-in properties for PIDs and packets listed as Name (4CC type FLAGS): description
+FLAGS can be D (droppable - see GSF mux filter help), P (packet property)
+ID               (PIDI uint ):  Stream ID
+ESID             (ESID uint D):  MPEG-4 ESID of pid
+ItemID           (ITID uint ):  ID of image item in HEIF, same value as ID
+ItemNumber       (ITIX uint ):  Number (1-based) of image item in HEIF, in order of declaration in file
+TrackNumber      (PIDX uint ):  Number (1-based) of track in order of declaration in file
+ServiceID        (PSID uint D):  ID of parent service
+ClockID          (CKID uint D):  ID of clock reference pid
+DependencyID     (DPID uint ):  ID of layer dependended on
+SubLayer         (DPSL bool ):  pid is a sublayer of the stream depended on rather than an enhancement layer
+PlaybackMode     (PBKM uint D):  Playback mode supported:
+	* 0: no time control
+	* 1: play/pause/seek,speed=1
+	* 2: play/pause/seek,speed>=0
+	* 3: play/pause/seek, reverse playback
+Scalable         (SCAL bool ):  Scalable stream
+TileBase         (SABT bool ):  Tile base stream
+TileID           (PTID uint ):  ID of the tile for hvt1/hvt2 PIDs
+Language         (LANG cstr ):  Language code: ISO639 2/3 character code or RFC 4646
+ServiceName      (SNAM str D):   Name of parent service
+ServiceProvider  (SPRO str D):   Provider of parent service
+StreamType       (PMST uint ):  Media stream type
+StreamSubtype    (PSST 4cc D):   Media subtype 4CC (auxiliary, pic sequence, etc ..)
+ISOMSubtype      (PIST 4cc D):   ISOM media subtype 4CC (avc1 avc2...)
+OrigStreamType   (POST uint ):  Original stream type before encryption
+CodecID          (POTI uint ):  Codec ID (MPEG-4 OTI or ISOBMFF 4CC)
+InitialObjectDescriptor (PIOD bool ):  Indicates if pid is declared in the IOD for MPEG-4
+Unframed         (PFRM bool ):  Indicates that the media data is not framed, i.e. each packet is not a complete AU/frame or is not in internal format (eg annexB for avc/hevc, adts for aac)
+UnframedAU       (PFRF bool ):  Indicates that the unframed media still has correct AU boundaries: one packet is one full AU, but the packet format might not be the internal one (eg annexB for avc/hevc, adts for aac)
+LATM             (LATM bool ):  Indicates media is unframed AAC in LATM format
+Duration         (PDUR lfrac ): Media duration
+NumFrames        (NFRM uint D):  Number of frames in the stream
+ConstantFrameSize (CFRS uint ):  Size of the frames for constant frame size streams
+TimeshiftDepth   (PTSD frac D):  Depth of the timeshift buffer
+TimeshiftTime    (PTST dbl D):   Time in the timeshift buffer in seconds - changes are signaled through pid info (no reconfigure)
+TimeshiftState   (PTSS uint D):  State of timeshift buffer: 0 is OK, 1 is underflow, 2 is overflow - changes are signaled through pid info (no reconfigure)
+Timescale        (TIMS uint ):  Media timescale (a timestamp delta of N is N/timescale seconds)
+ProfileLevel     (PRPL uint D):  MPEG-4 profile and level
+DecoderConfig    (DCFG mem ):   Decoder configuration data
+DecoderConfigEnhancement (ECFG mem ):   Decoder configuration data of the enhancement layer(s). Also used by 3GPP/Apple text streams to give the full sample description table used in SDP.
+DecoderConfigIndex (ICFG uint ):  1-based index of decoder config for ISO base media files
+SampleRate       (AUSR uint ):  Audio sample rate
+SamplesPerFrame  (FRMS uint ):  Number of audio sample in one coded frame
+NumChannels      (CHNB uint ):  Number of audio channels
+BPS              (ABPS uint ):  Number of bits per sample in compressed source
+ChannelLayout    (CHLO luint ): Channel Layout mask
+AudioFormat      (AFMT afmt ):  Audio sample format
+	Names: none,u8,s16,s24,s32,flt,dbl,u8p,s16p,s24p,s32p,fltp,dblp
+	File extensions: pc8|pcm|s24|s32|flt|dbl|pc8p|pcmp|s24p|s32p|fltp|dblp
+AudioPlaybackSpeed (ASPD dbl D):   Audio playback speed, only used for audio output reconfiguration
+Delay            (MDLY lsint ): Delay of presentation compared to composition timestamps, in media timescale. Positive value imply holding (delaying) the stream. Negative value imply skipping the beginning of stream
+CTSShift         (MDTS uint ):  CTS offset to apply in case of negative ctts
+SkipPriming      (ASKP bool ):  Indicate audio priming is not to be removed when initializing decoding
+Width            (WIDT uint ):  Visual Width (video / text / graphics)
+Height           (HEIG uint ):  Visual Height (video / text / graphics)
+PixelFormat      (PFMT pfmt ):  Pixel format
+	Names: none,yuv420,yvu420,yuv420_10,yuv422,yuv422_10,yuv444,yuv444_10,uyvy,vyuy,yuyv,yvyu,uyvl,vyul,yuyl,yvyl,nv12,nv21,nv1l,nv2l,yuva,yuvd,yuv444a,yuv444p,yuv444ap,yuv444p_10,grey,algr,gral,rgb4,rgb5,rgb6,rgba,argb,bgra,abgr,rgb,bgr,xrgb,rgbx,xbgr,bgrx,rgbd,rgbds,rgbs,rgbas
+	File extensions: yuv|yvu|yuvl|yuv2|yp2l|yuv4|yp4l|uyvy|vyuy|yuyv|yvyu|uyvl|vyul|yuyl|yvyl|nv12|nv21|nv1l|nv2l|yuva|yuvd|yp4a|yv4p|y4ap|y4lp|grey|algr|gral|rgb4|rgb5|rgb6|rgba|argb|bgra|abgr|rgb|bgr|xrgb|rgbx|xbgr|bgrx|rgbd|rgbds|rgbs|rgbas
+PixelFormatWrapped (PFMW pfmt ):  Underlying pixel format of video stream if pixel format is external GL texture
+	Names: none,yuv420,yvu420,yuv420_10,yuv422,yuv422_10,yuv444,yuv444_10,uyvy,vyuy,yuyv,yvyu,uyvl,vyul,yuyl,yvyl,nv12,nv21,nv1l,nv2l,yuva,yuvd,yuv444a,yuv444p,yuv444ap,yuv444p_10,grey,algr,gral,rgb4,rgb5,rgb6,rgba,argb,bgra,abgr,rgb,bgr,xrgb,rgbx,xbgr,bgrx,rgbd,rgbds,rgbs,rgbas
+	File extensions: yuv|yvu|yuvl|yuv2|yp2l|yuv4|yp4l|uyvy|vyuy|yuyv|yvyu|uyvl|vyul|yuyl|yvyl|nv12|nv21|nv1l|nv2l|yuva|yuvd|yp4a|yv4p|y4ap|y4lp|grey|algr|gral|rgb4|rgb5|rgb6|rgba|argb|bgra|abgr|rgb|bgr|xrgb|rgbx|xbgr|bgrx|rgbd|rgbds|rgbs|rgbas
+Stride           (VSTY uint ):  Image or Y/alpha plane stride
+StrideUV         (VSTC uint ):  UV plane or U/V planes stride
+BitDepthLuma     (YBPS uint ):  Bit depth for luma components
+BitDepthChroma   (CBPS uint ):  Bit depth for chroma components
+FPS              (VFPF frac ):  Video framerate
+Interlaced       (VILC bool ):  Video is interlaced
+SAR              (PSAR frac ):  Sample (ie pixel) aspect ratio
+PAR              (VPAR frac D):  Picture aspect ratio
+MaxWidth         (MWID uint ):  Maximum width (video / text / graphics) of all enhancement layers
+MaxHeight        (MHEI uint ):  Maximum height (video / text / graphics) of all enhancement layers
+ZOrder           (VZIX uint ):  Z-order of the video, from 0 (first) to max int (last)
+TransX           (VTRX sint ):  Horizontal translation of the video
+TransY           (VTRY sint ):  Vertical translation of the video
+Hidden           (HIDE bool ):  Indicates the PID is hidden in visual/audio rendering
+CropOrigin       (VCXY v2di ):  Position in source window, X,Y indicates coord in source
+OriginalSize     (VOWH v2di ):  Original resolution of video
+SRD              (SRD  v4di ):  Position and size of the video in the referential given by SRDRef
+SRDRef           (SRDR v2di ):  Width and Height of the SRD referential
+SRDMap           (SRDM uintl ): Mapping of input videos in reconstructed video, expressed as {Ox,Oy,Ow,Oh,Dx,Dy,Dw,Dh} per input, with:
+	* Ox,Oy,Ow,Oh: position and size of the input video (usually matching its SRD property), expressed in the output referential given by SRDRef
+	* Dx,Dy,Dw,Dh: Position and Size of the input video in the reconstructed output, expressed in the output referential given by SRDRef
+Alpha            (VALP bool ):  Indicates the video in this pid is an alpha map
+Bitrate          (RATE uint ):  Bitrate in bps
+Maxrate          (MRAT uint ):  Max bitrate in bps
+TargetRate       (TBRT uint ):  Target bitrate in bps, used to setup encoders
+DBSize           (DBSZ uint ):  Decode buffer size in bytes
+MediaDataSize    (MDSZ luint D): Size in bytes of media data
+DataRef          (DREF bool D):  Data referencing is possible (each compressed frame is a continuous set of bytes in source, with no transformation)
+URL              (FURL str D):   URL of source
+RemoteURL        (RURL str D):   Remote URL of source - used for MPEG-4 systems
+RedirectURL      (RELO str D):   Redirection URL of source
+SourcePath       (FSRC str D):   Path of source file on file system
+MIMEType         (MIME str D):   MIME type of source
+Extension        (FEXT str D):   File extension of source
+Cached           (CACH bool D):  indicates the file is completely cached
+DownloadRate     (DLBW uint D):  Download rate of resource in bits per second - changes are signaled through pid info (no reconfigure)
+DownloadSize     (DLSZ luint D): Size of resource in bytes
+DownBytes        (DLBD luint D): Number of bytes downloaded - changes are signaled through pid info (no reconfigure)
+ByteRange        (FBRA lfrac D): Byte range of resource
+DisableProgressive (NPRG uint ):  indicates that some blocks in file need patching (replace or insertion) upon closing, potentially disabling progressive upload
+IsoAltBrands     (ABRD 4ccl D):  indicates ISOBMFF brands associated with PID/file
+IsoBrand         (MBRD uint D):  indicates ISOBMFF major brand associated with PID/file
+MovieTime        (MHTS lfrac D): indicates ISOBMFF movie header duration and timescale
+HasSync          (PSYN bool D):  indicates ISOBMFF track has sync points
+ServiceWidth     (DWDT uint D):  Display width of service
+ServiceHeight    (DHGT uint D):  Display height of service
+CarouselRate     (CARA uint D):  Repeat rate in ms for systems carousel data
+UTC              (UTCD luint D): UTC date and time of PID
+UTCTimestamp     (UTCT luint D): Timestamp corresponding to UTC date and time
+AudioVolume      (AVOL uint D):  Volume of audio
+AudioPan         (APAN uint D):  Balance/Pan of audio
+AudioPriority    (APRI uint D):  Audio thread priority
+ProtectionScheme (SCHT 4cc ):   Protection scheme type (4CC) used
+SchemeVersion    (SCHV uint ):  Protection scheme version used
+SchemeURI        (SCHU str ):   Protection scheme URI
+KMS_URI          (KMSU str ):   URI for key management system
+SelectiveEncryption (ISSE bool ):  Indicates if ISMA/OMA selective encryption is used
+IVLength         (ISIV uint ):  ISMA IV size
+KILength         (ISKI uint ):  ISMA KeyIndication size
+CryptType        (OMCT uint ):  OMA encryption type
+ContentID        (OMID str ):   OMA Content ID
+TextualHeaders   (OMTH str ):   OMA textual headers
+PlaintextLen     (OMPT luint ): OMA size of plaintext data
+CryptInfo        (ECRI str D):   URL (local file only) of crypt info file for this pid
+DecryptInfo      (EDRI str D):   URL (local file only) of crypt info file for this pid - see decrypter help
+SenderNTP        (NTPS luint DP): NTP time at sender side or grabber side
+ReceiverNTP      (NTPR luint DP): Receiver NTP time (usually associated with the sender NTP property)
+Encrypted        (EPCK bool ):  Packets for the stream are by default encrypted (however the encryption state is carried in packet crypt flags) - changes are signaled through pid_set_info (no reconfigure)
+OMAPreview       (ODPR luint ): OMA Preview range 
+CENC_PSSH        (PSSH mem ):   PSSH blob for CENC, formatted as (u32)NbSystems [ (bin128)SystemID(u32)version(u32)KID_count[ (bin128)keyID ] (u32)priv_size(char*priv_size)priv_data]
+CENC_SAI         (SAIS mem P):   CENC SAI for the packet, formatted as (char(IV_Size))IV(u16)NbSubSamples [(u16)ClearBytes(u32)CryptedBytes]
+KeyInfo          (CBIV mem ):   Multi key info formatted as:
+ is_mkey(u8);
+nb_keys(u16);
+[
+	IV_size(u8);
+	KID(bin128);
+	if (!IV_size) {;
+		const_IV_size(u8);
+		constIV(const_IV_size);
+}
+]
+
+CENCPattern      (CPTR frac ):  CENC crypt pattern, CENC pattern, skip as frac.num crypt as frac.den
+CENCStore        (CSTR 4cc ):   Storage location 4CC of SAI data
+CENCstsdMode     (CSTM uint ):  Mode for CENC sample description when using clear samples:
+	* 0: single sample description is used
+	* 1: a clear clone of the sample description is created, inserted before the CENC sample description
+	* 2: a clear clone of the sample description is created, inserted after the CENC sample description
+AMRModeSet       (AMST uint ):  ModeSet for AMR and AMR-WideBand
+SubSampleInfo    (SUBS mem ):   Binary blob describing N subsamples of the sample, formatted as N [(u32)flags(u32)size(u32)codec_param(u8)priority(u8) discardable]. Subsamples for a given flag MUST appear in order, however flags can be interleaved
+NALUMaxSize      (NALS uint ):  Max size of NAL units in stream - changes are signaled through pid_set_info (no reconfigure)
+FileNumber       (FNUM uint P):  Index of file when dumping to files
+FileName         (FNAM str P):   Name of output file when dumping / dashing. Must be set on first packet belonging to new file
+IDXName          (INAM str P):   Name of index file when dashing MPEG-2 TS. Must be set on first packet belonging to new file
+FileSuffix       (FSUF str P):   File suffix name, replacement for $FS$ in tile templates
+EODS             (EODS bool P):  End of DASH segment
+CueStart         (PCUS bool P):  Set on packets marking the beginning of a DASH/HLS segment for cue-driven segmentation - see dasher help
+MaxFrameSize     (MFRS uint D):  Max size of frame in stream - changes are signaled through pid_set_info (no reconfigure)
+AvgFrameSize     (AFRS uint D):  Average size of frame in stream (isobmff only, static property)
+MaxTSDelta       (MTSD uint D):  Maximum DTS delta between frames (isobmff only, static property)
+MaxCTSOffset     (MCTO uint D):  Maximum absolute CTS offset (isobmff only, static property)
+ConstantDuration (SCTD uint D):  Constant duration of samples, 0 means variable duration (isobmff only, static property)
+TrackTemplate    (ITKT mem D):   ISOBMFF serialized track box for this PID, without any sample info (empty stbl and empty dref) - used by isomuxer to re-inject specific boxes of input ISOBMFF track
+TrexTemplate     (ITXT mem D):   ISOBMFF serialized trex box for this PID - used by isomuxer to remux empty init segments
+STSDTemplate     (ISTD mem D):   ISOBMFF serialized sample description box (stsd entry) for this PID - used by isomuxer to re-inject specific boxes of input ISOBMFF track
+MovieUserData    (IMUD mem D):   ISOBMFF serialized moov UDTA and other moov-level boxes (list) for this PID - used by isomuxer to re-inject specific boxes of input ISOBMFF moov
+TrackHandler     (IHDL str D):   ISOBMFF track handler name
+TrackFlags       (ITKF uint D):  ISOBMFF track header flags
+TrackMatrix      (ITKM uintl D): ISOBMFF track header matrix
+Period           (PEID str D):   ID of DASH period
+PStart           (PEST lfrac D): DASH Period start - cf dasher help
+PDur             (PEDU lfrac D): DASH Period duration - cf dasher help
+Representation   (DRID str D):   ID of DASH representation
+ASID             (DAID uint D):  ID of parent DASH AS
+MuxSrc           (MSRC str D):   Name of mux source(s), set by dasher to direct its outputs
+DashMode         (DMOD uint D):  DASH mode to be used by muxer if any, set by dasher. 0 is no DASH, 1 is regular DASH, 2 is VoD
+DashDur          (DDUR frac D):  DASH target segment duration in seconds
+Role             (ROLE strl D):  List of roles for this pid
+PDesc            (PDES strl D):  List of descriptors for the DASH period containing this pid
+ASDesc           (ACDS strl D):  List of conditional descriptors for the DASH AdaptationSet containing this pid. If a pid with the same property type but different value is found, the pids will be in different AdaptationSets
+ASCDesc          (AADS strl D):  List of common descriptors for the DASH AdaptationSet containing this pid
+RDesc            (RDES strl D):  List of descriptors for the DASH Representation containing this pid
+BUrl             (BURL strl D):  List of base URLs for this pid
+Template         (DTPL str ):   Template to use for DASH generation for this pid
+StartNumber      (DRSN uint ):  Start number to use for this pid - cf dasher help
+xlink            (XLNK str D):   Remote period URL for DASH - cf dasher help
+ClampDur         (DCMD lfrac D): Max media duration to process from pid in DASH mode
+HLSPL            (HLVP str D):   Name of the HLS variant playlist for this media
+HLSGroup         (HLGI str D):   Name of HLS Group of a stream
+DCue             (DCUE str D):   Name of a cue list file for this pid - see dasher help
+DSegs            (DCNS uint D):  Number of DASH segments defined by the DASH cue info
+Codec            (CODS str D):   codec parameter string to force. If starting with '.', appended to ISOBMF code point; otherwise replace the codec string
+SingleScale      (DSTS bool D):  Indicates the movie header should use the media timescale of the first track added
+RequireReorder   (PUDP bool D):  Indicates the PID packets come from source with losses and reordering happening (UDP)
+Primary          (PITM bool D):  Indicates this is a primary item in isobmf
+DFMode           (DFWD uint D):  Indicates that forward mode is used for this PID. If 2, indicates the manifest is also carried in packet propery
+DFManifest       (DMPD str D):   Value of manifest in forward mode
+DFVariant        (DHLV strl D):  Value of variant playlist in forward mode
+DFVariantName    (DHLN strl D):  Value of variant playlist name in forward mode
+DFPStart         (DPST luint D): Value of active period start time in forward mode
+HLSKey           (HLSK str ):   URI, KEYFORMAT and KEYFORMATVERSIONS for HLS
+ColorPrimaries   (CPRM cprm D):  Indicate color primaries for a visual pid
+	Names: reserved0,BT709,undef,reserved3,BT470M,BT470G,SMPTE170,SMPTE240,FILM,BT2020,SMPTE428,SMPTE431,SMPTE432,EBU3213
+	
+ColorTransfer    (CTRC ctfc D):  Indicate color transfer characteristics for a visual pid
+	Names: reserved0,BT709,undef,reserved3,BT470M,BT470BG,SMPTE170,SMPTE249,Linear,Log100,Log316,IEC61966,BT1361,sRGB,BT2020_10,BT2020_12,SMPTE2084,SMPTE428,STDB67
+	
+ColorMatrix      (CMXC cmxc D):  Indicate color matrix coefficient for a visual pid 
+	Names: GBR,BT709,undef,FCC,BT601,SMPTE170,SMPTE240,YCgCo,BT2020,BT2020cl,YDzDx
+	
+FullRange        (CFRA bool D):  Indicate color full range flag for a visual pid
+ChromaLoc        (CLOC uint D):  Indicate chroma location for a visual pid (see ISO/IEC 23001-8 / 23091-2)
+SrcMagic         (PSMG luint D): Indicate a magic number to store in the track, only used by importers
+MuxIndex         (TIDX luint D): Indicate target track index in destination file, stored by lowest value first (not set by demuxers)
+NoTSLoop         (NTSL bool ):  Indicate the timestamps on this PID are adjusted in case of loops (used by TS muxer output)
+MHAProfiles      (MHCP uintl D): Indicate a list of compatible profiles for this MPEG-H Audio object
+FragStart        (PFRB uint DP):  Indicate if packet is a fragment start (value 1) or a segment start (value 2)
+FragRange        (PFRR lfrac DP): Indicate start and end position in bytes of fragment if packet is a fragment or segment start
+SIDXRange        (PFSR lfrac DP): Indicate start and end position in bytes of sidx if packet is a fragment or segment start
+MoofTemplate     (MFTP mem DP):   Serialized moof box corresponding to the start of a movie fragment or segment (with styp and optionally sidx)
+InitSeg          (PCKI bool P):  Set to true if packet is a complete DASH init segment file
+RawGrab          (PGRB bool D):  Indicate PID is a raw media grabber (webcam, microphone, etc...)
+KeepAfterEOS     (PKAE bool D):  Indicate the PID must be kept alive after EOS (LASeR and BIFS)
+CoverArt         (PCOV mem D):   Indicate PID cover art image data. If associated data is NULL, the data is carried in the PID
+BufferLength     (PBPL uint D):  Indicate playout buffer in ms
+MaxBuffer        (PBMX uint D):  Indicate maximum buffer occupancy in ms
+ReBuffer         (PBRE uint D):  Indicate rebuffer threshold in ms, 0 disable rebuffering
+ViewIdx          (VIDX uint D):  Indicate view index for multiview (1 being left)
+FragURL          (OFRA str D):   Indicate fragment URL (without '#') of original URL (used by dash demux to set the property on media PIDs)
+ROUTEIP          (RSIP str D):   Indicate ROUTE session IP address
+ROUTEPort        (RSPN uint D):  Indicate ROUTE session port number
+ROUTEName        (RSFN str D):   Name (location) of raw file to advertise in ROUTE session
+ROUTECarousel    (RSCR frac D):  Carousel period in seconds of raw file in ROUTE session
+ROUTEUpload      (RSST frac D):  Upload time in seconds of raw file in ROUTE session
+Stereo           (PSTT uint D):  Stereo type of video
+Projection       (PPJT uint D):  Projection type of video
+InitalPose       (PPOS v3di D):  Initial pose for 360 video, in degrees expressed as 16.16 bits (x is yaw, y is pitch, z is roll)
+CMPad            (PCMP uint D):  Number of pixels to pad from edge of each face in cube map
+EQRClamp         (PEQC v4di D):  Clamping of frame for EQR as 0.32 fixed point (x is top, y is bottom, z is left and w is right)
+SkipBegin        (PCKS uint P):  Amount of media to skip from begining of packet in PID timescale
+SkipPres         (PCKD bool P):  Indicate the packet and any following with CTS greater than this packet shall not be presented (used by reframer to create edit lists)
+

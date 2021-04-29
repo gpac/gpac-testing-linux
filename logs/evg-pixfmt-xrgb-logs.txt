@@ -1,0 +1,155 @@
+*** evg-pixfmt-xrgb logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:09 ***
+
+
+*** Subtest "rgb_xrgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/raw/raw.rgb:size=128x128 compositor:!softblt:opfmt=xrgb @ -o ./results/temp/dump.xrgb  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1228324736
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/raw/raw.rgb:size=128x128) : 0 input pids 1 output pids 6 tasks 857 us process time
+		2 packets sent 54152 bytes sent (2333.72 pck/sec 505.503 mbps)
+		* output PID raw.rgb: 2 packets sent
+	Filter compositor ID _0x5633bc42d170_ (!softblt:opfmt=xrgb) : 1 input pids 1 output pids 12 tasks 1412 us process time
+		1 packets processed 49152 bytes processed (708.215 pck/sec 278.482 mbps)
+		1 packets sent 65536 bytes sent (708.215 pck/sec 371.309 mbps)
+		* input PID raw.rgb: 1 packets received
+		* output PID vout: 1 packets sent
+	Filter fout (dst=./results/temp/dump.xrgb) : 1 input pids 0 output pids 3 tasks 141 us process time
+		1 packets processed 65536 bytes processed (7092.2 pck/sec 3718.35 mbps)
+		* input PID vout: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 13 tasks 73 us process time
+		2 packets processed 54152 bytes processed (27397.3 pck/sec 5934.47 mbps)
+		1 packets sent 49152 bytes sent (13698.6 pck/sec 5386.52 mbps)
+		* input PID raw.rgb: 2 packets received
+		* output PID raw.rgb: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 5 tasks 62 us process time
+		1 packets processed 65536 bytes processed (16129 pck/sec 8456.26 mbps)
+		1 packets sent 65536 bytes sent (16129 pck/sec 8456.26 mbps)
+		* input PID vout: 1 packets received
+		* output PID vout: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2573 us active_time 2560 us nb_tasks 46
+
+Total: run_time 2573 us active_time 2560 us nb_tasks 46
+
+Filters connected:
+fin (src=./external_media/raw/raw.rgb:size=128x128) (ptr=0x5633bc42a7f0)
+-(PID raw.rgb) rfrawvid (ptr=0x5633bc451d10)
+--(PID raw.rgb) compositor (!softblt:opfmt=xrgb) (ID=_0x5633bc42d170_)
+---(PID vout) writegen (ptr=0x5633bc442750)
+----(PID vout) fout (dst=./results/temp/dump.xrgb) (ptr=0x5633bc454550)
+
+Computing ./results/temp/dump.xrgb  (rgb_xrgb) hash: 
+File hash (SHA-1): 0F94EE8F54D0DF641971A4286ABD96B1E3A2D65C
+Hash OK for ./results/temp/dump.xrgb
+
+*** Subtest "xrgb_rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dump.xrgb:size=128x128 compositor:!softblt:opfmt=rgb @ -o ./results/temp/dump.rgb  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 517111680
+
+Filter stats - 5 filters
+	Filter fin (src=./results/temp/dump.xrgb:size=128x128) : 0 input pids 1 output pids 6 tasks 919 us process time
+		2 packets sent 70536 bytes sent (2176.28 pck/sec 614.024 mbps)
+		* output PID dump.xrgb: 2 packets sent
+	Filter compositor ID _0x564386a2e160_ (!softblt:opfmt=rgb) : 1 input pids 1 output pids 12 tasks 1414 us process time
+		1 packets processed 65536 bytes processed (707.214 pck/sec 370.784 mbps)
+		1 packets sent 49152 bytes sent (707.214 pck/sec 278.088 mbps)
+		* input PID dump.xrgb: 1 packets received
+		* output PID vout: 1 packets sent
+	Filter fout (dst=./results/temp/dump.rgb) : 1 input pids 0 output pids 3 tasks 224 us process time
+		1 packets processed 49152 bytes processed (4464.29 pck/sec 1755.43 mbps)
+		* input PID vout: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 13 tasks 66 us process time
+		2 packets processed 70536 bytes processed (30303 pck/sec 8549.82 mbps)
+		1 packets sent 65536 bytes sent (15151.5 pck/sec 7943.76 mbps)
+		* input PID dump.xrgb: 2 packets received
+		* output PID dump.xrgb: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 5 tasks 59 us process time
+		1 packets processed 49152 bytes processed (16949.2 pck/sec 6664.68 mbps)
+		1 packets sent 49152 bytes sent (16949.2 pck/sec 6664.68 mbps)
+		* input PID vout: 1 packets received
+		* output PID vout: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2718 us active_time 2702 us nb_tasks 46
+
+Total: run_time 2718 us active_time 2702 us nb_tasks 46
+
+Filters connected:
+fin (src=./results/temp/dump.xrgb:size=128x128) (ptr=0x564386a2b7f0)
+-(PID dump.xrgb) rfrawvid (ptr=0x564386a52ca0)
+--(PID dump.xrgb) compositor (!softblt:opfmt=rgb) (ID=_0x564386a2e160_)
+---(PID vout) writegen (ptr=0x564386a43660)
+----(PID vout) fout (dst=./results/temp/dump.rgb) (ptr=0x564386a55540)
+
+Computing ./results/temp/dump.rgb  (xrgb_rgb) hash: 
+File hash (SHA-1): 86517A4D63CE3CFF584A05068209437A4962D02C
+Hash OK for ./results/temp/dump.rgb
+
+*** Subtest "compose_xrgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -font-dirs=./external_media/fonts/ -rescan-fonts -i ./results/temp/dump.xrgb:size=128x128 -i ./external_media/raw/overlay.bt compositor:!softblt:drv=no @ -o ./results/temp/compose.xrgb  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 704929664
+
+Filter stats - 10 filters
+	Filter fin (src=./results/temp/dump.xrgb:size=128x128) : 0 input pids 1 output pids 6 tasks 974 us process time
+		2 packets sent 70536 bytes sent (2053.39 pck/sec 579.351 mbps)
+		* output PID dump.xrgb: 2 packets sent
+	Filter fin (src=./external_media/raw/overlay.bt) : 0 input pids 1 output pids 5 tasks 558 us process time
+		1 packets sent 3171 bytes sent (1792.11 pck/sec 45.4624 mbps)
+		* output PID overlay.bt: 1 packets sent
+	Filter compositor ID _0x55a2cd2770a0_ (!softblt:drv=no) : 3 input pids 1 output pids 18 tasks 1862 us process time
+		2 packets processed 131072 bytes processed (1074.11 pck/sec 563.145 mbps)
+		1 packets sent 65536 bytes sent (537.057 pck/sec 281.573 mbps)
+		* input PID dump.xrgb: 1 packets received
+		* input PID overlay.bt: 0 packets received
+		* input PID logo.png: 1 packets received
+		* output PID dump.xrgb: 1 packets sent
+	Filter fout (dst=./results/temp/compose.xrgb) : 1 input pids 0 output pids 3 tasks 150 us process time
+		1 packets processed 65536 bytes processed (6666.67 pck/sec 3495.25 mbps)
+		* input PID dump.xrgb: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 11 tasks 58 us process time
+		2 packets processed 70536 bytes processed (34482.8 pck/sec 9729.1 mbps)
+		1 packets sent 65536 bytes sent (17241.4 pck/sec 9039.45 mbps)
+		* input PID dump.xrgb: 2 packets received
+		* output PID dump.xrgb: 1 packets sent
+	Filter btplay : 1 input pids 1 output pids 6 tasks 677 us process time
+		1 packets processed 3171 bytes processed (1477.1 pck/sec 37.4712 mbps)
+
+		* input PID overlay.bt: 1 packets received
+		* output PID overlay.bt: 0 packets sent
+	Filter writegen : 1 input pids 1 output pids 6 tasks 91 us process time
+		1 packets processed 65536 bytes processed (10989 pck/sec 5761.41 mbps)
+		1 packets sent 65536 bytes sent (10989 pck/sec 5761.41 mbps)
+		* input PID dump.xrgb: 1 packets received
+		* output PID dump.xrgb: 1 packets sent
+	Filter fin ID _0x55a2cd2ba1e0_ (src=./media/auxiliary_files/logo.png) : 0 input pids 1 output pids 6 tasks 630 us process time
+		4 packets sent 15681 bytes sent (6349.21 pck/sec 199.124 mbps)
+		* output PID logo.png: 4 packets sent
+	Filter rfimg : 1 input pids 1 output pids 7 tasks 342 us process time
+		1 packets processed 15681 bytes processed (2923.98 pck/sec 366.807 mbps)
+		1 packets sent 15681 bytes sent (2923.98 pck/sec 366.807 mbps)
+		* input PID logo.png: 1 frames (4 packets) received
+		* output PID logo.png: 1 packets sent
+	Filter imgdec "imgdec:libpng" : 1 input pids 1 output pids 6 tasks 597 us process time
+		1 packets processed 15681 bytes processed (1675.04 pck/sec 210.131 mbps)
+		1 packets sent 65536 bytes sent (1675.04 pck/sec 878.204 mbps)
+		* input PID logo.png: 1 packets received
+		* output PID logo.png: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 5989 us active_time 5975 us nb_tasks 87
+
+Total: run_time 5989 us active_time 5975 us nb_tasks 87
+
+Filters connected:
+fin (src=./results/temp/dump.xrgb:size=128x128) (ptr=0x55a2cd270a00)
+-(PID dump.xrgb) rfrawvid (ptr=0x55a2cd28c2c0)
+--(PID dump.xrgb) compositor (!softblt:drv=no) (ID=_0x55a2cd2770a0_)
+---(PID dump.xrgb) writegen (ptr=0x55a2cd294560)
+----(PID dump.xrgb) fout (dst=./results/temp/compose.xrgb) (ptr=0x55a2cd287e80)
+fin (src=./external_media/raw/overlay.bt) (ptr=0x55a2cd2736b0)
+-(PID overlay.bt) btplay (ptr=0x55a2cd291fd0)
+--(PID overlay.bt) compositor (!softblt:drv=no) (ID=_0x55a2cd2770a0_)
+fin (src=./media/auxiliary_files/logo.png) (ID=_0x55a2cd2ba1e0_)
+-(PID logo.png) rfimg (ptr=0x55a2cd2d3700)
+--(PID logo.png) imgdec "imgdec:libpng" (ptr=0x55a2cd2dfe70)
+---(PID logo.png) compositor (!softblt:drv=no) (ID=_0x55a2cd2770a0_)
+
+Computing ./results/temp/compose.xrgb  (compose_xrgb) hash: 
+File hash (SHA-1): 1F02C9BD35B23AFAABBBCEFC27F4687B73856314
+Hash OK for ./results/temp/compose.xrgb

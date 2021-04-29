@@ -1,0 +1,9 @@
+ <test name="rtp-m2ts" result="OK" date="29/04/2021 23:45:04">
+
+  <stat subtest="play" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50200" cpu_percent="25%" cpu_elapsed_time="0:01.66" cpu_user_time="0.27" cpu_kernel_time="0.15" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -for-test -i rtp://127.0.0.1:1234/:ifce=127.0.0.1 inspect:deep:allp:dur=1/1:log=./results/temp/inspect.txt -stats -graph</command_line>
+  </stat>
+  <stat subtest="stream" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50928" cpu_percent="23%" cpu_elapsed_time="0:02.56" cpu_user_time="0.57" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -runfor=2000 -i ./media/auxiliary_files/enst_audio.aac -o rtp://127.0.0.1:1234/:ifce=127.0.0.1:ext=ts:tso=100000:loop=false -stats</command_line>
+  </stat>
+ </test>

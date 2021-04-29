@@ -1,0 +1,49 @@
+*** reframer-ogg logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:56 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/import/dead_ogg.ogg reframer @ -o ./results/temp/dead.mp4  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1199829120
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/import/dead_ogg.ogg) : 0 input pids 1 output pids 598 tasks 2102 us process time
+		595 packets sent 2971669 bytes sent (283064 pck/sec 11309.9 mbps)
+		* output PID dead_ogg.ogg: 595 packets sent
+	Filter reframer ID _0x5576b1e8d040_ : 2 input pids 2 output pids 258 tasks 5895 us process time
+		3800 packets processed 2932475 bytes processed (644614 pck/sec 3979.61 mbps)
+		3800 packets sent 2932475 bytes sent (644614 pck/sec 3979.61 mbps)
+		* input PID dead_ogg.ogg: 2786 packets received
+		* input PID dead_ogg.ogg: 1014 packets received
+		* output PID dead_ogg.ogg: 2786 packets sent
+		* output PID dead_ogg.ogg: 1014 packets sent
+	Filter fout (dst=./results/temp/dead.mp4) : 1 input pids 0 output pids 534 tasks 2439 us process time
+		532 packets processed 2957812 bytes processed (218122 pck/sec 9701.72 mbps)
+		* input PID dead_ogg.ogg: 532 packets received
+	Filter oggdmx : 1 input pids 2 output pids 602 tasks 23557 us process time
+		595 packets processed 2971669 bytes processed (25257.9 pck/sec 1009.18 mbps)
+		3800 packets sent 2932475 bytes sent (161311 pck/sec 995.874 mbps)
+		* input PID dead_ogg.ogg: 595 packets received
+		* output PID dead_ogg.ogg: 2786 packets sent
+		* output PID dead_ogg.ogg: 1014 packets sent
+	Filter mp4mx : 2 input pids 1 output pids 2792 tasks 17103 us process time
+		3800 packets processed 2932475 bytes processed (222183 pck/sec 1371.68 mbps)
+		532 packets sent 2957812 bytes sent (31105.7 pck/sec 1383.53 mbps)
+		* input PID dead_ogg.ogg: 2786 packets received
+		* input PID dead_ogg.ogg: 1014 packets received
+		* output PID dead_ogg.ogg: 532 packets sent
+Session stats - threads 1
+	Thread 1: run_time 50108 us active_time 49835 us nb_tasks 4926
+
+Total: run_time 50108 us active_time 49835 us nb_tasks 4926
+
+Filters connected:
+fin (src=./external_media/import/dead_ogg.ogg) (ptr=0x5576b1e8a7f0)
+-(PID dead_ogg.ogg) oggdmx (ptr=0x5576b1e920d0)
+--(PID dead_ogg.ogg) reframer (ID=_0x5576b1e8d040_)
+---(PID dead_ogg.ogg) mp4mx (ptr=0x5576b1eae410)
+----(PID dead_ogg.ogg) fout (dst=./results/temp/dead.mp4) (ptr=0x5576b1e8e250)
+---(PID dead_ogg.ogg) mp4mx (ptr=0x5576b1eae410)
+--(PID dead_ogg.ogg) reframer (ID=_0x5576b1e8d040_)
+
+Computing ./results/temp/dead.mp4  (rewrite) hash: 
+File hash (SHA-1): 0F8AF1C54F8F537F88B3B8F9E80FB234F0AA2F2D
+Hash OK for ./results/temp/dead.mp4

@@ -1,0 +1,514 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/reframe_img.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - reframe_img.c<span style="font-size: 80%;"> (source / <a href="reframe_img.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">119</td>
+            <td class="headerCovTableEntry">199</td>
+            <td class="headerCovTableEntryLo">59.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / image (jpg/png/bmp/j2k) reframer filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/avparse.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #if defined(WIN32) || defined(_WIN32_WCE)
+<span class="lineNum">      32 </span>            : #include &lt;windows.h&gt;
+<span class="lineNum">      33 </span>            : #else
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #ifdef GPAC_CONFIG_LINUX
+<span class="lineNum">      36 </span>            : #include &lt;arpa/inet.h&gt;
+<span class="lineNum">      37 </span>            : #endif
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : typedef struct tagBITMAPFILEHEADER
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span>            :         u16     bfType;
+<span class="lineNum">      42 </span>            :         u32     bfSize;
+<span class="lineNum">      43 </span>            :         u16     bfReserved1;
+<span class="lineNum">      44 </span>            :         u16     bfReserved2;
+<span class="lineNum">      45 </span>            :         u32 bfOffBits;
+<span class="lineNum">      46 </span>            : } BITMAPFILEHEADER;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : typedef struct tagBITMAPINFOHEADER {
+<span class="lineNum">      49 </span>            :         u32     biSize;
+<span class="lineNum">      50 </span>            :         s32     biWidth;
+<span class="lineNum">      51 </span>            :         s32     biHeight;
+<span class="lineNum">      52 </span>            :         u16     biPlanes;
+<span class="lineNum">      53 </span>            :         u16     biBitCount;
+<span class="lineNum">      54 </span>            :         u32     biCompression;
+<span class="lineNum">      55 </span>            :         u32     biSizeImage;
+<span class="lineNum">      56 </span>            :         s32     biXPelsPerMeter;
+<span class="lineNum">      57 </span>            :         s32     biYPelsPerMeter;
+<span class="lineNum">      58 </span>            :         u32     biClrUsed;
+<span class="lineNum">      59 </span>            :         u32     biClrImportant;
+<span class="lineNum">      60 </span>            : } BITMAPINFOHEADER;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : #define BI_RGB        0L
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : #endif
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : typedef struct
+<span class="lineNum">      67 </span>            : {
+<span class="lineNum">      68 </span>            :         //options
+<span class="lineNum">      69 </span>            :         GF_Fraction fps;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :         //only one input pid declared
+<span class="lineNum">      72 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      73 </span>            :         //only one output pid declared
+<span class="lineNum">      74 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      75 </span>            :         u32 src_timescale;
+<span class="lineNum">      76 </span>            :         Bool is_bmp;
+<span class="lineNum">      77 </span>            :         Bool owns_timescale;
+<span class="lineNum">      78 </span>            :         u32 codec_id;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :         Bool initial_play_done;
+<span class="lineNum">      81 </span>            :         Bool is_playing;
+<span class="lineNum">      82 </span>            : } GF_ReframeImgCtx;
+<a name="83"><span class="lineNum">      83 </span>            : </a>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">        313 : GF_Err img_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      86 </span>            : {
+<span class="lineNum">      87 </span><span class="lineCov">        313 :         GF_ReframeImgCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">      88 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">      89 </span>            :         
+<span class="lineNum">      90 </span><span class="lineCov">        313 :         if (is_remove) {</span>
+<span class="lineNum">      91 </span><span class="lineCov">         25 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">      92 </span><span class="lineCov">         25 :                 return GF_OK;</span>
+<span class="lineNum">      93 </span>            :         }
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">        288 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">      96 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineCov">        288 :         gf_filter_pid_set_framing_mode(pid, GF_TRUE);</span>
+<span class="lineNum">      99 </span><span class="lineCov">        288 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     100 </span>            :         //force retest of codecid
+<span class="lineNum">     101 </span><span class="lineCov">        288 :         ctx-&gt;codec_id = 0;</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineCov">        288 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_TIMESCALE);</span>
+<span class="lineNum">     104 </span><span class="lineCov">        288 :         if (p) ctx-&gt;src_timescale = p-&gt;value.uint;</span>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">        288 :         if (ctx-&gt;src_timescale &amp;&amp; !ctx-&gt;opid) {</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :                 gf_filter_pid_copy_properties(ctx-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_UNFRAMED, NULL);</span>
+<span class="lineNum">     110 </span>            :         }
+<span class="lineNum">     111 </span><span class="lineCov">        288 :         ctx-&gt;is_playing = GF_TRUE;</span>
+<span class="lineNum">     112 </span><span class="lineCov">        288 :         return GF_OK;</span>
+<a name="113"><span class="lineNum">     113 </span>            : }</a>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">        756 : Bool img_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     116 </span>            : {
+<span class="lineNum">     117 </span>            :         GF_FilterEvent fevt;
+<span class="lineNum">     118 </span><span class="lineCov">        756 :         GF_ReframeImgCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     119 </span><span class="lineCov">        756 :         if (evt-&gt;base.on_pid != ctx-&gt;opid) return GF_TRUE;</span>
+<span class="lineNum">     120 </span><span class="lineCov">        441 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     121 </span><span class="lineCov">        317 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     122 </span><span class="lineCov">        317 :                 if (ctx-&gt;is_playing) {</span>
+<span class="lineNum">     123 </span>            :                         return GF_TRUE;
+<span class="lineNum">     124 </span>            :                 }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineCov">        315 :                 ctx-&gt;is_playing = GF_TRUE;</span>
+<span class="lineNum">     127 </span><span class="lineCov">        315 :                 if (!ctx-&gt;initial_play_done) {</span>
+<span class="lineNum">     128 </span><span class="lineCov">        284 :                         ctx-&gt;initial_play_done = GF_TRUE;</span>
+<span class="lineNum">     129 </span><span class="lineCov">        284 :                         return GF_TRUE;</span>
+<span class="lineNum">     130 </span>            :                 }
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">         31 :                 GF_FEVT_INIT(fevt, GF_FEVT_SOURCE_SEEK, ctx-&gt;ipid);</span>
+<span class="lineNum">     133 </span>            :                 fevt.seek.start_offset = 0;
+<span class="lineNum">     134 </span><span class="lineCov">         31 :                 gf_filter_pid_send_event(ctx-&gt;ipid, &amp;fevt);</span>
+<span class="lineNum">     135 </span><span class="lineCov">         31 :                 return GF_TRUE;</span>
+<span class="lineNum">     136 </span><span class="lineCov">         66 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     137 </span><span class="lineCov">         66 :                 ctx-&gt;is_playing = GF_FALSE;</span>
+<span class="lineNum">     138 </span><span class="lineCov">         66 :                 return GF_FALSE;</span>
+<span class="lineNum">     139 </span>            :         default:
+<span class="lineNum">     140 </span>            :                 break;
+<span class="lineNum">     141 </span>            :         }
+<span class="lineNum">     142 </span>            :         //cancel all events
+<span class="lineNum">     143 </span>            :         return GF_TRUE;
+<a name="144"><span class="lineNum">     144 </span>            : }</a>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">        723 : GF_Err img_process(GF_Filter *filter)</span>
+<span class="lineNum">     147 </span>            : {
+<span class="lineNum">     148 </span><span class="lineCov">        723 :         GF_ReframeImgCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     149 </span>            :         GF_FilterPacket *pck, *dst_pck;
+<span class="lineNum">     150 </span>            :         GF_Err e;
+<span class="lineNum">     151 </span>            :         u8 *data, *output;
+<span class="lineNum">     152 </span><span class="lineCov">        723 :         u32 size, w=0, h=0, pf=0;</span>
+<span class="lineNum">     153 </span>            :         u8 *pix;
+<span class="lineNum">     154 </span>            :         u32 i, j, irow, in_stride, out_stride;
+<span class="lineNum">     155 </span>            :         GF_BitStream *bs;
+<span class="lineNum">     156 </span>            :         BITMAPFILEHEADER fh;
+<span class="lineNum">     157 </span>            :         BITMAPINFOHEADER fi;
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineCov">        723 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     160 </span><span class="lineCov">        723 :         if (!pck) {</span>
+<span class="lineNum">     161 </span><span class="lineCov">        408 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     162 </span><span class="lineCov">        318 :                         if (ctx-&gt;opid)</span>
+<span class="lineNum">     163 </span><span class="lineCov">        318 :                                 gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     164 </span><span class="lineCov">        318 :                         ctx-&gt;is_playing = GF_FALSE;</span>
+<span class="lineNum">     165 </span><span class="lineCov">        318 :                         return GF_EOS;</span>
+<span class="lineNum">     166 </span>            :                 }
+<span class="lineNum">     167 </span>            :                 return GF_OK;
+<span class="lineNum">     168 </span>            :         }
+<span class="lineNum">     169 </span><span class="lineCov">        315 :         data = (char *) gf_filter_pck_get_data(pck, &amp;size);</span>
+<span class="lineNum">     170 </span>            :         
+<span class="lineNum">     171 </span><span class="lineCov">        315 :         if (!ctx-&gt;opid || !ctx-&gt;codec_id) {</span>
+<span class="lineNum">     172 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     173 </span>            :                 u32 dsi_size;
+<span class="lineNum">     174 </span><span class="lineCov">        286 :                 u8 *dsi=NULL;</span>
+<span class="lineNum">     175 </span>            : #endif
+<span class="lineNum">     176 </span>            :                 const char *ext, *mime;
+<span class="lineNum">     177 </span>            :                 const GF_PropertyValue *prop;
+<span class="lineNum">     178 </span><span class="lineCov">        286 :                 u32 codecid = 0;</span>
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span><span class="lineCov">        286 :                 if ((size &gt;= 54) &amp;&amp; (data[0] == 'B') &amp;&amp; (data[1] == 'M')) {</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :                         codecid = GF_CODECID_RAW;</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :                         ctx-&gt;is_bmp = GF_TRUE;</span>
+<span class="lineNum">     183 </span>            :                 }
+<span class="lineNum">     184 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     185 </span>            :                 else {
+<span class="lineNum">     186 </span><span class="lineCov">        286 :                         bs = gf_bs_new(data, size, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     187 </span><span class="lineCov">        286 :                         gf_img_parse(bs, &amp;codecid, &amp;w, &amp;h, &amp;dsi, &amp;dsi_size);</span>
+<span class="lineNum">     188 </span><span class="lineCov">        286 :                         gf_bs_del(bs);</span>
+<span class="lineNum">     189 </span>            :                 }
+<span class="lineNum">     190 </span>            : #endif
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span><span class="lineCov">        286 :                 prop = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_FILE_EXT);</span>
+<span class="lineNum">     193 </span><span class="lineCov">        286 :                 ext = (prop &amp;&amp; prop-&gt;value.string) ? prop-&gt;value.string : &quot;&quot;;</span>
+<span class="lineNum">     194 </span><span class="lineCov">        286 :                 prop = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_MIME);</span>
+<span class="lineNum">     195 </span><span class="lineCov">        286 :                 mime = (prop &amp;&amp; prop-&gt;value.string) ? prop-&gt;value.string : &quot;&quot;;</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineCov">        286 :                 if (!codecid) {</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :                         if (!stricmp(ext, &quot;jpeg&quot;) || !stricmp(ext, &quot;jpg&quot;) || !strcmp(mime, &quot;image/jpg&quot;)) {</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :                                 codecid = GF_CODECID_JPEG;</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                         } else if (!stricmp(ext, &quot;png&quot;) || !strcmp(mime, &quot;image/png&quot;)) {</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                                 codecid = GF_CODECID_PNG;</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                         } else if (!stricmp(ext, &quot;jp2&quot;) || !stricmp(ext, &quot;j2k&quot;) || !strcmp(mime, &quot;image/jp2&quot;)) {</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                                 codecid = GF_CODECID_J2K;</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :                         } else if (!stricmp(ext, &quot;pngd&quot;)) {</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :                                 codecid = GF_CODECID_PNG;</span>
+<span class="lineNum">     206 </span>            :                                 pf = GF_PIXEL_RGBD;
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :                         } else if (!stricmp(ext, &quot;pngds&quot;)) {</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :                                 codecid = GF_CODECID_PNG;</span>
+<span class="lineNum">     209 </span>            :                                 pf = GF_PIXEL_RGBDS;
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :                         } else if (!stricmp(ext, &quot;pngs&quot;)) {</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :                                 codecid = GF_CODECID_PNG;</span>
+<span class="lineNum">     212 </span>            :                                 pf = GF_PIXEL_RGBS;
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                         } else if (!stricmp(ext, &quot;bmp&quot;) || !strcmp(mime, &quot;image/png&quot;)) {</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                                 codecid = GF_CODECID_RAW;</span>
+<span class="lineNum">     215 </span>            :                         }
+<span class="lineNum">     216 </span>            :                 }
+<span class="lineNum">     217 </span><span class="lineCov">        286 :                 if (!codecid) {</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :                         return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     220 </span>            :                 }
+<span class="lineNum">     221 </span><span class="lineCov">        286 :                 ctx-&gt;codec_id = codecid;</span>
+<span class="lineNum">     222 </span><span class="lineCov">        286 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     223 </span><span class="lineCov">        286 :                 if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :                         return GF_SERVICE_ERROR;</span>
+<span class="lineNum">     226 </span>            :                 }
+<span class="lineNum">     227 </span><span class="lineCov">        286 :                 if (!ctx-&gt;fps.num || !ctx-&gt;fps.den) {</span>
+<span class="lineNum">     228 </span><span class="lineCov">        286 :                         ctx-&gt;fps.num = 1000;</span>
+<span class="lineNum">     229 </span><span class="lineCov">        286 :                         ctx-&gt;fps.den = 1000;</span>
+<span class="lineNum">     230 </span>            :                 }
+<span class="lineNum">     231 </span>            :                 //we don't have input reconfig for now
+<span class="lineNum">     232 </span><span class="lineCov">        286 :                 gf_filter_pid_copy_properties(ctx-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">     233 </span><span class="lineCov">        286 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STREAM_TYPE, &amp; PROP_UINT(GF_STREAM_VISUAL));</span>
+<span class="lineNum">     234 </span><span class="lineCov">        286 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CODECID, &amp; PROP_UINT(codecid));</span>
+<span class="lineNum">     235 </span><span class="lineCov">        286 :                 if (pf) gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_PIXFMT, &amp; PROP_UINT(pf));</span>
+<span class="lineNum">     236 </span><span class="lineCov">        286 :                 if (w) gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_WIDTH, &amp; PROP_UINT(w));</span>
+<span class="lineNum">     237 </span><span class="lineCov">        286 :                 if (h) gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_HEIGHT, &amp; PROP_UINT(h));</span>
+<span class="lineNum">     238 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     239 </span><span class="lineCov">        286 :                 if (dsi) gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG, &amp; PROP_DATA_NO_COPY(dsi, dsi_size));</span>
+<span class="lineNum">     240 </span>            : #endif
+<span class="lineNum">     241 </span><span class="lineCov">        286 :                 if (! gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_TIMESCALE)) {</span>
+<span class="lineNum">     242 </span><span class="lineCov">        286 :                         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(ctx-&gt;fps.num) );</span>
+<span class="lineNum">     243 </span><span class="lineCov">        286 :                         ctx-&gt;owns_timescale = GF_TRUE;</span>
+<span class="lineNum">     244 </span>            :                 }
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">        286 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_NB_FRAMES, &amp;PROP_UINT(1) );</span>
+<span class="lineNum">     247 </span><span class="lineCov">        286 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_PLAYBACK_MODE, &amp;PROP_UINT(GF_PLAYBACK_MODE_FASTFORWARD ) );</span>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineCov">        286 :                 if (ext || mime)</span>
+<span class="lineNum">     250 </span><span class="lineCov">        286 :                         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CAN_DATAREF, &amp; PROP_BOOL(GF_TRUE ) );</span>
+<span class="lineNum">     251 </span>            :         }
+<span class="lineNum">     252 </span><span class="lineCov">        315 :         if (! ctx-&gt;is_bmp) {</span>
+<span class="lineNum">     253 </span>            :                 e = GF_OK;
+<span class="lineNum">     254 </span>            :                 u32 start_offset = 0;
+<span class="lineNum">     255 </span><span class="lineCov">        315 :                 if (ctx-&gt;codec_id==GF_CODECID_J2K) {</span>
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span><span class="lineCov">          4 :                         if (size&lt;8) {</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                                 return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     260 </span>            :                         }
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span><span class="lineCov">          4 :                         if ((data[4]=='j') &amp;&amp; (data[5]=='P') &amp;&amp; (data[6]==' ') &amp;&amp; (data[7]==' ')) {</span>
+<span class="lineNum">     263 </span><span class="lineCov">          4 :                                 bs = gf_bs_new(data, size, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     264 </span><span class="lineCov">         24 :                                 while (gf_bs_available(bs)) {</span>
+<span class="lineNum">     265 </span><span class="lineCov">         20 :                                         u32 bsize = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     266 </span><span class="lineCov">         20 :                                         u32 btype = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     267 </span><span class="lineCov">         20 :                                         if (btype == GF_4CC('j','p','2','c') ) {</span>
+<span class="lineNum">     268 </span><span class="lineCov">          4 :                                                 start_offset = (u32) gf_bs_get_position(bs) - 8;</span>
+<span class="lineNum">     269 </span><span class="lineCov">          4 :                                                 break;</span>
+<span class="lineNum">     270 </span>            :                                         }
+<span class="lineNum">     271 </span><span class="lineCov">         16 :                                         gf_bs_skip_bytes(bs, bsize-8);</span>
+<span class="lineNum">     272 </span>            :                                 }
+<span class="lineNum">     273 </span><span class="lineCov">          4 :                                 gf_bs_del(bs);</span>
+<span class="lineNum">     274 </span><span class="lineCov">          4 :                                 if (start_offset&gt;=size) {</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                                         return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     277 </span>            :                                 }
+<span class="lineNum">     278 </span>            :                         }
+<span class="lineNum">     279 </span>            :                 }
+<span class="lineNum">     280 </span><span class="lineCov">        315 :                 dst_pck = gf_filter_pck_new_ref(ctx-&gt;opid, start_offset, size-start_offset, pck);</span>
+<span class="lineNum">     281 </span><span class="lineCov">        315 :                 if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineCov">        315 :                 gf_filter_pck_merge_properties(pck, dst_pck);</span>
+<span class="lineNum">     284 </span><span class="lineCov">        315 :                 if (ctx-&gt;owns_timescale) {</span>
+<span class="lineNum">     285 </span><span class="lineCov">        315 :                         gf_filter_pck_set_cts(dst_pck, 0);</span>
+<span class="lineNum">     286 </span><span class="lineCov">        315 :                         gf_filter_pck_set_sap(dst_pck, GF_FILTER_SAP_1 );</span>
+<span class="lineNum">     287 </span><span class="lineCov">        315 :                         gf_filter_pck_set_duration(dst_pck, ctx-&gt;fps.den);</span>
+<span class="lineNum">     288 </span>            :                 }
+<span class="lineNum">     289 </span><span class="lineCov">        315 :                 gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     290 </span><span class="lineCov">        315 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     291 </span><span class="lineCov">        315 :                 return e;</span>
+<span class="lineNum">     292 </span>            :         }
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :         bs = gf_bs_new(data, size, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :         /*fh.bfType = */ gf_bs_read_u16(bs);</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :         /*fh.bfSize = */ gf_bs_read_u32(bs);</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :         /*fh.bfReserved1 = */ gf_bs_read_u16(bs);</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :         /*fh.bfReserved2 = */ gf_bs_read_u16(bs);</span>
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :         fh.bfOffBits = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     301 </span>            :         fh.bfOffBits = ntohl(fh.bfOffBits);
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :         gf_bs_read_data(bs, (char *) &amp;fi, 40);</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :         gf_bs_del(bs);</span>
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :         if ((fi.biCompression != BI_RGB) || (fi.biPlanes!=1)) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :         if ((fi.biBitCount!=24) &amp;&amp; (fi.biBitCount!=32)) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :         w = fi.biWidth;</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :         h = fi.biHeight;</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :         pf = (fi.biBitCount==24) ? GF_PIXEL_RGB : GF_PIXEL_RGBA;</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :         size = (fi.biBitCount==24) ? 3 : 4;</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :         size *= w;</span>
+<span class="lineNum">     314 </span>            :         out_stride = size;
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :         size *= h;</span>
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_PIXFMT, &amp; PROP_UINT(pf));</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_WIDTH, &amp; PROP_UINT(w));</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_HEIGHT, &amp; PROP_UINT(h));</span>
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, size, &amp;output);</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     323 </span>            :         
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :         gf_filter_pck_merge_properties(pck, dst_pck);</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :         if (ctx-&gt;owns_timescale) {</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_cts(dst_pck, 0);</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_sap(dst_pck, GF_FILTER_SAP_1 );</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_duration(dst_pck, ctx-&gt;fps.den);</span>
+<span class="lineNum">     329 </span>            :         }
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            :         in_stride = out_stride;
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :         while (in_stride % 4) in_stride++;</span>
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :         if (fi.biBitCount==24) {</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;h; i++) {</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :                         irow = (h-1-i)*out_stride;</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :                         pix = data + fh.bfOffBits + i*in_stride;</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :                         for (j=0; j&lt;out_stride; j+=3) {</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :                                 output[j + irow] = pix[2];</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :                                 output[j+1 + irow] = pix[1];</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                                 output[j+2 + irow] = pix[0];</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :                                 pix += 3;</span>
+<span class="lineNum">     343 </span>            :                         }
+<span class="lineNum">     344 </span>            :                 }
+<span class="lineNum">     345 </span>            :         } else {
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;h; i++) {</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :                         irow = (h-1-i)*out_stride;</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                         pix = data + fh.bfOffBits + i*in_stride;</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                         for (j=0; j&lt;out_stride; j+=4) {</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                                 output[j + irow] = pix[2];</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                                 output[j+1 + irow] = pix[1];</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :                                 output[j+2 + irow] = pix[0];</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                                 output[j+3 + irow] = pix[3];</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                                 pix += 4;</span>
+<span class="lineNum">     355 </span>            :                         }
+<span class="lineNum">     356 </span>            :                 }
+<span class="lineNum">     357 </span>            :         }
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :         e = gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :         return e;</span>
+<span class="lineNum">     361 </span>            : }
+<span class="lineNum">     362 </span>            : 
+<a name="363"><span class="lineNum">     363 </span>            : #include &lt;gpac/internal/isomedia_dev.h&gt;</a>
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">       3074 : static const char * img_probe_data(const u8 *data, u32 size, GF_FilterProbeScore *score)</span>
+<span class="lineNum">     366 </span>            : {
+<span class="lineNum">     367 </span>            :         /*JPEG*/
+<span class="lineNum">     368 </span><span class="lineCov">       3074 :         if ((data[0]==0xFF) &amp;&amp; (data[1]==0xD8) &amp;&amp; (data[2]==0xFF)) {</span>
+<span class="lineNum">     369 </span><span class="lineCov">        170 :                 *score = GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     370 </span><span class="lineCov">        170 :                 return &quot;image/jpg&quot;;</span>
+<span class="lineNum">     371 </span>            :         }
+<span class="lineNum">     372 </span>            :         /*PNG*/
+<span class="lineNum">     373 </span><span class="lineCov">       2904 :         if ((data[0]==0x89) &amp;&amp; (data[1]==0x50) &amp;&amp; (data[2]==0x4E)) {</span>
+<span class="lineNum">     374 </span><span class="lineCov">        120 :                 *score = GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     375 </span><span class="lineCov">        120 :                 return &quot;image/png&quot;;</span>
+<span class="lineNum">     376 </span>            :         }
+<span class="lineNum">     377 </span><span class="lineCov">       2784 :         GF_BitStream *bs = gf_bs_new(data, size, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     378 </span><span class="lineCov">       2784 :         u32 bsize = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     379 </span><span class="lineCov">       2784 :         u32 btype = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     380 </span><span class="lineCov">       2784 :         if ( (bsize==12) &amp;&amp; ( (btype==GF_ISOM_BOX_TYPE_JP ) || (btype==GF_ISOM_BOX_TYPE_JP2H) ) ) {</span>
+<span class="lineNum">     381 </span><span class="lineCov">          4 :                 if (btype==GF_ISOM_BOX_TYPE_JP2H) {</span>
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :                         *score = GF_FPROBE_FORCE;</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :                         gf_bs_del(bs);</span>
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :                         return &quot;image/jp2&quot;;</span>
+<span class="lineNum">     385 </span>            :                 }
+<span class="lineNum">     386 </span><span class="lineCov">          4 :                 btype = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     387 </span><span class="lineCov">          4 :                 if (btype==0x0D0A870A) {</span>
+<span class="lineNum">     388 </span><span class="lineCov">          4 :                         *score = GF_FPROBE_FORCE;</span>
+<span class="lineNum">     389 </span><span class="lineCov">          4 :                         gf_bs_del(bs);</span>
+<span class="lineNum">     390 </span><span class="lineCov">          4 :                         return &quot;image/jp2&quot;;</span>
+<span class="lineNum">     391 </span>            :                 }
+<span class="lineNum">     392 </span>            :         }
+<span class="lineNum">     393 </span><span class="lineCov">       2780 :         gf_bs_del(bs);</span>
+<span class="lineNum">     394 </span><span class="lineCov">       2780 :         if ((size &gt;= 54) &amp;&amp; (data[0] == 'B') &amp;&amp; (data[1] == 'M')) {</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :                 *score = GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :                 return &quot;image/bmp&quot;;</span>
+<span class="lineNum">     397 </span>            :         }
+<span class="lineNum">     398 </span>            :         return NULL;
+<span class="lineNum">     399 </span>            : }
+<span class="lineNum">     400 </span>            : static const GF_FilterCapability ReframeImgCaps[] =
+<span class="lineNum">     401 </span>            : {
+<span class="lineNum">     402 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     403 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_FILE_EXT, &quot;jpg|jpeg|jp2|bmp|png|pngd|pngds|pngs&quot;),
+<span class="lineNum">     404 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_MIME, &quot;image/jpg|image/jp2|image/bmp|image/png|image/x-png+depth|image/x-png+depth+mask|image/x-png+stereo&quot;),
+<span class="lineNum">     405 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     406 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_PNG),
+<span class="lineNum">     407 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_JPEG),
+<span class="lineNum">     408 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_J2K),
+<span class="lineNum">     409 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_RAW),
+<span class="lineNum">     410 </span>            : //      CAP_BOOL(GF_CAPS_OUTPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     411 </span>            : };
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            : #define OFFS(_n)        #_n, offsetof(GF_ReframeImgCtx, _n)
+<span class="lineNum">     414 </span>            : static const GF_FilterArgs ReframeImgArgs[] =
+<span class="lineNum">     415 </span>            : {
+<span class="lineNum">     416 </span>            :         { OFFS(fps), &quot;import frame rate (0 default to 1 Hz)&quot;, GF_PROP_FRACTION, &quot;0/1000&quot;, NULL, GF_FS_ARG_HINT_HIDE},
+<span class="lineNum">     417 </span>            :         {0}
+<span class="lineNum">     418 </span>            : };
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            : GF_FilterRegister ReframeImgRegister = {
+<span class="lineNum">     421 </span>            :         .name = &quot;rfimg&quot;,
+<span class="lineNum">     422 </span>            :         GF_FS_SET_DESCRIPTION(&quot;JPG/J2K/PNG/BMP reframer&quot;)
+<span class="lineNum">     423 </span>            :         GF_FS_SET_HELP(&quot;This filter parses JPG/J2K/PNG/BMP files/data and outputs corresponding visual PID and frames.&quot;)
+<span class="lineNum">     424 </span>            :         .private_size = sizeof(GF_ReframeImgCtx),
+<span class="lineNum">     425 </span>            :         .args = ReframeImgArgs,
+<span class="lineNum">     426 </span>            :         SETCAPS(ReframeImgCaps),
+<span class="lineNum">     427 </span>            :         .configure_pid = img_configure_pid,
+<span class="lineNum">     428 </span>            :         .probe_data = img_probe_data,
+<span class="lineNum">     429 </span>            :         .process = img_process,
+<span class="lineNum">     430 </span>            :         .process_event = img_process_event
+<a name="431"><span class="lineNum">     431 </span>            : };</a>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineCov">       2877 : const GF_FilterRegister *img_reframe_register(GF_FilterSession *session)</span>
+<span class="lineNum">     434 </span>            : {
+<span class="lineNum">     435 </span><span class="lineCov">       2877 :         return &amp;ReframeImgRegister;</span>
+<span class="lineNum">     436 </span>            : }
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+*** mp4box-sar-counter logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:35 ***
+
+
+*** Subtest "create": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/counter.hvc -par 1=16:9 -new ./results/temp/setpar.mp4" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2546 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/setpar.mp4  (create) hash: 
+File hash (SHA-1): B8924642276AA59273EDAD19FC2BD8CD6777115C
+Hash OK for ./results/temp/setpar.mp4
+
+*** Subtest "rewrite": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/counter.hvc -par 1=w16:9 -new ./results/temp/rewritepar.mp4" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2546 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/rewritepar.mp4  (rewrite) hash: 
+File hash (SHA-1): 6A648DF35A57BFD65A4FC01DFB1437D7D82B6243
+Hash OK for ./results/temp/rewritepar.mp4
+
+*** Subtest "remove": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/rewritepar.mp4 -par 1=none -new ./results/temp/remove.mp4" ***
+IsoMedia import rewritepar.mp4 - track ID 1 - Video (size 1280 x 720)
+
+Computing ./results/temp/remove.mp4  (remove) hash: 
+File hash (SHA-1): 7998DE769E4FDDC8DCEC4EA558BBF07CCD7BE51E
+Hash OK for ./results/temp/remove.mp4
+
+*** Subtest "auto": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/remove.mp4 -par 1=auto -new ./results/temp/auto.mp4" ***
+IsoMedia import remove.mp4 - track ID 1 - Video (size 1280 x 720)
+
+Computing ./results/temp/auto.mp4  (auto) hash: 
+File hash (SHA-1): BA9BFB88924CFBC48899610BD81F077A866E4656
+Hash OK for ./results/temp/auto.mp4
+
+*** Subtest "set-pl": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/counter.hvc:profile=1:level:1 -new ./results/temp/set-pl.mp4" ***
+Unrecognized import option level, ignoring
+Unrecognized import option 1, ignoring
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2546 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/set-pl.mp4  (set-pl) hash: 
+File hash (SHA-1): FF142A08FF066EAADBE3F418FBA01F87A38A3E6E
+Hash OK for ./results/temp/set-pl.mp4

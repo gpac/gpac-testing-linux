@@ -1,0 +1,22 @@
+*** gsf-props-check logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:43 ***
+
+
+*** Subtest "gsf-mux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -ltf UTSource:gsftest reframer @ -o ./results/temp/dump.gsf:crate=2.0:skp=FPS:sigbo -graph -logs=container@debug" ***
+[GSFMux] Cannot serialize pointer property, ignoring !!
+[GSFMux] Cannot serialize pointer property, ignoring !!
+
+
+Computing ./results/temp/dump.gsf  (gsf-mux) hash: 
+File hash (SHA-1): 8D66B45AF36C911F6AF34A5B16A342AE7084917B
+Hash fail, ref hash ./hash_refs/gsf-props-check-gsf-mux.hash was 309FBC34801589BB4B81BB4702D61D46F60F07E9
+
+*** Subtest "gsf-demux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -strict-error -i ./results/temp/dump.gsf inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph" ***
+
+Filters connected:
+fin (src=./results/temp/dump.gsf) (ptr=0x55b1a0662ec0)
+-(PID dump.gsf) gsfdmx (ptr=0x55b1a06688f0)
+--(PID dump.gsf) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55b1a0665770)
+
+Computing ./results/temp/inspect.txt  (gsf-demux) hash: 
+File hash (SHA-1): 2117B941C99EE8140727618FFA4B79431F7DC49A
+Hash fail, ref hash ./hash_refs/gsf-props-check-gsf-demux.hash was D342D0E01ABF96DED3201A4A81343E4E547C29EB

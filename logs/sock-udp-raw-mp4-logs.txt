@@ -1,0 +1,21 @@
+*** sock-udp-raw-mp4 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:46:06 ***
+
+
+*** Subtest "in": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i udp://127.0.0.1:1234:ext=aac:timeout=1000 -o ./results/temp/test.mp4 -graph" ***
+
+Filters connected:
+sockin (src=udp://127.0.0.1:1234:ext=aac:timeout=1000) (ptr=0x563c04073ec0)
+-(PID 127.0.0.1:1234) rfadts (ptr=0x563c0407c490)
+--(PID 127.0.0.1:1234) mp4mx (ptr=0x563c04081570)
+---(PID 127.0.0.1:1234) fout (dst=./results/temp/test.mp4) (ptr=0x563c04077960)
+
+Computing ./results/temp/test.mp4  (in) hash: 
+File hash (SHA-1): CD1FA2BB8EA4AECD1774C1B0ECE13817677A7100
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "out": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_audio.aac -o udp://127.0.0.1:1234:ext=aac:rate=1m -graph" ***
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_audio.aac) (ptr=0x561428b81ec0)
+-(PID enst_audio.aac) sockout (dst=udp://127.0.0.1:1234:ext=aac:rate=1m) (ptr=0x561428b84ab0)
+

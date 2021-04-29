@@ -1,0 +1,65 @@
+*** dash_exotic_raw-live logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:25 ***
+
+
+*** Subtest "dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -out ./results/temp/test.mpd ./media/auxiliary_files/counter.hvc -profile live --muxtype=raw -fgraph -fstat" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[Dasher] No bitrate property assigned to PID counter.hvc, computing from bitstream
+[MPD] Generating MPD at time 2021-04-29T23:31:25.888Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+Filter stats - 7 filters
+	Filter fout (dst=./results/temp/test.mpd:gpac:segdur=1000/1000:profile=live:buf=1500:!check_dur:pssh=v:subs_sidx=0) : 1 input pids 0 output pids 3 tasks 44 us process time
+		1 packets processed 830 bytes processed (22727.3 pck/sec 150.909 mbps)
+		* input PID manifest_mpd: 1 packets received
+	Filter fin ID _0x55bd333cbd80_ (src=./media/auxiliary_files/counter.hvc:gpac:smode=splitx:#Representation=1) : 0 input pids 1 output pids 136 tasks 1066 us process time
+		131 packets sent 652932 bytes sent (122889 pck/sec 4900.05 mbps)
+		* output PID counter.hvc: 131 packets sent
+	Filter rfnalu : 1 input pids 1 output pids 381 tasks 12680 us process time
+		131 packets processed 652932 bytes processed (10331.2 pck/sec 411.944 mbps)
+		2512 packets sent 652074 bytes sent (198107 pck/sec 411.403 mbps)
+		* input PID counter.hvc: 131 packets received
+		* output PID counter.hvc: 2512 packets sent
+	Filter dasher ID _0x55bd333dad80_ : 1 input pids 2 output pids 411 tasks 1380 us process time
+		252 packets processed 652074 bytes processed (182609 pck/sec 3780.14 mbps)
+		253 packets sent 652904 bytes sent (183333 pck/sec 3784.95 mbps)
+		* input PID counter.hvc: 252 frames (2512 packets) received
+		* output PID manifest_mpd: 1 packets sent
+		* output PID counter.hvc: 252 packets sent
+	Filter fout (dst=./results/temp/counter_dashinit.hvc:gfopt:segdur=1000/1000:profile=live:buf=1500:!check_dur:pssh=v:subs_sidx=0:noinit:frag:xps_inband=no:psshs=moov:mime=video/hevc) : 1 input pids 0 output pids 254 tasks 1262 us process time
+		252 packets processed 654696 bytes processed (199683 pck/sec 4150.21 mbps)
+		* input PID counter.hvc: 252 packets received
+	Filter ufnalu : 1 input pids 1 output pids 393 tasks 1413 us process time
+		252 packets processed 652074 bytes processed (178344 pck/sec 3691.86 mbps)
+		252 packets sent 654696 bytes sent (178344 pck/sec 3706.7 mbps)
+		* input PID counter.hvc: 252 packets received
+		* output PID counter.hvc: 252 packets sent
+	Filter writegen : 1 input pids 1 output pids 396 tasks 358 us process time
+		252 packets processed 654696 bytes processed (703911 pck/sec 14630.1 mbps)
+		252 packets sent 654696 bytes sent (703911 pck/sec 14630.1 mbps)
+		* input PID counter.hvc: 252 packets received
+		* output PID counter.hvc: 252 packets sent
+Session stats - threads 1
+	Thread 1: run_time 18802 us active_time 18674 us nb_tasks 2110
+
+Total: run_time 18802 us active_time 18674 us nb_tasks 2110
+
+Filters connected:
+fin (src=./media/auxiliary_files/counter.hvc:gpac:smode=splitx:#Representation=1) (ID=_0x55bd333cbd80_)
+-(PID counter.hvc) rfnalu (ptr=0x55bd333d2410)
+--(PID counter.hvc) dasher (ID=_0x55bd333dad80_)
+---(PID manifest_mpd) fout (dst=./results/temp/test.mpd:gpac:segdur=1000/1000:profile=live:buf=1500:!check_dur:pssh=v:subs_sidx=0) (ptr=0x55bd333ca070)
+---(PID counter.hvc) ufnalu (ptr=0x55bd333eea10)
+----(PID counter.hvc) writegen (ptr=0x55bd333f0e40)
+-----(PID counter.hvc) fout (dst=./results/temp/counter_dashinit.hvc:gfopt:segdur=1000/1000:profile=live:buf=1500:!check_dur:pssh=v:subs_sidx=0:noinit:frag:xps_inband=no:psshs=moov:mime=video/hevc) (ptr=0x55bd333ea060)
+
+
+Computing ./results/temp/test.mpd  (mpd) hash: 
+File hash (SHA-1): AA6F049ED55956A44D6F45FD0C08E849A137211D
+Hash fail, ref hash ./hash_refs/dash_exotic_raw-live-mpd.hash was A380241D65A0D3607A01C8E722529F72F25892B7
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 6F276D9EF029C81965F0364368CAAE8024C403B6
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+

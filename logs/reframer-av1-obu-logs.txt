@@ -1,0 +1,49 @@
+*** reframer-av1-obu logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:55 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/video.av1 reframer @ -o ./results/temp/video.obu  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1884786816
+
+Filter stats - 6 filters
+	Filter fin (src=./media/auxiliary_files/video.av1) : 0 input pids 1 output pids 11 tasks 749 us process time
+		8 packets sent 37066 bytes sent (10680.9 pck/sec 395.899 mbps)
+		* output PID video.av1: 8 packets sent
+	Filter reframer ID _0x5599f0dbe020_ : 1 input pids 1 output pids 11 tasks 529 us process time
+		173 packets processed 36720 bytes processed (327032 pck/sec 555.312 mbps)
+		173 packets sent 36720 bytes sent (327032 pck/sec 555.312 mbps)
+		* input PID video.av1: 173 packets received
+		* output PID video.av1: 173 packets sent
+	Filter fout (dst=./results/temp/video.obu) : 1 input pids 0 output pids 175 tasks 278 us process time
+		173 packets processed 37066 bytes processed (622302 pck/sec 1066.65 mbps)
+		* input PID video.av1: 173 packets received
+	Filter rfav1 : 1 input pids 1 output pids 19 tasks 1456 us process time
+		8 packets processed 37066 bytes processed (5494.51 pck/sec 203.659 mbps)
+		173 packets sent 36720 bytes sent (118819 pck/sec 201.758 mbps)
+		* input PID video.av1: 8 packets received
+		* output PID video.av1: 173 packets sent
+	Filter ufobu : 1 input pids 1 output pids 177 tasks 553 us process time
+		173 packets processed 36720 bytes processed (312839 pck/sec 531.212 mbps)
+		173 packets sent 37066 bytes sent (312839 pck/sec 536.217 mbps)
+		* input PID video.av1: 173 packets received
+		* output PID video.av1: 173 packets sent
+	Filter writegen : 1 input pids 1 output pids 177 tasks 217 us process time
+		173 packets processed 37066 bytes processed (797235 pck/sec 1366.49 mbps)
+		173 packets sent 37066 bytes sent (797235 pck/sec 1366.49 mbps)
+		* input PID video.av1: 173 packets received
+		* output PID video.av1: 173 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3937 us active_time 3903 us nb_tasks 594
+
+Total: run_time 3937 us active_time 3903 us nb_tasks 594
+
+Filters connected:
+fin (src=./media/auxiliary_files/video.av1) (ptr=0x5599f0dbb7f0)
+-(PID video.av1) rfav1 (ptr=0x5599f0dc4c30)
+--(PID video.av1) reframer (ID=_0x5599f0dbe020_)
+---(PID video.av1) ufobu (ptr=0x5599f0dd57a0)
+----(PID video.av1) writegen (ptr=0x5599f0dd8820)
+-----(PID video.av1) fout (dst=./results/temp/video.obu) (ptr=0x5599f0dbf240)
+
+Computing ./results/temp/video.obu  (rewrite) hash: 
+File hash (SHA-1): DC0B36B421D847EDD484883D74EE152B9E7483B3
+Hash OK for ./results/temp/video.obu

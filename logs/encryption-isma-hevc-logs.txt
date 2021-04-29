@@ -1,0 +1,74 @@
+*** encryption-isma-hevc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:34:27 ***
+
+Computing ./results/temp/isma-hevc-crypted.mp4  (crypt) hash: 
+File hash (SHA-1): 12CBF68F50C1C819624199DBC45B06E2841FB1B7
+Hash OK for ./results/temp/isma-hevc-crypted.mp4
+
+*** Subtest "Encrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/isma.xml -out ./results/temp/isma-hevc-crypted.mp4 ./results/temp/source_media.mp4" ***
+[ISMACrypt] Encrypting stream PID1 - KMS: self
+
+Computing ./results/temp/isma-hevc-decrypted.mp4  (decrypt) hash: 
+File hash (SHA-1): FF142A08FF066EAADBE3F418FBA01F87A38A3E6E
+Hash OK for ./results/temp/isma-hevc-decrypted.mp4
+
+*** Subtest "Decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/isma.xml -out ./results/temp/isma-hevc-decrypted.mp4 ./results/temp/isma-hevc-crypted.mp4" ***
+
+Same Hash for ./results/temp/source_media.mp4 and ./results/temp/isma-hevc-decrypted.mp4
+
+*** Subtest "DumpIsma": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dcr ./results/temp/isma-hevc-crypted.mp4 -out ./results/temp/isamdump.xml" ***
+
+
+*** Subtest "HintIsma": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/isma-hevc-crypted.mp4 -out ./results/temp/isma-hevc-crypted_hint.mp4" ***
+Hinting track ID 1 - Type "encv:encv" (enc-mpeg4-generic) - BW 518 kbps
+
+
+*** Subtest "SetKMS": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -set-kms gpac:uri.isma ./results/temp/isma-hevc-crypted.mp4 -out ./results/temp/isma_kms.mp4" ***
+
+
+*** Subtest "INFO": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/isma-hevc-crypted.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.080
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand iso4 - version 1 - compatible brands: iso4
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 25000
+Media Duration 00:00:10.080 
+Media Info: Language "Undetermined (und)" - Type "vide:encv" - 252 samples
+Visual Sample Entry Info: width=1280 height=720 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=1280 height=720
+Unknown track type
+
+	Protected by ISMA E&A scheme iAEC (version 1)
+scheme location: urn:gpac:isma:encryption_scheme
+	KMS location: key in file
+	Selective Encryption: No
+	Initialization Vector size: 32 bits
+
+	RFC6381 Codec Parameters: 265b
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 25 samples
+	Max sample duration: 1000 / 25000
+
+
+Computing ./results/temp/isma-hevc-crypted_dashinit.mp4  (crypt-dash-init) hash: 
+File hash (SHA-1): 8D57AF4B4F5B20D40C50BCBE7863460B4FBDA583
+Hash OK for ./results/temp/isma-hevc-crypted_dashinit.mp4
+Computing ./results/temp/isma-hevc-crypted_dash1.m4s  (crypt-dash-seg) hash: 
+File hash (SHA-1): C647D68170F9F39662AEE5327FC3CED766E3BFDE
+Hash OK for ./results/temp/isma-hevc-crypted_dash1.m4s
+
+*** Subtest "DASH": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/isma-hevc-crypted.mp4" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[Dasher] Protection scheme iAEC has no official DASH mapping, using URI "urn:gpac:dash:mp4protection:2018"
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 4 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 8 end 3
+[MPD] Generating MPD at time 2021-04-29T23:34:27.849Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 10.08 end 4
+
+

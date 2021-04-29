@@ -1,0 +1,373 @@
+*** gpac-h-doc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:19 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -h doc" ***
+Usage: gpac [options] FILTER [LINK] FILTER [...] 
+
+General
+
+Filters are configurable processing units consuming and producing data packets. These packets are carried between filters through a data channel called pid. A PID is in charge of allocating/tracking data packets, and passing the packets to the destination filter(s). A filter output PID may be connected to zero or more filters. This fan-out is handled internally by GPAC (no such thing as a tee filter in GPAC).
+Note: When a PID cannot be connected to any filter, a warning is thrown and all packets dispatched on this PID will be destroyed. The session may however still run, unless -full-link is set.
+  
+Each output PID carries a set of properties describing the data it delivers (eg width, height, codec, ...). Properties can be built-in (identified by a 4 character code abcd, see properties (-h props) ), or user-defined (identified by a string). Each PID tracks its properties changes and triggers filter reconfiguration during packet processing. This allows the filter chain to be reconfigured at run time, potentially reloading part of the chain (eg unload a video decoder when switching from compressed to uncompressed sources).
+  
+Each filter exposes one or more sets of capabilities, called capability bundle, which are property type and values that must be matched or excluded by connecting PIDs.
+  
+Each filter exposes a set of argument to configure itself, using property types and values described as strings formatted with separators. This help is given with default separator sets :=#,@ to specify filters, properties and options. Use -seps to change them.
+
+Property format
+
+	* boolean: formatted as yes,true,1 or no,false,0
+	* enumeration (for filter arguments only): must use the syntax given in the argument description, otherwise value 0 (first in enum) is assumed.
+	* 1-dimension (numbers, floats, ints...): formatted as value[unit], where unit can be k,K (x 1000) or m,M (x 1000000) or g,G (x 1000000000) or sec (x 1000) or min (x 60000). For such properties, value +I means maximum possible value, -I minimum possible value.
+	* fraction: formatted as num/den or num-den or num, in which case the denominator is 1 if num is an integer, or 1000000 if num is a floating-point value.
+	* unsigned 32 bit integer: formatted as number or hexadecimal using the format 0xAABBCCDD.
+	* N-dimension (vectors): formatted as DIM1xDIM2[xDIM3[xDIM4]] values, without unit multiplier.
+	* string: formatted as:
+	 * `value`: copies value to string.
+	 * `file@FILE`: load string from local FILE (opened in binary mode).
+	 * `bxml@FILE`: binarize XML from local FILE and set property type to data - see https://wiki.gpac.io/NHML-Format.
+	* data: formatted as:
+	 * `size@address`: constant data block, not internally copied; size gives the size of the block, address the data pointer.
+	 * `0xBYTESTRING`: data block specified in hexadecimal, internally copied.
+	 * `file@FILE`: load data from local FILE (opened in binary mode).
+	 * `bxml@FILE`: binarize XML from local FILE - see https://wiki.gpac.io/NHML-Format.
+	* pointer: are formatted as address giving the pointer address (32 or 64 bit depending on platforms).
+	* string lists: formatted as val1,val2[,...]. Each value can also use file@FILE syntax.
+	* integer lists: formatted as val1,val2[,...]
+Note: The special characters in property formats (0x,/,-,+I,-I,x) cannot be configured.
+
+Filter declaration [FILTER]
+
+
+Generic declaration
+Each filter is declared by its name, with optional filter arguments appended as a list of colon-separated name=value pairs. Additional syntax is provided for:
+	* boolean: value can be omitted, defaulting to true (eg :noedit). Using ! before the name negates the result (eg :!moof_first)
+	* enumerations: name can be omitted (eg :disp=pbo is equivalent to :pbo), provided that filter developers pay attention to not reuse enumeration names in the same filter.
+
+  
+When string parameters are used (eg URLs), it is recommended to escape the string using the keyword gpac.  
+Example:
+filter:ARG=http://foo/bar?yes:gpac:opt=VAL
+This will properly extract the URL.
+Example:
+filter:ARG=http://foo/bar?yes:opt=VAL
+This will fail to extract it and keep :opt=VAL as part of the URL.
+The escape mechanism is not needed for local source, for which file existence is probed during argument parsing. It is also not needed for builtin protocol handlers (avin://, video://, audio://, pipe://)
+For tcp:// and udp:// protocols, the escape is not needed if a trailing / is appended after the port number.
+Example:
+-i tcp://127.0.0.1:1234:OPT
+This will fail to extract the URL and options.
+Example:
+-i tcp://127.0.0.1:1234/:OPT
+This will extract the URL and options.
+Note: one trick to avoid the escape sequence is to declare the URLs option at the end, eg f1:opt1=foo:url=http://bar, provided you have only one URL parameter to specify on the filter.
+
+It is possible to disable option parsing (for string options) by duplicating the separator.
+Example:
+filter::opt1=UDP://IP:PORT/:someopt=VAL::opt2=VAL2
+This will pass UDP://IP:PORT/:someopt=VAL to opt1 without inspecting it, and VAL2 to opt2.
+  
+A filter may be assigned a name (for inspection purposes, not inherited) using :N=name option. This name is not used in link resolution and may be changed at runtime by the filter instance.
+  
+A filter may be assigned a tag (any string) using :TAG=name option. This tag does not need to be unique, and can be used to exclude filter in link resolution. Tags are not inherited, therefore dynamically loaded filters never have a tag.
+  
+
+Source and Sink filters
+Source and sink filters do not need to be addressed by the filter name, specifying src= or dst= instead is enough. You can also use the syntax -src URL or -i URL for sources and -dst URL or -o URL for destination, this allows prompt completion in shells.
+Example:
+"src=file.mp4" or "-src file.mp4" or  "-i file.mp4"
+This will find a filter (for example fin) able to load file.mp4. The same result can be achieved by using fin:src=file.mp4.
+Example:
+"dst=dump.yuv" or "-dst dump.yuv" or "-o dump.yuv"
+This will dump the video content in dump.yuv. The same result can be achieved by using fout:dst=dump.yuv.
+
+Specific source or sink filters may also be specified using filterName:src=URL or filterName:dst=URL.
+
+The src= and dst= syntaxes can also be used in alias for dynamic argument cloning (see gpac -hx alias).
+
+
+Forcing specific filters
+There is a special option called gfreg which allows specifying preferred filters to use when handling URLs.
+Example:
+src=file.mp4:gfreg=ffdmx,ffdec
+This will use ffdmx to read file.mp4 and ffdec to decode it.
+This can be used to test a specific filter when alternate filter chains are possible.
+
+Specifying encoders and decoders
+By default filters chain will be resolved without any decoding/encoding if the destination accepts the desired format. Otherwise, decoders/encoders will be dynamically loaded to perform the conversion, unless dynamic resolution is disabled. There is a special shortcut filter name for encoders enc allowing to match a filter providing the desired encoding. The parameters for enc are:
+	* c=NAME: identifies the desired codec. NAME can be the GPAC codec name or the encoder instance for ffmpeg/others
+	* b=UINT, rate=UINT, bitrate=UINT: indicates the bitrate in bits per second
+	* g=UINT, gop=UINT: indicates the GOP size in frames
+	* pfmt=NAME: indicates the target pixel format name (see properties (-h props) ) of the source, if supported by codec
+	* all_intra=BOOL: indicates all frames should be intra frames, if supported by codec
+
+  
+Other options will be passed to the filter if it accepts generic argument parsing (as is the case for ffmpeg).
+Example:
+src=dump.yuv:size=320x240:fps=25 enc:c=avc:b=150000:g=50:cgop=true:fast=true dst=raw.264
+This creates a 25 fps AVC at 175kbps with a gop duration of 2 seconds, using closed gop and fast encoding settings for ffmpeg.
+
+The inverse operation (forcing a decode to happen) is possible using the reframer filter.
+Example:
+src=file.mp4 reframer:raw=av @ -o null
+This will force decoding media from file.mp4 and trash (send to null) the result (doing a decoder benchmark for example).
+
+When a filter uses an option defined as a string using the same separator character as gpac, you can either modify the set of separators, or escape the separator by duplicating it. The options enclosed by duplicated separator are not parsed. This is mostly used for meta filters, such as ffmpeg, to pass options to sub-filters such as libx264 (cf x264opts parameter).
+Example:
+f:a=foo:b=bar
+This will set option a to foo and option b to bar on the filter.
+Example:
+f::a=foo:b=bar
+This will set option a to foo:b=bar on the filter.
+Example:
+f:a=foo::b=bar:c::d=fun
+This will set option a to foo, b to bar:c and the option d to fun on the filter.
+
+Explicit links between filters [LINK]
+
+
+
+Quick links
+Link between filters may be manually specified. The syntax is an @ character optionally followed by an integer (0 if omitted). This indicates that the following filter specified at prompt should be linked only to a previous listed filter.
+The optional integer is a 0-based index to the previous filter declarations, 0 indicating the previous filter declaration, 1 the one before the previous declaration, ...).
+If @@ is used instead of @, the optional integer gives the filter index starting from the first filter specified in command line.
+Several link directives can be given for a filter.
+Example:
+fA fB @1 fC
+This indicates that fC only accepts inputs from fA.
+Example:
+fA fB fC @1 @0 fD
+This indicates that fD only accepts inputs from fB and fC.
+Example:
+fA fB fC ... @@1 fZ
+This indicates that fZ only accepts inputs from fB.
+
+If no link directives are given, the links will be dynamically solved to fulfill as many connections as possible (see below).
+
+Warning: This means that fA fB fC and fA fB @ fC will likely not give the same result.
+
+
+
+Complex links
+The link directive is just a quick shortcut to set the following arguments:
+- FID=name, which assigns an identifier to the filter
+- SID=name1[,name2...], which set a list of filter identifiers , or sourceIDs, restricting the list of possible inputs for a filter.
+
+Example:
+fA fB @1 fC
+This is equivalent to fA:FID=1 fB fC:SID=1.
+Link directives specify which source a filter can accept connections from. They do not specify which destination a filter can connect to.
+Example:
+fA:FID=1 fB fC:SID=1
+This indicates that fC only accepts input from fA, but fB might accept inputs from fA.
+Example:
+fA:FID=1 fB:FID=2 fC:SID=1 fD:SID=1,2
+This indicates that fD only accepts input from fA and fB and fC only from fA
+Note: A filter with sourceID set cannot get input from filters with no IDs.
+A sourceID name can be further extended using fragment identifier (# by default):
+	* name#PIDNAME: accepts only PID(s) with name PIDNAME
+	* name#TYPE: accepts only PIDs of matching media type. TYPE can be audio, video, scene, text, font, meta
+	* name#TYPEN: accepts only N (1-based index) PID of matching type from source (eg video2 to only accept second video PID)
+	* name#TAG=VAL: accepts the PID if its parent filter has no tag or a tag matching VAL
+	* name#P4CC=VAL: accepts only PIDs with property matching VAL.
+	* name#PName=VAL: same as above, using the builtin name corresponding to the property.
+	* name#AnyName=VAL: same as above, using the name of a non built-in property.
+	* name#Name=OtherPropName: compares the value with the value of another property of the PID. The matching will fail if the value to compare to is not present or different from the value to check. The property to compare with shall be a built-in property.
+If the property is not defined on the PID, the property is matched. Otherwise, its value is checked against the given value.
+
+The following modifiers for comparisons are allowed (for any fragment format using =):
+	* name#P4CC=!VAL: accepts only PIDs with property NOT matching VAL.
+	* name#P4CC-VAL: accepts only PIDs with property strictly less than VAL (only for 1-dimension number properties).
+	* name#P4CC+VAL: accepts only PIDs with property strictly greater than VAL (only for 1-dimension number properties).
+
+A sourceID name can also use wildcard or be empty to match a property regardless of the source filter.
+Example:
+fA fB:SID=*#ServiceID=2
+fA fB:SID=#ServiceID=2
+This indicates to match connection between fA and fB only for PIDs with a ServiceID property of 2.
+These extensions also work with the LINK @ shortcut.
+Example:
+fA fB @1#video fC
+This indicates that fC only accepts inputs from fA, and of type video.
+Example:
+src=img.heif @#ItemID=200 vout
+This indicates to connect to vout only PIDs with ItemID property equal to 200.
+Example:
+src=vid.mp4 @#PID=1 vout
+This indicates to connect to vout only PIDs with ID property equal to 1.
+Example:
+src=vid.mp4 @#Width=640 vout
+This indicates to connect to vout only PIDs with Width property equal to 640.
+Example:
+src=vid.mp4 @#Width-640 vout
+This indicates to connect to vout only PIDs with Width property less than 640
+Example:
+src=vid.mp4 @#ID=ItemID#ItemNumber=1 vout
+This will connect to vout only PID with an ID property equal to ItemID property (keep items, discard tracks) and an Item number of 1 (first item).
+
+Multiple fragment can be specified to check for multiple PID properties.
+Example:
+src=vid.mp4 @#Width=640#Height+380 vout
+This indicates to connect to vout only PIDs with Width property equal to 640 and Height greater than 380.
+
+
+Warning: If a filter PID gets connected to an explicitly loaded filter, no further dynamic link resolution will be done to connect it to other filters, unless sourceIDs are set. Link directives should be carefully setup.
+
+Example:
+src=video.264.mp4 @ reframer dst=dump.mp4
+This will link src file.mp4 PID (type file) to dst dump.mp4 filter (type file) because dst has no sourceID and therefore will accept input from src. Since the PID is connected, the filter engine will not try to solve a link between src and reframer. The result is a direct copy of the source file, reframer being unused.
+Example:
+src=file.mp4 reframer @ dst=dump.mp4
+This will force dst to accept only from reframer, a muxer will be loaded to solve this link, and src PID will be linked to reframer (no source ID), loading a demuxer to solve the link. The result is a complete remultiplexing of the source file.
+
+Note: the linker will prevent cycles in the graph, and a given filter can never have the same PID connected twice as an input, whether directly or through a filter chain.
+
+Arguments inheriting
+
+Unless explicitly disabled (see -max-chain), the filter engine will resolve implicit or explicit (LINK) connections between filters and will allocate any filter chain required to connect the filters. In doing so, it loads new filters with arguments inherited from both the source and the destination.
+Example:
+src=file.mp4:OPT dst=file.aac dst=file.264
+This will pass the :OPT to all filters loaded between the source and the two destinations.
+Example:
+src=file.mp4 dst=file.aac:OPT dst=file.264
+This will pass the :OPT to all filters loaded between the source and the file.aac destination.
+Note: the destination arguments inherited are the arguments placed AFTER the dst= option.
+Example:
+src=file.mp4 fout:OPTFOO:dst=file.aac:OPTBAR
+This will pass the :OPTBAR to all filters loaded between file.mp4 source and file.aac destination, but not OPTFOO.
+Arguments inheriting can be stopped by using the keyword gfloc: arguments after the keyword will not be inherited.
+Example:
+src=file.mp4 dst=file.aac:OPTFOO:gfloc:OPTBAR dst=file.264
+This will pass :OPTFOO to all filters loaded between file.mp4 source and file.aac destination, but not OPTBAR
+Arguments are by default tracked to check if they were used by the filter chain, and a warning is thrown if this is not the case.
+It may be useful to specify arguments which may not be consumed depending on the graph resolution; the specific keyword gfopt indicates that arguments after the keyword will not be tracked.
+Example:
+src=file.mp4 dst=file.aac:OPTFOO:gfopt:OPTBAR dst=file.264
+This will warn if OPTFOO is not consumed, but will not track OPTBAR.
+
+URL templating
+
+Destination URLs can be templated using the same mechanism as MPEG-DASH, where $KEYWORD$ is replaced in the template with the resolved value and $KEYWORD%%0Nd$ is replaced in the template with the resolved integer, padded with up to N zeros if needed.
+KEYWORD is case sensitive, and may be present multiple times in the string. Supported KEYWORD:
+	* num: replaced by file number if defined, 0 otherwise
+	* PID: ID of the source PID
+	* URL: URL of source file
+	* File: path on disk for source file; if not found, use URL if set, or PID name otherwise
+	* Type: name of stream type of PID (video, audio ...)
+	* p4cc=ABCD: uses PID property with 4CC value ABCD
+	* pname=VAL: uses PID property with name VAL
+	* OTHER: locates property 4CC for the given name, or property name if no 4CC matches.
+  
+$$ is an escape for $
+
+Templating can be useful when encoding several qualities in one pass.
+Example:
+src=dump.yuv:size=640x360 vcrop:wnd=0x0x320x180 enc:c=avc:b=1M @2 enc:c=avc:b=750k dst=dump_$CropOrigin$x$Width$x$Height$.264:clone
+This will create a cropped version of the source, encoded in AVC at 1M, and a full version of the content in AVC at 750k. Outputs will be dump_0x0x320x180.264 for the cropped version and dump_0x0x640x360.264 for the non-cropped one.
+
+Cloning filters
+
+When a filter accepts a single connection and has a connected input, it is no longer available for dynamic resolution. There may be cases where this behavior is undesired. Take a HEIF file with N items and do:
+Example:
+src=img.heif dst=dump_$ItemID$.jpg
+In this case, only one item (likely the first declared in the file) will connect to the destination.
+Other items will not be connected since the destination only accepts one input PID.
+There is a special option clone allowing filters to be cloned with the same arguments. The cloned filters have the same ID as the original one.
+Example:
+src=img.heif dst=dump_$ItemID$.jpg:clone
+In this case, the destination will be cloned for each item, and all will be exported to different JPEGs thanks to URL templating.
+Example:
+src=vid.mpd enc:c=avc:FID=1:clone dst=transcode.mpd:SID=1
+In this case, the encoder will be cloned for each video PIDs in the source, and the destination will only use PIDs coming from the encoders.
+
+Templating filter chains
+
+There can be cases where the number of desired outputs depends on the source content, for example dumping a multiplex of N services into N files. When the destination involves multiplexing the input PIDs, the :clone option is not enough since the muxer will always accept the input PIDs.
+To handle this, it is possible to use a PID property name in the sourceID of a filter with the value * or an empty value. In this case, whenever a new PID with a new value for the property is found, the filter with such sourceID will be dynamically cloned.
+
+Warning: This feature should only be called with a single property set to * (or empty) per source ID, results are undefined otherwise.
+
+Example:
+src=source.ts dst=file_$ServiceID$.mp4:SID=*#ServiceID=*
+src=source.ts dst=file_$ServiceID$.mp4:SID=#ServiceID=
+In this case, each new ServiceID value found when connecting PIDs to the destination will create a new destination file.
+
+Assigning PID properties
+
+It is possible to define properties on output PIDs that will be declared by a filter. This allows tagging parts of the graph with different properties than other parts (for example ServiceID). The syntax is the same as filter option, and uses the fragment separator to identify properties, eg #Name=Value.
+This sets output PIDs property (4cc, built-in name or any name) to the given value. Value can be omitted for boolean (defaults to true, eg :#Alpha).
+Non built-in properties are parsed as follows:
+- file@FOO will be declared as string with a value set to the content of FOO.
+- bxml@FOO will be declared as data with a value set to the binarized content of FOO.
+- FOO will be declared as string with a value set to FOO.
+- TYPE@FOO will be parsed according to TYPE. If the type is not recognized, the entire value is copied as string. See gpac -h props for defined types.
+
+User-assigned PID properties on filter fA will be inherited by all filters dynamically loaded to solve fA -> fB connection.
+If fB also has user-assigned PID properties, these only apply starting from fB in the chain and are not inherited by filters between fA and fB.
+
+
+Warning: Properties are not filtered and override the properties of the filter's output PIDs, be careful not to break the session by overriding core properties such as width/height/samplerate/... !
+
+Example:
+-i v1.mp4:#ServiceID=4 -i v2.mp4:#ServiceID=2 -o dump.ts
+This will mux the streams in dump.ts, using ServiceID 4 for PIDs from v1.mp4 and ServiceID 2 for PIDs from v2.mp4.
+
+PID properties may be conditionally assigned by checking other PID properties. The syntax uses parenthesis (not configurable) after the property assignment sign:
+#Prop=(CP=CV)VAL
+This will assign PID property Prop to VAL for PIDs with property CP equal to CV.
+#Prop=(CP=CV)VAL,(CP2=CV2)VAL2
+This will assign PID property Prop to VAL for PIDs with property CP equal to CV, and to VAL2 for PIDs with property CP2 equal to CV2.
+#Prop=(CP=CV)(CP2=CV2)VAL
+This will assign PID property Prop to VAL for PIDs with property CP equal to CV and property CP2 equal to CV2.
+#Prop=(CP=CV)VAL,()DEFAULT
+This will assign PID property Prop to VAL for PIDs with property CP equal to CV, or to DEFAULT for other PIDs.
+The condition syntax is the same as source ID fragment syntax.
+Note: When set, the default value (empty condition) always matches the PID, therefore it should be placed last in the list of conditions.
+Example:
+gpac -i source.mp4:#MyProp=(audio)"Super Audio",(video)"Super Video"
+This will assign property MyProp to Super Audio for audio PIDs and to Super Video for video PIDs.
+Example:
+gpac -i source.mp4:#MyProp=(audio1)"Super Audio"
+This will assign property MyProp to Super Audio for first audio PID declared.
+Example:
+gpac -i source.mp4:#MyProp=(Width+1280)HD
+This will assign property MyProp to HD for PIDs with property Width greater than 1280.
+
+Using option files
+
+It is possible to use a file to define options of a filter, by specifying the target file name as an option without value, i.e. :myopts.txt.
+
+Warning: Only local files are allowed.
+
+An option file is a simple text file containing one or more options or PID properties on one or more lines.
+A line beginning with "//" is a comment and is ignored.
+Options in an option file may point to other option files, with a maximum redirection level of 5.
+An option file declaration (filter:myopts.txt) follows the same inheritance rules as regular options.
+Example:
+src=source.mp4:myopts.txt:foo=bar dst
+Any filter loaded between source.mp4 and dst will inherit both myopts.txt and foo options and will resolve options and PID properties given in myopts.txt.
+
+Specific filter options
+
+Some specific keywords are replaced when processing filter options.
+
+Warning: These keywords do not apply to PID properties. Multiple keywords cannot be defined for a single option.
+
+Defined keywords:
+	* $GSHARE: replaced by system path to GPAC shared directory (e.g. /usr/share/gpac)
+	* $GJS: replaced by the first path from global share directory and paths set through -js-dirs that contains the file name following the macro, e.g. $GJS/source.js
+	* $GLANG: replaced by the global config language option -lang
+	* $GUA: replaced by the global config user agent option -user-agent
+	* $GINC(init_val[,inc]): replaced by init_val and increment init_val by inc (positive or negative number, 1 if not specified) each time a new filter using this string is created.
+
+The $GINC construct can be used to dynamically assign numbers in filter chains:
+Example:
+gpac -i source.ts tssplit @#ServiceID= -o dump_$GINC(10,2).ts
+This will dump first service in dump_10.ts, second service in dump_12.ts, etc...
+
+External filters
+
+GPAC comes with a set of built-in filters in libgpac. It may also load external filters in dynamic libraries, located in default module folder or folders listed in -mod-dirs option. The files shall be named gf_* and shall export a single function RegisterFilter returning a filter register - see libgpac documentation for more details.
+
+

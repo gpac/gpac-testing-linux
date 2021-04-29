@@ -1,0 +1,24 @@
+ <test name="encryption-isma-aac" result="OK" date="29/04/2021 23:34:16">
+
+  <stat subtest="Encrypt" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51608" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/isma.xml -out ./results/temp/isma-aac-crypted.mp4 ./results/temp/source_media.mp4</command_line>
+  </stat>
+  <stat subtest="Decrypt" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51940" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.07" cpu_kernel_time="0.00" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/isma.xml -out ./results/temp/isma-aac-decrypted.mp4 ./results/temp/isma-aac-crypted.mp4</command_line>
+  </stat>
+  <stat subtest="DumpIsma" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45828" cpu_percent="98%" cpu_elapsed_time="0:00.06" cpu_user_time="0.04" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dcr ./results/temp/isma-aac-crypted.mp4 -out ./results/temp/isamdump.xml</command_line>
+  </stat>
+  <stat subtest="HintIsma" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="46136" cpu_percent="100%" cpu_elapsed_time="0:00.06" cpu_user_time="0.03" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/isma-aac-crypted.mp4 -out ./results/temp/isma-aac-crypted_hint.mp4</command_line>
+  </stat>
+  <stat subtest="SetKMS" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45236" cpu_percent="98%" cpu_elapsed_time="0:00.05" cpu_user_time="0.04" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -set-kms gpac:uri.isma ./results/temp/isma-aac-crypted.mp4 -out ./results/temp/isma_kms.mp4</command_line>
+  </stat>
+  <stat subtest="INFO" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45332" cpu_percent="98%" cpu_elapsed_time="0:00.05" cpu_user_time="0.05" cpu_kernel_time="0.00" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/isma-aac-crypted.mp4</command_line>
+  </stat>
+  <stat subtest="DASH" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52464" cpu_percent="100%" cpu_elapsed_time="0:00.08" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/isma-aac-crypted.mp4</command_line>
+  </stat>
+ </test>

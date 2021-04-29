@@ -1,0 +1,48 @@
+*** mp4box-sar-enst_video logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:33 ***
+
+
+*** Subtest "create": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264 -par 1=16:9 -new ./results/temp/setpar.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/setpar.mp4  (create) hash: 
+File hash (SHA-1): 370FBF9449AF9DC522CB5E517AB9D6FC4ECDFAFA
+Hash OK for ./results/temp/setpar.mp4
+
+*** Subtest "rewrite": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264 -par 1=w16:9 -new ./results/temp/rewritepar.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/rewritepar.mp4  (rewrite) hash: 
+File hash (SHA-1): 5E5E3898C10F2A3DC7BEDDCD46FB1662CA1C52DC
+Hash OK for ./results/temp/rewritepar.mp4
+
+*** Subtest "remove": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/rewritepar.mp4 -par 1=none -new ./results/temp/remove.mp4" ***
+IsoMedia import rewritepar.mp4 - track ID 1 - Video (size 128 x 128)
+
+Computing ./results/temp/remove.mp4  (remove) hash: 
+File hash (SHA-1): 8B116E181A81866D469621ED598ED57A247DFFBA
+Hash OK for ./results/temp/remove.mp4
+
+*** Subtest "auto": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/remove.mp4 -par 1=auto -new ./results/temp/auto.mp4" ***
+IsoMedia import remove.mp4 - track ID 1 - Video (size 128 x 128)
+
+Computing ./results/temp/auto.mp4  (auto) hash: 
+File hash (SHA-1): 9480CF6B9C33EAEF85128C2227FCE2742769910E
+Hash OK for ./results/temp/auto.mp4
+
+*** Subtest "set-pl": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264:profile=1:level:1 -new ./results/temp/set-pl.mp4" ***
+Unrecognized import option level, ignoring
+Unrecognized import option 1, ignoring
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/set-pl.mp4  (set-pl) hash: 
+File hash (SHA-1): E747C266A5966720236581E0D29C7B1DF3AFFA65
+Hash OK for ./results/temp/set-pl.mp4

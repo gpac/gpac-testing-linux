@@ -1,0 +1,76 @@
+*** mp4box-io-counter_30s_audio.usac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:15 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/counter/counter_30s_audio.usac" ***
+Import probing results for ./external_media/counter/counter_30s_audio.usac:
+File has 1 tracks
+- Track 1 type: Audio - Codec xHEAAC / USAC Audio
+	SampleRate 44100 - 2 channels
+
+For more details, use `gpac -i counter_30s_audio.usac inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/counter_30s_audio.usac.mp4  (add) hash: 
+File hash (SHA-1): 78ACC8D931D13876BEAAF2DD74F03487E8103C4C
+Hash OK for ./results/temp/counter_30s_audio.usac.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_audio.usac -new ./results/temp/counter_30s_audio.usac.mp4" ***
+Track Importing xHE-AAC / USAC - SampleRate 44100 Num Channels 2
+
+Computing ./results/temp/counter_30s_audio.usac.1.tmp  (diso) hash: 
+File hash (SHA-1): 93773D69695770B62E9E2A0A379641B31BC09BB2
+Hash OK for ./results/temp/counter_30s_audio.usac.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/counter_30s_audio.usac.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:30.023
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: No visual capability required (0xff)
+Audio PL: High Quality Audio Profile @ Level 2 (0x0f)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 44100
+Media Duration 00:00:30.023 
+Media Info: Language "Undetermined (und)" - Type "soun:mp4a" - 1293 samples
+MPEG Audio xHE-AAC (AOT=42 hierarchical) - 2 Channel(s) - SampleRate 44100
+	RFC6381 Codec Parameters: mp4a.40.42
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1024 / 44100
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/counter_30s_audio.usac.mp4 -out ./results/temp/counter_30s_audio.usac.1.tmp" ***
+
+Computing ./results/temp/counter_30s_audio.usac.2.tmp  (dts) hash: 
+File hash (SHA-1): D4A22E77CF2984398939A3E5D89DA217E38A6FF2
+Hash OK for ./results/temp/counter_30s_audio.usac.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/counter_30s_audio.usac.mp4 -out ./results/temp/counter_30s_audio.usac.2.tmp" ***
+
+Computing ./results/temp/counter_30s_audio.usac.mp4.hint  (hint) hash: 
+File hash (SHA-1): 6465D2B0D70E01426A213AD25F9A60E51C185157
+Hash OK for ./results/temp/counter_30s_audio.usac.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/counter_30s_audio.usac.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): DE8715E8477D468C6DD73E449EBA140829D94ABD
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/counter_30s_audio.usac.mp4 -out ./results/temp/counter_30s_audio.usac.mp4.hint" ***
+Hinting track ID 1 - Type "mp4a:mp4a" (mpeg4-generic) - BW 28 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/counter_30s_audio.usac.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/counter_30s_audio.usac.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 2A5E04BE8C744471577F6DBD6339769C11404015
+Hash OK for ./results/temp/counter_30s_audio.usac.mp4.hint

@@ -1,0 +1,26 @@
+*** softstretch-nv12 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:46:17 ***
+
+
+*** Subtest "dump-nv12": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.jpg compositor:opfmt=nv12 @ -o ./results/temp/raw.nv12 -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+Computing ./results/temp/raw.nv12  (dump-nv12) hash: 
+File hash (SHA-1): 3070D97A7779C7F2F2210A48F8BBC37DE92A40C2
+Hash OK for ./results/temp/raw.nv12
+
+*** Subtest "blit-alpha-nv12": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.png compositor:opfmt=nv12 @ -o ./results/temp/dump_alpha.nv12" ***
+
+Computing ./results/temp/dump_alpha.nv12  (dump-alpha-nv12) hash: 
+File hash (SHA-1): 5A8B5160DB71DCAD66486931D80C55893CEC4026
+Hash OK for ./results/temp/dump_alpha.nv12
+Computing ./results/temp/dump.rgb  (blit-nv12-to-rgb) hash: 
+File hash (SHA-1): 24856964E05CD013E142147C58883FBB439649C5
+Hash OK for ./results/temp/dump.rgb
+
+*** Subtest "blit-rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.nv12:size=128x128 compositor:opfmt=rgb @ -o ./results/temp/dump.rgb" ***
+
+
+*** Subtest "dump-nv12-yuv": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.nv12:size=128x128 compositor:opfmt=yuv @ -o ./results/temp/dump_yuv.yuv" ***
+
+Computing ./results/temp/dump_yuv.yuv  (dump-nv12-yuv) hash: 
+File hash (SHA-1): A6F1B03D0080729F8FA91DF1090F16A957468CA8
+Hash OK for ./results/temp/dump_yuv.yuv

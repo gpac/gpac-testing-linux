@@ -1,0 +1,42 @@
+*** vtt-comments logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:47:05 ***
+
+
+*** Subtest "vtt-to-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/webvtt/comments.vtt -new ./results/temp/test.mp4" ***
+Track Importing WebVTT - Text track 400 x 60 layer 0
+
+Computing ./results/temp/test.mp4  (vtt-to-mp4) hash: 
+File hash (SHA-1): 761DE64A117DCB1DBB117374EA73E131C6259C25
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "vtt-dxml": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dxml ./results/temp/test.mp4 -out ./results/temp/dump.xml" ***
+
+Computing ./results/temp/dump.xml  (vtt-dxml) hash: 
+File hash (SHA-1): 0465BDAFADF73F692CC70FA35A0A188D1FED0154
+Hash OK for ./results/temp/dump.xml
+
+*** Subtest "vtt-merge-dxml": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dxml -mergevtt ./results/temp/test.mp4 -out ./results/temp/dump2.xml" ***
+
+Computing ./results/temp/dump2.xml  (vtt-merge-dxml) hash: 
+File hash (SHA-1): 5CC5CF79479990284F81DA7151A11A2B2E1073C3
+Hash OK for ./results/temp/dump2.xml
+
+*** Subtest "vtt-dump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raw 1 ./results/temp/test.mp4 -out ./results/temp/dump.vtt" ***
+Exporting WebVTT Text
+
+Computing ./results/temp/dump.vtt  (vtt-dump) hash: 
+File hash (SHA-1): B67B34B3F400BBA173E139A812F5A93C6D1AFA59
+Hash OK for ./results/temp/dump.vtt
+
+*** Subtest "six-dump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -six 1 ./results/temp/test.mp4 -out ./results/temp/dumpvtt" ***
+[iso file] Unknown box type  Exa
+
+Computing ./results/temp/dumpvtt.six  (six-dump) hash: 
+File hash (SHA-1): 9CA52DE0A3552D58AD07150ECB9ED69F5033B759
+Hash OK for ./results/temp/dumpvtt.six
+
+*** Subtest "vttraw-dump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -webvtt-raw 1 ./results/temp/test.mp4 -out ./results/temp/vttraw" ***
+[iso file] Unknown box type  Exa
+
+Computing ./results/temp/vttraw.vtt  (vttraw-dump) hash: 
+File hash (SHA-1): 1CA9D7E44E77CB9E23FFC8FDEAD92D110E78EF9B
+Hash OK for ./results/temp/vttraw.vtt

@@ -1,0 +1,24 @@
+ <test name="gpac-patch_box" result="OK" date="29/04/2021 23:29:08">
+
+  <stat subtest="add-root-box" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51700" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264 -o ./results/temp/root_add.mp4:boxpatch=./media/boxpatch/box_add_root.xml</command_line>
+  </stat>
+  <stat subtest="add-box" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51396" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264:#boxpatch=./media/boxpatch/box_add.xml -o ./results/temp/track_add.mp4</command_line>
+  </stat>
+  <stat subtest="add-box-inline" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51640" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264:#boxpatch=file@./media/boxpatch/box_add.xml -o ./results/temp/track_add_inline.mp4</command_line>
+  </stat>
+  <stat subtest="add-item" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51488" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/sky.jpg:#ItemID=1 -o ./results/temp/item_add.mp4:boxpatch=./media/boxpatch/box_add_item.xml</command_line>
+  </stat>
+  <stat subtest="add-item-prop" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51364" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.06" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/sky.jpg:#ItemID=1 -o ./results/temp/item_prop_add.mp4:boxpatch=./media/boxpatch/box_add_item_prop.xml</command_line>
+  </stat>
+  <stat subtest="add-item-prop2" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50736" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/sky.jpg:#ItemID=1:#boxpatch=./media/boxpatch/box_add_item_prop_no_item.xml -o ./results/temp/item_prop_add2.mp4</command_line>
+  </stat>
+  <stat subtest="add-frag" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51600" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.06" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264 --boxpatch=./media/boxpatch/box_add_frag.xml -o ./results/temp/file.mpd</command_line>
+  </stat>
+ </test>

@@ -1,0 +1,52 @@
+*** dash-xlink logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:26 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264:dur=2 -new ./results/temp/remote.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+[MP4Mux] Imported 52 frames - media duration 2.08 - track duration 2.08
+AVC|H264 duration specified at import time, may have parsed more frames than imported
+AVC|H264 parsed 56 samples (65 NALUs) - Slices: 3 I 53 P 0 B - 1 SEI - 3 IDR
+AVC|H264 Max NALU size is 27841 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "dash-remote": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -profile live ./results/temp/remote.mp4 -out ./results/temp/remote.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 3
+[MPD] Generating MPD at time 2021-04-29T23:33:26.211Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.08 end 4
+
+
+Computing ./results/temp/remote.mpd  (mpd) hash: 
+File hash (SHA-1): D5A484BA8DC12EBB286FB4F61B86E105850D2592
+Hash OK for ./results/temp/remote.mpd
+
+*** Subtest "dash-xlink": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -profile live ./results/temp/main.mp4:period=1 :period=2:xlink=remote.mpd:pdur=2 ./results/temp/main2.mp4:period=3 -out ./results/temp/file.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 3
+[MPD] Generating MPD at time 2021-04-29T23:33:26.374Z
+[Dasher] End of Period 1
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.08 end 4
+[MPD] Generating MPD at time 2021-04-29T23:33:26.374Z
+[Dasher] End of Period 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 3
+[MPD] Generating MPD at time 2021-04-29T23:33:26.377Z
+[Dasher] End of Period 3
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.08 end 4
+
+
+Computing ./results/temp/remote.mpd  (mpd) hash: 
+File hash (SHA-1): D5A484BA8DC12EBB286FB4F61B86E105850D2592
+Hash OK for ./results/temp/remote.mpd
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:dur=6/1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 116218C114432BD34D8D34C347DDE50153F508EC
+Hash OK for ./results/temp/inspect.txt

@@ -1,0 +1,89 @@
+*** mp4box-io-svc_BasketBallDrive1080p50_mc_1Mbps.h264 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:08 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/svc_BasketBallDrive1080p50_mc_1Mbps.h264" ***
+Import probing results for ./external_media/import/svc_BasketBallDrive1080p50_mc_1Mbps.h264:
+File has 1 tracks
+Duration: 1 s
+- Track 1 type: Video - Codec MPEG-4 AVC|H264 Video
+	Size 1280x720 @ 50 FPS PAR: 1:1
+
+For more details, use `gpac -i svc_BasketBallDrive1080p50_mc_1Mbps.h264 inspect[:deep][:analyze=on|bs]`
+
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/svc_BasketBallDrive1080p50_mc_1Mbps.h264 -new ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4" ***
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 200/4 SAR 1/1
+SVC Detected - SSPS ID 0 - frame size 1920 x 1080
+AVC|H264 Import results: 501 samples (2161 NALUs) - Slices: 12 I 126 P 363 B - 513 SEI - 12 IDR
+AVC|H264 SVC (SSPS ID 0, 1920x1080) Import results: Slices: 12 I 126 P 363 B
+AVC|H264 Stream uses forward prediction - stream CTS offset: 3 frames
+AVC|H264 Max NALU size is 20897 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "NALDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 1 ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4 -out ./results/temp/nal.xml" ***
+
+Computing ./results/temp/nal.xml  (NALDump) hash: 
+File hash (SHA-1): A918A93796FCD82E106DDFE35F5A3CC2C6467F21
+Hash OK for ./results/temp/nal.xml
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.020
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom avc1
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: AVC/H264 Profile (0x7f)
+Audio PL: No audio capability required (0xff)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 200
+Media Duration 00:00:10.020 
+Track has 1 edits: track duration is 00:00:10.020
+Media Info: Language "Undetermined (und)" - Type "vide:avc1" - 501 samples
+Visual Sample Entry Info: width=1280 height=720 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=1280 height=720
+AVC/H264 Video - Visual Size 1280 x 720
+	AVC Info: 1 SPS - 1 PPS - Profile High @ Level 3.2
+	NAL Unit length bits: 32
+	Pixel Aspect Ratio 1:1 - Indicated track size 1280 x 720
+	Chroma format YUV 4:2:0 - Luma bit depth 8 - chroma bit depth 8
+	SPS#1 hash: 6DD87966881DA1A568762B478CAFAF58F16CC0C3
+	PPS#1 hash: EF201B815F58F908DCEBF71182F58C2DCF852B6A
+
+	SVC Info: 1 SPS - 1 PPS - Profile Scalable High @ Level 5
+	SVC NAL Unit length bits: 32
+		SPS ID 0 - Visual Size 1920 x 1080
+	Pixel Aspect Ratio 1:1 - Indicated track size 1280 x 720
+	SPS#1 hash: 2A5228F935F376D35BF7B3C4BDE651BAB263EA87
+	PPS#1 hash: CCFA38B6EC5EDE225B30B6981E79822EB5A52051
+	RFC6381 Codec Parameters: avc1.640020
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 45 samples
+	Max sample duration: 4 / 200
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4 -out ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.1.tmp" ***
+
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4 -out ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 72D6309CD577EE66DAB50533D512328C96359624
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4 -out ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4.hint" ***
+Hinting track ID 1 - Type "avc1:avc1" (H264) - BW 1756 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/svc_BasketBallDrive1080p50_mc_1Mbps.h264.mp4.hint" ***
+Removing hint track ID 65536
+

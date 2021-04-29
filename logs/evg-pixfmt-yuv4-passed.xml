@@ -1,0 +1,12 @@
+ <test name="evg-pixfmt-yuv4" result="OK" date="29/04/2021 23:34:59">
+
+  <stat subtest="rgb_yuv4" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52860" cpu_percent="100%" cpu_elapsed_time="0:00.08" cpu_user_time="0.07" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/raw/raw.rgb:size=128x128 compositor:!softblt:opfmt=yuv4 @ -o ./results/temp/dump.yuv4  -graph -stats</command_line>
+  </stat>
+  <stat subtest="yuv4_rgb" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52920" cpu_percent="100%" cpu_elapsed_time="0:00.08" cpu_user_time="0.07" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dump.yuv4:size=128x128 compositor:!softblt:opfmt=rgb @ -o ./results/temp/dump.rgb  -graph -stats</command_line>
+  </stat>
+  <stat subtest="compose_yuv4" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="53560" cpu_percent="98%" cpu_elapsed_time="0:00.09" cpu_user_time="0.07" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -font-dirs=./external_media/fonts/ -rescan-fonts -i ./results/temp/dump.yuv4:size=128x128 -i ./external_media/raw/overlay.bt compositor:!softblt:drv=no @ -o ./results/temp/compose.yuv4  -graph -stats</command_line>
+  </stat>
+ </test>

@@ -1,0 +1,68 @@
+*** dash-subt logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:19 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/subtitle.srt -new ./results/temp/file.mp4" ***
+Track Importing Timed Text - Text track 400 x 60 font Serif (size 18) layer 0
+
+Computing ./results/temp/file_dash3.m4s  (dash-seg3) hash: 
+File hash (SHA-1): 9184130756E20F00C16F80BAF9D1FB54ED325EE0
+Hash OK for ./results/temp/file_dash3.m4s
+Computing ./results/temp/file.mpd  (dash-subt-hash-mpd) hash: 
+File hash (SHA-1): A94A1A9E753FB30CFF4F747E431748D35A92B0F6
+Hash OK for ./results/temp/file.mpd
+
+*** Subtest "dash-subt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1500 ./results/temp/file.mp4 -profile live -out ./results/temp/file.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.5 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 3 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 4.5 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 6 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 7.5 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 9 end 7
+[MPD] Generating MPD at time 2021-04-29T23:33:19.551Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 10.487 end 8
+
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): AD12B2D75DF0AD7CF6244F78F011C75045C8DE81
+Hash fail, ref hash ./hash_refs/dash-subt-inspect.hash was 1BD9194204877C3E7D58E0DD9E6DA613944F0407
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/file2_dash10.m4s  (dash-seg10) hash: 
+File hash (SHA-1): 611B4155955A0890AC324DE7C0254BE39A784ADA
+Hash OK for ./results/temp/file2_dash10.m4s
+Computing ./results/temp/file.mpd  (dash-subt2-hash-mpd) hash: 
+File hash (SHA-1): A94A1A9E753FB30CFF4F747E431748D35A92B0F6
+Hash OK for ./results/temp/file.mpd
+
+*** Subtest "dash-subt2": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 500 ./results/temp/file2.mp4 -profile live -out ./results/temp/file2.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 0.5 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 1.5 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 2 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 2.5 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 3 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 3.5 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 4 end 9
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 4.5 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 5 end 11
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 5.5 end 12
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 6 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 6.5 end 14
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 7 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 7.5 end 16
+[MP4Mux] Done writing segment 16 - estimated next fragment times start 8 end 17
+[MP4Mux] Done writing segment 17 - estimated next fragment times start 8.5 end 18
+[MP4Mux] Done writing segment 18 - estimated next fragment times start 9 end 19
+[MPD] Generating MPD at time 2021-04-29T23:33:19.939Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 19 - estimated next fragment times start 9.5 end 20
+[MP4Mux] Done writing segment 20 - estimated next fragment times start 10 end 21
+[MP4Mux] Done writing segment 21 - estimated next fragment times start 10.487 end 22
+
+

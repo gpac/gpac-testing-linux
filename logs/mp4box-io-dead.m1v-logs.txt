@@ -1,0 +1,82 @@
+*** mp4box-io-dead.m1v logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:55 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/dead.m1v" ***
+Import probing results for ./external_media/import/dead.m1v:
+File has 1 tracks
+- Track 1 type: Video - Codec MPEG-1 Video
+	Size 320x240 @ 25 FPS
+
+For more details, use `gpac -i dead.m1v inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/dead.m1v.mp4  (add) hash: 
+File hash (SHA-1): E931B69C346D493F08830049BDBEEEDCE26D2F88
+Hash OK for ./results/temp/dead.m1v.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/dead.m1v -new ./results/temp/dead.m1v.mp4" ***
+Track Importing MPEG-2 Video - Width 320 Height 240 FPS 25000/1000
+MPEG-1/2 Import results: 1017 VOPs (69 Is - 294 Ps - 654 Bs)
+	2 max consecutive B-frames
+
+Computing ./results/temp/dead.m1v.1.tmp  (diso) hash: 
+File hash (SHA-1): 00526F7E5B3CFACACEC4C52C796165222B6BE2D0
+Hash OK for ./results/temp/dead.m1v.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/dead.m1v.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:40.680
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: ISO Reserved Profile (0x6a)
+Audio PL: No audio capability required (0xff)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 25000
+Media Duration 00:00:40.680 
+Track has 1 edits: track duration is 00:00:40.680
+Media Info: Language "Undetermined (und)" - Type "vide:mp4v" - 1017 samples
+Visual Sample Entry Info: width=320 height=240 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=320 height=240
+MPEG-1 Video - Visual Size 320 x 240
+[RFC6381-M4V] Cannot find M4V config, using default mp4v.6A
+	RFC6381 Codec Parameters: mp4v.6A
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 14 samples
+	Max sample duration: 1000 / 25000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/dead.m1v.mp4 -out ./results/temp/dead.m1v.1.tmp" ***
+
+Computing ./results/temp/dead.m1v.2.tmp  (dts) hash: 
+File hash (SHA-1): EA210582D52437B871A60065B0DB44108546E4CB
+Hash OK for ./results/temp/dead.m1v.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/dead.m1v.mp4 -out ./results/temp/dead.m1v.2.tmp" ***
+
+Computing ./results/temp/dead.m1v.mp4.hint  (hint) hash: 
+File hash (SHA-1): C3481A2D9382C43AD8EDC9D6FF8A3AAC0480E85C
+Hash OK for ./results/temp/dead.m1v.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dead.m1v.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): BAB7D0C9055B8EA30B101E460CA4E27A43DAE120
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/dead.m1v.mp4 -out ./results/temp/dead.m1v.mp4.hint" ***
+Hinting track ID 1 - Type "mp4v:mp4v" (MPV) - BW 550 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/dead.m1v.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/dead.m1v.mp4.hint  (unhint) hash: 
+File hash (SHA-1): D532198E323A66160FD0D83DF80012EB2075FD84
+Hash OK for ./results/temp/dead.m1v.mp4.hint

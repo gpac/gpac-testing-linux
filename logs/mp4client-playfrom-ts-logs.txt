@@ -1,0 +1,149 @@
+*** mp4client-playfrom-ts logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:41:41 ***
+
+
+*** Subtest "create": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264 -o ./results/temp/file.ts" ***
+[M2TSMux] Packet CTS 2880000 is less than packet DTS 3040000, adjusting all CTS by 320000 / 4000000!
+
+
+*** Subtest "play": executing "MP4Client -noprog -strict-error  -mem-track -p=0 -for-test -no-save -size 100x100 -speed 2 -rtix ./results/temp/logs.txt -exit -play-from 6 ./results/temp/file.ts -cov -blacklist=vtbdec,nvdec" ***
+System info: 7961 MB RAM - 2 cores
+Loading GPAC Terminal
+Terminal Loaded in 156 ms
+Opening URL ./results/temp/file.ts
+Service Connected
+                                                                                     ************** Bench Mode Done in 833 ms ********************
+ffdec:h264 128x128 sar=1:1 duration 8.18s
+71% 34 frames FPS 61.48 (max 288266 us/f) rate avg 0 max 0
+71% 34 f FPS 61.48 (288.27 ms max) rate 0 Currently loaded objects:
+Current service ID 1
+#0 Root - OD ID 1
+ #1 - ./results/temp/file.ts - Video - Service ID 1
++ Service ./results/temp/file.ts:
+ - OD 1: Playing - Buffer: 0 ms - Clock drift: 0 ms - time: 00:00:05.839
+
++ Service ./results/temp/file.ts:
+ - OD 1: Playing - Buffer: 0 ms - CB: 0/4 CUs
+  34 decoded frames - 0 dropped frames
+  Avg Bitrate 0 kbps (0 max) - Avg Decoding Time 136337.41 us (288266 max)
+
+Object Duration: 00:00:08.177
+Service Handler: fin
+Service URL: ./results/temp/file.ts
+
+Stream ID 0 - Unknown - Clock ID 101
+
+Stopped - Not buffering - Clock drift: 0 ms
+
+Current Downloads in service:
+./results/temp/file.ts: 85916 / 85916 bytes (100.00 %) - 0.00 kBps
+
+Object Duration: 00:00:08.177
+Service Handler: fin
+Service URL: ./results/temp/file.ts
+Video Object: Width 128 - Height 128
+Media Codec: ffdec:h264
+	Bitrate over last second: 0 kbps
+	Max bitrate over one second: 0 kbps
+	Average Decoding Time 136337.41 us 288266 max)
+	Total decoded frames 34
+
+Stream ID 101 - Visual - Clock ID 101
+
+Playing - Buffer: 0 ms - Clock drift: 0 ms
+Composition Buffer: 0 CU (4 max)
+
+Usage: MP4Client [options] [filename]
+
+General
+
+The player accepts any URL supported by GPAC.
+Specific URLs shortcuts are available, see GPAC Compositor (gpac -h compositor)
+Version: 1.1.0-DEV-revUNKNOWN-HEAD
+(c) 2000-2021 Telecom Paris distributed under LGPL v2.1+ - http://gpac.io
+
+Please cite our work in your research:
+	GPAC Filters: https://doi.org/10.1145/3339825.3394929
+	GPAC: https://doi.org/10.1145/1291233.1291452
+
+For more info on GPAC configuration, use gpac  -h bin  
+  
+
+Options  
+
+  
+-size (string):                specify visual size WxH. If not set, scene size or video size is used
+-rti-refresh (int):            set refresh time in ms between two runt-time counters queries (default is 200)
+-no-audio:                     disable audio
+-pause:                        pause at first frame
+-play-from (number):           start playback from given time in seconds in media
+-speed (number):               start playback wit given speed
+-loop:                         loop playback
+-fs:                           start in fullscreen mode
+-exit:                         exit when presentation is over
+-run-for:                      run for indicated time in seconds and exits
+-service (int):                auto-tune to given service ID in a multiplex
+-gui:                          start in GUI mode. The GUI is indicated in the configuration file [General]StartupFile
+-p (string):                   use indicated profile for the global GPAC config. If not found, config file is created. If a file path is indicated, this will load profile from that file. Otherwise, this will create a directory of the specified name and store new config there. Reserved name 0 means a new profile, not stored to disk. Works using -p=NAME or -p NAME
+-nk:                           disable keyboard interaction
+-h,-help:                      show this help. Use -hx to show expert help
+-hc:                           show libgpac core options
+-hr:                           show runtime options when keybard interaction is enabled
+
+MP4Client runtime commands
+
+
+Prompt Interaction
+The following keys are used for prompt interaction:
+q: quit
+X: kill
+r: reload current presentation
+o: connect to the specified URL
+O: connect to the specified playlist
+N: switch to the next URL in the playlist. Also works with \n
+P: jump to a given number ahead in the playlist
+D: disconnect the current presentation
+G: select object or service ID
+p: play/pause the presentation
+s: step one frame ahead
+z: seek into presentation by percentage
+T: seek into presentation by time
+t: print current timing
+u: send a command (BIFS or LASeR) to the main scene
+e: evaluate JavaScript code in the main scene
+Z: dump current output frame to PNG
+w: view world info
+v: view list of active media objects in scene
+i: view Object Descriptor info (by ID)
+j: view Object Descriptor info (by number)
+b: view media objects timing and buffering info
+m: view media objects buffering and memory info
+d: dump scene graph
+k: turn stress mode on/off
+n: change navigation mode
+x: reset to last active viewpoint
+3: switch OpenGL on or off for 2D scenes
+4: force 4/3 Aspect Ratio
+5: force 16/9 Aspect Ratio
+6: force no Aspect Ratio (always fill screen)
+7: force original Aspect Ratio (default)
+H: set HTTP max download rate
+E: force reload of compositor options
+L: change to new log tool/level. CF MP4Client usage for possible values
+R: toggle run-time info display in window title bar on/off
+F: toggle displaying of FPS in stderr on/off
+f: print filter session stats
+g: print filter session graph
+h: print this message
+M: specify video cache memory for 2D objects ! experimental !
+
+
+Content interaction
+It is possible to interact with content (interactive or not) using mouse and keyboard.
+The following commands are available:
+TODO
+
+No World Info available
+Select Navigation ('N'one, 'E'xamine, 'S'lide): Dump to gpac_video_dump_1619739702743.png
+Done: gpac_video_dump_1619739702743.png
+Service Disconnected
+

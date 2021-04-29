@@ -1,0 +1,93 @@
+*** mp4box-io-counter.hvc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:22 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/counter.hvc" ***
+Import probing results for ./media/auxiliary_files/counter.hvc:
+File has 1 tracks
+Duration: 1 s
+- Track 1 type: Video - Codec HEVC Video
+	Size 1280x720 @ 25 FPS
+
+For more details, use `gpac -i counter.hvc inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/counter.hvc.mp4  (add) hash: 
+File hash (SHA-1): FF142A08FF066EAADBE3F418FBA01F87A38A3E6E
+Hash OK for ./results/temp/counter.hvc.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/counter.hvc -new ./results/temp/counter.hvc.mp4" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2546 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "NALDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 1 ./results/temp/counter.hvc.mp4 -out ./results/temp/nal.xml" ***
+
+Computing ./results/temp/nal.xml  (NALDump) hash: 
+File hash (SHA-1): BACFA603619AABD9D580402473A9CAA3FBFDA558
+Hash OK for ./results/temp/nal.xml
+Computing ./results/temp/counter.hvc.1.tmp  (diso) hash: 
+File hash (SHA-1): 5A0B1378C97B7D88AD2027083EAFD227E5631D70
+Hash OK for ./results/temp/counter.hvc.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/counter.hvc.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.080
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand iso4 - version 1 - compatible brands: iso4
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 25000
+Media Duration 00:00:10.080 
+Media Info: Language "Undetermined (und)" - Type "vide:hvc1" - 252 samples
+Visual Sample Entry Info: width=1280 height=720 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=1280 height=720
+HEVC Video - Visual Size 1280 x 720
+	HEVC Info: Profile Main @ Level 6.2 - Chroma Format YUV 4:2:0
+
+	NAL Unit length bits: 32 - general profile compatibility 0x60000000
+
+	Parameter Sets: 1 VPS 1 SPS 1 PPS 
+	SPS resolution 1280x720
+	Bit Depth luma 8 - Chroma 8 - 2 temporal layers
+	VPS#1 hash: 9E811E99CCFE114792C63911120CBE88BA7BD8CD
+	SPS#1 hash: BA22AAE3C2B2C9488D5811717CF8A1A2976F748C
+	PPS#1 hash: A7386EEF7CBEA134DAEDABE7B8E66804B3323450
+
+	RFC6381 Codec Parameters: hvc1.1.6.L186.80
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 25 samples
+	Max sample duration: 1000 / 25000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/counter.hvc.mp4 -out ./results/temp/counter.hvc.1.tmp" ***
+
+Computing ./results/temp/counter.hvc.2.tmp  (dts) hash: 
+File hash (SHA-1): 310751B4A2D5C706D05148E7B50549217792FC71
+Hash OK for ./results/temp/counter.hvc.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/counter.hvc.mp4 -out ./results/temp/counter.hvc.2.tmp" ***
+
+Computing ./results/temp/counter.hvc.mp4.hint  (hint) hash: 
+File hash (SHA-1): 3F82E3E5C67AD6A897A7E8F4E367B7B80ED62B84
+Hash OK for ./results/temp/counter.hvc.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/counter.hvc.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 759A8FE979C9E6228587DB00E40D0A3EFBB6A495
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/counter.hvc.mp4 -out ./results/temp/counter.hvc.mp4.hint" ***
+Hinting track ID 1 - Type "hvc1:hvc1" (H265) - BW 518 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/counter.hvc.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/counter.hvc.mp4.hint  (unhint) hash: 
+File hash (SHA-1): B7FB4489D3206CE3D0FA31E206EE472C2E0FD3C8
+Hash OK for ./results/temp/counter.hvc.mp4.hint

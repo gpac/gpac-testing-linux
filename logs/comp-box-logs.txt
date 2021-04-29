@@ -1,0 +1,24 @@
+*** comp-box logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:30:37 ***
+
+
+*** Subtest "comp": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 --compress=moov -add ./media/auxiliary_files/count_video.cmp -new ./results/temp/comp.mp4" ***
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+
+
+*** Subtest "comp-read": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/comp.mp4 inspect:deep:log=./results/temp/comp-inspect.txt" ***
+
+Computing ./results/temp/comp-inspect.txt  (comp-read) hash: 
+File hash (SHA-1): BFF5F2A43EBDA41542D7B8D081B93B846D829A55
+Hash OK for ./results/temp/comp-inspect.txt
+
+*** Subtest "dash": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 --compress=all -i ./media/auxiliary_files/count_video.cmp -o ./results/temp/comp.mpd:profile=onDemand" ***
+
+
+*** Subtest "comp-dash-read": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/comp.mpd inspect:deep:log=./results/temp/comp-dash-inspect.txt" ***
+
+Computing ./results/temp/comp-dash-inspect.txt  (comp-dash-read) hash: 
+File hash (SHA-1): 18F48C6CA8C935F97956476C95E64428573061C2
+Hash OK for ./results/temp/comp-dash-inspect.txt

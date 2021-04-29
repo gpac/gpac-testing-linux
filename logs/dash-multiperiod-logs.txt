@@ -1,0 +1,64 @@
+*** dash-multiperiod logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:46 ***
+
+
+*** Subtest "multiperiod-input-preparation_180": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_320x180_128kbps.264:dur=5 -new ./results/temp/counter_video_180.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 320 Height 180 FPS 100/4
+[MP4Mux] Imported 127 frames - media duration 5.08 - track duration 5.08
+AVC|H264 duration specified at import time, may have parsed more frames than imported
+AVC|H264 parsed 134 samples (153 NALUs) - Slices: 7 I 128 P 0 B - 1 SEI - 6 IDR
+AVC|H264 Max NALU size is 6849 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "multiperiod-input-preparation_audio": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_audio.aac:dur=5 -new ./results/temp/counter_audio.mp4" ***
+Track Importing AAC  - SampleRate 44100 Num Channels 1
+[MP4Mux] Imported 216 frames - media duration 5.01551 - track duration 5.015
+
+
+*** Subtest "dash-multiperiod": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -bs-switching no -dash 1000 -dash-profile live -out ./results/temp/file.mpd -segment-name $RepresentationID$-$Number$ ./results/temp/counter_audio.mp4:id=ap1:Period=P1 ./results/temp/counter_video_180.mp4:id=vp1:Period=P1 ./results/temp/counter_audio.mp4:id=ap2:Period=P2 ./results/temp/counter_video_180.mp4:id=vp2:Period=P2" ***
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 0.998458 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3 end 4
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.99692 end 3
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5 end 6
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.99537 end 4
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 5.08 end 7
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 3.99383 end 5
+[MPD] Generating MPD at time 2021-04-29T23:31:46.839Z
+[Dasher] End of Period P1
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.01551 end 6
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 0.998458 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3 end 4
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.99692 end 3
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5 end 6
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.99537 end 4
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 5.08 end 7
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 3.99383 end 5
+[Dasher] patch for old regression tests hit, changing max seg dur from 1022 to 1080
+Please notify GPAC devs to remove this, and do not use fot_test modes in dash filter
+[MPD] Generating MPD at time 2021-04-29T23:31:46.844Z
+[Dasher] End of Period P2
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.01551 end 6
+
+
+Computing ./results/temp/vp1-.mp4  (initp1) hash: 
+File hash (SHA-1): 5BDF72A4655042104C5B1D3E8A0EBB21A4682EBB
+Hash OK for ./results/temp/vp1-.mp4
+Computing ./results/temp/vp2-.mp4  (initp2) hash: 
+File hash (SHA-1): 5BDF72A4655042104C5B1D3E8A0EBB21A4682EBB
+Hash OK for ./results/temp/vp2-.mp4
+Computing ./results/temp/file.mpd  (mpd) hash: 
+File hash (SHA-1): AB27D985C9D51A240B5BB0EEB9E3D5AD0FA25D72
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): C8B217C0239D3A5F858C99096ECDAF02F63F9854
+Hash fail, ref hash ./hash_refs/dash-multiperiod-inspect.hash was 980570BA83247691E7AEAB73D139392D689C3BB3
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+

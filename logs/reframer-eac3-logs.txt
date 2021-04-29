@@ -1,0 +1,43 @@
+*** reframer-eac3 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:57 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_30s_audio.eac3 -blacklist=ffdmx reframer @ -o ./results/temp/dump.mp4  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 311181184
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/counter/counter_30s_audio.eac3) : 0 input pids 1 output pids 76 tasks 800 us process time
+		73 packets sent 360280 bytes sent (91250 pck/sec 3602.8 mbps)
+		* output PID counter_30s_audio.eac3: 73 packets sent
+	Filter reframer ID _0x5626aebf0260_ : 1 input pids 1 output pids 76 tasks 1023 us process time
+		861 packets processed 359862 bytes processed (841642 pck/sec 2814.17 mbps)
+		861 packets sent 359862 bytes sent (841642 pck/sec 2814.17 mbps)
+		* input PID counter_30s_audio.eac3: 861 packets received
+		* output PID counter_30s_audio.eac3: 861 packets sent
+	Filter fout (dst=./results/temp/dump.mp4) : 1 input pids 0 output pids 75 tasks 483 us process time
+		73 packets processed 364075 bytes processed (151139 pck/sec 6030.23 mbps)
+		* input PID counter_30s_audio.eac3: 73 packets received
+	Filter rfac3 : 1 input pids 1 output pids 84 tasks 2996 us process time
+		73 packets processed 360280 bytes processed (24365.8 pck/sec 962.029 mbps)
+		861 packets sent 359862 bytes sent (287383 pck/sec 960.913 mbps)
+		* input PID counter_30s_audio.eac3: 73 packets received
+		* output PID counter_30s_audio.eac3: 861 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 865 tasks 2336 us process time
+		861 packets processed 359862 bytes processed (368579 pck/sec 1232.4 mbps)
+		73 packets sent 364075 bytes sent (31250 pck/sec 1246.83 mbps)
+		* input PID counter_30s_audio.eac3: 861 packets received
+		* output PID counter_30s_audio.eac3: 73 packets sent
+Session stats - threads 1
+	Thread 1: run_time 7533 us active_time 7461 us nb_tasks 1321
+
+Total: run_time 7533 us active_time 7461 us nb_tasks 1321
+
+Filters connected:
+fin (src=./external_media/counter/counter_30s_audio.eac3) (ptr=0x5626aebddbb0)
+-(PID counter_30s_audio.eac3) rfac3 (ptr=0x5626aebf5080)
+--(PID counter_30s_audio.eac3) reframer (ID=_0x5626aebf0260_)
+---(PID counter_30s_audio.eac3) mp4mx (ptr=0x5626aebfc7f0)
+----(PID counter_30s_audio.eac3) fout (dst=./results/temp/dump.mp4) (ptr=0x5626aebf13b0)
+
+Computing ./results/temp/dump.mp4  (rewrite) hash: 
+File hash (SHA-1): B56A2AE9F3643ADD0C1BFE166FA8735EA2EEE270
+Hash OK for ./results/temp/dump.mp4

@@ -1,0 +1,71 @@
+*** encryption-cbcs-avc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:51 ***
+
+Computing ./results/temp/cbcs-avc-crypted.mp4  (crypt) hash: 
+File hash (SHA-1): 6B09C3E85EF0DFAD0B7067DBB3F8F54E3357F2CC
+Hash OK for ./results/temp/cbcs-avc-crypted.mp4
+
+*** Subtest "Encrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/cbcs.xml -out ./results/temp/cbcs-avc-crypted.mp4 ./results/temp/source_media.mp4" ***
+
+Computing ./results/temp/cbcs-avc-decrypted.mp4  (decrypt) hash: 
+File hash (SHA-1): 12A035C2E9B0EB18E845EDD1CBFEE3D94D76EE13
+Hash OK for ./results/temp/cbcs-avc-decrypted.mp4
+
+*** Subtest "Decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/cbcs.xml -out ./results/temp/cbcs-avc-decrypted.mp4 ./results/temp/cbcs-avc-crypted.mp4" ***
+
+Same Hash for ./results/temp/source_media.mp4 and ./results/temp/cbcs-avc-decrypted.mp4
+
+*** Subtest "INFO": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/cbcs-avc-crypted.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:06.960
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom avc1
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: AVC/H264 Profile (0x7f)
+Audio PL: No audio capability required (0xff)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 4000000
+Media Duration 00:00:06.920 
+Track has 1 edits: track duration is 00:00:06.960
+Media Info: Language "Undetermined (und)" - Type "vide:encv" - 173 samples
+Visual Sample Entry Info: width=128 height=128 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=128
+AVC/H264 Video - Visual Size 128 x 128
+	AVC Info: 1 SPS - 1 PPS - Profile High @ Level 5.1
+	NAL Unit length bits: 32
+	Chroma format YUV 4:2:0 - Luma bit depth 8 - chroma bit depth 8
+	SPS#1 hash: F6932703545AC73EB4B06422517531B1C0D283E2
+	PPS#1 hash: 3A989C24CAD66ADB5B83367A3D196480883A6252
+
+	Protected by CENC scheme cbcs version 0x00010000 - Pattern 9:1
+		KID 279926496A7F5D25DA69F2B3B2799A7F - IV size 39 
+
+	RFC6381 Codec Parameters: avc1.640033
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 173 samples
+	Max sample duration: 160000 / 4000000
+
+
+Computing ./results/temp/cbcs-avc-crypted_dashinit.mp4  (crypt-dash-init) hash: 
+File hash (SHA-1): FFF3BE0B38FFB3DBA0AC8C690A70D3DF45EFDFAC
+Hash OK for ./results/temp/cbcs-avc-crypted_dashinit.mp4
+Computing ./results/temp/cbcs-avc-crypted_dash1.m4s  (crypt-dash-seg) hash: 
+File hash (SHA-1): 74BC1115062A422AF2975DDC91E9184D917F4F26
+Hash OK for ./results/temp/cbcs-avc-crypted_dash1.m4s
+
+*** Subtest "DASH": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/cbcs-avc-crypted.mp4" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[Dasher] Segment 1 duration 6.48 more than 3/2 DASH duration, consider reencoding or using segment timeline
+[Dasher] First CTS 25920000 in segment 2 drifting by 2.48 (more than half a segment duration) from segment time, consider reencoding or using segment timeline
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 6.52 end 2
+[MPD] Generating MPD at time 2021-04-29T23:33:51.639Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 7 end 3
+
+

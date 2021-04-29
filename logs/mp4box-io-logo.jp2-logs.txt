@@ -1,0 +1,63 @@
+*** mp4box-io-logo.jp2 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:59 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/logo.jp2" ***
+[iso file] Unknown top-level box type jP  
+[iso file] Unknown top-level box type jp2c
+Import probing results for ./external_media/import/logo.jp2:
+File has 1 tracks
+- Track 1 type: Video - Codec JPEG2000 Image
+	Size 128x128
+
+For more details, use `gpac -i logo.jp2 inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/logo.jp2.mp4  (add) hash: 
+File hash (SHA-1): CEBC71C34DDC6E546F9E2A6B6C91A3795F6B8236
+Hash OK for ./results/temp/logo.jp2.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/logo.jp2 -new ./results/temp/logo.jp2.mp4" ***
+[iso file] Unknown top-level box type jP  
+[iso file] Unknown top-level box type jp2c
+Track Importing JPEG2000 - Width 128 Height 128 FPS 25/1
+
+Computing ./results/temp/logo.jp2.1.tmp  (diso) hash: 
+File hash (SHA-1): FD8C2FBFED8C0DB003ABEA28D196302A258378E0
+Hash OK for ./results/temp/logo.jp2.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/logo.jp2.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:01.000
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 1000
+Media Duration 00:00:01.000 
+Media Info: Language "Undetermined (und)" - Type "vide:mjp2" - 1 samples
+Visual Sample Entry Info: width=128 height=128 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=128
+	MotionJPEG2000 stream - Resolution 128 x 128
+	RFC6381 Codec Parameters: mjp2
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1000 / 1000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/logo.jp2.mp4 -out ./results/temp/logo.jp2.1.tmp" ***
+
+Computing ./results/temp/logo.jp2.2.tmp  (dts) hash: 
+File hash (SHA-1): 18385D9DAFA6D3AF5908B17B4F0E2E16887A187B
+Hash OK for ./results/temp/logo.jp2.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/logo.jp2.mp4 -out ./results/temp/logo.jp2.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/logo.jp2.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): B618A073CBC6581355442CBBD1E99A0C51CF0657
+Hash OK for ./results/temp/inspect.txt

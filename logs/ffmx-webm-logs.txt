@@ -1,0 +1,40 @@
+*** ffmx-webm logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:13 ***
+
+
+*** Subtest "mux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -no-reassign=no -i ./external_media/import/counter_1280_720_I_25_500k.ivf reframer @ -o ./results/temp/mux.webm -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1666052224
+
+Filter stats - 4 filters
+	Filter fin (src=./external_media/import/counter_1280_720_I_25_500k.ivf) : 0 input pids 1 output pids 127 tasks 1009 us process time
+		124 packets sent 616512 bytes sent (122894 pck/sec 4888.1 mbps)
+		* output PID counter_1280_720_I_25_500k.ivf: 124 packets sent
+	Filter reframer ID _0x56022addd030_ : 1 input pids 1 output pids 125 tasks 252 us process time
+		252 packets processed 613456 bytes processed (1e+06 pck/sec 19474.8 mbps)
+		252 packets sent 613456 bytes sent (1e+06 pck/sec 19474.8 mbps)
+		* input PID counter_1280_720_I_25_500k.ivf: 252 packets received
+		* output PID counter_1280_720_I_25_500k.ivf: 252 packets sent
+	Filter ffmx (dst=./results/temp/mux.webm) : 1 input pids 0 output pids 254 tasks 1391 us process time
+		252 packets processed 613456 bytes processed (181165 pck/sec 3528.14 mbps)
+		* input PID counter_1280_720_I_25_500k.ivf: 252 packets received
+	Filter rfav1 : 1 input pids 1 output pids 131 tasks 1922 us process time
+		124 packets processed 616512 bytes processed (64516.1 pck/sec 2566.13 mbps)
+		252 packets sent 613456 bytes sent (131113 pck/sec 2553.41 mbps)
+		* input PID counter_1280_720_I_25_500k.ivf: 124 packets received
+		* output PID counter_1280_720_I_25_500k.ivf: 252 packets sent
+Session stats - threads 1
+	Thread 1: run_time 4779 us active_time 4735 us nb_tasks 641
+
+Total: run_time 4779 us active_time 4735 us nb_tasks 641
+
+Filters connected:
+fin (src=./external_media/import/counter_1280_720_I_25_500k.ivf) (ptr=0x56022adda840)
+-(PID counter_1280_720_I_25_500k.ivf) rfav1 (ptr=0x56022ade1d20)
+--(PID counter_1280_720_I_25_500k.ivf) reframer (ID=_0x56022addd030_)
+---(PID counter_1280_720_I_25_500k.ivf) ffmx (dst=./results/temp/mux.webm) (ptr=0x56022adde240)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 6DB84B89074EB19B492232E9828389270FFA4997
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0  -no-reassign=no -i ./results/temp/mux.webm:#FPS=25 inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+

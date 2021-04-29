@@ -1,0 +1,117 @@
+*** dash-ts logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:23 ***
+
+
+*** Subtest "ts-for-dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264 -add ./external_media/counter/counter_30s_audio.aac -new ./results/temp/file.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+AVC|H264 Import results: 750 samples (840 NALUs) - Slices: 30 I 720 P 0 B - 1 SEI - 30 IDR
+AVC|H264 Max NALU size is 32815 - stream could be optimized by setting nal_length=2
+Track Importing AAC  - SampleRate 44100 Num Channels 1
+
+
+*** Subtest "ts-for-dash-input": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mp4 -o ./results/temp/file.ts:pcr_init=10000:pes_pack=none" ***
+
+Computing ./results/temp/file1.mpd  (mpd-single) hash: 
+File hash (SHA-1): 5873E9FEE89067F874DF0C591A8E830B69101250
+Hash fail, ref hash ./hash_refs/dash-ts-mpd-single.hash was 33A9D013C81C58B94551BF427B10B5E99912876F
+
+*** Subtest "ts-dash-single-file": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -rap -single-file -segment-name myrep/ts-segment-single-f-$RepresentationID$ ./results/temp/file.ts -out ./results/temp/file1.mpd" ***
+[Dasher] No bitrate property assigned to PID P1V2, computing from bitstream
+[Dasher] No bitrate property assigned to PID P1A3, computing from bitstream
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[Dasher] No bitrate property assigned to PID P1V2, computing from bitstream
+[Dasher] No bitrate property assigned to PID P1A3, computing from bitstream
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.00037 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.00037 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3.00037 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4.00037 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.00037 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6.00037 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7.00037 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 8.00037 end 9
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 9.00037 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 10.0004 end 11
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 11.0004 end 12
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 12.0004 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 13.0004 end 14
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 14.0004 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 15.0004 end 16
+[MP4Mux] Done writing segment 16 - estimated next fragment times start 16.0004 end 17
+[MP4Mux] Done writing segment 17 - estimated next fragment times start 17.0004 end 18
+[MP4Mux] Done writing segment 18 - estimated next fragment times start 18.0004 end 19
+[MP4Mux] Done writing segment 19 - estimated next fragment times start 19.0004 end 20
+[MP4Mux] Done writing segment 20 - estimated next fragment times start 20.0004 end 21
+[MP4Mux] Done writing segment 21 - estimated next fragment times start 21.0004 end 22
+[MP4Mux] Done writing segment 22 - estimated next fragment times start 22.0004 end 23
+[MP4Mux] Done writing segment 23 - estimated next fragment times start 23.0004 end 24
+[MP4Mux] Done writing segment 24 - estimated next fragment times start 24.0004 end 25
+[MP4Mux] Done writing segment 25 - estimated next fragment times start 25.0004 end 26
+[MP4Mux] Done writing segment 26 - estimated next fragment times start 26.0004 end 27
+[MP4Mux] Done writing segment 27 - estimated next fragment times start 27.0004 end 28
+[MP4Mux] Done writing segment 28 - estimated next fragment times start 28.0004 end 29
+[MP4Mux] Done writing segment 29 - estimated next fragment times start 29.0004 end 30
+[MP4Mux] Done writing segment 30 - estimated next fragment times start 29.0004 end 31
+[MPD] Generating MPD at time 2021-04-29T23:33:23.884Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/inspect_single.txt  (inspect-single) hash: 
+File hash (SHA-1): DE38C51CADA57A323955BAEEBC232A2B278E9758
+Hash fail, ref hash ./hash_refs/dash-ts-inspect-single.hash was BB1493153F567964ED714354BB2D86B35CE436F2
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file1.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect_single.txt" ***
+
+Computing ./results/temp/file2.mpd  (mpd-multi) hash: 
+File hash (SHA-1): 511689E992AB56C2DF68D1FA0C2864B8FA03BD30
+Hash fail, ref hash ./hash_refs/dash-ts-mpd-multi.hash was 67EBA28B56C03FD07831A2E008F3DABC88F82C18
+
+*** Subtest "ts-dash-multiple-file": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -rap -segment-name myrep/ts-segment-multiple-f-$RepresentationID$ ./results/temp/file.ts -out ./results/temp/file2.mpd" ***
+[Dasher] No bitrate property assigned to PID P1V2, computing from bitstream
+[Dasher] No bitrate property assigned to PID P1A3, computing from bitstream
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[Dasher] No bitrate property assigned to PID P1V2, computing from bitstream
+[Dasher] No bitrate property assigned to PID P1A3, computing from bitstream
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.00037 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.00037 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3.00037 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4.00037 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.00037 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6.00037 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7.00037 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 8.00037 end 9
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 9.00037 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 10.0004 end 11
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 11.0004 end 12
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 12.0004 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 13.0004 end 14
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 14.0004 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 15.0004 end 16
+[MP4Mux] Done writing segment 16 - estimated next fragment times start 16.0004 end 17
+[MP4Mux] Done writing segment 17 - estimated next fragment times start 17.0004 end 18
+[MP4Mux] Done writing segment 18 - estimated next fragment times start 18.0004 end 19
+[MP4Mux] Done writing segment 19 - estimated next fragment times start 19.0004 end 20
+[MP4Mux] Done writing segment 20 - estimated next fragment times start 20.0004 end 21
+[MP4Mux] Done writing segment 21 - estimated next fragment times start 21.0004 end 22
+[MP4Mux] Done writing segment 22 - estimated next fragment times start 22.0004 end 23
+[MP4Mux] Done writing segment 23 - estimated next fragment times start 23.0004 end 24
+[MP4Mux] Done writing segment 24 - estimated next fragment times start 24.0004 end 25
+[MP4Mux] Done writing segment 25 - estimated next fragment times start 25.0004 end 26
+[MP4Mux] Done writing segment 26 - estimated next fragment times start 26.0004 end 27
+[MP4Mux] Done writing segment 27 - estimated next fragment times start 27.0004 end 28
+[MP4Mux] Done writing segment 28 - estimated next fragment times start 28.0004 end 29
+[MP4Mux] Done writing segment 29 - estimated next fragment times start 29.0004 end 30
+[MPD] Generating MPD at time 2021-04-29T23:33:24.314Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 30 - estimated next fragment times start 29.0004 end 31
+
+
+Computing ./results/temp/inspect_multi.txt  (inspect-multi) hash: 
+File hash (SHA-1): 1C4D5C927CD11860DBB00B89A78EF846CE5622C0
+Hash fail, ref hash ./hash_refs/dash-ts-inspect-multi.hash was 2A0D80758B804BD2681582C3450592B50FB2F727
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file2.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect_multi.txt" ***
+

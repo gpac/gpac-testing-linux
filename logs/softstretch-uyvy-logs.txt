@@ -1,0 +1,26 @@
+*** softstretch-uyvy logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:46:14 ***
+
+
+*** Subtest "dump-uyvy": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.jpg compositor:opfmt=uyvy @ -o ./results/temp/raw.uyvy -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+Computing ./results/temp/raw.uyvy  (dump-uyvy) hash: 
+File hash (SHA-1): AAD5802427F75C93CBEB208B9F2A10A0302B4D37
+Hash OK for ./results/temp/raw.uyvy
+
+*** Subtest "blit-alpha-uyvy": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.png compositor:opfmt=uyvy @ -o ./results/temp/dump_alpha.uyvy" ***
+
+Computing ./results/temp/dump_alpha.uyvy  (dump-alpha-uyvy) hash: 
+File hash (SHA-1): E02DF985FA3C5B2E1625D803924C5261AA8801EC
+Hash OK for ./results/temp/dump_alpha.uyvy
+
+*** Subtest "blit-rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.uyvy:size=128x128 compositor:opfmt=rgb @ -o ./results/temp/dump.rgb" ***
+
+Computing ./results/temp/dump.rgb  (blit-uyvy-to-rgb) hash: 
+File hash (SHA-1): 14F56F42D0CE15A213042C2F0EA5B215EDB9ED73
+Hash OK for ./results/temp/dump.rgb
+
+*** Subtest "dump-uyvy-yuv": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.uyvy:size=128x128 compositor:opfmt=yuv @ -o ./results/temp/dump_yuv.yuv" ***
+
+Computing ./results/temp/dump_yuv.yuv  (dump-uyvy-yuv) hash: 
+File hash (SHA-1): 399386C5884AB79CCB63B93AAE0F10343AE8BD2D
+Hash OK for ./results/temp/dump_yuv.yuv

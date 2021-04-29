@@ -1,0 +1,17 @@
+*** http-server-push-pull logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:42:45 ***
+
+
+*** Subtest "make-input": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_audio.aac reframer @ -o ./results/temp/test.aac:dur=2" ***
+
+
+*** Subtest "client-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i http://127.0.0.1:8080/live.mpd inspect:dur=1:allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt" ***
+
+
+*** Subtest "dash-push": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.aac reframer:rt=on @ -o http://127.0.0.1:8080/live.mpd:hmode=push:dmode=dynamic" ***
+
+
+*** Subtest "http-server": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -runfor=6000 httpout:port=8080:rdirs=./results/temp:wdir=./results/temp" ***
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 205060BA2B9DBE8038FEB9D1426BA49A4AA927DF
+Hash fail, ref hash ./hash_refs/http-server-push-pull-inspect.hash was 185CF55BE4C270A8A50AE39C0C20D119648B9FB4

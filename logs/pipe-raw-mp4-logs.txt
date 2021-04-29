@@ -1,0 +1,42 @@
+*** pipe-raw-mp4 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:42:51 ***
+
+
+*** Subtest "pipe-osrv-in": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i pipe://gpac_pipe:ext=aac -o ./results/temp/o-test.mp4 -graph" ***
+[PipeIn] end of stream detected
+
+Filters connected:
+pin (src=pipe://gpac_pipe:ext=aac) (ptr=0x56475b5bfec0)
+-(PID gpac_pipe) rfadts (ptr=0x56475b5c4fa0)
+--(PID gpac_pipe) mp4mx (ptr=0x56475b5c9f20)
+---(PID gpac_pipe) fout (dst=./results/temp/o-test.mp4) (ptr=0x56475b5c1800)
+
+Computing ./results/temp/o-test.mp4  (pipe-osrv-in) hash: 
+File hash (SHA-1): CD1FA2BB8EA4AECD1774C1B0ECE13817677A7100
+Hash OK for ./results/temp/o-test.mp4
+
+*** Subtest "pipe-osrv-out": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_audio.aac -o pipe://gpac_pipe:mkp:ext=aac -graph" ***
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_audio.aac) (ptr=0x55fd56076ec0)
+-(PID enst_audio.aac) pout (dst=pipe://gpac_pipe:mkp:ext=aac) (ptr=0x55fd56079aa0)
+
+
+*** Subtest "pipe-isrv-in": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i pipe://gpac_pipe:ext=aac:mkp -o ./results/temp/i-test.mp4 -graph" ***
+[PipeIn] end of stream detected
+
+Filters connected:
+pin (src=pipe://gpac_pipe:ext=aac:mkp) (ptr=0x561871916ec0)
+-(PID gpac_pipe) rfadts (ptr=0x56187191c0c0)
+--(PID gpac_pipe) mp4mx (ptr=0x561871921040)
+---(PID gpac_pipe) fout (dst=./results/temp/i-test.mp4) (ptr=0x561871918920)
+
+Computing ./results/temp/i-test.mp4  (pipe-isrv-in) hash: 
+File hash (SHA-1): CD1FA2BB8EA4AECD1774C1B0ECE13817677A7100
+Hash OK for ./results/temp/i-test.mp4
+
+*** Subtest "pipe-isrv-out": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_audio.aac -o pipe://gpac_pipe:ext=aac -graph" ***
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_audio.aac) (ptr=0x5629a374bec0)
+-(PID enst_audio.aac) pout (dst=pipe://gpac_pipe:ext=aac) (ptr=0x5629a374eaa0)
+

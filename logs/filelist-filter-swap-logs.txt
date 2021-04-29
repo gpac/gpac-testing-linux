@@ -1,0 +1,51 @@
+*** filelist-filter-swap logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:14 ***
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i plist.m3u inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats -logs=app@debug" ***
+GPAC args: -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i plist.m3u inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats -logs=app@debug 
+System info: 7961 MB RAM - 2 cores - main thread ID 793218944
+
+Filter stats - 5 filters
+	Filter fin (src=plist.m3u) : 0 input pids 1 output pids 4 tasks 587 us process time
+		1 packets sent 148 bytes sent (1703.58 pck/sec 2.01704 mbps)
+		* output PID plist.m3u: 1 packets sent
+	Filter inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 255 tasks 1465 us process time
+		253 packets processed 217960 bytes processed (172696 pck/sec 1190.23 mbps)
+		* input PID sky.jpg: 253 packets received
+	Filter flist : 2 input pids 1 output pids 271 tasks 813 us process time
+		254 packets processed 218108 bytes processed (312423 pck/sec 2146.2 mbps)
+		253 packets sent 217960 bytes sent (311193 pck/sec 2144.75 mbps)
+		* input PID plist.m3u: 1 packets received
+		* input PID sky.jpg: 1 packets received
+		* output PID sky.jpg: 253 packets sent
+	Filter fin (src=media/auxiliary_files/sky.jpg:allp:deep:interleave=false:log=./results/temp/inspect.txt) : 0 input pids 1 output pids 4 tasks 511 us process time
+		2 packets sent 6496 bytes sent (3913.89 pck/sec 101.699 mbps)
+		* output PID sky.jpg: 2 packets sent
+	Filter rfimg : 1 input pids 1 output pids 6 tasks 86 us process time
+		1 packets processed 6496 bytes processed (11627.9 pck/sec 604.279 mbps)
+		1 packets sent 6496 bytes sent (11627.9 pck/sec 604.279 mbps)
+		* input PID sky.jpg: 1 frames (2 packets) received
+		* output PID sky.jpg: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 7487 us active_time 7444 us nb_tasks 727
+
+Total: run_time 7487 us active_time 7444 us nb_tasks 727
+
+Filters connected:
+fin (src=plist.m3u) (ptr=0x5580ff0f2840)
+-(PID plist.m3u) flist (ptr=0x5580ff0f9bc0)
+--(PID sky.jpg) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x5580ff0f5100)
+fin (src=media/auxiliary_files/sky.jpg:allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x5580ff110170)
+-(PID sky.jpg) rfimg (ptr=0x5580ff1013b0)
+--(PID sky.jpg) flist (ptr=0x5580ff0f9bc0)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 50A4354F39F046DDBAC49339987EBEF98E04A346
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -no-reassign=0 -i plist.m3u ffsws:osize=192x192:ofmt=rgb @ -o ./results/temp/dump.rgb -blacklist=nvdec,vtbdec" ***
+[swscaler @ 0x562e48b725a0] Warning: data is not aligned! This can lead to a speed loss
+
+Computing ./results/temp/dump.rgb  (dump) hash: 
+File hash (SHA-1): EFF0A45467DBCF6431B6D2AACC3F0204D6603F67
+Hash OK for ./results/temp/dump.rgb

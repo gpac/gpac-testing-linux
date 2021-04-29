@@ -1,0 +1,81 @@
+*** encryption-isma-avc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:34:03 ***
+
+Computing ./results/temp/isma-avc-crypted.mp4  (crypt) hash: 
+File hash (SHA-1): EF71740F860827D547965D39C3963BB6A1468348
+Hash OK for ./results/temp/isma-avc-crypted.mp4
+
+*** Subtest "Encrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/isma.xml -out ./results/temp/isma-avc-crypted.mp4 ./results/temp/source_media.mp4" ***
+[ISMACrypt] Encrypting stream PID1 - KMS: self
+
+Computing ./results/temp/isma-avc-decrypted.mp4  (decrypt) hash: 
+File hash (SHA-1): 12A035C2E9B0EB18E845EDD1CBFEE3D94D76EE13
+Hash OK for ./results/temp/isma-avc-decrypted.mp4
+
+*** Subtest "Decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/isma.xml -out ./results/temp/isma-avc-decrypted.mp4 ./results/temp/isma-avc-crypted.mp4" ***
+
+Same Hash for ./results/temp/source_media.mp4 and ./results/temp/isma-avc-decrypted.mp4
+
+*** Subtest "DumpIsma": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dcr ./results/temp/isma-avc-crypted.mp4 -out ./results/temp/isamdump.xml" ***
+
+
+*** Subtest "HintIsma": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/isma-avc-crypted.mp4 -out ./results/temp/isma-avc-crypted_hint.mp4" ***
+Hinting track ID 1 - Type "encv:encv" (enc-mpeg4-generic) - BW 55 kbps
+
+
+*** Subtest "SetKMS": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -set-kms gpac:uri.isma ./results/temp/isma-avc-crypted.mp4 -out ./results/temp/isma_kms.mp4" ***
+
+
+*** Subtest "INFO": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/isma-avc-crypted.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:06.960
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom avc1
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: AVC/H264 Profile (0x7f)
+Audio PL: No audio capability required (0xff)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 4000000
+Media Duration 00:00:06.920 
+Track has 1 edits: track duration is 00:00:06.960
+Media Info: Language "Undetermined (und)" - Type "vide:encv" - 173 samples
+Visual Sample Entry Info: width=128 height=128 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=128
+Unknown track type
+
+	Protected by ISMA E&A scheme iAEC (version 1)
+scheme location: urn:gpac:isma:encryption_scheme
+	KMS location: key in file
+	Selective Encryption: No
+	Initialization Vector size: 16 bits
+
+	RFC6381 Codec Parameters: 264b
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 173 samples
+	Max sample duration: 160000 / 4000000
+
+
+Computing ./results/temp/isma-avc-crypted_dashinit.mp4  (crypt-dash-init) hash: 
+File hash (SHA-1): C2D8C2050B3F1E6F90D86C6A113B1AB69FF822CF
+Hash OK for ./results/temp/isma-avc-crypted_dashinit.mp4
+Computing ./results/temp/isma-avc-crypted_dash1.m4s  (crypt-dash-seg) hash: 
+File hash (SHA-1): 15E28B3C4EAE8D0F07DD64EED10742BB91139A29
+Hash OK for ./results/temp/isma-avc-crypted_dash1.m4s
+
+*** Subtest "DASH": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/isma-avc-crypted.mp4" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[Dasher] Protection scheme iAEC has no official DASH mapping, using URI "urn:gpac:dash:mp4protection:2018"
+[Dasher] Segment 1 duration 6.48 more than 3/2 DASH duration, consider reencoding or using segment timeline
+[Dasher] First CTS 25920000 in segment 2 drifting by 2.48 (more than half a segment duration) from segment time, consider reencoding or using segment timeline
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 6.52 end 2
+[MPD] Generating MPD at time 2021-04-29T23:34:04.500Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 7 end 3
+
+

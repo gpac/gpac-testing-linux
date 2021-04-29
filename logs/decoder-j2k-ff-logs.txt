@@ -1,0 +1,49 @@
+*** decoder-j2k-ff logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:31 ***
+
+
+*** Subtest "decoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4 -o ./results/temp/test.yuv -graph -stats -blacklist=j2kdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 445841280
+
+Filter stats - 6 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 6 tasks 694 us process time
+		1 packets sent 5000 bytes sent (1440.92 pck/sec 57.6369 mbps)
+		* output PID in.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/test.yuv) : 1 input pids 0 output pids 3 tasks 3114 us process time
+		1 packets processed 24576 bytes processed (321.13 pck/sec 63.1368 mbps)
+		* input PID in.mp4: 1 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 9 tasks 715 us process time
+		2 packets processed 5000 bytes processed (2797.2 pck/sec 55.9441 mbps)
+		1 packets sent 12182 bytes sent (1398.6 pck/sec 136.302 mbps)
+		* input PID in.mp4: 2 packets received
+		* output PID in.mp4: 1 packets sent
+	Filter ffdec "ffdec:jpeg2000" : 1 input pids 1 output pids 9 tasks 5133 us process time
+		1 packets processed 12182 bytes processed (194.818 pck/sec 18.9862 mbps)
+		1 packets sent 49152 bytes sent (194.818 pck/sec 76.6055 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 11 tasks 151 us process time
+		1 packets processed 24576 bytes processed (6622.52 pck/sec 1302.04 mbps)
+		1 packets sent 24576 bytes sent (6622.52 pck/sec 1302.04 mbps)
+		* input PID in.mp4: 2 frames (1 packets) received
+		* output PID in.mp4: 1 packets sent
+	Filter ffsws : 1 input pids 1 output pids 6 tasks 271 us process time
+		1 packets processed 49152 bytes processed (3690.04 pck/sec 1450.98 mbps)
+		1 packets sent 24576 bytes sent (3690.04 pck/sec 725.491 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 28332 us active_time 10109 us nb_tasks 49
+
+Total: run_time 28332 us active_time 10109 us nb_tasks 49
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x55775bda6a80)
+-(PID in.mp4) mp4dmx (ptr=0x55775bdacd20)
+--(PID in.mp4) ffdec "ffdec:jpeg2000" (ptr=0x55775bdb6420)
+---(PID in.mp4) ffsws (ptr=0x55775bdcbd30)
+----(PID in.mp4) writegen (ptr=0x55775bdb74f0)
+-----(PID in.mp4) fout (dst=./results/temp/test.yuv) (ptr=0x55775bda9460)
+
+Computing ./results/temp/test.yuv  (decoder) hash: 
+File hash (SHA-1): DB33635A1685B67826F275C7C3C180F9624D0ED8
+Hash OK for ./results/temp/test.yuv

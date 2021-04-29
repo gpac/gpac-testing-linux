@@ -1,0 +1,44 @@
+*** gpac-unit-info logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:20 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -ltf -h UTFilter" ***
+
+UTFilter
+
+Description: Unit Test Filter
+
+This filter is only used for unit testing of filter framework
+
+
+Options (basic):
+
+pid_att (cstr, default: UTSourceData): set default value for PID cust attribute
+max_pck (uint, default: 1000): maximum number of packets to send in source mode
+nb_pids (uint, default: 1, minmax: 1-+I): number of PIDs in source mode
+max_out (sint, default: -1, updatable): maximum number of shared packets not yet released in source/filter mode, no limit if -1
+alloc (bool, default: false, updatable): use allocated memory packets in source mode
+fwd (enum, default: shared, updatable): indicate packet forward mode for filter.
+	* shared: use shared memory (dangerous)
+	* copy: use copy
+	* ref: use references to source packet
+	* mix: change mode at each packet sent
+
+framing (enum, default: none, updatable): packet framing.
+	* none: disable packet split
+	* default: divide packets in 3 for filter mode and allows partial blocks for sink mode
+	* nostart: same as default but does not signal packet start flag
+	* noend: same as default but does not signal packet end flag
+
+update (str, updatable):       send update message after half packet send. Update format is FID,argname,argval
+cov (bool, default: false, updatable): dump options and exercise error cases for code coverage
+norecfg (bool, default: false, updatable): disable reconfig on input pid in filter/sink mode
+gsftest (bool, default: false, updatable): dispatch a fake single video pid with props and packet props for GSF testing
+dummy1 (lsint, default: 0, updatable): dummy for coverage
+dummy1 (luint, default: 0, updatable): dummy for coverage
+dummy1 (flt, default: 0, updatable): dummy for coverage
+dummy1 (dbl, default: 0, updatable): dummy for coverage
+dummy1 (frac, default: 0, updatable): dummy for coverage
+dummy1 (ptr, default: 0, updatable): dummy for coverage
+dummy1 (lfrac, default: 0, updatable): dummy for coverage
+
+

@@ -1,0 +1,39 @@
+*** xps-avc_up_down_same_xps_id logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:47:33 ***
+
+
+*** Subtest "create-oob": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/avc_up_down_same_xps_id.264 -o ./results/temp/file_oob.mp4" ***
+
+Computing ./results/temp/file_oob.mp4  (create-oob) hash: 
+File hash (SHA-1): 3199B648EFC789179E44B2289E91041E6D26789D
+Hash OK for ./results/temp/file_oob.mp4
+
+*** Subtest "create-ib": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/avc_up_down_same_xps_id.264 -o ./results/temp/file_ib.mp4:xps_inband=all" ***
+
+Computing ./results/temp/file_ib.mp4  (create-ib) hash: 
+File hash (SHA-1): 7A184F25BFAD49FD97B119207E597220E707EDD6
+Hash OK for ./results/temp/file_ib.mp4
+Computing ./results/temp/file.mpd  (dash-ib-mpd) hash: 
+File hash (SHA-1): 766A1842CB58CB3F28629BEEE485926338069843
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/file_ib_dashinit.mp4  (dash-ib-seg) hash: 
+File hash (SHA-1): DE99846BA1CEC2B4CA8C370D87A6CD05D2F9338D
+Hash OK for ./results/temp/file_ib_dashinit.mp4
+
+*** Subtest "dash-ib": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file_ib.mp4 -o ./results/temp/file.mpd:profile=onDemand" ***
+[Dasher] WARNING! Max SAP type 3 detected - switching to FULL profile
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file_ib.mp4 inspect:deep:log=./results/temp/inspect.xml" ***
+
+Computing ./results/temp/inspect.xml  (inspect) hash: 
+File hash (SHA-1): 1CA0096DDD83E5150429E53F9D3BFE65A6B1FEC0
+Hash OK for ./results/temp/inspect.xml
+
+*** Subtest "decode": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/avc_up_down_same_xps_id.264 -o null:ext=yuv -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+
+*** Subtest "create-both": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/avc_up_down_same_xps_id.264 -o ./results/temp/file_both.mp4:xps_inband=both" ***
+
+Computing ./results/temp/file_both.mp4  (create-both) hash: 
+File hash (SHA-1): 59C6FCB81A279B33041766B75361076922BE26C7
+Hash OK for ./results/temp/file_both.mp4

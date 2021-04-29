@@ -1,0 +1,29 @@
+*** gpac-filter-1source-1filter-1sink-update-4th logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:39 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -logs=strict -ltf -stats UTSource:max_pck=100:update=1,fwd,copy UTFilter:FID=1:fwd=shared UTSink:SID=1 -threads=4" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -90157184
+
+Filter stats - 3 filters
+	Filter UTSource (max_pck=100:update=1,fwd,copy) : 0 input pids 1 output pids 103 tasks 320 us process time
+		100 packets sent 1200 bytes sent (312500 pck/sec 30 mbps)
+		* output PID PID1: 100 packets sent
+	Filter UTFilter ID 1 (FID=1:fwd=shared) : 1 input pids 1 output pids 181 tasks 937 us process time
+		100 packets processed 1200 bytes processed (106724 pck/sec 10.2455 mbps)
+		100 packets sent 1200 bytes sent (106724 pck/sec 10.2455 mbps)
+		* input PID PID1: 100 packets received
+		* output PID PID1: 100 packets sent
+	Filter UTSink (SID=1) : 1 input pids 0 output pids 101 tasks 517 us process time
+		100 packets processed 1200 bytes processed (193424 pck/sec 18.5687 mbps)
+		* input PID PID1: 100 packets received
+Session stats - threads 5
+	Thread 1: run_time 13197 us active_time 1906 us nb_tasks 174
+	Thread 2: run_time 13456 us active_time 1344 us nb_tasks 119
+	Thread 3: run_time 13264 us active_time 7734 us nb_tasks 12
+	Thread 4: run_time 13317 us active_time 597 us nb_tasks 78
+	Thread 5: run_time 13188 us active_time 71 us nb_tasks 4
+
+Total: run_time 66422 us active_time 11652 us nb_tasks 387
+[UTFilter] Pid 1 hash OK after execution
+[UTSink] Pid 1 hash OK after execution
+

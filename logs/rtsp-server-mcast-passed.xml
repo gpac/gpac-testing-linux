@@ -1,0 +1,9 @@
+ <test name="rtsp-server-mcast" result="OK" date="29/04/2021 23:45:59">
+
+  <stat subtest="dump" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="49772" cpu_percent="19%" cpu_elapsed_time="0:01.92" cpu_user_time="0.22" cpu_kernel_time="0.13" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i rtsp://127.0.0.1:8888/enst_audio.aac inspect:deep:allp:dur=1/1:interleave=false:log=./results/temp/inspect.txt  --force_mcast=234.0.0.1  -stats -graph</command_line>
+  </stat>
+  <stat subtest="server" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50984" cpu_percent="5%" cpu_elapsed_time="0:03.02" cpu_user_time="0.15" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -runfor=4000 rtspout:port=8888:runfor=1500:mounts=./media/auxiliary_files/  --tso=10000 --mcast=mirror -stats</command_line>
+  </stat>
+ </test>

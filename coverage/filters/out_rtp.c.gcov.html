@@ -1,0 +1,1271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/out_rtp.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - out_rtp.c<span style="font-size: 80%;"> (source / <a href="out_rtp.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">477</td>
+            <td class="headerCovTableEntry">560</td>
+            <td class="headerCovTableEntryMed">85.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2019-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / rtp output filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/internal/media_dev.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/maths.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #if !defined(GPAC_DISABLE_ISOM) &amp;&amp; !defined(GPAC_DISABLE_STREAMING)
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;gpac/ietf.h&gt;
+<span class="lineNum">      34 </span>            : #include &lt;gpac/config_file.h&gt;
+<span class="lineNum">      35 </span>            : #include &lt;gpac/base_coding.h&gt;
+<span class="lineNum">      36 </span>            : #include &lt;gpac/rtp_streamer.h&gt;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : #include &quot;out_rtp.h&quot;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : typedef struct
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span>            :         //options
+<span class="lineNum">      44 </span>            :         char *ip;
+<span class="lineNum">      45 </span>            :         char *dst, *ext, *mime;
+<span class="lineNum">      46 </span>            :         u32 port;
+<span class="lineNum">      47 </span>            :         Bool loop, xps;
+<span class="lineNum">      48 </span>            :         Bool mpeg4;
+<span class="lineNum">      49 </span>            :         u32 mtu;
+<span class="lineNum">      50 </span>            :         u32 ttl;
+<span class="lineNum">      51 </span>            :         char *ifce;
+<span class="lineNum">      52 </span>            :         u32 payt, tt;
+<span class="lineNum">      53 </span>            :         s32 delay;
+<span class="lineNum">      54 </span>            :         char *info, *url, *email;
+<span class="lineNum">      55 </span>            :         s32 runfor, tso;
+<span class="lineNum">      56 </span>            :         Bool latm;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :         /*timeline origin of our session (all tracks) in microseconds*/
+<span class="lineNum">      59 </span>            :         u64 sys_clock_at_init;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :         /*list of streams in session*/
+<span class="lineNum">      62 </span>            :         GF_List *streams;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :         /*base stream if this stream contains a media decoding dependency, 0 otherwise*/
+<span class="lineNum">      65 </span>            :         u32 base_pid_id;
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :         Bool first_RTCP_sent;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :         GF_RTPOutStream *active_stream;
+<span class="lineNum">      70 </span>            :         u32 active_stream_idx;
+<span class="lineNum">      71 </span>            :         u64 active_min_ts_microsec;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :         Bool wait_for_loop;
+<span class="lineNum">      76 </span>            :         u64 microsec_ts_init;
+<span class="lineNum">      77 </span>            :         //0: not single stream, 1: input is raw media, 2: input is TS
+<span class="lineNum">      78 </span>            :         u32 single_stream;
+<span class="lineNum">      79 </span>            :         GF_FilterCapability in_caps[2];
+<span class="lineNum">      80 </span>            :         char szExt[10];
+<span class="lineNum">      81 </span>            : } GF_RTPOutCtx;
+<a name="82"><span class="lineNum">      82 </span>            : </a>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">         34 : GF_Err rtpout_create_sdp(GF_List *streams, Bool is_rtsp, const char *ip, const char *info, const char *sess_name, const char *url, const char *email, u32 base_pid_id, FILE **sdp_tmp, u64 *session_id)</span>
+<span class="lineNum">      85 </span>            : {
+<span class="lineNum">      86 </span>            :         FILE *sdp_out;
+<span class="lineNum">      87 </span>            :         u32 i, count;
+<span class="lineNum">      88 </span>            :         u64 session_version;
+<span class="lineNum">      89 </span><span class="lineCov">         34 :         sdp_out = gf_file_temp(NULL);</span>
+<span class="lineNum">      90 </span><span class="lineCov">         34 :         if (!sdp_out) return GF_IO_ERR;</span>
+<span class="lineNum">      91 </span><span class="lineCov">         34 :         *sdp_tmp = sdp_out;</span>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">         34 :         count = gf_list_count(streams);</span>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">         34 :         gf_fprintf(sdp_out, &quot;v=0\n&quot;);</span>
+<span class="lineNum">      97 </span><span class="lineCov">         34 :         if (gf_sys_is_test_mode()) {</span>
+<span class="lineNum">      98 </span><span class="lineCov">         34 :                 *session_id = 0;</span>
+<span class="lineNum">      99 </span>            :                 session_version = 0;
+<span class="lineNum">     100 </span>            :         } else {
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :                 if (! *session_id) *session_id = gf_net_get_ntp_ts();</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :                 session_version = gf_net_get_ntp_ts();</span>
+<span class="lineNum">     103 </span>            :         }
+<span class="lineNum">     104 </span><span class="lineCov">         34 :         gf_fprintf(sdp_out, &quot;o=gpac &quot;LLU&quot; &quot;LLU&quot; IN IP%d %s\n&quot;, *session_id, session_version, gf_net_is_ipv6(ip) ? 6 : 4, ip);</span>
+<span class="lineNum">     105 </span><span class="lineCov">         34 :         gf_fprintf(sdp_out, &quot;s=%s\n&quot;, sess_name);</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">         34 :         if (info) {</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :                 gf_fprintf(sdp_out, &quot;i=%s\n&quot;, info);</span>
+<span class="lineNum">     109 </span>            :         } else {
+<span class="lineNum">     110 </span><span class="lineCov">         34 :                 GF_RTPOutStream *stream = gf_list_get(streams, 0);</span>
+<span class="lineNum">     111 </span><span class="lineCov">         34 :                 const char *src = gf_filter_pid_orig_src_args(stream-&gt;pid, GF_FALSE);</span>
+<span class="lineNum">     112 </span><span class="lineCov">         34 :                 if (!src) src = gf_filter_pid_get_source_filter_name(stream-&gt;pid);</span>
+<span class="lineNum">     113 </span>            :                 else {
+<span class="lineNum">     114 </span><span class="lineCov">         34 :                         src = gf_file_basename(src);</span>
+<span class="lineNum">     115 </span>            :                 }
+<span class="lineNum">     116 </span><span class="lineCov">         34 :                 if (src)</span>
+<span class="lineNum">     117 </span><span class="lineCov">         34 :                         gf_fprintf(sdp_out, &quot;i=%s\n&quot;, src);</span>
+<span class="lineNum">     118 </span>            :         }
+<span class="lineNum">     119 </span><span class="lineCov">         34 :         gf_fprintf(sdp_out, &quot;u=%s\n&quot;, url ? url : &quot;http://gpac.io&quot;);</span>
+<span class="lineNum">     120 </span><span class="lineCov">         34 :         if (email) {</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :                 gf_fprintf(sdp_out, &quot;e=%s\n&quot;, email);</span>
+<span class="lineNum">     122 </span>            :         }
+<span class="lineNum">     123 </span><span class="lineCov">         34 :         if (is_rtsp) {</span>
+<span class="lineNum">     124 </span><span class="lineCov">          5 :                 gf_fprintf(sdp_out, &quot;c=IN IP4 0.0.0.0\n&quot;);</span>
+<span class="lineNum">     125 </span>            :         } else {
+<span class="lineNum">     126 </span><span class="lineCov">         29 :                 gf_fprintf(sdp_out, &quot;c=IN IP%d %s\n&quot;, gf_net_is_ipv6(ip) ? 6 : 4, ip);</span>
+<span class="lineNum">     127 </span>            :         }
+<span class="lineNum">     128 </span><span class="lineCov">         34 :         gf_fprintf(sdp_out, &quot;t=0 0\n&quot;);</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">         34 :         if (is_rtsp) {</span>
+<span class="lineNum">     131 </span><span class="lineCov">          5 :                 gf_fprintf(sdp_out, &quot;a=control=*\n&quot;);</span>
+<span class="lineNum">     132 </span>            :         }
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">         34 :         if (gf_sys_is_test_mode()) {</span>
+<span class="lineNum">     135 </span><span class="lineCov">         34 :                 gf_fprintf(sdp_out, &quot;a=x-copyright: Streamed with GPAC - http://gpac.io\n&quot;);</span>
+<span class="lineNum">     136 </span>            :         } else {
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :                 gf_fprintf(sdp_out, &quot;a=x-copyright: Streamed with GPAC %s - %s\n&quot;, gf_gpac_version(), gf_gpac_copyright() );</span>
+<span class="lineNum">     138 </span>            :         }
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineCov">         34 :         if (is_rtsp) {</span>
+<span class="lineNum">     141 </span>            :                 Double max_dur=0;
+<span class="lineNum">     142 </span>            :                 Bool disable_seek = GF_FALSE;
+<span class="lineNum">     143 </span><span class="lineCov">          6 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     144 </span>            :                         const GF_PropertyValue *p;
+<span class="lineNum">     145 </span><span class="lineCov">          6 :                         GF_RTPOutStream *stream = gf_list_get(streams, i);</span>
+<span class="lineNum">     146 </span><span class="lineCov">          6 :                         if (!stream-&gt;rtp) continue;</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineCov">          6 :                         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_DURATION);</span>
+<span class="lineNum">     149 </span><span class="lineCov">          6 :                         if (p) {</span>
+<span class="lineNum">     150 </span><span class="lineCov">          6 :                                 Double dur = (Double) p-&gt;value.lfrac.num;</span>
+<span class="lineNum">     151 </span><span class="lineCov">          6 :                                 dur /= p-&gt;value.lfrac.den;</span>
+<span class="lineNum">     152 </span><span class="lineCov">          6 :                                 if (dur&gt;max_dur) max_dur = dur;</span>
+<span class="lineNum">     153 </span>            :                         }
+<span class="lineNum">     154 </span><span class="lineCov">          6 :                         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_PLAYBACK_MODE);</span>
+<span class="lineNum">     155 </span><span class="lineCov">          6 :                         if (!p || (p-&gt;value.uint&lt;GF_PLAYBACK_MODE_FASTFORWARD))</span>
+<span class="lineNum">     156 </span>            :                                 disable_seek = GF_TRUE;
+<span class="lineNum">     157 </span>            :                 }
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineCov">          5 :                 if (!disable_seek &amp;&amp; max_dur) {</span>
+<span class="lineNum">     160 </span><span class="lineCov">          5 :                         gf_fprintf(sdp_out, &quot;a=range:npt=0-%g\n&quot;, max_dur);</span>
+<span class="lineNum">     161 </span>            :                 }
+<span class="lineNum">     162 </span>            :         }
+<span class="lineNum">     163 </span>            :         
+<span class="lineNum">     164 </span><span class="lineCov">         34 :         if (base_pid_id) {</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                 gf_fprintf(sdp_out, &quot;a=group:DDP L%d&quot;, base_pid_id);</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :                 for (i = 0; i &lt; count; i++) {</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :                         GF_RTPOutStream *st = gf_list_get(streams, i);</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                         if (st-&gt;depends_on == base_pid_id) {</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                                 gf_fprintf(sdp_out, &quot; L%d&quot;, i+1);</span>
+<span class="lineNum">     170 </span>            :                         }
+<span class="lineNum">     171 </span>            :                 }
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :                 gf_fprintf(sdp_out, &quot;\n&quot;);</span>
+<span class="lineNum">     173 </span>            :         }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">         35 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     176 </span><span class="lineCov">         35 :                 char *sdp_media=NULL;</span>
+<span class="lineNum">     177 </span>            :                 const char *KMS = NULL;
+<span class="lineNum">     178 </span>            :                 char *dsi = NULL;
+<span class="lineNum">     179 </span>            :                 char *dsi_enh = NULL;
+<span class="lineNum">     180 </span>            :                 u32 w, h, tw, th;
+<span class="lineNum">     181 </span>            :                 s32 tx, ty;
+<span class="lineNum">     182 </span>            :                 s16 tl;
+<span class="lineNum">     183 </span>            :                 u32 dsi_len = 0;
+<span class="lineNum">     184 </span>            :                 u32 dsi_enh_len = 0;
+<span class="lineNum">     185 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     186 </span><span class="lineCov">         35 :                 GF_RTPOutStream *stream = gf_list_get(streams, i);</span>
+<span class="lineNum">     187 </span><span class="lineCov">         35 :                 if (!stream-&gt;rtp) continue;</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">         35 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     190 </span><span class="lineCov">         35 :                 if (p &amp;&amp; p-&gt;value.data.ptr) {</span>
+<span class="lineNum">     191 </span>            :                         dsi = p-&gt;value.data.ptr;
+<span class="lineNum">     192 </span><span class="lineCov">         27 :                         dsi_len = p-&gt;value.data.size;</span>
+<span class="lineNum">     193 </span>            :                 }
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineCov">         35 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_DECODER_CONFIG_ENHANCEMENT);</span>
+<span class="lineNum">     196 </span><span class="lineCov">         35 :                 if (p &amp;&amp; p-&gt;value.data.ptr) {</span>
+<span class="lineNum">     197 </span>            :                         dsi_enh = p-&gt;value.data.ptr;
+<span class="lineNum">     198 </span><span class="lineCov">          2 :                         dsi_enh_len = p-&gt;value.data.size;</span>
+<span class="lineNum">     199 </span>            :                 }
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :                 w = h = tw = th = 0;
+<span class="lineNum">     202 </span>            :                 tx = ty = 0;
+<span class="lineNum">     203 </span>            :                 tl = 0;
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span><span class="lineCov">         35 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_WIDTH);</span>
+<span class="lineNum">     206 </span><span class="lineCov">         35 :                 if (p) w = p-&gt;value.uint;</span>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineCov">         35 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_HEIGHT);</span>
+<span class="lineNum">     209 </span><span class="lineCov">         35 :                 if (p) h = p-&gt;value.uint;</span>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineCov">         35 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_PROTECTION_KMS_URI);</span>
+<span class="lineNum">     212 </span><span class="lineCov">         35 :                 if (p) KMS = p-&gt;value.string;</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span><span class="lineCov">         35 :                 if (stream-&gt;codecid == GF_CODECID_TX3G) {</span>
+<span class="lineNum">     215 </span><span class="lineCov">          2 :                         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_TRANS_X);</span>
+<span class="lineNum">     216 </span><span class="lineCov">          2 :                         if (p) tx = p-&gt;value.sint;</span>
+<span class="lineNum">     217 </span><span class="lineCov">          2 :                         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_TRANS_Y);</span>
+<span class="lineNum">     218 </span><span class="lineCov">          2 :                         if (p) ty = p-&gt;value.sint;</span>
+<span class="lineNum">     219 </span><span class="lineCov">          2 :                         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_ZORDER);</span>
+<span class="lineNum">     220 </span><span class="lineCov">          2 :                         if (p) tl = p-&gt;value.sint;</span>
+<span class="lineNum">     221 </span>            :                         tw = w;
+<span class="lineNum">     222 </span>            :                         th = h;
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span><span class="lineCov">          2 :                         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_WIDTH_MAX);</span>
+<span class="lineNum">     225 </span><span class="lineCov">          2 :                         if (p) w = p-&gt;value.uint;</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">          2 :                         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_HEIGHT_MAX);</span>
+<span class="lineNum">     228 </span><span class="lineCov">          2 :                         if (p) h = p-&gt;value.uint;</span>
+<span class="lineNum">     229 </span>            :                 }
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span><span class="lineCov">         35 :                 gf_rtp_streamer_append_sdp_extended(stream-&gt;rtp, stream-&gt;id, dsi, dsi_len, dsi_enh, dsi_enh_len, (char *)KMS, w, h, tw, th, tx, ty, tl, is_rtsp, &amp;sdp_media);</span>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineCov">         35 :                 if (sdp_media) {</span>
+<span class="lineNum">     234 </span><span class="lineCov">         35 :                         gf_fprintf(sdp_out, &quot;%s&quot;, sdp_media);</span>
+<span class="lineNum">     235 </span><span class="lineCov">         35 :                         gf_free(sdp_media);</span>
+<span class="lineNum">     236 </span>            :                 }
+<span class="lineNum">     237 </span><span class="lineCov">         35 :                 if (base_pid_id) {</span>
+<span class="lineNum">     238 </span>            :                         u32 j;
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :                         gf_fprintf(sdp_out, &quot;a=mid:L%d\n&quot;, i+1);</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :                         gf_fprintf(sdp_out, &quot;a=depend:%d lay&quot;, gf_rtp_streamer_get_payload_type(stream-&gt;rtp) );</span>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :                         for (j=0; j&lt;count; j++) {</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :                                 GF_RTPOutStream *tk = gf_list_get(streams, j);</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :                                 if (tk == stream) continue;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :                                 if (tk-&gt;depends_on == stream-&gt;id) {</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :                                         gf_fprintf(sdp_out, &quot; L%d:%d&quot;, j+1, gf_rtp_streamer_get_payload_type(tk-&gt;rtp) );</span>
+<span class="lineNum">     248 </span>            :                                 }
+<span class="lineNum">     249 </span>            :                         }
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :                         gf_fprintf(sdp_out, &quot;\n&quot;);</span>
+<span class="lineNum">     251 </span>            :                 }
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span><span class="lineCov">         35 :                 if (is_rtsp) {</span>
+<span class="lineNum">     254 </span><span class="lineCov">          6 :                         gf_fprintf(sdp_out, &quot;a=control:trackID=%d\n&quot;, stream-&gt;ctrl_id);</span>
+<span class="lineNum">     255 </span>            :                 }
+<span class="lineNum">     256 </span>            :         }
+<span class="lineNum">     257 </span><span class="lineCov">         34 :         gf_fprintf(sdp_out, &quot;\n&quot;);</span>
+<span class="lineNum">     258 </span><span class="lineCov">         34 :         return GF_OK;</span>
+<a name="259"><span class="lineNum">     259 </span>            : }</a>
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span><span class="lineCov">         36 : GF_Err rtpout_init_streamer(GF_RTPOutStream *stream, const char *ipdest, Bool inject_xps, Bool use_mpeg4_signaling, Bool use_latm, u32 payt, u32 mtu, u32 ttl, const char *ifce, Bool is_rtsp, u32 *base_pid_id, u32 file_mode)</span>
+<span class="lineNum">     262 </span>            : {
+<span class="lineNum">     263 </span>            :         Bool disable_mpeg4 = GF_FALSE;
+<span class="lineNum">     264 </span>            :         u32 flags, average_size, max_size, max_tsdelta, codecid, const_dur, nb_ch, samplerate, max_cts_offset, bandwidth, IV_length, KI_length, dsi_len, max_ptime, au_sn_len;
+<span class="lineNum">     265 </span>            :         char *dsi;
+<span class="lineNum">     266 </span>            :         Bool is_crypted;
+<span class="lineNum">     267 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineCov">         36 :         *base_pid_id = 0;</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :         dsi_len = samplerate = nb_ch = IV_length = KI_length = 0;
+<span class="lineNum">     272 </span>            :         is_crypted = 0;
+<span class="lineNum">     273 </span>            :         dsi = NULL;
+<span class="lineNum">     274 </span>            :         flags = 0;
+<span class="lineNum">     275 </span>            :         max_ptime = au_sn_len = 0;
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_CODECID);</span>
+<span class="lineNum">     278 </span><span class="lineCov">         36 :         codecid = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     279 </span><span class="lineCov">         36 :         if (stream-&gt;codecid &amp;&amp; (stream-&gt;codecid != codecid)) {</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_RTP, (&quot;[RTPOut] Dynamic change of codec in RTP session not supported !\n&quot;));</span>
+<span class="lineNum">     281 </span>            :                 return GF_FILTER_NOT_SUPPORTED;
+<span class="lineNum">     282 </span>            :         }
+<span class="lineNum">     283 </span><span class="lineCov">         36 :         stream-&gt;codecid = codecid;</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">         36 :         stream-&gt;is_encrypted = GF_FALSE;</span>
+<span class="lineNum">     286 </span><span class="lineCov">         36 :         if (stream-&gt;streamtype == GF_STREAM_ENCRYPTED) {</span>
+<span class="lineNum">     287 </span><span class="lineCov">          2 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_ORIG_STREAM_TYPE);</span>
+<span class="lineNum">     288 </span><span class="lineCov">          2 :                 if (p) stream-&gt;streamtype = p-&gt;value.uint;</span>
+<span class="lineNum">     289 </span><span class="lineCov">          2 :                 stream-&gt;is_encrypted = GF_TRUE;</span>
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineCov">          2 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_PROTECTION_SCHEME_TYPE);</span>
+<span class="lineNum">     292 </span><span class="lineCov">          2 :                 if (!p || (p-&gt;value.uint != GF_ISOM_ISMACRYP_SCHEME)) {</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_RTP, (&quot;[RTPOut] Protected track with scheme type %s, cannot stream (only ISMA over RTP is supported !\n&quot;, p ? gf_4cc_to_str(p-&gt;value.uint) : &quot;unknwon&quot; ));</span>
+<span class="lineNum">     294 </span>            :                         return GF_FILTER_NOT_SUPPORTED;
+<span class="lineNum">     295 </span>            :                 }
+<span class="lineNum">     296 </span>            :         }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_TIMESCALE);</span>
+<span class="lineNum">     299 </span><span class="lineCov">         36 :         stream-&gt;timescale = p ? p-&gt;value.uint : 1000;</span>
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_CONFIG_IDX);</span>
+<span class="lineNum">     302 </span><span class="lineCov">         36 :         stream-&gt;sample_desc_index = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :         u32 cfg_crc=0;
+<span class="lineNum">     306 </span>            :         dsi = NULL;
+<span class="lineNum">     307 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     308 </span><span class="lineCov">         36 :         if (p) {</span>
+<span class="lineNum">     309 </span><span class="lineCov">         27 :                 dsi = p-&gt;value.data.ptr;</span>
+<span class="lineNum">     310 </span><span class="lineCov">         27 :                 dsi_len = p-&gt;value.data.size;</span>
+<span class="lineNum">     311 </span><span class="lineCov">         27 :                 cfg_crc = gf_crc_32(dsi, dsi_len);</span>
+<span class="lineNum">     312 </span>            :         }
+<span class="lineNum">     313 </span><span class="lineCov">         36 :         if (stream-&gt;rtp &amp;&amp; (cfg_crc==stream-&gt;cfg_crc))</span>
+<span class="lineNum">     314 </span>            :                 return GF_OK;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span><span class="lineCov">         36 :         if (inject_xps)</span>
+<span class="lineNum">     317 </span><span class="lineCov">          1 :                 stream-&gt;inject_ps = GF_TRUE;</span>
+<span class="lineNum">     318 </span><span class="lineCov">         35 :         else if (stream-&gt;cfg_crc)</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                 stream-&gt;inject_ps = GF_TRUE;</span>
+<span class="lineNum">     320 </span><span class="lineCov">         36 :         stream-&gt;cfg_crc = cfg_crc;</span>
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_NB_FRAMES);</span>
+<span class="lineNum">     323 </span><span class="lineCov">         36 :         stream-&gt;nb_aus = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineCov">         36 :         switch (stream-&gt;streamtype) {</span>
+<span class="lineNum">     326 </span>            :         case GF_STREAM_OD:
+<span class="lineNum">     327 </span>            :         case GF_STREAM_SCENE:
+<span class="lineNum">     328 </span>            :                 //todo, check if sync shadow is used
+<span class="lineNum">     329 </span>            : //              if (gf_isom_has_sync_shadows(ctx-&gt;isom, stream-&gt;track_num) || gf_isom_has_sample_dependency(ctx-&gt;isom, stream-&gt;track_num))
+<span class="lineNum">     330 </span>            : //                      flags |= GP_RTP_PCK_SYSTEMS_CAROUSEL;
+<span class="lineNum">     331 </span>            :                 break;
+<span class="lineNum">     332 </span><span class="lineCov">         19 :         case GF_STREAM_AUDIO:</span>
+<span class="lineNum">     333 </span><span class="lineCov">         19 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_SAMPLE_RATE);</span>
+<span class="lineNum">     334 </span><span class="lineCov">         19 :                 if (p) samplerate = p-&gt;value.uint;</span>
+<span class="lineNum">     335 </span><span class="lineCov">         19 :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_NUM_CHANNELS);</span>
+<span class="lineNum">     336 </span><span class="lineCov">         19 :                 if (p) nb_ch = p-&gt;value.uint;</span>
+<span class="lineNum">     337 </span>            :                 break;
+<span class="lineNum">     338 </span>            :         case GF_STREAM_VISUAL:
+<span class="lineNum">     339 </span>            :                 break;
+<span class="lineNum">     340 </span><span class="lineCov">          1 :         case GF_STREAM_FILE:</span>
+<span class="lineNum">     341 </span><span class="lineCov">          1 :                 if (file_mode==2) {</span>
+<span class="lineNum">     342 </span><span class="lineCov">          1 :                         stream-&gt;codecid = codecid = GF_CODECID_FAKE_MP2T;</span>
+<span class="lineNum">     343 </span><span class="lineCov">          1 :                         stream-&gt;timescale = 90000;</span>
+<span class="lineNum">     344 </span>            :                 }
+<span class="lineNum">     345 </span>            :                 break;
+<span class="lineNum">     346 </span>            :         default:
+<span class="lineNum">     347 </span>            :                 break;
+<span class="lineNum">     348 </span>            :         }
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span><span class="lineCov">         36 :         gf_filter_pid_set_framing_mode(stream-&gt;pid, (stream-&gt;streamtype==GF_STREAM_FILE) ? GF_FALSE : GF_TRUE);</span>
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            :         /*get sample info*/
+<span class="lineNum">     353 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_MAX_FRAME_SIZE);</span>
+<span class="lineNum">     354 </span><span class="lineCov">         36 :         max_size = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     355 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_AVG_FRAME_SIZE);</span>
+<span class="lineNum">     356 </span><span class="lineCov">         36 :         average_size = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     357 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_MAX_TS_DELTA);</span>
+<span class="lineNum">     358 </span><span class="lineCov">         36 :         max_tsdelta = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     359 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_MAX_CTS_OFFSET);</span>
+<span class="lineNum">     360 </span><span class="lineCov">         36 :         max_cts_offset = p ? p-&gt;value.uint : (u32) -1;</span>
+<span class="lineNum">     361 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_CONSTANT_DURATION);</span>
+<span class="lineNum">     362 </span><span class="lineCov">         36 :         const_dur = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">         36 :         if (stream-&gt;avcc) gf_odf_avc_cfg_del(stream-&gt;avcc);</span>
+<span class="lineNum">     366 </span><span class="lineCov">         36 :         stream-&gt;avcc = NULL;</span>
+<span class="lineNum">     367 </span><span class="lineCov">         36 :         if (stream-&gt;hvcc) gf_odf_hevc_cfg_del(stream-&gt;hvcc);</span>
+<span class="lineNum">     368 </span><span class="lineCov">         36 :         stream-&gt;hvcc = NULL;</span>
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span><span class="lineCov">         36 :         stream-&gt;avc_nalu_size = 0;</span>
+<span class="lineNum">     371 </span><span class="lineCov">         36 :         switch (codecid) {</span>
+<span class="lineNum">     372 </span><span class="lineCov">          6 :         case GF_CODECID_AVC:</span>
+<span class="lineNum">     373 </span>            :         case GF_CODECID_SVC:
+<span class="lineNum">     374 </span>            :         case GF_CODECID_MVC:
+<span class="lineNum">     375 </span><span class="lineCov">          6 :                 if (dsi) {</span>
+<span class="lineNum">     376 </span><span class="lineCov">          6 :                         GF_AVCConfig *avcc = gf_odf_avc_cfg_read(dsi, dsi_len);</span>
+<span class="lineNum">     377 </span><span class="lineCov">          6 :                         if (avcc) {</span>
+<span class="lineNum">     378 </span><span class="lineCov">          6 :                                 stream-&gt;avc_nalu_size = avcc-&gt;nal_unit_size;</span>
+<span class="lineNum">     379 </span><span class="lineCov">          6 :                                 if (stream-&gt;inject_ps)</span>
+<span class="lineNum">     380 </span><span class="lineCov">          1 :                                         stream-&gt;avcc = avcc;</span>
+<span class="lineNum">     381 </span>            :                                 else
+<span class="lineNum">     382 </span><span class="lineCov">          5 :                                         gf_odf_avc_cfg_del(avcc);</span>
+<span class="lineNum">     383 </span>            :                         }
+<span class="lineNum">     384 </span>            :                 }
+<span class="lineNum">     385 </span>            :                 break;
+<span class="lineNum">     386 </span><span class="lineCov">          2 :         case GF_CODECID_HEVC:</span>
+<span class="lineNum">     387 </span>            :         case GF_CODECID_LHVC:
+<span class="lineNum">     388 </span><span class="lineCov">          2 :                 if (dsi) {</span>
+<span class="lineNum">     389 </span><span class="lineCov">          2 :                         GF_HEVCConfig *hvcc = gf_odf_hevc_cfg_read(dsi, dsi_len, (codecid==GF_CODECID_LHVC) ? GF_TRUE : GF_FALSE );</span>
+<span class="lineNum">     390 </span><span class="lineCov">          2 :                         if (hvcc) {</span>
+<span class="lineNum">     391 </span><span class="lineCov">          2 :                                 stream-&gt;avc_nalu_size = hvcc-&gt;nal_unit_size;</span>
+<span class="lineNum">     392 </span><span class="lineCov">          2 :                                 if (stream-&gt;inject_ps) {</span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :                                         u32 i, count = gf_list_count(hvcc-&gt;param_array);</span>
+<span class="lineNum">     394 </span>            :                                         GF_NALUFFParamArray *vpsa=NULL, *spsa=NULL;
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :                                         stream-&gt;hvcc = hvcc;</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :                                         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :                                                 GF_NALUFFParamArray *pa = gf_list_get(hvcc-&gt;param_array, i);</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :                                                 if (!vpsa &amp;&amp; (pa-&gt;type == GF_HEVC_NALU_VID_PARAM)) {</span>
+<span class="lineNum">     399 </span>            :                                                         vpsa = pa;
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :                                                         gf_list_rem(hvcc-&gt;param_array, i);</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :                                                         count--;</span>
+<span class="lineNum">     402 </span>            :                                                 }
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :                                                 else if (!spsa &amp;&amp; (pa-&gt;type == GF_HEVC_NALU_SEQ_PARAM)) {</span>
+<span class="lineNum">     404 </span>            :                                                         spsa = pa;
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :                                                         gf_list_rem(hvcc-&gt;param_array, i);</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :                                                         count--;</span>
+<span class="lineNum">     407 </span>            :                                                 }
+<span class="lineNum">     408 </span>            :                                         }
+<span class="lineNum">     409 </span>            :                                         //insert SPS at beginning
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :                                         gf_list_insert(hvcc-&gt;param_array, spsa, 0);</span>
+<span class="lineNum">     411 </span>            :                                         //insert VPS at beginning - we now have VPS, SPS and other (PPS, SEI...)
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :                                         gf_list_insert(hvcc-&gt;param_array, vpsa, 0);</span>
+<span class="lineNum">     413 </span>            :                                 } else
+<span class="lineNum">     414 </span><span class="lineCov">          2 :                                         gf_odf_hevc_cfg_del(hvcc);</span>
+<span class="lineNum">     415 </span>            :                         }
+<span class="lineNum">     416 </span>            :                 }
+<span class="lineNum">     417 </span>            :                 break;
+<span class="lineNum">     418 </span><span class="lineCov">         11 :         case GF_CODECID_AAC_MPEG4:</span>
+<span class="lineNum">     419 </span>            :         case GF_CODECID_AAC_MPEG2_MP:
+<span class="lineNum">     420 </span>            :         case GF_CODECID_AAC_MPEG2_LCP:
+<span class="lineNum">     421 </span>            :         case GF_CODECID_AAC_MPEG2_SSRP:
+<span class="lineNum">     422 </span>            :                 //we cannot disable mpeg4 payload type, compute default values !!
+<span class="lineNum">     423 </span><span class="lineCov">         11 :                 if (!const_dur || !average_size || !max_tsdelta || !max_size) {</span>
+<span class="lineNum">     424 </span>            :                         const_dur = 1024;
+<span class="lineNum">     425 </span><span class="lineCov">          5 :                         const_dur *= stream-&gt;timescale;</span>
+<span class="lineNum">     426 </span><span class="lineCov">          5 :                         const_dur /= samplerate;</span>
+<span class="lineNum">     427 </span>            :                         max_tsdelta = const_dur;
+<span class="lineNum">     428 </span>            :                         average_size = 500;
+<span class="lineNum">     429 </span>            :                         max_size = 1000;
+<span class="lineNum">     430 </span><span class="lineCov">          5 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_RTP, (&quot;[RTPOut] AAC stream detected but not information available on average size/tsdelta/duration, assuming const dur %d max_tsdelta %d average size %d max size %d\n&quot;, const_dur, max_tsdelta, average_size, max_size));</span>
+<span class="lineNum">     431 </span>            :                 }
+<span class="lineNum">     432 </span><span class="lineCov">         11 :                 if (use_latm)</span>
+<span class="lineNum">     433 </span>            :                         flags |= GP_RTP_PCK_USE_LATM_AAC;
+<span class="lineNum">     434 </span>            :                 break;
+<span class="lineNum">     435 </span>            :         }
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span><span class="lineCov">         36 :         if (max_cts_offset==(u32)-1) {</span>
+<span class="lineNum">     438 </span><span class="lineCov">         27 :                 if (stream-&gt;streamtype==GF_STREAM_VISUAL) {</span>
+<span class="lineNum">     439 </span>            :                         disable_mpeg4 = GF_TRUE;
+<span class="lineNum">     440 </span>            :                 }
+<span class="lineNum">     441 </span>            :                 max_cts_offset = 0;
+<span class="lineNum">     442 </span>            :         }
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span><span class="lineCov">         36 :         if (!disable_mpeg4 &amp;&amp; use_mpeg4_signaling)</span>
+<span class="lineNum">     445 </span>            :                 flags = GP_RTP_PCK_SIGNAL_RAP | GP_RTP_PCK_FORCE_MPEG4;
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_ID);</span>
+<span class="lineNum">     449 </span><span class="lineCov">         36 :         stream-&gt;id = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_BITRATE);</span>
+<span class="lineNum">     452 </span><span class="lineCov">         36 :         bandwidth = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span>            :         if (codecid==GF_CODECID_AAC_MPEG4)
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :         if (is_crypted) {
+<span class="lineNum">     457 </span>            :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_ISMA_SELECTIVE_ENC);
+<span class="lineNum">     458 </span>            :                 if (p-&gt;value.boolean) {
+<span class="lineNum">     459 </span>            :                         flags |= GP_RTP_PCK_SELECTIVE_ENCRYPTION;
+<span class="lineNum">     460 </span>            :                 }
+<span class="lineNum">     461 </span>            :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_ISMA_IV_LENGTH);
+<span class="lineNum">     462 </span>            :                 IV_length = p ? p-&gt;value.uint : 0;
+<span class="lineNum">     463 </span>            :                 p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_ISMA_KI_LENGTH);
+<span class="lineNum">     464 </span>            :                 KI_length = p ? p-&gt;value.uint : 0;
+<span class="lineNum">     465 </span>            :         }
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            : 
+<span class="lineNum">     468 </span>            :         /*init packetizer*/
+<span class="lineNum">     469 </span><span class="lineCov">         72 :         stream-&gt;rtp = gf_rtp_streamer_new(stream-&gt;streamtype, codecid, stream-&gt;timescale,</span>
+<span class="lineNum">     470 </span><span class="lineCov">         36 :                                  (char *) ipdest, stream-&gt;port, mtu, ttl, ifce,</span>
+<span class="lineNum">     471 </span>            :                                  flags, dsi, dsi_len,
+<span class="lineNum">     472 </span>            :                                  payt, samplerate, nb_ch,
+<span class="lineNum">     473 </span>            :                                  is_crypted, IV_length, KI_length,
+<span class="lineNum">     474 </span>            :                                  average_size, max_size, max_tsdelta, max_cts_offset, const_dur, bandwidth, max_ptime, au_sn_len, is_rtsp);
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span><span class="lineCov">         36 :         if (!stream-&gt;rtp) {</span>
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_RTP, (&quot;[RTPOut] Could not initialize RTP for stream %s:  not supported\n&quot;, gf_filter_pid_get_name(stream-&gt;pid) ));</span>
+<span class="lineNum">     478 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     479 </span>            :         }
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_DELAY);</span>
+<span class="lineNum">     482 </span><span class="lineCov">         36 :         stream-&gt;ts_delay = p ? p-&gt;value.longsint : 0;</span>
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span>            :         payt++;
+<span class="lineNum">     485 </span><span class="lineCov">         36 :         stream-&gt;microsec_ts_scale_frac.num = 1000000;</span>
+<span class="lineNum">     486 </span><span class="lineCov">         36 :         stream-&gt;microsec_ts_scale_frac.den = stream-&gt;timescale;</span>
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span><span class="lineCov">        185 :         while (! (stream-&gt;microsec_ts_scale_frac.num % 10) &amp;&amp; ! (stream-&gt;microsec_ts_scale_frac.den % 10)) {</span>
+<span class="lineNum">     489 </span><span class="lineCov">        113 :                 stream-&gt;microsec_ts_scale_frac.num /= 10;</span>
+<span class="lineNum">     490 </span><span class="lineCov">        113 :                 stream-&gt;microsec_ts_scale_frac.den /= 10;</span>
+<span class="lineNum">     491 </span>            :         }
+<span class="lineNum">     492 </span>            : 
+<span class="lineNum">     493 </span><span class="lineCov">         36 :         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_PID_DEPENDENCY_ID);</span>
+<span class="lineNum">     494 </span><span class="lineCov">         36 :         if (p) {</span>
+<span class="lineNum">     495 </span><span class="lineNoCov">          0 :                 *base_pid_id = p-&gt;value.uint;</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :                 gf_rtp_streamer_disable_auto_rtcp(stream-&gt;rtp);</span>
+<span class="lineNum">     497 </span>            :         }
+<span class="lineNum">     498 </span>            :         return GF_OK;
+<a name="499"><span class="lineNum">     499 </span>            : }</a>
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span><span class="lineCov">         30 : static GF_Err rtpout_setup_sdp(GF_RTPOutCtx *ctx)</span>
+<span class="lineNum">     502 </span>            : {
+<span class="lineNum">     503 </span>            :         FILE *sdp_out;
+<span class="lineNum">     504 </span>            :         u32 fsize;
+<span class="lineNum">     505 </span>            :         GF_Err e;
+<span class="lineNum">     506 </span><span class="lineCov">         30 :         u64 sess_id=0;</span>
+<span class="lineNum">     507 </span>            :         u8 *output;
+<span class="lineNum">     508 </span><span class="lineCov">         30 :         const char *ip = ctx-&gt;ip;</span>
+<span class="lineNum">     509 </span><span class="lineCov">         30 :         if (!ip) ip = &quot;127.0.0.1&quot;;</span>
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span><span class="lineCov">         30 :         if (ctx-&gt;single_stream) return GF_OK;</span>
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span><span class="lineCov">         29 :         e = rtpout_create_sdp(ctx-&gt;streams, GF_FALSE, ip, ctx-&gt;info, &quot;livesession&quot;, ctx-&gt;url, ctx-&gt;email, ctx-&gt;base_pid_id, &amp;sdp_out, &amp;sess_id);</span>
+<span class="lineNum">     514 </span><span class="lineCov">         29 :         if (e) return e;</span>
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span><span class="lineCov">         29 :         fsize = (u32) gf_ftell(sdp_out);</span>
+<span class="lineNum">     517 </span><span class="lineCov">         29 :         GF_FilterPacket *pck = gf_filter_pck_new_alloc(ctx-&gt;opid, fsize, &amp;output);</span>
+<span class="lineNum">     518 </span><span class="lineCov">         29 :         if (pck) {</span>
+<span class="lineNum">     519 </span><span class="lineCov">         29 :                 gf_fseek(sdp_out, 0, SEEK_SET);</span>
+<span class="lineNum">     520 </span><span class="lineCov">         29 :                 u32 read = (u32) gf_fread(output, fsize, sdp_out);</span>
+<span class="lineNum">     521 </span><span class="lineCov">         29 :                 if (read != fsize) {</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_RTP, (&quot;[RTPOut] Failed to read SDP from temp file, got %d bytes but expecting %d\n&quot;, read, fsize));</span>
+<span class="lineNum">     523 </span><span class="lineNoCov">          0 :                         gf_filter_pck_discard(pck);</span>
+<span class="lineNum">     524 </span>            :                         e = GF_IO_ERR;
+<span class="lineNum">     525 </span>            :                 } else {
+<span class="lineNum">     526 </span><span class="lineCov">         29 :                         char c = output[fsize-1];</span>
+<span class="lineNum">     527 </span><span class="lineCov">         29 :                         output[fsize-1] = 0;</span>
+<span class="lineNum">     528 </span><span class="lineCov">         29 :                         GF_LOG(GF_LOG_INFO, GF_LOG_RTP, (&quot;[RTPOut] SDP file generated: %s\n&quot;, output));</span>
+<span class="lineNum">     529 </span><span class="lineCov">         29 :                         output[fsize-1] = c;</span>
+<span class="lineNum">     530 </span><span class="lineCov">         29 :                         gf_filter_pck_set_framing(pck, GF_TRUE, GF_TRUE);</span>
+<span class="lineNum">     531 </span><span class="lineCov">         29 :                         gf_filter_pck_send(pck);</span>
+<span class="lineNum">     532 </span>            :                         e = GF_OK;
+<span class="lineNum">     533 </span>            :                 }
+<span class="lineNum">     534 </span>            :         } else {
+<span class="lineNum">     535 </span>            :                 e = GF_OUT_OF_MEM;
+<span class="lineNum">     536 </span>            :         }
+<span class="lineNum">     537 </span><span class="lineCov">         29 :         gf_fclose(sdp_out);</span>
+<span class="lineNum">     538 </span><span class="lineCov">         29 :         return e;</span>
+<a name="539"><span class="lineNum">     539 </span>            : }</a>
+<span class="lineNum">     540 </span>            : 
+<span class="lineNum">     541 </span><span class="lineCov">         30 : static u16 rtpout_check_next_port(GF_RTPOutCtx *ctx, u16 first_port)</span>
+<span class="lineNum">     542 </span>            : {
+<span class="lineNum">     543 </span><span class="lineCov">         30 :         u32 i, count = gf_list_count(ctx-&gt;streams);</span>
+<span class="lineNum">     544 </span><span class="lineCov">         60 :         for (i=0;i&lt;count; i++) {</span>
+<span class="lineNum">     545 </span><span class="lineCov">         30 :                 GF_RTPOutStream *stream = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     546 </span><span class="lineCov">         30 :                 if (stream-&gt;port==first_port) {</span>
+<span class="lineNum">     547 </span><span class="lineNoCov">          0 :                         return rtpout_check_next_port(ctx, (u16) (first_port+2) );</span>
+<span class="lineNum">     548 </span>            :                 }
+<span class="lineNum">     549 </span>            :         }
+<span class="lineNum">     550 </span>            :         return first_port;
+<a name="551"><span class="lineNum">     551 </span>            : }</a>
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span><span class="lineCov">         30 : static void rtpout_del_stream(GF_RTPOutStream *st)</span>
+<span class="lineNum">     554 </span>            : {
+<span class="lineNum">     555 </span><span class="lineCov">         30 :         if (st-&gt;rtp) gf_rtp_streamer_del(st-&gt;rtp);</span>
+<span class="lineNum">     556 </span><span class="lineCov">         30 :         if (st-&gt;pck) gf_filter_pid_drop_packet(st-&gt;pid);</span>
+<span class="lineNum">     557 </span><span class="lineCov">         30 :         if (st-&gt;avcc)</span>
+<span class="lineNum">     558 </span><span class="lineCov">          1 :                 gf_odf_avc_cfg_del(st-&gt;avcc);</span>
+<span class="lineNum">     559 </span><span class="lineCov">         30 :         if (st-&gt;hvcc)</span>
+<span class="lineNum">     560 </span><span class="lineNoCov">          0 :                 gf_odf_hevc_cfg_del(st-&gt;hvcc);</span>
+<span class="lineNum">     561 </span><span class="lineCov">         30 :         gf_free(st);</span>
+<a name="562"><span class="lineNum">     562 </span><span class="lineCov">         30 : }</span></a>
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span><span class="lineCov">         30 : static GF_Err rtpout_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     565 </span>            : {
+<span class="lineNum">     566 </span><span class="lineCov">         30 :         GF_RTPOutCtx *ctx = (GF_RTPOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     567 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">     568 </span>            :         GF_RTPOutStream *stream;
+<span class="lineNum">     569 </span>            :         u16 first_port;
+<span class="lineNum">     570 </span>            :         u32 streamType, payt;
+<span class="lineNum">     571 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     572 </span>            : 
+<span class="lineNum">     573 </span><span class="lineCov">         30 :         first_port = ctx-&gt;port;</span>
+<span class="lineNum">     574 </span>            : 
+<span class="lineNum">     575 </span><span class="lineCov">         30 :         if (is_remove) {</span>
+<span class="lineNum">     576 </span><span class="lineNoCov">          0 :                 GF_RTPOutStream *t =gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :                 if (t) {</span>
+<span class="lineNum">     578 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;active_stream==t) ctx-&gt;active_stream = NULL;</span>
+<span class="lineNum">     579 </span><span class="lineNoCov">          0 :                         gf_list_del_item(ctx-&gt;streams, t);</span>
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :                         rtpout_del_stream(t);</span>
+<span class="lineNum">     581 </span>            :                 }
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :                 if (!gf_list_count(ctx-&gt;streams)) {</span>
+<span class="lineNum">     583 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;opid) gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     584 </span>            :                         return GF_EOS;
+<span class="lineNum">     585 </span>            :                 }
+<span class="lineNum">     586 </span>            :                 return GF_OK;
+<span class="lineNum">     587 </span>            :         }
+<span class="lineNum">     588 </span><span class="lineCov">         30 :         stream = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span><span class="lineCov">         30 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_STREAM_TYPE);</span>
+<span class="lineNum">     591 </span><span class="lineCov">         30 :         streamType = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     592 </span>            : 
+<span class="lineNum">     593 </span><span class="lineCov">         30 :         switch (streamType) {</span>
+<span class="lineNum">     594 </span>            :         case GF_STREAM_VISUAL:
+<span class="lineNum">     595 </span>            :         case GF_STREAM_AUDIO:
+<span class="lineNum">     596 </span>            :                 break;
+<span class="lineNum">     597 </span><span class="lineCov">          1 :         case GF_STREAM_FILE:</span>
+<span class="lineNum">     598 </span>            :         case GF_STREAM_UNKNOWN:
+<span class="lineNum">     599 </span><span class="lineCov">          1 :                 if (stream) {</span>
+<span class="lineNum">     600 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;active_stream==stream) ctx-&gt;active_stream = NULL;</span>
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :                         gf_list_del_item(ctx-&gt;streams, stream);</span>
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :                         rtpout_del_stream(stream);</span>
+<span class="lineNum">     603 </span>            :                 }
+<span class="lineNum">     604 </span><span class="lineCov">          1 :                 if (!ctx-&gt;dst)</span>
+<span class="lineNum">     605 </span>            :                         return GF_FILTER_NOT_SUPPORTED;
+<span class="lineNum">     606 </span><span class="lineCov">          1 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_MIME);</span>
+<span class="lineNum">     607 </span><span class="lineCov">          1 :                 if (p &amp;&amp; p-&gt;value.string &amp;&amp; !strcmp(p-&gt;value.string, &quot;video/mpeg-2&quot;)) {</span>
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 :                         ctx-&gt;single_stream = 2;</span>
+<span class="lineNum">     609 </span>            :                 } else {
+<span class="lineNum">     610 </span><span class="lineCov">          1 :                         p = gf_filter_pid_get_property(pid, GF_PROP_PID_FILE_EXT);</span>
+<span class="lineNum">     611 </span><span class="lineCov">          1 :                         if (p &amp;&amp; p-&gt;value.string &amp;&amp; !strcmp(p-&gt;value.string, &quot;ts&quot;)) {</span>
+<span class="lineNum">     612 </span><span class="lineCov">          1 :                                 ctx-&gt;single_stream = 2;</span>
+<span class="lineNum">     613 </span>            :                         } else {
+<span class="lineNum">     614 </span>            :                                 return GF_FILTER_NOT_SUPPORTED;
+<span class="lineNum">     615 </span>            :                         }
+<span class="lineNum">     616 </span>            :                 }
+<span class="lineNum">     617 </span>            : 
+<span class="lineNum">     618 </span>            :                 break;
+<span class="lineNum">     619 </span>            :         default:
+<span class="lineNum">     620 </span>            :                 break;
+<span class="lineNum">     621 </span>            :         }
+<span class="lineNum">     622 </span><span class="lineCov">         30 :         if (!stream) {</span>
+<span class="lineNum">     623 </span><span class="lineCov">         30 :                 GF_SAFEALLOC(stream, GF_RTPOutStream);</span>
+<span class="lineNum">     624 </span><span class="lineCov">         30 :                 if (!stream) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     625 </span><span class="lineCov">         30 :                 gf_list_add(ctx-&gt;streams, stream);</span>
+<span class="lineNum">     626 </span><span class="lineCov">         30 :                 stream-&gt;pid = pid;</span>
+<span class="lineNum">     627 </span><span class="lineCov">         30 :                 stream-&gt;streamtype = streamType;</span>
+<span class="lineNum">     628 </span><span class="lineCov">         30 :                 stream-&gt;min_dts = GF_FILTER_NO_TS;</span>
+<span class="lineNum">     629 </span><span class="lineCov">         30 :                 gf_filter_pid_set_udta(pid, stream);</span>
+<span class="lineNum">     630 </span><span class="lineCov">         30 :                 if (ctx-&gt;single_stream) {</span>
+<span class="lineNum">     631 </span>            :                         GF_FilterEvent evt;
+<span class="lineNum">     632 </span><span class="lineCov">          1 :                         gf_filter_pid_init_play_event(pid, &amp;evt, 0, 1.0, &quot;RTPOut&quot;);</span>
+<span class="lineNum">     633 </span><span class="lineCov">          1 :                         gf_filter_pid_send_event(pid, &amp;evt);</span>
+<span class="lineNum">     634 </span>            :                 }
+<span class="lineNum">     635 </span>            :         }
+<span class="lineNum">     636 </span><span class="lineCov">         30 :         if (!ctx-&gt;single_stream) {</span>
+<span class="lineNum">     637 </span><span class="lineCov">         29 :                 if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     638 </span><span class="lineCov">         29 :                         ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     639 </span>            :                 }
+<span class="lineNum">     640 </span><span class="lineCov">         29 :                 gf_filter_pid_copy_properties(ctx-&gt;opid, pid);</span>
+<span class="lineNum">     641 </span><span class="lineCov">         29 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_FILE) );</span>
+<span class="lineNum">     642 </span><span class="lineCov">         29 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG, NULL );</span>
+<span class="lineNum">     643 </span><span class="lineCov">         29 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CODECID, NULL );</span>
+<span class="lineNum">     644 </span><span class="lineCov">         29 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_FILE_EXT, &amp;PROP_STRING(&quot;sdp&quot;) );</span>
+<span class="lineNum">     645 </span><span class="lineCov">         29 :                 gf_filter_pid_set_name(ctx-&gt;opid, &quot;SDP&quot;);</span>
+<span class="lineNum">     646 </span>            :         } else {
+<span class="lineNum">     647 </span><span class="lineCov">          1 :                 char *dst = ctx-&gt;dst+6;</span>
+<span class="lineNum">     648 </span><span class="lineCov">          1 :                 char *sep = strchr(dst, ':');</span>
+<span class="lineNum">     649 </span><span class="lineCov">          1 :                 if (sep) {</span>
+<span class="lineNum">     650 </span><span class="lineCov">          2 :                         first_port = ctx-&gt;port = atoi(sep+1);</span>
+<span class="lineNum">     651 </span><span class="lineCov">          1 :                         sep[0] = 0;</span>
+<span class="lineNum">     652 </span><span class="lineCov">          1 :                         if (ctx-&gt;ip) gf_free(ctx-&gt;ip);</span>
+<span class="lineNum">     653 </span><span class="lineCov">          1 :                         ctx-&gt;ip = gf_strdup(dst);</span>
+<span class="lineNum">     654 </span><span class="lineCov">          1 :                         sep[0] = ':';</span>
+<span class="lineNum">     655 </span>            :                 }
+<span class="lineNum">     656 </span>            :         }
+<span class="lineNum">     657 </span>            : 
+<span class="lineNum">     658 </span><span class="lineCov">         30 :         stream-&gt;port = rtpout_check_next_port(ctx, first_port);</span>
+<span class="lineNum">     659 </span>            : 
+<span class="lineNum">     660 </span><span class="lineCov">         30 :         payt = ctx-&gt;payt + gf_list_find(ctx-&gt;streams, stream);</span>
+<span class="lineNum">     661 </span>            :         //init rtp
+<span class="lineNum">     662 </span><span class="lineCov">         30 :         e = rtpout_init_streamer(stream,  ctx-&gt;ip ? ctx-&gt;ip : &quot;127.0.0.1&quot;, ctx-&gt;xps, ctx-&gt;mpeg4, ctx-&gt;latm, payt, ctx-&gt;mtu, ctx-&gt;ttl, ctx-&gt;ifce, GF_FALSE, &amp;ctx-&gt;base_pid_id, ctx-&gt;single_stream);</span>
+<span class="lineNum">     663 </span><span class="lineCov">         30 :         if (e) return e;</span>
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span><span class="lineCov">         30 :         stream-&gt;selected = GF_TRUE;</span>
+<span class="lineNum">     666 </span>            : 
+<span class="lineNum">     667 </span><span class="lineCov">         30 :         if (ctx-&gt;loop) {</span>
+<span class="lineNum">     668 </span><span class="lineCov">         14 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_PLAYBACK_MODE);</span>
+<span class="lineNum">     669 </span><span class="lineCov">         14 :                 if (!p || (p-&gt;value.uint&lt;GF_PLAYBACK_MODE_FASTFORWARD)) {</span>
+<span class="lineNum">     670 </span><span class="lineNoCov">          0 :                         ctx-&gt;loop = GF_FALSE;</span>
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_RTP, (&quot;[RTPOut] PID %s cannot be seek, disabling loop\n&quot;, gf_filter_pid_get_name(pid) ));</span>
+<span class="lineNum">     672 </span>            :                 }
+<span class="lineNum">     673 </span>            :         }
+<span class="lineNum">     674 </span>            :         return GF_OK;
+<a name="675"><span class="lineNum">     675 </span>            : }</a>
+<span class="lineNum">     676 </span>            : 
+<span class="lineNum">     677 </span><span class="lineCov">         30 : static GF_Err rtpout_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     678 </span>            : {
+<span class="lineNum">     679 </span><span class="lineCov">         30 :         GF_RTPOutCtx *ctx = (GF_RTPOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     680 </span><span class="lineCov">         30 :         if (!ctx-&gt;payt) ctx-&gt;payt = 96;</span>
+<span class="lineNum">     681 </span><span class="lineCov">         30 :         if (!ctx-&gt;port) ctx-&gt;port = 7000;</span>
+<span class="lineNum">     682 </span><span class="lineCov">         30 :         if (!ctx-&gt;mtu) ctx-&gt;mtu = 1450;</span>
+<span class="lineNum">     683 </span><span class="lineCov">         30 :         if (ctx-&gt;payt&lt;96) ctx-&gt;payt = 96;</span>
+<span class="lineNum">     684 </span><span class="lineCov">         30 :         if (ctx-&gt;payt&gt;127) ctx-&gt;payt = 127;</span>
+<span class="lineNum">     685 </span><span class="lineCov">         30 :         ctx-&gt;streams = gf_list_new();</span>
+<span class="lineNum">     686 </span>            : 
+<span class="lineNum">     687 </span><span class="lineCov">         30 :         if (ctx-&gt;dst &amp;&amp; (ctx-&gt;ext || ctx-&gt;mime) ) {</span>
+<span class="lineNum">     688 </span>            :                 //static cap, streamtype = file
+<span class="lineNum">     689 </span><span class="lineCov">          1 :                 ctx-&gt;in_caps[0].code = GF_PROP_PID_STREAM_TYPE;</span>
+<span class="lineNum">     690 </span><span class="lineCov">          1 :                 ctx-&gt;in_caps[0].val = PROP_UINT(GF_STREAM_FILE);</span>
+<span class="lineNum">     691 </span><span class="lineCov">          1 :                 ctx-&gt;in_caps[0].flags = GF_CAPS_INPUT_STATIC;</span>
+<span class="lineNum">     692 </span>            : 
+<span class="lineNum">     693 </span><span class="lineCov">          1 :                 if (ctx-&gt;mime) {</span>
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 :                         ctx-&gt;in_caps[1].code = GF_PROP_PID_MIME;</span>
+<span class="lineNum">     695 </span><span class="lineNoCov">          0 :                         ctx-&gt;in_caps[1].val = PROP_NAME( ctx-&gt;mime );</span>
+<span class="lineNum">     696 </span><span class="lineNoCov">          0 :                         ctx-&gt;in_caps[1].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">     697 </span>            :                 } else {
+<span class="lineNum">     698 </span><span class="lineCov">          1 :                         strncpy(ctx-&gt;szExt, ctx-&gt;ext, 9);</span>
+<span class="lineNum">     699 </span><span class="lineCov">          1 :                         ctx-&gt;szExt[9] = 0;</span>
+<span class="lineNum">     700 </span><span class="lineCov">          1 :                         strlwr(ctx-&gt;szExt);</span>
+<span class="lineNum">     701 </span><span class="lineCov">          1 :                         ctx-&gt;in_caps[1].code = GF_PROP_PID_FILE_EXT;</span>
+<span class="lineNum">     702 </span><span class="lineCov">          1 :                         ctx-&gt;in_caps[1].val = PROP_NAME( ctx-&gt;szExt );</span>
+<span class="lineNum">     703 </span><span class="lineCov">          1 :                         ctx-&gt;in_caps[1].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">     704 </span>            :                 }
+<span class="lineNum">     705 </span><span class="lineCov">          1 :                 gf_filter_override_caps(filter, ctx-&gt;in_caps, 2);</span>
+<span class="lineNum">     706 </span><span class="lineCov">          1 :                 gf_filter_set_max_extra_input_pids(filter, 0);</span>
+<span class="lineNum">     707 </span><span class="lineCov">          1 :                 ctx-&gt;single_stream = GF_TRUE;</span>
+<span class="lineNum">     708 </span>            :         }
+<span class="lineNum">     709 </span><span class="lineCov">         30 :         return GF_OK;</span>
+<a name="710"><span class="lineNum">     710 </span>            : }</a>
+<span class="lineNum">     711 </span>            : 
+<span class="lineNum">     712 </span><span class="lineCov">         30 : static void rtpout_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     713 </span>            : {
+<span class="lineNum">     714 </span><span class="lineCov">         30 :         GF_RTPOutCtx *ctx = (GF_RTPOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span><span class="lineCov">         90 :         while (gf_list_count(ctx-&gt;streams)) {</span>
+<span class="lineNum">     717 </span><span class="lineCov">         30 :                 GF_RTPOutStream *tmp = gf_list_pop_back(ctx-&gt;streams);</span>
+<span class="lineNum">     718 </span><span class="lineCov">         30 :                 rtpout_del_stream(tmp);</span>
+<span class="lineNum">     719 </span>            :         }
+<span class="lineNum">     720 </span><span class="lineCov">         30 :         gf_list_del(ctx-&gt;streams);</span>
+<span class="lineNum">     721 </span>            : 
+<a name="722"><span class="lineNum">     722 </span><span class="lineCov">         30 : }</span></a>
+<span class="lineNum">     723 </span>            : 
+<span class="lineNum">     724 </span><span class="lineCov">          3 : static GF_Err rtpout_send_xps(GF_RTPOutStream *stream, GF_List *pslist, Bool *au_start, u32 pck_size, u32 cts, u32 dts, u32 duration)</span>
+<span class="lineNum">     725 </span>            : {
+<span class="lineNum">     726 </span>            :         GF_Err e;
+<span class="lineNum">     727 </span><span class="lineCov">          3 :         u32 i, count = gf_list_count(pslist);</span>
+<span class="lineNum">     728 </span><span class="lineCov">          5 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     729 </span><span class="lineCov">          2 :                 GF_NALUFFParam *sl = gf_list_get(pslist, i);</span>
+<span class="lineNum">     730 </span><span class="lineCov">          2 :                 e = gf_rtp_streamer_send_data(stream-&gt;rtp, (char *) sl-&gt;data, sl-&gt;size, pck_size, cts, dts, stream-&gt;current_sap ? 1 : 0, *au_start, GF_FALSE, stream-&gt;pck_num, duration, stream-&gt;sample_desc_index);</span>
+<span class="lineNum">     731 </span><span class="lineCov">          2 :                 if (e) return e;</span>
+<span class="lineNum">     732 </span><span class="lineCov">          2 :                 *au_start = GF_FALSE;</span>
+<span class="lineNum">     733 </span>            :         }
+<span class="lineNum">     734 </span>            :         return GF_OK;
+<a name="735"><span class="lineNum">     735 </span>            : }</a>
+<span class="lineNum">     736 </span>            : 
+<span class="lineNum">     737 </span><span class="lineCov">         30 : static Bool rtpout_init_clock(GF_RTPOutCtx *ctx)</span>
+<span class="lineNum">     738 </span>            : {
+<span class="lineNum">     739 </span>            :         GF_Err e;
+<span class="lineNum">     740 </span>            :         u64 min_dts = GF_FILTER_NO_TS;
+<span class="lineNum">     741 </span><span class="lineCov">         30 :         u32 i, count = gf_list_count(ctx-&gt;streams);</span>
+<span class="lineNum">     742 </span>            : 
+<span class="lineNum">     743 </span><span class="lineCov">         60 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     744 </span>            :                 u64 dts;
+<span class="lineNum">     745 </span><span class="lineCov">         30 :                 GF_RTPOutStream *stream = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     746 </span><span class="lineCov">         30 :                 GF_FilterPacket *pck = gf_filter_pid_get_packet(stream-&gt;pid);</span>
+<span class="lineNum">     747 </span><span class="lineCov">         30 :                 if (!pck) return GF_FALSE;</span>
+<span class="lineNum">     748 </span>            : 
+<span class="lineNum">     749 </span><span class="lineCov">         30 :                 dts = gf_filter_pck_get_dts(pck);</span>
+<span class="lineNum">     750 </span><span class="lineCov">         30 :                 if (dts==GF_FILTER_NO_TS)</span>
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :                         dts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     752 </span>            : 
+<span class="lineNum">     753 </span><span class="lineCov">         30 :                 if (dts==GF_FILTER_NO_TS) dts=0;</span>
+<span class="lineNum">     754 </span>            : 
+<span class="lineNum">     755 </span><span class="lineCov">         30 :                 dts *= 1000000;</span>
+<span class="lineNum">     756 </span><span class="lineCov">         30 :                 dts /= stream-&gt;timescale;</span>
+<span class="lineNum">     757 </span><span class="lineCov">         30 :                 if (min_dts &gt; dts)</span>
+<span class="lineNum">     758 </span>            :                         min_dts = dts;
+<span class="lineNum">     759 </span>            : 
+<span class="lineNum">     760 </span><span class="lineCov">         30 :                 if (ctx-&gt;tso&gt;0) {</span>
+<span class="lineNum">     761 </span><span class="lineCov">         15 :                         u64 offset = ctx-&gt;tso;</span>
+<span class="lineNum">     762 </span><span class="lineCov">         15 :                         offset *= stream-&gt;timescale;</span>
+<span class="lineNum">     763 </span><span class="lineCov">         15 :                         offset /= 1000000;</span>
+<span class="lineNum">     764 </span><span class="lineCov">         15 :                         stream-&gt;rtp_ts_offset = (u32) offset;</span>
+<span class="lineNum">     765 </span>            :                 }
+<span class="lineNum">     766 </span>            :         }
+<span class="lineNum">     767 </span><span class="lineCov">         30 :         ctx-&gt;sys_clock_at_init = gf_sys_clock_high_res();</span>
+<span class="lineNum">     768 </span><span class="lineCov">         30 :         ctx-&gt;microsec_ts_init = min_dts;</span>
+<span class="lineNum">     769 </span><span class="lineCov">         30 :         GF_LOG(GF_LOG_INFO, GF_LOG_RTP, (&quot;[RTPOut] RTP clock initialized - time origin set to &quot;LLU&quot; us (sys clock) / &quot;LLU&quot; us (media clock)\n&quot;, ctx-&gt;sys_clock_at_init, ctx-&gt;microsec_ts_init));</span>
+<span class="lineNum">     770 </span><span class="lineCov">         30 :         if (ctx-&gt;tso&lt;0) {</span>
+<span class="lineNum">     771 </span><span class="lineCov">         15 :                 gf_rand_init(GF_FALSE);</span>
+<span class="lineNum">     772 </span><span class="lineCov">         30 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     773 </span><span class="lineCov">         15 :                         GF_RTPOutStream *stream = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     774 </span><span class="lineCov">         15 :                         stream-&gt;rtp_ts_offset = gf_rand();</span>
+<span class="lineNum">     775 </span><span class="lineCov">         15 :                         GF_LOG(GF_LOG_INFO, GF_LOG_RTP, (&quot;[RTPOut] RTP stream %d initial RTP TS set to %d\n&quot;, i+1, stream-&gt;rtp_ts_offset));</span>
+<span class="lineNum">     776 </span>            :                 }
+<span class="lineNum">     777 </span>            :         }
+<span class="lineNum">     778 </span>            : 
+<span class="lineNum">     779 </span><span class="lineCov">         30 :         e = rtpout_setup_sdp(ctx);</span>
+<span class="lineNum">     780 </span><span class="lineCov">         30 :         if (e) return e;</span>
+<span class="lineNum">     781 </span>            : 
+<span class="lineNum">     782 </span><span class="lineCov">         30 :         if (ctx-&gt;runfor==0) {</span>
+<span class="lineNum">     783 </span><span class="lineCov">         14 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     784 </span><span class="lineCov">         14 :                         GF_RTPOutStream *stream = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     785 </span><span class="lineCov">         14 :                         gf_filter_pid_set_discard(stream-&gt;pid, GF_TRUE);</span>
+<span class="lineNum">     786 </span>            :                 }
+<span class="lineNum">     787 </span>            :         }
+<span class="lineNum">     788 </span>            : 
+<span class="lineNum">     789 </span>            :         return GF_TRUE;
+<a name="790"><span class="lineNum">     790 </span>            : }</a>
+<span class="lineNum">     791 </span>            : 
+<span class="lineNum">     792 </span><span class="lineCov">    2471985 : GF_Err rtpout_process_rtp(GF_List *streams, GF_RTPOutStream **active_stream, Bool loop, s32 delay, u32 *active_stream_idx, u64 sys_clock_at_init, u64 *active_min_ts_microsec, u64 microsec_ts_init, Bool *wait_for_loop, u32 *repost_delay_us, Bool *first_RTCP_sent, u32 base_pid_id)</span>
+<span class="lineNum">     793 </span>            : {
+<span class="lineNum">     794 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">     795 </span>            :         GF_RTPOutStream *stream;
+<span class="lineNum">     796 </span>            :         u32 duration, i, count;
+<span class="lineNum">     797 </span>            :         s64 diff;
+<span class="lineNum">     798 </span>            :         u64 clock;
+<span class="lineNum">     799 </span>            :         const char *pck_data;
+<span class="lineNum">     800 </span>            :         u32 pck_size;
+<span class="lineNum">     801 </span>            :         u32 dts, cts;
+<span class="lineNum">     802 </span>            : 
+<span class="lineNum">     803 </span>            :         /*browse all inputs and locate most mature stream*/
+<span class="lineNum">     804 </span><span class="lineCov">    2471985 :         if (! *active_stream) {</span>
+<span class="lineNum">     805 </span>            :                 u32 nb_eos = 0;
+<span class="lineNum">     806 </span><span class="lineCov">       1004 :                 count = gf_list_count(streams);</span>
+<span class="lineNum">     807 </span>            : 
+<span class="lineNum">     808 </span><span class="lineCov">       1004 :                 *active_min_ts_microsec = (u64) -1;</span>
+<span class="lineNum">     809 </span><span class="lineCov">       2118 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     810 </span><span class="lineCov">       1114 :                         stream = gf_list_get(streams, i);</span>
+<span class="lineNum">     811 </span><span class="lineCov">       1114 :                         if (!stream-&gt;rtp) continue;</span>
+<span class="lineNum">     812 </span>            : 
+<span class="lineNum">     813 </span>            :                         /*load next AU*/
+<span class="lineNum">     814 </span><span class="lineCov">       1114 :                         if (!stream-&gt;pck) {</span>
+<span class="lineNum">     815 </span>            :                                 u64 ts;
+<span class="lineNum">     816 </span><span class="lineCov">       1008 :                                 stream-&gt;pck = gf_filter_pid_get_packet(stream-&gt;pid);</span>
+<span class="lineNum">     817 </span>            : 
+<span class="lineNum">     818 </span><span class="lineCov">       1008 :                                 if (!stream-&gt;pck) {</span>
+<span class="lineNum">     819 </span><span class="lineCov">         62 :                                         if (gf_filter_pid_is_eos(stream-&gt;pid)) {</span>
+<span class="lineNum">     820 </span>            :                                                 //flush stream
+<span class="lineNum">     821 </span><span class="lineCov">         45 :                                                 if (!stream-&gt;bye_sent) {</span>
+<span class="lineNum">     822 </span><span class="lineCov">         30 :                                                         stream-&gt;bye_sent = GF_TRUE;</span>
+<span class="lineNum">     823 </span><span class="lineCov">         30 :                                                         gf_rtp_streamer_send_au(stream-&gt;rtp, NULL, 0, 0, 0, GF_FALSE);</span>
+<span class="lineNum">     824 </span><span class="lineCov">         30 :                                                         gf_rtp_streamer_send_bye(stream-&gt;rtp);</span>
+<span class="lineNum">     825 </span>            :                                                 }
+<span class="lineNum">     826 </span><span class="lineCov">         45 :                                                 nb_eos++;</span>
+<span class="lineNum">     827 </span>            :                                         }
+<span class="lineNum">     828 </span><span class="lineCov">         62 :                                         continue;</span>
+<span class="lineNum">     829 </span>            :                                 }
+<span class="lineNum">     830 </span><span class="lineCov">        946 :                                 stream-&gt;current_dts = gf_filter_pck_get_dts(stream-&gt;pck);</span>
+<span class="lineNum">     831 </span>            :                                 //if CTS is not set, use prev packet CTS
+<span class="lineNum">     832 </span><span class="lineCov">        946 :                                 ts = gf_filter_pck_get_cts(stream-&gt;pck);</span>
+<span class="lineNum">     833 </span><span class="lineCov">        946 :                                 if (ts==GF_FILTER_NO_TS) ts = stream-&gt;current_cts;</span>
+<span class="lineNum">     834 </span><span class="lineCov">        946 :                                 stream-&gt;current_cts = ts;</span>
+<span class="lineNum">     835 </span>            : 
+<span class="lineNum">     836 </span><span class="lineCov">        946 :                                 stream-&gt;current_sap = gf_filter_pck_get_sap(stream-&gt;pck);</span>
+<span class="lineNum">     837 </span><span class="lineCov">        946 :                                 duration = gf_filter_pck_get_duration(stream-&gt;pck);</span>
+<span class="lineNum">     838 </span><span class="lineCov">        946 :                                 if (duration) stream-&gt;current_duration = duration;</span>
+<span class="lineNum">     839 </span><span class="lineCov">        946 :                                 if (stream-&gt;current_dts==GF_FILTER_NO_TS)</span>
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :                                         stream-&gt;current_dts = stream-&gt;current_cts;</span>
+<span class="lineNum">     841 </span>            : 
+<span class="lineNum">     842 </span><span class="lineCov">        946 :                                 if (stream-&gt;min_dts==GF_FILTER_NO_TS) {</span>
+<span class="lineNum">     843 </span><span class="lineCov">         22 :                                         stream-&gt;min_dts = stream-&gt;current_dts;</span>
+<span class="lineNum">     844 </span>            :                                 }
+<span class="lineNum">     845 </span>            : 
+<span class="lineNum">     846 </span><span class="lineCov">        946 :                                 stream-&gt;microsec_dts = (u64) (stream-&gt;microsec_ts_scale_frac.num * (s64) stream-&gt;current_dts);</span>
+<span class="lineNum">     847 </span><span class="lineCov">        946 :                                 stream-&gt;microsec_dts /= stream-&gt;microsec_ts_scale_frac.den;</span>
+<span class="lineNum">     848 </span><span class="lineCov">        946 :                                 stream-&gt;microsec_dts += stream-&gt;microsec_ts_offset + sys_clock_at_init;</span>
+<span class="lineNum">     849 </span>            : 
+<span class="lineNum">     850 </span><span class="lineCov">        946 :                                 if (stream-&gt;microsec_dts &lt; microsec_ts_init) {</span>
+<span class="lineNum">     851 </span><span class="lineNoCov">          0 :                                         stream-&gt;microsec_dts = 0;</span>
+<span class="lineNum">     852 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_RTP, (&quot;[RTPOut] next RTP packet (stream %d) has a timestamp &quot;LLU&quot; less than initial timestamp &quot;LLU&quot; - forcing to 0\n&quot;, i+1, stream-&gt;microsec_dts, microsec_ts_init));</span>
+<span class="lineNum">     853 </span>            :                                 } else {
+<span class="lineNum">     854 </span><span class="lineCov">        946 :                                         stream-&gt;microsec_dts -= microsec_ts_init;</span>
+<span class="lineNum">     855 </span>            :                                 }
+<span class="lineNum">     856 </span>            : 
+<span class="lineNum">     857 </span><span class="lineCov">        946 :                                 if (stream-&gt;current_sap&gt;GF_FILTER_SAP_3) stream-&gt;current_sap = 0;</span>
+<span class="lineNum">     858 </span><span class="lineCov">        946 :                                 stream-&gt;pck_num++;</span>
+<span class="lineNum">     859 </span><span class="lineCov">        946 :                                 *wait_for_loop = GF_FALSE;</span>
+<span class="lineNum">     860 </span>            :                         }
+<span class="lineNum">     861 </span>            : 
+<span class="lineNum">     862 </span>            :                         /*check timing*/
+<span class="lineNum">     863 </span><span class="lineCov">       1052 :                         if (stream-&gt;pck) {</span>
+<span class="lineNum">     864 </span><span class="lineCov">       1052 :                                 if (*active_min_ts_microsec &gt; stream-&gt;microsec_dts) {</span>
+<span class="lineNum">     865 </span><span class="lineCov">        983 :                                         *active_min_ts_microsec = stream-&gt;microsec_dts;</span>
+<span class="lineNum">     866 </span><span class="lineCov">        983 :                                         *active_stream = stream;</span>
+<span class="lineNum">     867 </span><span class="lineCov">        983 :                                         *active_stream_idx = i+1;</span>
+<span class="lineNum">     868 </span>            :                                 }
+<span class="lineNum">     869 </span>            :                         }
+<span class="lineNum">     870 </span>            :                 }
+<span class="lineNum">     871 </span>            : 
+<span class="lineNum">     872 </span>            :                 /*no input data ...*/
+<span class="lineNum">     873 </span><span class="lineCov">       1004 :                 if (! *active_stream) {</span>
+<span class="lineNum">     874 </span><span class="lineCov">         59 :                         if (nb_eos==count) {</span>
+<span class="lineNum">     875 </span>            :                                 u64 max_dur = 0;
+<span class="lineNum">     876 </span><span class="lineCov">         45 :                                 if (!loop)</span>
+<span class="lineNum">     877 </span>            :                                         return GF_EOS;
+<span class="lineNum">     878 </span>            : 
+<span class="lineNum">     879 </span><span class="lineCov">         14 :                                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     880 </span><span class="lineCov">         14 :                                         stream = gf_list_get(streams, i);</span>
+<span class="lineNum">     881 </span><span class="lineCov">         14 :                                         u64 dur = stream-&gt;current_dts + stream-&gt;current_duration - stream-&gt;min_dts;</span>
+<span class="lineNum">     882 </span>            : 
+<span class="lineNum">     883 </span><span class="lineCov">         14 :                                         dur *= 1000000;</span>
+<span class="lineNum">     884 </span><span class="lineCov">         14 :                                         dur /= stream-&gt;timescale;</span>
+<span class="lineNum">     885 </span>            : 
+<span class="lineNum">     886 </span><span class="lineCov">         14 :                                         if (max_dur &lt; dur) {</span>
+<span class="lineNum">     887 </span>            :                                                 max_dur = dur;
+<span class="lineNum">     888 </span>            :                                         }
+<span class="lineNum">     889 </span>            :                                 }
+<span class="lineNum">     890 </span><span class="lineCov">         14 :                                 if (*wait_for_loop)</span>
+<span class="lineNum">     891 </span>            :                                         return GF_OK;
+<span class="lineNum">     892 </span>            : 
+<span class="lineNum">     893 </span><span class="lineCov">         14 :                                 GF_LOG(GF_LOG_INFO, GF_LOG_RTP, (&quot;[RTPOut] RTP session done, looping source\n&quot;));</span>
+<span class="lineNum">     894 </span><span class="lineCov">         14 :                                 *wait_for_loop = GF_TRUE;</span>
+<span class="lineNum">     895 </span><span class="lineCov">         28 :                                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     896 </span>            :                                         GF_FilterEvent evt;
+<span class="lineNum">     897 </span>            :                                         const GF_PropertyValue *p;
+<span class="lineNum">     898 </span><span class="lineCov">         14 :                                         stream = gf_list_get(streams, i);</span>
+<span class="lineNum">     899 </span><span class="lineCov">         14 :                                         p = gf_filter_pid_get_property(stream-&gt;pid, GF_PROP_NO_TS_LOOP);</span>
+<span class="lineNum">     900 </span><span class="lineCov">         14 :                                         if (!p || !p-&gt;value.boolean) {</span>
+<span class="lineNum">     901 </span>            :                                                 u64 new_ts;
+<span class="lineNum">     902 </span>            :                                                 new_ts = max_dur;
+<span class="lineNum">     903 </span><span class="lineCov">         14 :                                                 new_ts *= stream-&gt;timescale;</span>
+<span class="lineNum">     904 </span><span class="lineCov">         14 :                                                 new_ts /= 1000000;</span>
+<span class="lineNum">     905 </span><span class="lineCov">         14 :                                                 stream-&gt;ts_offset += new_ts;</span>
+<span class="lineNum">     906 </span><span class="lineCov">         14 :                                                 stream-&gt;microsec_ts_offset = (u64) (stream-&gt;ts_offset*(1000000.0/stream-&gt;timescale) + sys_clock_at_init);</span>
+<span class="lineNum">     907 </span>            :                                         }
+<span class="lineNum">     908 </span>            : 
+<span class="lineNum">     909 </span>            :                                         //loop pid: stop and play
+<span class="lineNum">     910 </span><span class="lineCov">         14 :                                         GF_FEVT_INIT(evt, GF_FEVT_STOP, stream-&gt;pid);</span>
+<span class="lineNum">     911 </span><span class="lineCov">         14 :                                         gf_filter_pid_send_event(stream-&gt;pid, &amp;evt);</span>
+<span class="lineNum">     912 </span>            : 
+<span class="lineNum">     913 </span><span class="lineCov">         14 :                                         GF_FEVT_INIT(evt, GF_FEVT_PLAY, stream-&gt;pid);</span>
+<span class="lineNum">     914 </span><span class="lineCov">         14 :                                         gf_filter_pid_send_event(stream-&gt;pid, &amp;evt);</span>
+<span class="lineNum">     915 </span>            :                                 }
+<span class="lineNum">     916 </span>            :                         }
+<span class="lineNum">     917 </span>            :                         return GF_OK;
+<span class="lineNum">     918 </span>            :                 }
+<span class="lineNum">     919 </span>            :         }
+<span class="lineNum">     920 </span>            : 
+<span class="lineNum">     921 </span><span class="lineCov">    2471926 :         stream = *active_stream;</span>
+<span class="lineNum">     922 </span><span class="lineCov">    2471926 :         clock = gf_sys_clock_high_res();</span>
+<span class="lineNum">     923 </span><span class="lineCov">    2471926 :         diff = (s64) *active_min_ts_microsec;</span>
+<span class="lineNum">     924 </span><span class="lineCov">    2471926 :         diff += ((s64) delay) * 1000;</span>
+<span class="lineNum">     925 </span><span class="lineCov">    2471926 :         diff -= (s64) clock;</span>
+<span class="lineNum">     926 </span>            : 
+<span class="lineNum">     927 </span><span class="lineCov">    2471926 :         if (diff &gt; 1000) {</span>
+<span class="lineNum">     928 </span>            :                 u64 repost_in;
+<span class="lineNum">     929 </span>            :                 //if more than 11 secs ahead of time, ask for delay minus one second, otherwise ask for half the delay
+<span class="lineNum">     930 </span><span class="lineCov">    2470985 :                 if (diff&lt;=11000) repost_in = diff/3;</span>
+<span class="lineNum">     931 </span><span class="lineCov">     685229 :                 else repost_in = diff - 10000;</span>
+<span class="lineNum">     932 </span><span class="lineCov">    2470985 :                 *repost_delay_us = (u32) repost_in;</span>
+<span class="lineNum">     933 </span><span class="lineCov">    2470985 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_RTP, (&quot;[RTPOut] next RTP packet (stream %d DTS &quot;LLU&quot;) scheduled in &quot;LLU&quot; us, requesting filter reschedule in &quot;LLU&quot; us - clock &quot;LLU&quot; us\n&quot;, *active_stream_idx, stream-&gt;current_dts, diff, repost_in, clock));</span>
+<span class="lineNum">     934 </span>            :                 return GF_OK;
+<span class="lineNum">     935 </span><span class="lineCov">        941 :         } else if (diff&lt;=-1000) {</span>
+<span class="lineNum">     936 </span><span class="lineCov">          2 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_RTP, (&quot;[RTPOut] RTP session stream %d - sending packet %d (DTS &quot;LLU&quot;) too late by %d us - clock &quot;LLU&quot; us\n&quot;, *active_stream_idx, stream-&gt;pck_num, stream-&gt;current_dts, -diff, clock));</span>
+<span class="lineNum">     937 </span><span class="lineCov">        939 :         } else if (diff&gt;0){</span>
+<span class="lineNum">     938 </span><span class="lineCov">        892 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_RTP, (&quot;[RTPOut] RTP session stream %d - sending packet %d (DTS &quot;LLU&quot;) ahead of %d us - clock &quot;LLU&quot; us\n&quot;, *active_stream_idx, stream-&gt;pck_num, stream-&gt;current_dts, diff, clock));</span>
+<span class="lineNum">     939 </span>            :         }
+<span class="lineNum">     940 </span>            : 
+<span class="lineNum">     941 </span>            :         /*send packets*/
+<span class="lineNum">     942 </span><span class="lineCov">        941 :         pck_data = gf_filter_pck_get_data(stream-&gt;pck, &amp;pck_size);</span>
+<span class="lineNum">     943 </span><span class="lineCov">        941 :         if (!pck_size) {</span>
+<span class="lineNum">     944 </span><span class="lineNoCov">          0 :                 gf_filter_pid_drop_packet(stream-&gt;pid);</span>
+<span class="lineNum">     945 </span><span class="lineNoCov">          0 :                 stream-&gt;pck = NULL;</span>
+<span class="lineNum">     946 </span><span class="lineNoCov">          0 :                 *active_stream = NULL;</span>
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     948 </span>            :         }
+<span class="lineNum">     949 </span>            : 
+<span class="lineNum">     950 </span><span class="lineCov">        941 :         dts = (u32) (stream-&gt;current_dts + stream-&gt;ts_offset);</span>
+<span class="lineNum">     951 </span><span class="lineCov">        941 :         cts = (u32) (stream-&gt;current_cts + stream-&gt;ts_offset);</span>
+<span class="lineNum">     952 </span><span class="lineCov">        941 :         duration = stream-&gt;current_duration;</span>
+<span class="lineNum">     953 </span>            : 
+<span class="lineNum">     954 </span><span class="lineCov">        941 :         dts += stream-&gt;rtp_ts_offset;</span>
+<span class="lineNum">     955 </span><span class="lineCov">        941 :         cts += stream-&gt;rtp_ts_offset;</span>
+<span class="lineNum">     956 </span><span class="lineCov">        941 :         if (stream-&gt;ts_delay&gt;=0) {</span>
+<span class="lineNum">     957 </span><span class="lineCov">        806 :                 dts += (u32) stream-&gt;ts_delay;</span>
+<span class="lineNum">     958 </span><span class="lineCov">        806 :                 cts += (u32) stream-&gt;ts_delay;</span>
+<span class="lineNum">     959 </span>            :         } else {
+<span class="lineNum">     960 </span><span class="lineCov">        135 :                 if ((s32) dts &gt;= -stream-&gt;ts_delay)</span>
+<span class="lineNum">     961 </span><span class="lineCov">        135 :                         dts += (s32) stream-&gt;ts_delay;</span>
+<span class="lineNum">     962 </span>            :                 else
+<span class="lineNum">     963 </span>            :                         dts = 0;
+<span class="lineNum">     964 </span>            : 
+<span class="lineNum">     965 </span><span class="lineCov">        135 :                 if ((s32) cts &gt;= -stream-&gt;ts_delay )</span>
+<span class="lineNum">     966 </span><span class="lineCov">        135 :                         cts += (s32) stream-&gt;ts_delay;</span>
+<span class="lineNum">     967 </span>            :                 else
+<span class="lineNum">     968 </span>            :                         cts = 0;
+<span class="lineNum">     969 </span>            :         }
+<span class="lineNum">     970 </span>            : 
+<span class="lineNum">     971 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     972 </span><span class="lineCov">        941 :         if (gf_log_tool_level_on(GF_LOG_RTP, GF_LOG_DEBUG)) {</span>
+<span class="lineNum">     973 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_RTP, (&quot;[RTPOut] Sending RTP packets for stream %d pck %d/%d DTS &quot;LLU&quot; - CTS &quot;LLU&quot; - RTP TS &quot;LLU&quot; - size %d - SAP %d - clock &quot;LLU&quot; us\n&quot;, *active_stream_idx, stream-&gt;pck_num, stream-&gt;nb_aus, stream-&gt;current_dts, stream-&gt;current_dts, cts, pck_size, stream-&gt;current_sap, clock) );</span>
+<span class="lineNum">     974 </span>            :         } else {
+<span class="lineNum">     975 </span><span class="lineCov">        941 :                 GF_LOG(GF_LOG_INFO, GF_LOG_RTP, (&quot;[RTPOut] Runtime %08u ms send stream %d pck %08u/%08u DTS %08u CTS %08u RTP-TS %08u size %08u SAP %d\r&quot;, (u32) (clock - sys_clock_at_init)/1000, *active_stream_idx, stream-&gt;pck_num, stream-&gt;nb_aus, (u32) stream-&gt;current_dts, (u32) stream-&gt;current_dts, (u32) cts, pck_size, stream-&gt;current_sap) );</span>
+<span class="lineNum">     976 </span>            :         }
+<span class="lineNum">     977 </span>            : #endif
+<span class="lineNum">     978 </span>            : 
+<span class="lineNum">     979 </span>            :         /*we are about to send scalable base: trigger RTCP reports with the same NTP. This avoids
+<span class="lineNum">     980 </span>            :         NTP drift due to system clock precision which could break sync decoding*/
+<span class="lineNum">     981 </span><span class="lineCov">        941 :         if (! *first_RTCP_sent || (base_pid_id &amp;&amp; (base_pid_id== stream-&gt;id) )) {</span>
+<span class="lineNum">     982 </span>            :                 u32 ntp_sec, ntp_frac;
+<span class="lineNum">     983 </span>            :                 /*force sending RTCP SR every RAP ? - not really compliant but we cannot perform scalable tuning otherwise*/
+<span class="lineNum">     984 </span><span class="lineCov">         21 :                 u32 ntp_type = stream-&gt;current_sap ? 2 : 1;</span>
+<span class="lineNum">     985 </span><span class="lineCov">         21 :                 gf_net_get_ntp(&amp;ntp_sec, &amp;ntp_frac);</span>
+<span class="lineNum">     986 </span><span class="lineCov">         21 :                 count = gf_list_count(streams);</span>
+<span class="lineNum">     987 </span>            : 
+<span class="lineNum">     988 </span><span class="lineCov">         42 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     989 </span><span class="lineCov">         22 :                         GF_RTPOutStream *astream = gf_list_get(streams, i);</span>
+<span class="lineNum">     990 </span><span class="lineCov">         22 :                         if (!astream-&gt;pck) break;</span>
+<span class="lineNum">     991 </span>            : 
+<span class="lineNum">     992 </span><span class="lineCov">         21 :                         u32 ts = (u32) (astream-&gt;current_cts + astream-&gt;ts_offset + astream-&gt;rtp_ts_offset);</span>
+<span class="lineNum">     993 </span><span class="lineCov">         21 :                         gf_rtp_streamer_send_rtcp(stream-&gt;rtp, GF_TRUE, ts, ntp_type, ntp_sec, ntp_frac);</span>
+<span class="lineNum">     994 </span>            :                 }
+<span class="lineNum">     995 </span><span class="lineCov">         21 :                 *first_RTCP_sent = GF_TRUE;</span>
+<span class="lineNum">     996 </span>            :         }
+<span class="lineNum">     997 </span>            : 
+<span class="lineNum">     998 </span>            :         /*unpack nal units*/
+<span class="lineNum">     999 </span><span class="lineCov">        941 :         if (stream-&gt;avc_nalu_size) {</span>
+<span class="lineNum">    1000 </span>            :                 Bool au_start, au_end;
+<span class="lineNum">    1001 </span>            :                 u32 v, size;
+<span class="lineNum">    1002 </span><span class="lineCov">        146 :                 u32 remain = pck_size;</span>
+<span class="lineNum">    1003 </span>            :                 const char *ptr = pck_data;
+<span class="lineNum">    1004 </span>            : 
+<span class="lineNum">    1005 </span><span class="lineCov">        146 :                 au_start = 1;</span>
+<span class="lineNum">    1006 </span>            :                 e = GF_OK;
+<span class="lineNum">    1007 </span>            : 
+<span class="lineNum">    1008 </span><span class="lineCov">        146 :                 if (stream-&gt;avcc &amp;&amp; stream-&gt;current_sap) {</span>
+<span class="lineNum">    1009 </span><span class="lineCov">          1 :                         e = rtpout_send_xps(stream, stream-&gt;avcc-&gt;sequenceParameterSets, &amp;au_start, pck_size, cts, dts, duration);</span>
+<span class="lineNum">    1010 </span><span class="lineCov">          1 :                         if (!e)</span>
+<span class="lineNum">    1011 </span><span class="lineCov">          1 :                                 e = rtpout_send_xps(stream, stream-&gt;avcc-&gt;sequenceParameterSetExtensions, &amp;au_start, pck_size, cts, dts, duration);</span>
+<span class="lineNum">    1012 </span>            : 
+<span class="lineNum">    1013 </span><span class="lineCov">          1 :                         if (!e)</span>
+<span class="lineNum">    1014 </span><span class="lineCov">          1 :                                 e = rtpout_send_xps(stream, stream-&gt;avcc-&gt;pictureParameterSets, &amp;au_start, pck_size, cts, dts, duration);</span>
+<span class="lineNum">    1015 </span>            :                 }
+<span class="lineNum">    1016 </span><span class="lineCov">        145 :                 else if (stream-&gt;hvcc &amp;&amp; stream-&gt;current_sap) {</span>
+<span class="lineNum">    1017 </span><span class="lineNoCov">          0 :                         u32 nbps = gf_list_count(stream-&gt;hvcc-&gt;param_array);</span>
+<span class="lineNum">    1018 </span><span class="lineNoCov">          0 :                         for (i=0; i&lt;nbps; i++) {</span>
+<span class="lineNum">    1019 </span><span class="lineNoCov">          0 :                                 GF_NALUFFParamArray *pa = gf_list_get(stream-&gt;hvcc-&gt;param_array, i);</span>
+<span class="lineNum">    1020 </span>            : 
+<span class="lineNum">    1021 </span><span class="lineNoCov">          0 :                                 if (!e)</span>
+<span class="lineNum">    1022 </span><span class="lineNoCov">          0 :                                         e = rtpout_send_xps(stream, pa-&gt;nalus, &amp;au_start, pck_size, cts, dts, duration);</span>
+<span class="lineNum">    1023 </span>            :                         }
+<span class="lineNum">    1024 </span>            :                 }
+<span class="lineNum">    1025 </span>            : 
+<span class="lineNum">    1026 </span><span class="lineCov">        541 :                 while (!e &amp;&amp; remain) {</span>
+<span class="lineNum">    1027 </span>            :                         size = 0;
+<span class="lineNum">    1028 </span><span class="lineCov">        395 :                         v = (*active_stream)-&gt;avc_nalu_size;</span>
+<span class="lineNum">    1029 </span><span class="lineCov">       2370 :                         while (v) {</span>
+<span class="lineNum">    1030 </span><span class="lineCov">       1580 :                                 size |= (u8) *ptr;</span>
+<span class="lineNum">    1031 </span><span class="lineCov">       1580 :                                 ptr++;</span>
+<span class="lineNum">    1032 </span><span class="lineCov">       1580 :                                 remain--;</span>
+<span class="lineNum">    1033 </span><span class="lineCov">       1580 :                                 v-=1;</span>
+<span class="lineNum">    1034 </span><span class="lineCov">       1580 :                                 if (v) size&lt;&lt;=8;</span>
+<span class="lineNum">    1035 </span>            :                         }
+<span class="lineNum">    1036 </span><span class="lineCov">        395 :                         if (remain &lt; size) {</span>
+<span class="lineNum">    1037 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_RTP, (&quot;[RTPOut] Broken AVC nalu encapsulation: NALU size is %d but only %d bytes left in sample %d\n&quot;, size, remain, (*active_stream)-&gt;pck_num));</span>
+<span class="lineNum">    1038 </span>            :                                 break;
+<span class="lineNum">    1039 </span>            :                         }
+<span class="lineNum">    1040 </span><span class="lineCov">        395 :                         remain -= size;</span>
+<span class="lineNum">    1041 </span><span class="lineCov">        395 :                         au_end = remain ? 0 : 1;</span>
+<span class="lineNum">    1042 </span>            : 
+<span class="lineNum">    1043 </span><span class="lineCov">        395 :                         e = gf_rtp_streamer_send_data(stream-&gt;rtp, (char *) ptr, size, pck_size, cts, dts, stream-&gt;current_sap ? 1 : 0, au_start, au_end, stream-&gt;pck_num, duration, stream-&gt;sample_desc_index);</span>
+<span class="lineNum">    1044 </span><span class="lineCov">        395 :                         ptr += size;</span>
+<span class="lineNum">    1045 </span><span class="lineCov">        395 :                         au_start = 0;</span>
+<span class="lineNum">    1046 </span>            :                 }
+<span class="lineNum">    1047 </span>            :         } else {
+<span class="lineNum">    1048 </span><span class="lineCov">        795 :                 e = gf_rtp_streamer_send_data(stream-&gt;rtp, (char *) pck_data, pck_size, pck_size, cts, dts, stream-&gt;current_sap ? 1 : 0, 1, 1, stream-&gt;pck_num, duration, stream-&gt;sample_desc_index);</span>
+<span class="lineNum">    1049 </span>            :         }
+<span class="lineNum">    1050 </span><span class="lineCov">        941 :         gf_filter_pid_drop_packet(stream-&gt;pid);</span>
+<span class="lineNum">    1051 </span><span class="lineCov">        941 :         stream-&gt;pck = NULL;</span>
+<span class="lineNum">    1052 </span>            : 
+<span class="lineNum">    1053 </span><span class="lineCov">        941 :         if (e) {</span>
+<span class="lineNum">    1054 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_RTP, (&quot;[RTPOut] Error sending RTP packet %d: %s\n&quot;, stream-&gt;pck_num, gf_error_to_string(e) ));</span>
+<span class="lineNum">    1055 </span>            :         }
+<span class="lineNum">    1056 </span>            : 
+<span class="lineNum">    1057 </span><span class="lineCov">        941 :         *active_stream = NULL;</span>
+<span class="lineNum">    1058 </span><span class="lineCov">        941 :         return e;</span>
+<span class="lineNum">    1059 </span>            : 
+<a name="1060"><span class="lineNum">    1060 </span>            : }</a>
+<span class="lineNum">    1061 </span>            : 
+<span class="lineNum">    1062 </span><span class="lineCov">    2469288 : static GF_Err rtpout_process(GF_Filter *filter)</span>
+<span class="lineNum">    1063 </span>            : {
+<span class="lineNum">    1064 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">    1065 </span><span class="lineCov">    2469288 :         u32 repost_delay_us=0;</span>
+<span class="lineNum">    1066 </span><span class="lineCov">    2469288 :         GF_RTPOutCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">    1067 </span>            : 
+<span class="lineNum">    1068 </span>            :         /*init session timeline - all sessions are sync'ed for packet scheduling purposes*/
+<span class="lineNum">    1069 </span><span class="lineCov">    2469288 :         if (!ctx-&gt;sys_clock_at_init) {</span>
+<span class="lineNum">    1070 </span><span class="lineCov">         30 :                 if (!rtpout_init_clock(ctx)) return GF_OK;</span>
+<span class="lineNum">    1071 </span>            :         }
+<span class="lineNum">    1072 </span>            : 
+<span class="lineNum">    1073 </span><span class="lineCov">    2469288 :         if (ctx-&gt;runfor&gt;0) {</span>
+<span class="lineNum">    1074 </span><span class="lineNoCov">          0 :                 s64 diff = gf_sys_clock_high_res();</span>
+<span class="lineNum">    1075 </span><span class="lineNoCov">          0 :                 diff -= ctx-&gt;sys_clock_at_init;</span>
+<span class="lineNum">    1076 </span><span class="lineNoCov">          0 :                 diff /= 1000;</span>
+<span class="lineNum">    1077 </span><span class="lineNoCov">          0 :                 if ((s32) diff &gt; ctx-&gt;runfor) {</span>
+<span class="lineNum">    1078 </span><span class="lineNoCov">          0 :                         u32 i, count = gf_list_count(ctx-&gt;streams);</span>
+<span class="lineNum">    1079 </span><span class="lineNoCov">          0 :                         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">    1080 </span><span class="lineNoCov">          0 :                                 GF_RTPOutStream *stream = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">    1081 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_set_discard(stream-&gt;pid, GF_TRUE);</span>
+<span class="lineNum">    1082 </span><span class="lineNoCov">          0 :                                 stream-&gt;pck = NULL;</span>
+<span class="lineNum">    1083 </span>            :                         }
+<span class="lineNum">    1084 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;opid) gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">    1085 </span>            :                         return GF_EOS;
+<span class="lineNum">    1086 </span>            :                 }
+<span class="lineNum">    1087 </span>            :         }
+<span class="lineNum">    1088 </span>            : 
+<span class="lineNum">    1089 </span><span class="lineCov">    2469288 :         e = rtpout_process_rtp(ctx-&gt;streams, &amp;ctx-&gt;active_stream, ctx-&gt;loop, ctx-&gt;delay, &amp;ctx-&gt;active_stream_idx, ctx-&gt;sys_clock_at_init, &amp;ctx-&gt;active_min_ts_microsec, ctx-&gt;microsec_ts_init, &amp;ctx-&gt;wait_for_loop, &amp;repost_delay_us, &amp;ctx-&gt;first_RTCP_sent, ctx-&gt;base_pid_id);</span>
+<span class="lineNum">    1090 </span><span class="lineCov">    2469288 :         if (e) return e;</span>
+<span class="lineNum">    1091 </span>            : 
+<span class="lineNum">    1092 </span><span class="lineCov">    2469257 :         if (repost_delay_us)</span>
+<span class="lineNum">    1093 </span><span class="lineCov">    2468683 :                 gf_filter_ask_rt_reschedule(filter, repost_delay_us);</span>
+<span class="lineNum">    1094 </span>            : 
+<span class="lineNum">    1095 </span>            :         return GF_OK;
+<a name="1096"><span class="lineNum">    1096 </span>            : }</a>
+<span class="lineNum">    1097 </span>            : 
+<span class="lineNum">    1098 </span><span class="lineCov">       2198 : static GF_FilterProbeScore rtpout_probe_url(const char *url, const char *mime)</span>
+<span class="lineNum">    1099 </span>            : {
+<span class="lineNum">    1100 </span><span class="lineCov">       2198 :         if (!strnicmp(url, &quot;rtp://&quot;, 6)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">    1101 </span><span class="lineCov">       2197 :         return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">    1102 </span>            : }
+<span class="lineNum">    1103 </span>            : 
+<span class="lineNum">    1104 </span>            : static const GF_FilterCapability RTPOutCaps[] =
+<span class="lineNum">    1105 </span>            : {
+<span class="lineNum">    1106 </span>            :         //anything else (not file and framed) result in manifest PID
+<span class="lineNum">    1107 </span>            :         CAP_UINT(GF_CAPS_INPUT_EXCLUDED,  GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">    1108 </span>            :         CAP_UINT(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_CODECID, GF_CODECID_NONE),
+<span class="lineNum">    1109 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">    1110 </span>            : 
+<span class="lineNum">    1111 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">    1112 </span>            :         CAP_STRING(GF_CAPS_OUTPUT, GF_PROP_PID_FILE_EXT, &quot;sdp&quot;),
+<span class="lineNum">    1113 </span>            :         CAP_STRING(GF_CAPS_OUTPUT, GF_PROP_PID_MIME, &quot;application/sdp&quot;),
+<span class="lineNum">    1114 </span>            :         {0},
+<span class="lineNum">    1115 </span>            :         //anything else (not file and framed) result in media pids not file
+<span class="lineNum">    1116 </span>            :         CAP_UINT(GF_CAPS_INPUT_EXCLUDED | GF_CAPFLAG_LOADED_FILTER,  GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">    1117 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED | GF_CAPFLAG_LOADED_FILTER, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">    1118 </span>            :         {0},
+<span class="lineNum">    1119 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">    1120 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_FILE_EXT, &quot;ts|m2t|mts|dmb|trp&quot;),
+<span class="lineNum">    1121 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_MIME, &quot;video/mpeg-2|video/mp2t|video/mpeg&quot;),
+<span class="lineNum">    1122 </span>            : };
+<span class="lineNum">    1123 </span>            : 
+<span class="lineNum">    1124 </span>            : 
+<span class="lineNum">    1125 </span>            : #define OFFS(_n)        #_n, offsetof(GF_RTPOutCtx, _n)
+<span class="lineNum">    1126 </span>            : static const GF_FilterArgs RTPOutArgs[] =
+<span class="lineNum">    1127 </span>            : {
+<span class="lineNum">    1128 </span>            :         { OFFS(ip), &quot;destination IP address (NULL is 127.0.0.1)&quot;, GF_PROP_STRING, NULL, NULL, 0},
+<span class="lineNum">    1129 </span>            :         { OFFS(port), &quot;port for first stream in session&quot;, GF_PROP_UINT, &quot;7000&quot;, NULL, 0},
+<span class="lineNum">    1130 </span>            :         { OFFS(loop), &quot;loop all streams in session (not always possible depending on source type)&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, 0},
+<span class="lineNum">    1131 </span>            :         { OFFS(mpeg4), &quot;send all streams using MPEG-4 generic payload format if posible&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">    1132 </span>            :         { OFFS(mtu), &quot;size of RTP MTU in bytes&quot;, GF_PROP_UINT, &quot;1460&quot;, NULL, 0},
+<span class="lineNum">    1133 </span>            :         { OFFS(ttl), &quot;time-to-live for multicast packets&quot;, GF_PROP_UINT, &quot;2&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1134 </span>            :         { OFFS(ifce), &quot;default network interface to use&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1135 </span>            :         { OFFS(payt), &quot;payload type to use for dynamic configs&quot;, GF_PROP_UINT, &quot;96&quot;, &quot;96-127&quot;, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">    1136 </span>            :         { OFFS(delay), &quot;send delay for packet (negative means send earlier)&quot;, GF_PROP_SINT, &quot;0&quot;, NULL, 0},
+<span class="lineNum">    1137 </span>            :         { OFFS(tt), &quot;time tolerance in microseconds. Whenever schedule time minus realtime is below this value, the packet is sent right away&quot;, GF_PROP_UINT, &quot;1000&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">    1138 </span>            :         { OFFS(runfor), &quot;run for the given time in ms. Negative value means run for ever (if loop) or source duration, 0 only outputs the sdp&quot;, GF_PROP_SINT, &quot;-1&quot;, NULL, 0},
+<span class="lineNum">    1139 </span>            :         { OFFS(tso), &quot;set timestamp offset in microseconds. Negative value means random initial timestamp&quot;, GF_PROP_SINT, &quot;-1&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">    1140 </span>            :         { OFFS(xps), &quot;force parameter set injection at each SAP. If not set, only inject if different from SDP ones&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1141 </span>            :         { OFFS(latm), &quot;use latm for AAC payload format&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">    1142 </span>            :         { OFFS(dst), &quot;URL for direct RTP mode - see filter help&quot;, GF_PROP_NAME, NULL, NULL, 0},
+<span class="lineNum">    1143 </span>            :         { OFFS(ext), &quot;file extension for direct RTP mode - see filter help&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1144 </span>            :         { OFFS(mime), &quot;set mime type for direct RTP mode - see filter help&quot;, GF_PROP_NAME, NULL, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1145 </span>            :         {0}
+<span class="lineNum">    1146 </span>            : };
+<span class="lineNum">    1147 </span>            : 
+<span class="lineNum">    1148 </span>            : 
+<span class="lineNum">    1149 </span>            : GF_FilterRegister RTPOutRegister = {
+<span class="lineNum">    1150 </span>            :         .name = &quot;rtpout&quot;,
+<span class="lineNum">    1151 </span>            :         GF_FS_SET_DESCRIPTION(&quot;RTP Streamer&quot;)
+<span class="lineNum">    1152 </span>            :         GF_FS_SET_HELP(&quot;The RTP streamer handles SDP/RTP output streaming.\n&quot;
+<span class="lineNum">    1153 </span>            :         &quot;# SDP mode\n&quot;
+<span class="lineNum">    1154 </span>            :         &quot;When the destination url is an SDP, the filter outputs an SDP on a file pid and streams RTP packets over UDP, starting from the indicated [-port]().\n&quot;
+<span class="lineNum">    1155 </span>            :         &quot;# Direct RTP mode\n&quot;
+<span class="lineNum">    1156 </span>            :         &quot;When the destination url uses the protocol scheme `rtp://IP:PORT`, the filter does not output any SDP and streams a single input over RTP, using PORT indicated in the destination URL, or the first [-port]() configured.\n&quot;
+<span class="lineNum">    1157 </span>            :         &quot;In this mode, it is usually needed to specify the desired format using [-ext]() or [-mime]().\n&quot;
+<span class="lineNum">    1158 </span>            :         &quot;EX gpac -i src -o rtp://localhost:1234/:ext=ts\n&quot;
+<span class="lineNum">    1159 </span>            :         &quot;This will indicate that the RTP streamer expects a MPEG-2 TS mux as an input.\n&quot;
+<span class="lineNum">    1160 </span>            :         &quot;# RTP Packets\n&quot;
+<span class="lineNum">    1161 </span>            :         &quot;The RTP packets produced have a maximum payload set by the [-mtu]() option (IP packet will be MTU + 40 bytes of IP+UDP+RTP headers).\n&quot;
+<span class="lineNum">    1162 </span>            :         &quot;The real-time scheduling algorithm works as follows:\n&quot;
+<span class="lineNum">    1163 </span>            :         &quot;- first initialize the clock by:\n&quot;
+<span class="lineNum">    1164 </span>            :         &quot; - computing the smallest timestamp for all input pids\n&quot;
+<span class="lineNum">    1165 </span>            :         &quot; - mapping this media time to the system clock\n&quot;
+<span class="lineNum">    1166 </span>            :         &quot;- determine the earliest packet to send next on each input pid, adding [-delay]() if any\n&quot;
+<span class="lineNum">    1167 </span>            :         &quot;- finally compare the packet mapped timestamp __TS__ to the system clock __SC__. When __TS__ - __SC__ is less than [-tt](), the RTP packets for the source packet are sent\n&quot;
+<span class="lineNum">    1168 </span>            :         )
+<span class="lineNum">    1169 </span>            :         .private_size = sizeof(GF_RTPOutCtx),
+<span class="lineNum">    1170 </span>            :         .max_extra_pids = -1,
+<span class="lineNum">    1171 </span>            :         .args = RTPOutArgs,
+<span class="lineNum">    1172 </span>            :         //dynamic redirect since RTP may be dynamically loaded when solving .sdp destinations
+<span class="lineNum">    1173 </span>            :         .flags = GF_FS_REG_DYNAMIC_REDIRECT,
+<span class="lineNum">    1174 </span>            :         .initialize = rtpout_initialize,
+<span class="lineNum">    1175 </span>            :         .finalize = rtpout_finalize,
+<span class="lineNum">    1176 </span>            :         SETCAPS(RTPOutCaps),
+<span class="lineNum">    1177 </span>            :         .configure_pid = rtpout_configure_pid,
+<span class="lineNum">    1178 </span>            :         .probe_url = rtpout_probe_url,
+<span class="lineNum">    1179 </span>            :         .process = rtpout_process
+<span class="lineNum">    1180 </span>            : };
+<a name="1181"><span class="lineNum">    1181 </span>            : </a>
+<span class="lineNum">    1182 </span>            : 
+<span class="lineNum">    1183 </span><span class="lineCov">       2877 : const GF_FilterRegister *rtpout_register(GF_FilterSession *session)</span>
+<span class="lineNum">    1184 </span>            : {
+<span class="lineNum">    1185 </span><span class="lineCov">       2877 :         return &amp;RTPOutRegister;</span>
+<span class="lineNum">    1186 </span>            : }
+<span class="lineNum">    1187 </span>            : 
+<span class="lineNum">    1188 </span>            : #else
+<span class="lineNum">    1189 </span>            : 
+<span class="lineNum">    1190 </span>            : const GF_FilterRegister *rtpout_register(GF_FilterSession *session)
+<span class="lineNum">    1191 </span>            : {
+<span class="lineNum">    1192 </span>            :         return NULL;
+<span class="lineNum">    1193 </span>            : }
+<span class="lineNum">    1194 </span>            : 
+<span class="lineNum">    1195 </span>            : #endif /* !defined(GPAC_DISABLE_ISOM) &amp;&amp; !defined(GPAC_DISABLE_STREAMING) */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

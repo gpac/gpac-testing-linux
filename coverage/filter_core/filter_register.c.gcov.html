@@ -1,0 +1,386 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filter_core/filter_register.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filter_core</a> - filter_register.c<span style="font-size: 80%;"> (source / <a href="filter_register.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">119</td>
+            <td class="headerCovTableEntry">119</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / filters sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terfsess of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &quot;filter_session.h&quot;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : const GF_FilterRegister *ut_filter_register(GF_FilterSession *session);
+<span class="lineNum">      31 </span>            : const GF_FilterRegister *ut_source_register(GF_FilterSession *session);
+<span class="lineNum">      32 </span>            : const GF_FilterRegister *ut_sink_register(GF_FilterSession *session);
+<span class="lineNum">      33 </span>            : const GF_FilterRegister *ut_sink2_register(GF_FilterSession *session);
+<span class="lineNum">      34 </span>            : const GF_FilterRegister *ffdmx_register(GF_FilterSession *session);
+<span class="lineNum">      35 </span>            : const GF_FilterRegister *ffdec_register(GF_FilterSession *session);
+<span class="lineNum">      36 </span>            : const GF_FilterRegister *ffenc_register(GF_FilterSession *session);
+<span class="lineNum">      37 </span>            : const GF_FilterRegister *ffavin_register(GF_FilterSession *session);
+<span class="lineNum">      38 </span>            : const GF_FilterRegister *ffsws_register(GF_FilterSession *session);
+<span class="lineNum">      39 </span>            : const GF_FilterRegister *ffmx_register(GF_FilterSession *session);
+<span class="lineNum">      40 </span>            : const GF_FilterRegister *ffavf_register(GF_FilterSession *session);
+<span class="lineNum">      41 </span>            : const GF_FilterRegister *inspect_register(GF_FilterSession *session);
+<span class="lineNum">      42 </span>            : const GF_FilterRegister *probe_register(GF_FilterSession *session);
+<span class="lineNum">      43 </span>            : const GF_FilterRegister *compose_filter_register(GF_FilterSession *session);
+<span class="lineNum">      44 </span>            : const GF_FilterRegister *isoffin_register(GF_FilterSession *session);
+<span class="lineNum">      45 </span>            : const GF_FilterRegister *bifs_dec_register(GF_FilterSession *session);
+<span class="lineNum">      46 </span>            : const GF_FilterRegister *odf_dec_register(GF_FilterSession *session);
+<span class="lineNum">      47 </span>            : const GF_FilterRegister *filein_register(GF_FilterSession *session);
+<span class="lineNum">      48 </span>            : const GF_FilterRegister *ctxload_register(GF_FilterSession *session);
+<span class="lineNum">      49 </span>            : const GF_FilterRegister *httpin_register(GF_FilterSession *session);
+<span class="lineNum">      50 </span>            : const GF_FilterRegister *svgin_register(GF_FilterSession *session);
+<span class="lineNum">      51 </span>            : const GF_FilterRegister *img_reframe_register(GF_FilterSession *session);
+<span class="lineNum">      52 </span>            : const GF_FilterRegister *imgdec_register(GF_FilterSession *session);
+<span class="lineNum">      53 </span>            : const GF_FilterRegister *adts_dmx_register(GF_FilterSession *session);
+<span class="lineNum">      54 </span>            : const GF_FilterRegister *latm_dmx_register(GF_FilterSession *session);
+<span class="lineNum">      55 </span>            : const GF_FilterRegister *mp3_dmx_register(GF_FilterSession *session);
+<span class="lineNum">      56 </span>            : const GF_FilterRegister *faad_register(GF_FilterSession *session);
+<span class="lineNum">      57 </span>            : const GF_FilterRegister *maddec_register(GF_FilterSession *session);
+<span class="lineNum">      58 </span>            : const GF_FilterRegister *xviddec_register(GF_FilterSession *session);
+<span class="lineNum">      59 </span>            : const GF_FilterRegister *j2kdec_register(GF_FilterSession *session);
+<span class="lineNum">      60 </span>            : const GF_FilterRegister *ac3dmx_register(GF_FilterSession *session);
+<span class="lineNum">      61 </span>            : const GF_FilterRegister *a52dec_register(GF_FilterSession *session);
+<span class="lineNum">      62 </span>            : const GF_FilterRegister *amrdmx_register(GF_FilterSession *session);
+<span class="lineNum">      63 </span>            : const GF_FilterRegister *oggdmx_register(GF_FilterSession *session);
+<span class="lineNum">      64 </span>            : const GF_FilterRegister *vorbisdec_register(GF_FilterSession *session);
+<span class="lineNum">      65 </span>            : const GF_FilterRegister *theoradec_register(GF_FilterSession *session);
+<span class="lineNum">      66 </span>            : const GF_FilterRegister *m2tsdmx_register(GF_FilterSession *session);
+<span class="lineNum">      67 </span>            : const GF_FilterRegister *sockin_register(GF_FilterSession *session);
+<span class="lineNum">      68 </span>            : const GF_FilterRegister *dvblin_register(GF_FilterSession *session);
+<span class="lineNum">      69 </span>            : const GF_FilterRegister *vtbdec_register(GF_FilterSession *session);
+<span class="lineNum">      70 </span>            : const GF_FilterRegister *lsrdec_register(GF_FilterSession *session);
+<span class="lineNum">      71 </span>            : const GF_FilterRegister *safdmx_register(GF_FilterSession *session);
+<span class="lineNum">      72 </span>            : const GF_FilterRegister *osvcdec_register(GF_FilterSession *session);
+<span class="lineNum">      73 </span>            : #ifdef GPAC_OPENHEVC_STATIC
+<span class="lineNum">      74 </span>            : const GF_FilterRegister *ohevcdec_register(GF_FilterSession *session);
+<span class="lineNum">      75 </span>            : #endif
+<span class="lineNum">      76 </span>            : const GF_FilterRegister *dashdmx_register(GF_FilterSession *session);
+<span class="lineNum">      77 </span>            : const GF_FilterRegister *cenc_decrypt_register(GF_FilterSession *session);
+<span class="lineNum">      78 </span>            : const GF_FilterRegister *cenc_encrypt_register(GF_FilterSession *session);
+<span class="lineNum">      79 </span>            : const GF_FilterRegister *mp4_mux_register(GF_FilterSession *session);
+<span class="lineNum">      80 </span>            : const GF_FilterRegister *qcpdmx_register(GF_FilterSession *session);
+<span class="lineNum">      81 </span>            : const GF_FilterRegister *h263dmx_register(GF_FilterSession *session);
+<span class="lineNum">      82 </span>            : const GF_FilterRegister *mpgviddmx_register(GF_FilterSession *session);
+<span class="lineNum">      83 </span>            : const GF_FilterRegister *nhntdmx_register(GF_FilterSession *session);
+<span class="lineNum">      84 </span>            : const GF_FilterRegister *nhmldmx_register(GF_FilterSession *session);
+<span class="lineNum">      85 </span>            : const GF_FilterRegister *naludmx_register(GF_FilterSession *session);
+<span class="lineNum">      86 </span>            : const GF_FilterRegister *m2psdmx_register(GF_FilterSession *session);
+<span class="lineNum">      87 </span>            : const GF_FilterRegister *avidmx_register(GF_FilterSession *session);
+<span class="lineNum">      88 </span>            : const GF_FilterRegister *txtin_register(GF_FilterSession *session);
+<span class="lineNum">      89 </span>            : const GF_FilterRegister *ttxtdec_register(GF_FilterSession *session);
+<span class="lineNum">      90 </span>            : const GF_FilterRegister *vttdec_register(GF_FilterSession *session);
+<span class="lineNum">      91 </span>            : const GF_FilterRegister *ttmldec_register(GF_FilterSession *session);
+<span class="lineNum">      92 </span>            : const GF_FilterRegister *rtpin_register(GF_FilterSession *session);
+<span class="lineNum">      93 </span>            : const GF_FilterRegister *fileout_register(GF_FilterSession *session);
+<span class="lineNum">      94 </span>            : const GF_FilterRegister *adtsmx_register(GF_FilterSession *session);
+<span class="lineNum">      95 </span>            : const GF_FilterRegister *latm_mx_register(GF_FilterSession *session);
+<span class="lineNum">      96 </span>            : const GF_FilterRegister *reframer_register(GF_FilterSession *session);
+<span class="lineNum">      97 </span>            : const GF_FilterRegister *writegen_register(GF_FilterSession *session);
+<span class="lineNum">      98 </span>            : const GF_FilterRegister *nalumx_register(GF_FilterSession *session);
+<span class="lineNum">      99 </span>            : const GF_FilterRegister *qcpmx_register(GF_FilterSession *session);
+<span class="lineNum">     100 </span>            : const GF_FilterRegister *vttmx_register(GF_FilterSession *session);
+<span class="lineNum">     101 </span>            : const GF_FilterRegister *nhntdump_register(GF_FilterSession *session);
+<span class="lineNum">     102 </span>            : const GF_FilterRegister *nhmldump_register(GF_FilterSession *session);
+<span class="lineNum">     103 </span>            : const GF_FilterRegister *vobsubdmx_register(GF_FilterSession *session);
+<span class="lineNum">     104 </span>            : const GF_FilterRegister *avimux_register(GF_FilterSession *session);
+<span class="lineNum">     105 </span>            : const GF_FilterRegister *aout_register(GF_FilterSession *session);
+<span class="lineNum">     106 </span>            : const GF_FilterRegister *m4vmx_register(GF_FilterSession *session);
+<span class="lineNum">     107 </span>            : const GF_FilterRegister *resample_register(GF_FilterSession *session);
+<span class="lineNum">     108 </span>            : #if !defined(GPAC_CONFIG_ANDROID)
+<span class="lineNum">     109 </span>            : const GF_FilterRegister *vout_register(GF_FilterSession *session);
+<span class="lineNum">     110 </span>            : #endif
+<span class="lineNum">     111 </span>            : const GF_FilterRegister *vcrop_register(GF_FilterSession *session);
+<span class="lineNum">     112 </span>            : const GF_FilterRegister *vflip_register(GF_FilterSession *session);
+<span class="lineNum">     113 </span>            : const GF_FilterRegister *rawvidreframe_register(GF_FilterSession *session);
+<span class="lineNum">     114 </span>            : const GF_FilterRegister *pcmreframe_register(GF_FilterSession *session);
+<span class="lineNum">     115 </span>            : const GF_FilterRegister *jpgenc_register(GF_FilterSession *session);
+<span class="lineNum">     116 </span>            : const GF_FilterRegister *pngenc_register(GF_FilterSession *session);
+<span class="lineNum">     117 </span>            : const GF_FilterRegister *rewind_register(GF_FilterSession *session);
+<span class="lineNum">     118 </span>            : const GF_FilterRegister *filelist_register(GF_FilterSession *session);
+<span class="lineNum">     119 </span>            : const GF_FilterRegister *tsmux_register(GF_FilterSession *session);
+<span class="lineNum">     120 </span>            : const GF_FilterRegister *dasher_register(GF_FilterSession *session);
+<span class="lineNum">     121 </span>            : const GF_FilterRegister *tileagg_register(GF_FilterSession *session);
+<span class="lineNum">     122 </span>            : const GF_FilterRegister *tilesplit_register(GF_FilterSession *session);
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : #if !defined(GPAC_CONFIG_ANDROID)
+<span class="lineNum">     125 </span>            : const GF_FilterRegister *pipein_register(GF_FilterSession *session);
+<span class="lineNum">     126 </span>            : const GF_FilterRegister *pipeout_register(GF_FilterSession *session);
+<span class="lineNum">     127 </span>            : #endif
+<span class="lineNum">     128 </span>            : const GF_FilterRegister *gsfmx_register(GF_FilterSession *session);
+<span class="lineNum">     129 </span>            : const GF_FilterRegister *gsfdmx_register(GF_FilterSession *session);
+<span class="lineNum">     130 </span>            : const GF_FilterRegister *sockout_register(GF_FilterSession *session);
+<span class="lineNum">     131 </span>            : const GF_FilterRegister *av1dmx_register(GF_FilterSession *session);
+<span class="lineNum">     132 </span>            : const GF_FilterRegister *obumx_register(GF_FilterSession *session);
+<span class="lineNum">     133 </span>            : #if !defined(GPAC_CONFIG_IOS) &amp;&amp; !defined(GPAC_CONFIG_ANDROID)
+<span class="lineNum">     134 </span>            : const GF_FilterRegister *nvdec_register(GF_FilterSession *session);
+<span class="lineNum">     135 </span>            : #endif
+<span class="lineNum">     136 </span>            : const GF_FilterRegister *routein_register(GF_FilterSession *session);
+<span class="lineNum">     137 </span>            : const GF_FilterRegister *rtpout_register(GF_FilterSession *session);
+<span class="lineNum">     138 </span>            : const GF_FilterRegister *rtspout_register(GF_FilterSession *session);
+<span class="lineNum">     139 </span>            : const GF_FilterRegister *hevcsplit_register(GF_FilterSession *session);
+<span class="lineNum">     140 </span>            : const GF_FilterRegister *hevcmerge_register(GF_FilterSession *session);
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : const GF_FilterRegister *jsfilter_register(GF_FilterSession *session);
+<span class="lineNum">     143 </span>            : const GF_FilterRegister *m2tssplit_register(GF_FilterSession *session);
+<span class="lineNum">     144 </span>            : const GF_FilterRegister *httpout_register(GF_FilterSession *session);
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : #if !defined(GPAC_CONFIG_IOS) &amp;&amp; !defined(GPAC_CONFIG_ANDROID) &amp;&amp; !defined(GPAC_HAVE_DTAPI) &amp;&amp; !defined(WIN32) 
+<span class="lineNum">     147 </span>            : const GF_FilterRegister *dtout_register(GF_FilterSession *session);
+<span class="lineNum">     148 </span>            : #endif
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            : #if !defined(GPAC_CONFIG_IOS)
+<span class="lineNum">     151 </span>            : const GF_FilterRegister *mcdec_register(GF_FilterSession *session);
+<span class="lineNum">     152 </span>            : #endif
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            : const GF_FilterRegister *flac_dmx_register(GF_FilterSession *session);
+<span class="lineNum">     155 </span>            : const GF_FilterRegister *proresdmx_register(GF_FilterSession *session);
+<span class="lineNum">     156 </span>            : const GF_FilterRegister *bsrw_register(GF_FilterSession *session);
+<span class="lineNum">     157 </span>            : const GF_FilterRegister *mhas_dmx_register(GF_FilterSession *session);
+<span class="lineNum">     158 </span>            : const GF_FilterRegister *mhasmx_register(GF_FilterSession *session);
+<span class="lineNum">     159 </span>            : const GF_FilterRegister *routeout_register(GF_FilterSession *session);
+<span class="lineNum">     160 </span>            : const GF_FilterRegister *truehd_register(GF_FilterSession *session);
+<span class="lineNum">     161 </span>            : const GF_FilterRegister *cryptfin_register(GF_FilterSession *session);
+<a name="162"><span class="lineNum">     162 </span>            : const GF_FilterRegister *cryptfout_register(GF_FilterSession *session);</a>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">       2877 : void gf_fs_reg_all(GF_FilterSession *fsess, GF_FilterSession *a_sess)</span>
+<span class="lineNum">     165 </span>            : {
+<span class="lineNum">     166 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, inspect_register(a_sess) );</span>
+<span class="lineNum">     167 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, probe_register(a_sess) );</span>
+<span class="lineNum">     168 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, compose_filter_register(a_sess) );</span>
+<span class="lineNum">     169 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, isoffin_register(a_sess) );</span>
+<span class="lineNum">     170 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, bifs_dec_register(a_sess) );</span>
+<span class="lineNum">     171 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, odf_dec_register(a_sess) );</span>
+<span class="lineNum">     172 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, filein_register(a_sess) );</span>
+<span class="lineNum">     173 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ctxload_register(a_sess) );</span>
+<span class="lineNum">     174 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, httpin_register(a_sess) );</span>
+<span class="lineNum">     175 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, svgin_register(a_sess) );</span>
+<span class="lineNum">     176 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, img_reframe_register(a_sess) );</span>
+<span class="lineNum">     177 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, imgdec_register(a_sess) );</span>
+<span class="lineNum">     178 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, adts_dmx_register(a_sess) );</span>
+<span class="lineNum">     179 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, latm_dmx_register(a_sess) );</span>
+<span class="lineNum">     180 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, mp3_dmx_register(a_sess) );</span>
+<span class="lineNum">     181 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, faad_register(a_sess) );</span>
+<span class="lineNum">     182 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, maddec_register(a_sess) );</span>
+<span class="lineNum">     183 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, xviddec_register(a_sess) );</span>
+<span class="lineNum">     184 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, j2kdec_register(a_sess) );</span>
+<span class="lineNum">     185 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ac3dmx_register(a_sess) );</span>
+<span class="lineNum">     186 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, a52dec_register(a_sess) );</span>
+<span class="lineNum">     187 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, amrdmx_register(a_sess) );</span>
+<span class="lineNum">     188 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, oggdmx_register(a_sess) );</span>
+<span class="lineNum">     189 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, vorbisdec_register(a_sess) );</span>
+<span class="lineNum">     190 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, theoradec_register(a_sess) );</span>
+<span class="lineNum">     191 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, m2tsdmx_register(a_sess) );</span>
+<span class="lineNum">     192 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, sockin_register(a_sess) );</span>
+<span class="lineNum">     193 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, dvblin_register(a_sess) );</span>
+<span class="lineNum">     194 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, osvcdec_register(a_sess) );</span>
+<span class="lineNum">     195 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, vtbdec_register(a_sess) );</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            : #if !defined(GPAC_CONFIG_IOS)
+<span class="lineNum">     198 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, mcdec_register(a_sess) );</span>
+<span class="lineNum">     199 </span>            : #endif
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, lsrdec_register(a_sess) );</span>
+<span class="lineNum">     202 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, safdmx_register(a_sess) );</span>
+<span class="lineNum">     203 </span>            : #ifdef GPAC_OPENHEVC_STATIC
+<span class="lineNum">     204 </span>            :         gf_fs_add_filter_register(fsess, ohevcdec_register(a_sess) );
+<span class="lineNum">     205 </span>            : #endif
+<span class="lineNum">     206 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, dashdmx_register(a_sess) );</span>
+<span class="lineNum">     207 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, cenc_decrypt_register(a_sess) );</span>
+<span class="lineNum">     208 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, cenc_encrypt_register(a_sess) );</span>
+<span class="lineNum">     209 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, mp4_mux_register(a_sess) );</span>
+<span class="lineNum">     210 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, qcpdmx_register(a_sess) );</span>
+<span class="lineNum">     211 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, h263dmx_register(a_sess) );</span>
+<span class="lineNum">     212 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, mpgviddmx_register(a_sess) );</span>
+<span class="lineNum">     213 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, nhntdmx_register(a_sess) );</span>
+<span class="lineNum">     214 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, nhmldmx_register(a_sess) );</span>
+<span class="lineNum">     215 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, naludmx_register(a_sess) );</span>
+<span class="lineNum">     216 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, m2psdmx_register(a_sess) );</span>
+<span class="lineNum">     217 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, avidmx_register(a_sess) );</span>
+<span class="lineNum">     218 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, txtin_register(a_sess) );</span>
+<span class="lineNum">     219 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ttxtdec_register(a_sess) );</span>
+<span class="lineNum">     220 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, vttdec_register(a_sess) );</span>
+<span class="lineNum">     221 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ttmldec_register(a_sess) );</span>
+<span class="lineNum">     222 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, rtpin_register(a_sess) );</span>
+<span class="lineNum">     223 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, fileout_register(a_sess) );</span>
+<span class="lineNum">     224 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, latm_mx_register(a_sess) );</span>
+<span class="lineNum">     225 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, adtsmx_register(a_sess) );</span>
+<span class="lineNum">     226 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, mhasmx_register(a_sess) );</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, reframer_register(a_sess) );</span>
+<span class="lineNum">     229 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, writegen_register(a_sess) );</span>
+<span class="lineNum">     230 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, nalumx_register(a_sess) );</span>
+<span class="lineNum">     231 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, qcpmx_register(a_sess) );</span>
+<span class="lineNum">     232 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, vttmx_register(a_sess) );</span>
+<span class="lineNum">     233 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, nhntdump_register(a_sess) );</span>
+<span class="lineNum">     234 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, nhmldump_register(a_sess) );</span>
+<span class="lineNum">     235 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, vobsubdmx_register(a_sess) );</span>
+<span class="lineNum">     236 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, avimux_register(a_sess) );</span>
+<span class="lineNum">     237 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, aout_register(a_sess) );</span>
+<span class="lineNum">     238 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, m4vmx_register(a_sess) );</span>
+<span class="lineNum">     239 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, resample_register(a_sess) );</span>
+<span class="lineNum">     240 </span>            : #if !defined(GPAC_CONFIG_ANDROID)
+<span class="lineNum">     241 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, vout_register(a_sess) );</span>
+<span class="lineNum">     242 </span>            : #endif
+<span class="lineNum">     243 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, vcrop_register(a_sess) );</span>
+<span class="lineNum">     244 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, vflip_register(a_sess) );</span>
+<span class="lineNum">     245 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, rawvidreframe_register(a_sess) );</span>
+<span class="lineNum">     246 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, pcmreframe_register(a_sess) );</span>
+<span class="lineNum">     247 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, jpgenc_register(a_sess) );</span>
+<span class="lineNum">     248 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, pngenc_register(a_sess) );</span>
+<span class="lineNum">     249 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, rewind_register(a_sess) );</span>
+<span class="lineNum">     250 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, filelist_register(a_sess) );</span>
+<span class="lineNum">     251 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, tsmux_register(a_sess) );</span>
+<span class="lineNum">     252 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, dasher_register(a_sess) );</span>
+<span class="lineNum">     253 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, tileagg_register(a_sess) );</span>
+<span class="lineNum">     254 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, tilesplit_register(a_sess) );</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            : #if !defined(GPAC_CONFIG_ANDROID)
+<span class="lineNum">     257 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, pipein_register(a_sess) );</span>
+<span class="lineNum">     258 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, pipeout_register(a_sess) );</span>
+<span class="lineNum">     259 </span>            : #endif
+<span class="lineNum">     260 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, gsfmx_register(a_sess) );</span>
+<span class="lineNum">     261 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, gsfdmx_register(a_sess) );</span>
+<span class="lineNum">     262 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, sockout_register(a_sess) );</span>
+<span class="lineNum">     263 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, av1dmx_register(a_sess) );</span>
+<span class="lineNum">     264 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, obumx_register(a_sess) );</span>
+<span class="lineNum">     265 </span>            : #if !defined(GPAC_CONFIG_IOS) &amp;&amp; !defined(GPAC_CONFIG_ANDROID)
+<span class="lineNum">     266 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, nvdec_register(a_sess));</span>
+<span class="lineNum">     267 </span>            : #endif
+<span class="lineNum">     268 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, routein_register(a_sess));</span>
+<span class="lineNum">     269 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, rtpout_register(a_sess));</span>
+<span class="lineNum">     270 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, rtspout_register(a_sess));</span>
+<span class="lineNum">     271 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, httpout_register(a_sess));</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, hevcsplit_register(a_sess));</span>
+<span class="lineNum">     274 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, hevcmerge_register(a_sess));</span>
+<span class="lineNum">     275 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, flac_dmx_register(a_sess));</span>
+<span class="lineNum">     276 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, mhas_dmx_register(a_sess));</span>
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, proresdmx_register(a_sess));</span>
+<span class="lineNum">     279 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, m2tssplit_register(a_sess));</span>
+<span class="lineNum">     280 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, bsrw_register(a_sess));</span>
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ffdmx_register(a_sess) );</span>
+<span class="lineNum">     283 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ffdec_register(a_sess) );</span>
+<span class="lineNum">     284 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ffavin_register(a_sess) );</span>
+<span class="lineNum">     285 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ffsws_register(a_sess) );</span>
+<span class="lineNum">     286 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ffenc_register(a_sess) );</span>
+<span class="lineNum">     287 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ffmx_register(a_sess) );</span>
+<span class="lineNum">     288 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, ffavf_register(a_sess) );</span>
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, jsfilter_register(a_sess) );</span>
+<span class="lineNum">     291 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, routeout_register(a_sess) );</span>
+<span class="lineNum">     292 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, truehd_register(a_sess) );</span>
+<span class="lineNum">     293 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, cryptfin_register(a_sess) );</span>
+<span class="lineNum">     294 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, cryptfout_register(a_sess) );</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            : #if !defined(GPAC_CONFIG_IOS) &amp;&amp; !defined(GPAC_CONFIG_ANDROID) &amp;&amp; !defined(GPAC_HAVE_DTAPI) &amp;&amp; !defined(WIN32) 
+<span class="lineNum">     297 </span><span class="lineCov">       2877 :         gf_fs_add_filter_register(fsess, dtout_register(a_sess) );</span>
+<span class="lineNum">     298 </span>            : #endif
+<span class="lineNum">     299 </span><span class="lineCov">       2877 : }</span>
+<a name="300"><span class="lineNum">     300 </span>            : </a>
+<span class="lineNum">     301 </span>            : GF_EXPORT
+<span class="lineNum">     302 </span><span class="lineCov">        142 : void gf_fs_register_test_filters(GF_FilterSession *fsess)</span>
+<span class="lineNum">     303 </span>            : {
+<span class="lineNum">     304 </span><span class="lineCov">        142 :         gf_fs_add_filter_register(fsess, ut_source_register(NULL) );</span>
+<span class="lineNum">     305 </span><span class="lineCov">        142 :         gf_fs_add_filter_register(fsess, ut_filter_register(NULL) );</span>
+<span class="lineNum">     306 </span><span class="lineCov">        142 :         gf_fs_add_filter_register(fsess, ut_sink_register(NULL) );</span>
+<span class="lineNum">     307 </span><span class="lineCov">        142 :         gf_fs_add_filter_register(fsess, ut_sink2_register(NULL) );</span>
+<span class="lineNum">     308 </span><span class="lineCov">        142 : }</span>
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

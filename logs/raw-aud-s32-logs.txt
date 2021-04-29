@@ -1,0 +1,32 @@
+*** raw-aud-s32 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:32 ***
+
+
+*** Subtest "dump-s32": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/aud.mp4 -o ./results/temp/raw.s32" ***
+
+Computing ./results/temp/raw.s32  (dump-s32) hash: 
+File hash (SHA-1): 71DFB4CC7DF781AAD91F0DF9B40B06FAEE3DC69F
+Hash fail, ref hash ./hash_refs/raw-aud-s32-dump-s32.hash was 6EA40C8B4BA2E29423DCC068AA6F027E64EA1FE0
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.s32:sr=48000:ch=2 inspect:fmt=@pn@-@cts@-@bo@@lf@:log=./results/temp/dump.txt" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): E5C9E869A380161AA3BCC69E4AB41B5688A1488A
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "dump-pcm": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.s32 -o ./results/temp/raw2.pcm" ***
+
+Computing ./results/temp/raw2.pcm  (dump-pcm) hash: 
+File hash (SHA-1): A7A9AD495B3A85BD3348562D3E0862C56C582B8D
+Hash fail, ref hash ./hash_refs/raw-aud-s32-dump-pcm.hash was 2F628F8CBB5C7E2663FECDF10A383A253CCEB1B2
+
+*** Subtest "isobmff-write": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.s32:sr=48000:ch=2 -o ./results/temp/pcm.mp4:ase=v1" ***
+
+Computing ./results/temp/pcm.mp4  (isobmff-write) hash: 
+File hash (SHA-1): 7209CC8D54D5F983F259DA483D4F7E8C25BFB96E
+Hash fail, ref hash ./hash_refs/raw-aud-s32-isobmff-write.hash was 906507FA5E125F4E570AED96275DC441E0F6DC86
+
+*** Subtest "isobmff-read": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/pcm.mp4 inspect:deep:log=./results/temp/dump_isopcm.txt:test=nocrc" ***
+
+Computing ./results/temp/dump_isopcm.txt  (isobmff-read) hash: 
+File hash (SHA-1): E8EBD69DFDE667117B30296AEDD7B8235E36D1C6
+Hash OK for ./results/temp/dump_isopcm.txt

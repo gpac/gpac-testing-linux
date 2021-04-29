@@ -1,0 +1,49 @@
+*** reframer-aac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:53 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_audio.aac reframer @ -o ./results/temp/enst_audio.aac  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 702369664
+
+Filter stats - 6 filters
+	Filter fin (src=./media/auxiliary_files/enst_audio.aac) : 0 input pids 1 output pids 21 tasks 687 us process time
+		18 packets sent 85058 bytes sent (26200.9 pck/sec 990.486 mbps)
+		* output PID enst_audio.aac: 18 packets sent
+	Filter reframer ID _0x55bc8cb9b040_ : 1 input pids 1 output pids 21 tasks 533 us process time
+		330 packets processed 82748 bytes processed (619137 pck/sec 1242 mbps)
+		330 packets sent 82748 bytes sent (619137 pck/sec 1242 mbps)
+		* input PID enst_audio.aac: 330 packets received
+		* output PID enst_audio.aac: 330 packets sent
+	Filter fout (dst=./results/temp/enst_audio.aac) : 1 input pids 0 output pids 332 tasks 403 us process time
+		330 packets processed 85058 bytes processed (818859 pck/sec 1688.5 mbps)
+		* input PID enst_audio.aac: 330 packets received
+	Filter rfadts : 1 input pids 1 output pids 31 tasks 817 us process time
+		18 packets processed 85058 bytes processed (22031.8 pck/sec 832.881 mbps)
+		330 packets sent 82748 bytes sent (403917 pck/sec 810.262 mbps)
+		* input PID enst_audio.aac: 18 packets received
+		* output PID enst_audio.aac: 330 packets sent
+	Filter ufadts : 1 input pids 1 output pids 334 tasks 491 us process time
+		330 packets processed 82748 bytes processed (672098 pck/sec 1348.24 mbps)
+		330 packets sent 85058 bytes sent (672098 pck/sec 1385.87 mbps)
+		* input PID enst_audio.aac: 330 packets received
+		* output PID enst_audio.aac: 330 packets sent
+	Filter writegen : 1 input pids 1 output pids 334 tasks 392 us process time
+		330 packets processed 85058 bytes processed (841837 pck/sec 1735.88 mbps)
+		330 packets sent 85058 bytes sent (841837 pck/sec 1735.88 mbps)
+		* input PID enst_audio.aac: 330 packets received
+		* output PID enst_audio.aac: 330 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3647 us active_time 3584 us nb_tasks 1128
+
+Total: run_time 3647 us active_time 3584 us nb_tasks 1128
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_audio.aac) (ptr=0x55bc8cb987f0)
+-(PID enst_audio.aac) rfadts (ptr=0x55bc8cba0030)
+--(PID enst_audio.aac) reframer (ID=_0x55bc8cb9b040_)
+---(PID enst_audio.aac) ufadts (ptr=0x55bc8cba7380)
+----(PID enst_audio.aac) writegen (ptr=0x55bc8cba86c0)
+-----(PID enst_audio.aac) fout (dst=./results/temp/enst_audio.aac) (ptr=0x55bc8cb9c260)
+
+Computing ./results/temp/enst_audio.aac  (rewrite) hash: 
+File hash (SHA-1): C5CB812A89468B3A7ED871AC98FA8CBB5881820D
+Hash OK for ./results/temp/enst_audio.aac

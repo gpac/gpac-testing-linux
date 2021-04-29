@@ -1,0 +1,49 @@
+*** reframer-hevc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:54 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/counter.hvc reframer @ -o ./results/temp/counter.hvc  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1399525248
+
+Filter stats - 6 filters
+	Filter fin (src=./media/auxiliary_files/counter.hvc) : 0 input pids 1 output pids 134 tasks 1021 us process time
+		131 packets sent 652932 bytes sent (128306 pck/sec 5116.02 mbps)
+		* output PID counter.hvc: 131 packets sent
+	Filter reframer ID _0x55b0b89ec020_ : 1 input pids 1 output pids 344 tasks 628 us process time
+		252 packets processed 652074 bytes processed (401274 pck/sec 8306.68 mbps)
+		252 packets sent 652074 bytes sent (401274 pck/sec 8306.68 mbps)
+		* input PID counter.hvc: 252 frames (2512 packets) received
+		* output PID counter.hvc: 252 packets sent
+	Filter fout (dst=./results/temp/counter.hvc) : 1 input pids 0 output pids 254 tasks 841 us process time
+		252 packets processed 654696 bytes processed (299643 pck/sec 6227.79 mbps)
+		* input PID counter.hvc: 252 packets received
+	Filter rfnalu : 1 input pids 1 output pids 382 tasks 12520 us process time
+		131 packets processed 652932 bytes processed (10463.3 pck/sec 417.209 mbps)
+		2512 packets sent 652074 bytes sent (200639 pck/sec 416.661 mbps)
+		* input PID counter.hvc: 131 packets received
+		* output PID counter.hvc: 2512 packets sent
+	Filter ufnalu : 1 input pids 1 output pids 376 tasks 1334 us process time
+		252 packets processed 652074 bytes processed (188906 pck/sec 3910.49 mbps)
+		252 packets sent 654696 bytes sent (188906 pck/sec 3926.21 mbps)
+		* input PID counter.hvc: 252 packets received
+		* output PID counter.hvc: 252 packets sent
+	Filter writegen : 1 input pids 1 output pids 376 tasks 338 us process time
+		252 packets processed 654696 bytes processed (745562 pck/sec 15495.8 mbps)
+		252 packets sent 654696 bytes sent (745562 pck/sec 15495.8 mbps)
+		* input PID counter.hvc: 252 packets received
+		* output PID counter.hvc: 252 packets sent
+Session stats - threads 1
+	Thread 1: run_time 17287 us active_time 17181 us nb_tasks 1987
+
+Total: run_time 17287 us active_time 17181 us nb_tasks 1987
+
+Filters connected:
+fin (src=./media/auxiliary_files/counter.hvc) (ptr=0x55b0b89e97f0)
+-(PID counter.hvc) rfnalu (ptr=0x55b0b89f2310)
+--(PID counter.hvc) reframer (ID=_0x55b0b89ec020_)
+---(PID counter.hvc) ufnalu (ptr=0x55b0b89fbbe0)
+----(PID counter.hvc) writegen (ptr=0x55b0b89fcc80)
+-----(PID counter.hvc) fout (dst=./results/temp/counter.hvc) (ptr=0x55b0b89ed240)
+
+Computing ./results/temp/counter.hvc  (rewrite) hash: 
+File hash (SHA-1): B9EAAD723BA31C26E87E7BABC6A0B64004162AD4
+Hash fail, ref hash ./hash_refs/reframer-hevc-rewrite.hash was B73AC8970037F8BD95CE4E7AB4179FB45B7F4BE3

@@ -1,0 +1,688 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - compositor/scene_ns.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">compositor</a> - scene_ns.c<span style="font-size: 80%;"> (source / <a href="scene_ns.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">167</td>
+            <td class="headerCovTableEntry">268</td>
+            <td class="headerCovTableEntryLo">62.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryMed">85.7 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2018
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / Scene Compositor sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/internal/compositor_dev.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/network.h&gt;
+<a name="28"><span class="lineNum">      28 </span>            : </a>
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 : void scene_ns_on_setup_error(GF_Filter *failed_filter, void *udta, GF_Err err)</span>
+<span class="lineNum">      31 </span>            : {
+<span class="lineNum">      32 </span>            :         GF_SceneNamespace *scene_ns;
+<span class="lineNum">      33 </span>            :         GF_Scene *scene;
+<span class="lineNum">      34 </span>            :         GF_ObjectManager *root = (GF_ObjectManager *)udta;
+<span class="lineNum">      35 </span>            :         assert(root);
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :         scene_ns = root-&gt;scene_ns;</span>
+<span class="lineNum">      37 </span>            :         assert(scene_ns);
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :         scene = root-&gt;subscene ? root-&gt;subscene : root-&gt;parentscene;</span>
+<span class="lineNum">      39 </span>            :         assert(scene);
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_MEDIA, (&quot;[ODM] Service connection failure received from %s - %s\n&quot;, scene_ns-&gt;url, gf_error_to_string(err) ));</span>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :         if (root-&gt;scene_ns-&gt;owner != root) {</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :                 gf_scene_message(scene, scene_ns-&gt;url, &quot;Incompatible module type&quot;, GF_SERVICE_ERROR);</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :                 return;</span>
+<span class="lineNum">      46 </span>            :         }
+<span class="lineNum">      47 </span>            :         /*this is service connection*/
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :         gf_odm_service_media_event(root, GF_EVENT_MEDIA_SETUP_DONE);</span>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :         scene_ns-&gt;connect_ack = GF_TRUE;</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :         if (err) {</span>
+<span class="lineNum">      52 </span>            :                 char msg[5000];
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :                 snprintf(msg, sizeof(msg), &quot;Cannot open %s&quot;, scene_ns-&gt;url);</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :                 gf_scene_message(scene, scene_ns-&gt;url, msg, err);</span>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :                 if (root-&gt;mo) root-&gt;mo-&gt;connect_failure = GF_TRUE;</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :                 gf_odm_service_media_event(root, GF_EVENT_ERROR);</span>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :                 /*destroy service only if attached*/
+<span class="lineNum">      60 </span>            :                 if (root) {
+<span class="lineNum">      61 </span>            :                         GF_Scene *top_scene;
+<span class="lineNum">      62 </span>            :                         //notify before disconnecting
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :                         if (root-&gt;subscene) gf_scene_notify_event(root-&gt;subscene, GF_EVENT_SCENE_ATTACHED, NULL, NULL, err, GF_FALSE);</span>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :                         //detach clocks before destroying namspace
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :                         root-&gt;ck = NULL;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :                         if (root-&gt;subscene) {</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :                                 u32 i, count = gf_list_count(root-&gt;subscene-&gt;resources);</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :                                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :                                         GF_ObjectManager *anodm = gf_list_get(root-&gt;subscene-&gt;resources, i);</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :                                         anodm-&gt;ck = NULL;</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :                                         if (anodm-&gt;scene_ns==root-&gt;scene_ns)</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :                                                 anodm-&gt;scene_ns = NULL;</span>
+<span class="lineNum">      74 </span>            :                                 }
+<span class="lineNum">      75 </span>            :                         }
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :                         root-&gt;scene_ns = NULL;</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :                         if (scene_ns-&gt;owner &amp;&amp; scene_ns-&gt;nb_odm_users) scene_ns-&gt;nb_odm_users--;</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :                         scene_ns-&gt;owner = NULL;</span>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :                         top_scene = gf_scene_get_root_scene(scene);</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :                         //source filter no longer exists
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :                         scene_ns-&gt;source_filter = NULL;</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :                         gf_scene_ns_del(scene_ns, top_scene);</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :                         if (!root-&gt;parentscene) {</span>
+<span class="lineNum">      88 </span>            :                                 GF_Event evt;
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :                                 evt.type = GF_EVENT_CONNECT;</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :                                 evt.connect.is_connected = 0;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :                                 gf_filter_send_gf_event(scene-&gt;compositor-&gt;filter, &amp;evt);</span>
+<span class="lineNum">      92 </span>            :                         } else {
+<span class="lineNum">      93 </span>            :                                 /*try to reinsert OD for VRML/X3D with multiple URLs:
+<span class="lineNum">      94 </span>            :                                 1- first remove from parent scene without destroying object, this will trigger a re-setup
+<span class="lineNum">      95 </span>            :                                         if other URLs are present
+<span class="lineNum">      96 </span>            :                                         2- then destroy object*/
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :                                 gf_scene_remove_object(root-&gt;parentscene, root, 0);</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :                                 gf_odm_disconnect(root, 1);</span>
+<span class="lineNum">      99 </span>            :                         }
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :                         return;</span>
+<span class="lineNum">     101 </span>            :                 }
+<span class="lineNum">     102 </span>            :         }
+<span class="lineNum">     103 </span>            : }
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : #ifdef FILTER_FIXME
+<span class="lineNum">     108 </span>            : static void term_on_disconnect(GF_ClientService *service, LPNETCHANNEL netch, GF_Err response)
+<span class="lineNum">     109 </span>            : {
+<span class="lineNum">     110 </span>            :         GF_ObjectManager *root;
+<span class="lineNum">     111 </span>            :         GF_Channel *ch;
+<span class="lineNum">     112 </span>            :         GF_Terminal *term = service-&gt;term;
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :         /*may be null upon destroy*/
+<span class="lineNum">     115 </span>            :         root = service-&gt;owner;
+<span class="lineNum">     116 </span>            :         if (root &amp;&amp; (root-&gt;net_service != service)) {
+<span class="lineNum">     117 </span>            :                 if (root-&gt;net_service) gf_term_message(term, service-&gt;url, &quot;Incompatible module type&quot;, GF_SERVICE_ERROR);
+<span class="lineNum">     118 </span>            :                 return;
+<span class="lineNum">     119 </span>            :         }
+<span class="lineNum">     120 </span>            :         //reset global seek time
+<span class="lineNum">     121 </span>            :         if (term-&gt;root_scene &amp;&amp; term-&gt;root_scene-&gt;root_od)
+<span class="lineNum">     122 </span>            :                 term-&gt;root_scene-&gt;root_od-&gt;media_start_time = 0;
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :         /*this is service disconnect*/
+<span class="lineNum">     125 </span>            :         if (!netch) {
+<span class="lineNum">     126 </span>            :                 if (service-&gt;subservice_disconnect) {
+<span class="lineNum">     127 </span>            :                         if (service-&gt;owner &amp;&amp; service-&gt;subservice_disconnect==1) {
+<span class="lineNum">     128 </span>            :                                 GF_Scene *scene = service-&gt;owner-&gt;subscene ? service-&gt;owner-&gt;subscene : service-&gt;owner-&gt;parentscene;
+<span class="lineNum">     129 </span>            :                                 /*destroy all media*/
+<span class="lineNum">     130 </span>            :                                 gf_scene_disconnect(scene, GF_TRUE);
+<span class="lineNum">     131 </span>            :                         }
+<span class="lineNum">     132 </span>            :                         return;
+<span class="lineNum">     133 </span>            :                 }
+<span class="lineNum">     134 </span>            :                 /*unregister from valid services*/
+<span class="lineNum">     135 </span>            :                 if (gf_list_del_item(term-&gt;net_services, service)&gt;=0) {
+<span class="lineNum">     136 </span>            :                         /*and queue for destroy*/
+<span class="lineNum">     137 </span>            :                         gf_list_add(term-&gt;net_services_to_remove, service);
+<span class="lineNum">     138 </span>            :                 }
+<span class="lineNum">     139 </span>            :                 return;
+<span class="lineNum">     140 </span>            :         }
+<span class="lineNum">     141 </span>            :         /*this is channel disconnect*/
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :         /*no notif in case of failure for disconnection*/
+<span class="lineNum">     144 </span>            :         ch = gf_term_get_channel(service, netch);
+<span class="lineNum">     145 </span>            :         if (!ch) return;
+<span class="lineNum">     146 </span>            :         /*signal channel state*/
+<span class="lineNum">     147 </span>            :         ch-&gt;es_state = GF_ESM_ES_DISCONNECTED;
+<span class="lineNum">     148 </span>            : }
+<a name="149"><span class="lineNum">     149 </span>            : #endif</a>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineCov">        887 : void gf_scene_insert_pid(GF_Scene *scene, GF_SceneNamespace *sns, GF_FilterPid *pid, Bool is_in_iod)</span>
+<span class="lineNum">     152 </span>            : {
+<span class="lineNum">     153 </span>            :         u32 i, min_od_id;
+<span class="lineNum">     154 </span>            :         GF_MediaObject *the_mo;
+<span class="lineNum">     155 </span>            :         GF_ObjectManager *odm, *root;
+<span class="lineNum">     156 </span>            :         const GF_PropertyValue *v;
+<span class="lineNum">     157 </span>            :         u32 mtype=0;
+<span class="lineNum">     158 </span>            :         u32 pid_odid=0;
+<span class="lineNum">     159 </span>            :         u32 pid_id=0;
+<span class="lineNum">     160 </span>            :         u32 ServiceID=0;
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineCov">        887 :         root = sns-&gt;owner;</span>
+<span class="lineNum">     163 </span><span class="lineCov">        887 :         if (!root) {</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MEDIA, (&quot;[Service %s] has no root, aborting !\n&quot;, sns-&gt;url));</span>
+<span class="lineNum">     165 </span>            :                 return;
+<span class="lineNum">     166 </span>            :         }
+<span class="lineNum">     167 </span><span class="lineCov">        887 :         if (root-&gt;flags &amp; GF_ODM_DESTROYED) {</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MEDIA, (&quot;[Service %s] root has been scheduled for destruction - aborting !\n&quot;, sns-&gt;url));</span>
+<span class="lineNum">     169 </span>            :                 return;
+<span class="lineNum">     170 </span>            :         }
+<span class="lineNum">     171 </span><span class="lineCov">        887 :         scene = root-&gt;subscene ? root-&gt;subscene : root-&gt;parentscene;</span>
+<span class="lineNum">     172 </span><span class="lineCov">        887 :         if (scene-&gt;root_od-&gt;addon &amp;&amp; (scene-&gt;root_od-&gt;addon-&gt;addon_type == GF_ADDON_TYPE_MAIN)) {</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :                 scene-&gt;root_od-&gt;flags |= GF_ODM_REGENERATE_SCENE;</span>
+<span class="lineNum">     174 </span>            :         }
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span><span class="lineCov">        887 :         if (scene-&gt;is_dynamic_scene) {</span>
+<span class="lineNum">     177 </span><span class="lineCov">        209 :                 if (!root-&gt;ID)</span>
+<span class="lineNum">     178 </span><span class="lineCov">        207 :                         root-&gt;ID = 1;</span>
+<span class="lineNum">     179 </span>            :         }
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">        887 :         v = gf_filter_pid_get_property(pid, GF_PROP_PID_STREAM_TYPE);</span>
+<span class="lineNum">     182 </span><span class="lineCov">        887 :         if (!v) return;</span>
+<span class="lineNum">     183 </span><span class="lineCov">        887 :         mtype = v-&gt;value.uint;</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">        887 :         v = gf_filter_pid_get_property(pid, GF_PROP_PID_SERVICE_ID);</span>
+<span class="lineNum">     186 </span><span class="lineCov">        887 :         if (v) ServiceID = v-&gt;value.uint;</span>
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineCov">        887 :         v = gf_filter_pid_get_property(pid, GF_PROP_PID_ID);</span>
+<span class="lineNum">     189 </span><span class="lineCov">        887 :         if (v) pid_id = v-&gt;value.uint;</span>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">        887 :         if (scene-&gt;compositor-&gt;autofps &amp;&amp; (mtype==GF_STREAM_VISUAL) ) {</span>
+<span class="lineNum">     192 </span><span class="lineCov">        345 :                 v = gf_filter_pid_get_property(pid, GF_PROP_PID_FPS);</span>
+<span class="lineNum">     193 </span><span class="lineCov">        345 :                 if (v &amp;&amp; v-&gt;value.frac.den &amp;&amp; v-&gt;value.frac.num &amp;&amp; (v-&gt;value.frac.den!=v-&gt;value.frac.num)) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">        180 :                         scene-&gt;compositor-&gt;autofps = GF_FALSE;</span>
+<span class="lineNum">     195 </span><span class="lineCov">        180 :                         gf_sc_set_fps(scene-&gt;compositor, v-&gt;value.frac);</span>
+<span class="lineNum">     196 </span>            :                 }
+<span class="lineNum">     197 </span>            :         }
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span><span class="lineCov">        887 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_MEDIA, (&quot;[Service %s] Adding new media\n&quot;, sns-&gt;url));</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :         /*object declared this way are not part of an OD stream and are considered as dynamic*/
+<span class="lineNum">     202 </span>            :         /*      od-&gt;objectDescriptorID = GF_MEDIA_EXTERNAL_ID; */
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :         /*check if we have a mediaObject in the scene not attached and matching this object*/
+<span class="lineNum">     205 </span>            :         the_mo = NULL;
+<span class="lineNum">     206 </span>            :         odm = NULL;
+<span class="lineNum">     207 </span>            :         min_od_id = 0;
+<span class="lineNum">     208 </span><span class="lineCov">        139 :         for (i=0; i&lt;gf_list_count(scene-&gt;scene_objects); i++) {</span>
+<span class="lineNum">     209 </span>            : #if FILTER_FIXME
+<span class="lineNum">     210 </span>            :                 char *frag = NULL;
+<span class="lineNum">     211 </span>            : #endif
+<span class="lineNum">     212 </span>            :                 char *ext, *url;
+<span class="lineNum">     213 </span>            :                 u32 match_esid = 0;
+<span class="lineNum">     214 </span>            :                 Bool type_matched = GF_FALSE;
+<span class="lineNum">     215 </span><span class="lineCov">        310 :                 GF_MediaObject *mo = gf_list_get(scene-&gt;scene_objects, i);</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineCov">        310 :                 if ((mo-&gt;OD_ID != GF_MEDIA_EXTERNAL_ID) &amp;&amp; (min_od_id&lt;mo-&gt;OD_ID))</span>
+<span class="lineNum">     218 </span>            :                         min_od_id = mo-&gt;OD_ID;
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            :                 //got the service, check the type
+<span class="lineNum">     221 </span>            :                 /*match type*/
+<span class="lineNum">     222 </span><span class="lineCov">        310 :                 switch (mtype) {</span>
+<span class="lineNum">     223 </span><span class="lineCov">        256 :                 case GF_STREAM_VISUAL:</span>
+<span class="lineNum">     224 </span><span class="lineCov">        256 :                         if (mo-&gt;type == GF_MEDIA_OBJECT_VIDEO) type_matched = GF_TRUE;</span>
+<span class="lineNum">     225 </span>            :                         break;
+<span class="lineNum">     226 </span><span class="lineCov">         21 :                 case GF_STREAM_AUDIO:</span>
+<span class="lineNum">     227 </span><span class="lineCov">         21 :                         if (mo-&gt;type == GF_MEDIA_OBJECT_AUDIO) type_matched = GF_TRUE;</span>
+<span class="lineNum">     228 </span>            :                         break;
+<span class="lineNum">     229 </span><span class="lineCov">         29 :                 case GF_STREAM_SCENE:</span>
+<span class="lineNum">     230 </span><span class="lineCov">         29 :                         if (mo-&gt;type == GF_MEDIA_OBJECT_UPDATES) type_matched = GF_TRUE;</span>
+<span class="lineNum">     231 </span>            :                         break;
+<span class="lineNum">     232 </span>            :                 default:
+<span class="lineNum">     233 </span>            :                         break;
+<span class="lineNum">     234 </span>            :                 }
+<span class="lineNum">     235 </span><span class="lineCov">        310 :                 if (!mo-&gt;odm) {</span>
+<span class="lineNum">     236 </span>            :                         u32 j;
+<span class="lineNum">     237 </span>            :                         //if not external OD, look for ODM with same ID
+<span class="lineNum">     238 </span><span class="lineCov">         14 :                         if (mo-&gt;OD_ID != GF_MEDIA_EXTERNAL_ID) {</span>
+<span class="lineNum">     239 </span><span class="lineCov">          6 :                                 for (j=0; j&lt;gf_list_count(scene-&gt;resources); j++) {</span>
+<span class="lineNum">     240 </span><span class="lineCov">         20 :                                         GF_ObjectManager *an_odm = gf_list_get(scene-&gt;resources, j);</span>
+<span class="lineNum">     241 </span><span class="lineCov">         20 :                                         if (an_odm-&gt;ID == mo-&gt;OD_ID) {</span>
+<span class="lineNum">     242 </span><span class="lineCov">         14 :                                                 mo-&gt;odm = an_odm;</span>
+<span class="lineNum">     243 </span><span class="lineCov">         14 :                                                 break;</span>
+<span class="lineNum">     244 </span>            :                                         }
+<span class="lineNum">     245 </span>            :                                 }
+<span class="lineNum">     246 </span>            :                         }
+<span class="lineNum">     247 </span><span class="lineCov">         14 :                         if (!mo-&gt;odm) {</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :                                 continue;</span>
+<span class="lineNum">     249 </span>            :                         }
+<span class="lineNum">     250 </span>            :                 }
+<span class="lineNum">     251 </span>            :                 /*if object is attached to a service, don't bother looking in a different one*/
+<span class="lineNum">     252 </span><span class="lineCov">        310 :                 if (mo-&gt;odm-&gt;scene_ns &amp;&amp; (mo-&gt;odm-&gt;scene_ns != sns)) {</span>
+<span class="lineNum">     253 </span>            :                         Bool mine = 0;
+<span class="lineNum">     254 </span><span class="lineCov">        284 :                         if (mo-&gt;odm-&gt;scene_ns-&gt;source_filter) {</span>
+<span class="lineNum">     255 </span><span class="lineCov">        217 :                                 mine = gf_filter_pid_is_filter_in_parents(pid, mo-&gt;odm-&gt;scene_ns-&gt;source_filter);</span>
+<span class="lineNum">     256 </span>            :                         }
+<span class="lineNum">     257 </span>            :                         //passthrough ODM not yet assigned, consider it ours
+<span class="lineNum">     258 </span><span class="lineCov">         67 :                         else if (!mo-&gt;odm-&gt;pid &amp;&amp; (mo-&gt;odm-&gt;flags &amp; GF_ODM_PASSTHROUGH)) {</span>
+<span class="lineNum">     259 </span>            :                                 mine = GF_TRUE;
+<span class="lineNum">     260 </span>            :                         }
+<span class="lineNum">     261 </span><span class="lineCov">        327 :                         if (!mine) continue;</span>
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span><span class="lineCov">        174 :                         if (type_matched) {</span>
+<span class="lineNum">     264 </span>            :                                 the_mo = mo;
+<span class="lineNum">     265 </span><span class="lineCov">        171 :                                 odm = mo-&gt;odm;</span>
+<span class="lineNum">     266 </span><span class="lineCov">        171 :                                 pid_odid = odm-&gt;ID = mo-&gt;OD_ID;</span>
+<span class="lineNum">     267 </span><span class="lineCov">        171 :                                 break;</span>
+<span class="lineNum">     268 </span>            :                         }
+<span class="lineNum">     269 </span>            :                 }
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :                 /*already assigned object*/
+<span class="lineNum">     272 </span><span class="lineCov">         29 :                 if (mo-&gt;odm-&gt;ID) continue;</span>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :                 /*we cannot match yet the object, we need the OD command for that*/
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :                 if (mo-&gt;OD_ID != GF_MEDIA_EXTERNAL_ID) {</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     277 </span>            :                 }
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                 if (!mo-&gt;URLs.count || !mo-&gt;URLs.vals[0].url) continue;</span>
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                 ext = strrchr(mo-&gt;URLs.vals[0].url, '#');</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :                 if (ext) {</span>
+<span class="lineNum">     282 </span>            : #if FILTER_FIXME
+<span class="lineNum">     283 </span>            :                         frag = strchr(ext, '=');
+<span class="lineNum">     284 </span>            : #endif
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :                         ext[0] = 0;</span>
+<span class="lineNum">     286 </span>            :                 }
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :                 url = mo-&gt;URLs.vals[0].url;</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :                 if (!strnicmp(url, &quot;file://localhost&quot;, 16)) url += 16;</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :                 else if (!strnicmp(url, &quot;file://&quot;, 7)) url += 7;</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :                 else if (!strnicmp(url, &quot;gpac://&quot;, 7)) url += 7;</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                 else if (!strnicmp(url, &quot;pid://&quot;, 6)) match_esid = atoi(url+6);</span>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                 if (!match_esid &amp;&amp; mo-&gt;odm-&gt;scene_ns &amp;&amp; !strstr(mo-&gt;odm-&gt;scene_ns-&gt;url, url)) {</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                         if (ext) ext[0] = '#';</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     296 </span>            :                 }
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                 if (ext) ext[0] = '#';</span>
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :                 if (match_esid &amp;&amp; (pid_id != match_esid))</span>
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            :                 /*match type*/
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :                 switch (mtype) {</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :                 case GF_STREAM_VISUAL:</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :                         if (mo-&gt;type != GF_MEDIA_OBJECT_VIDEO) continue;</span>
+<span class="lineNum">     306 </span>            :                         break;
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                 case GF_STREAM_AUDIO:</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :                         if (mo-&gt;type != GF_MEDIA_OBJECT_AUDIO) continue;</span>
+<span class="lineNum">     309 </span>            :                         break;
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :                 case GF_STREAM_SCENE:</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :                         if (mo-&gt;type != GF_MEDIA_OBJECT_UPDATES) continue;</span>
+<span class="lineNum">     312 </span>            :                         break;
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :                 default:</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     315 </span>            :                 }
+<span class="lineNum">     316 </span>            : #if FILTER_FIXME
+<span class="lineNum">     317 </span>            :                 if (frag) {
+<span class="lineNum">     318 </span>            :                         u32 frag_id = 0;
+<span class="lineNum">     319 </span>            :                         u32 ID = od-&gt;objectDescriptorID;
+<span class="lineNum">     320 </span>            :                         if (ID==GF_MEDIA_EXTERNAL_ID) ID = esd-&gt;ESID;
+<span class="lineNum">     321 </span>            :                         frag++;
+<span class="lineNum">     322 </span>            :                         frag_id = atoi(frag);
+<span class="lineNum">     323 </span>            :                         if (ID!=frag_id) continue;
+<span class="lineNum">     324 </span>            :                 }
+<span class="lineNum">     325 </span>            : #endif
+<span class="lineNum">     326 </span>            :                 the_mo = mo;
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                 odm = mo-&gt;odm;</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :                 pid_odid = odm-&gt;ID = mo-&gt;OD_ID;</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :                 if (mo-&gt;OD_ID == GF_MEDIA_EXTERNAL_ID)</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :                         odm-&gt;flags |= GF_ODM_NOT_IN_OD_STREAM;</span>
+<span class="lineNum">     331 </span>            :                 break;
+<span class="lineNum">     332 </span>            :         }
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            :         /*add a pass on scene-&gt;resource to check for min_od_id,
+<span class="lineNum">     335 </span>            :         otherwise we may have another modules declaring an object with ID 0 from
+<span class="lineNum">     336 </span>            :         another thread, which will assert (only one object with a givne OD ID)*/
+<span class="lineNum">     337 </span><span class="lineCov">       1241 :         for (i=0; i&lt;gf_list_count(scene-&gt;resources); i++) {</span>
+<span class="lineNum">     338 </span><span class="lineCov">        371 :                 GF_ObjectManager *an_odm = gf_list_get(scene-&gt;resources, i);</span>
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span><span class="lineCov">        371 :                 if (an_odm-&gt;ID == GF_MEDIA_EXTERNAL_ID) continue;</span>
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineCov">        274 :                 if (min_od_id &lt; an_odm-&gt;ID)</span>
+<span class="lineNum">     343 </span>            :                         min_od_id = an_odm-&gt;ID;
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span><span class="lineCov">        274 :                 if (odm) continue;</span>
+<span class="lineNum">     346 </span>            :                 //check for OD replacement, look for ODMs with no PID assigned and a source filter origin for this pid
+<span class="lineNum">     347 </span><span class="lineCov">         65 :                 if (an_odm-&gt;pid) continue;</span>
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span><span class="lineCov">         24 :                 if (!an_odm-&gt;scene_ns-&gt;source_filter) continue;</span>
+<span class="lineNum">     350 </span><span class="lineCov">         17 :                 if (! gf_filter_pid_is_filter_in_parents(pid, an_odm-&gt;scene_ns-&gt;source_filter))</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :                 odm = an_odm;
+<span class="lineNum">     354 </span><span class="lineCov">         17 :                 pid_odid = an_odm-&gt;ID;</span>
+<span class="lineNum">     355 </span><span class="lineCov">         17 :                 break;</span>
+<span class="lineNum">     356 </span>            :         }
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span><span class="lineCov">        887 :         if (is_in_iod) {</span>
+<span class="lineNum">     359 </span><span class="lineCov">        479 :                 odm = scene-&gt;root_od;</span>
+<span class="lineNum">     360 </span>            :                 //for inline cases, the media object may already be setup
+<span class="lineNum">     361 </span><span class="lineCov">        479 :                 the_mo = odm-&gt;mo;</span>
+<span class="lineNum">     362 </span><span class="lineCov">        479 :                 if (the_mo) pid_odid = the_mo-&gt;OD_ID;</span>
+<span class="lineNum">     363 </span>            :         }
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">        887 :         if (!odm) {</span>
+<span class="lineNum">     366 </span><span class="lineCov">        220 :                 odm = gf_odm_new();</span>
+<span class="lineNum">     367 </span><span class="lineCov">        220 :                 odm-&gt;parentscene = scene;</span>
+<span class="lineNum">     368 </span><span class="lineCov">        220 :                 gf_list_add(scene-&gt;resources, odm);</span>
+<span class="lineNum">     369 </span>            :         }
+<span class="lineNum">     370 </span><span class="lineCov">        887 :         odm-&gt;flags |= GF_ODM_NOT_SETUP;</span>
+<span class="lineNum">     371 </span><span class="lineCov">        887 :         if (!pid_odid) {</span>
+<span class="lineNum">     372 </span><span class="lineCov">        658 :                 pid_odid = min_od_id + 1;</span>
+<span class="lineNum">     373 </span>            :         }
+<span class="lineNum">     374 </span><span class="lineCov">        887 :         odm-&gt;ID = pid_odid;</span>
+<span class="lineNum">     375 </span><span class="lineCov">        887 :         odm-&gt;mo = the_mo;</span>
+<span class="lineNum">     376 </span><span class="lineCov">        887 :         odm-&gt;ServiceID = ServiceID;</span>
+<span class="lineNum">     377 </span><span class="lineCov">        887 :         if (!odm-&gt;pid) {</span>
+<span class="lineNum">     378 </span><span class="lineCov">        881 :                 odm-&gt;type = mtype;</span>
+<span class="lineNum">     379 </span><span class="lineCov">        881 :                 if (mtype == GF_STREAM_AUDIO) {</span>
+<span class="lineNum">     380 </span><span class="lineCov">         18 :                         scene-&gt;compositor-&gt;audio_renderer-&gt;nb_audio_objects++;</span>
+<span class="lineNum">     381 </span><span class="lineCov">         18 :                         scene-&gt;compositor-&gt;audio_renderer-&gt;scene_ready = GF_FALSE;</span>
+<span class="lineNum">     382 </span>            :                 }
+<span class="lineNum">     383 </span>            :         }
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            :         //register PID with ODM, but don't call setup object
+<span class="lineNum">     386 </span><span class="lineCov">        887 :         gf_odm_register_pid(odm, pid, GF_TRUE);</span>
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span><span class="lineCov">        887 :         gf_filter_pid_set_udta(pid, odm);</span>
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span><span class="lineCov">        887 :         v = gf_filter_pid_get_property(pid, GF_PROP_PID_PLAYBACK_MODE);</span>
+<span class="lineNum">     391 </span><span class="lineCov">        887 :         if (!v || !v-&gt;value.uint) odm-&gt;flags |= GF_ODM_NO_TIME_CTRL;</span>
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span><span class="lineCov">        887 :         if (the_mo) the_mo-&gt;OD_ID = odm-&gt;ID;</span>
+<span class="lineNum">     394 </span><span class="lineCov">        887 :         if (!scene-&gt;selected_service_id)</span>
+<span class="lineNum">     395 </span><span class="lineCov">        887 :                 scene-&gt;selected_service_id = ServiceID;</span>
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span><span class="lineCov">        887 :         if (odm-&gt;parentscene &amp;&amp; odm-&gt;parentscene-&gt;is_dynamic_scene)</span>
+<span class="lineNum">     398 </span><span class="lineCov">        209 :                 odm-&gt;flags |= GF_ODM_NOT_IN_OD_STREAM;</span>
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            :         //we insert right away the PID as a new object if the scene is dynamic
+<span class="lineNum">     401 </span>            :         //if the scene is not dynamic, we wait for the corresponding OD update
+<span class="lineNum">     402 </span>            :         //FILTER_FIXME: needs rework to enable attaching subtitle to a non-dynamic scene
+<span class="lineNum">     403 </span>            :         //otherwise if subscene, this is an IOD
+<span class="lineNum">     404 </span><span class="lineCov">        887 :         if (odm-&gt;subscene || (odm-&gt;flags &amp; GF_ODM_NOT_IN_OD_STREAM) ) {</span>
+<span class="lineNum">     405 </span><span class="lineCov">        876 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MEDIA, (&quot;[ODM%d] setup object - MO %08x\n&quot;, odm-&gt;ID, odm-&gt;mo));</span>
+<span class="lineNum">     406 </span><span class="lineCov">        876 :                 gf_odm_setup_object(odm, sns, pid);</span>
+<span class="lineNum">     407 </span>            :         } else {
+<span class="lineNum">     408 </span>            :                 //cannot setup until we get the associated OD_Update
+<span class="lineNum">     409 </span><span class="lineCov">         11 :                 odm-&gt;ID = 0;</span>
+<span class="lineNum">     410 </span>            :         }
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span><span class="lineCov">        887 :         if (scene-&gt;is_dynamic_scene &amp;&amp; !root-&gt;scene_ns-&gt;connect_ack) {</span>
+<span class="lineNum">     413 </span>            :                 /*othewise send a connect ack for top level*/
+<span class="lineNum">     414 </span>            :                 GF_Event evt;
+<span class="lineNum">     415 </span><span class="lineCov">        209 :                 root-&gt;scene_ns-&gt;connect_ack = GF_TRUE;</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span><span class="lineCov">        209 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MEDIA, (&quot;[ODM] Root object connected (%s) !\n&quot;, root-&gt;scene_ns-&gt;url));</span>
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span><span class="lineCov">        209 :                 evt.type = GF_EVENT_CONNECT;</span>
+<span class="lineNum">     420 </span><span class="lineCov">        209 :                 evt.connect.is_connected = GF_TRUE;</span>
+<span class="lineNum">     421 </span><span class="lineCov">        209 :                 gf_sc_send_event(scene-&gt;compositor, &amp;evt);</span>
+<span class="lineNum">     422 </span>            :         }
+<a name="423"><span class="lineNum">     423 </span>            : }</a>
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span><span class="lineCov">        906 : GF_SceneNamespace *gf_scene_ns_new(GF_Scene *scene, GF_ObjectManager *owner, const char *url, const char *parent_url)</span>
+<span class="lineNum">     426 </span>            : {
+<span class="lineNum">     427 </span>            :         char *frag;
+<span class="lineNum">     428 </span>            :         GF_SceneNamespace *sns;
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span><span class="lineCov">        906 :         GF_SAFEALLOC(sns, GF_SceneNamespace);</span>
+<span class="lineNum">     431 </span><span class="lineCov">        906 :         if (!sns) {</span>
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MEDIA, (&quot;[Compose] Failed to allocate namespace\n&quot;));</span>
+<span class="lineNum">     433 </span>            :                 return NULL;
+<span class="lineNum">     434 </span>            :         }
+<span class="lineNum">     435 </span><span class="lineCov">        906 :         sns-&gt;owner = owner;</span>
+<span class="lineNum">     436 </span><span class="lineCov">        906 :         sns-&gt;url = gf_url_concatenate(parent_url, url);</span>
+<span class="lineNum">     437 </span><span class="lineCov">        906 :         sns-&gt;clocks = gf_list_new();</span>
+<span class="lineNum">     438 </span><span class="lineCov">        906 :         frag = strchr(sns-&gt;url, '#');</span>
+<span class="lineNum">     439 </span><span class="lineCov">        906 :         if (frag) {</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :                 sns-&gt;url_frag = gf_strdup(frag+1);</span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :                 frag[0] = 0;</span>
+<span class="lineNum">     442 </span>            :         }
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            :         //move to top scene
+<span class="lineNum">     445 </span><span class="lineCov">        906 :         scene = gf_scene_get_root_scene(scene);</span>
+<span class="lineNum">     446 </span><span class="lineCov">        906 :         gf_list_add(scene-&gt;namespaces, sns);</span>
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span><span class="lineCov">        906 :         return sns;</span>
+<span class="lineNum">     449 </span>            : }
+<span class="lineNum">     450 </span>            : 
+<a name="451"><span class="lineNum">     451 </span>            : </a>
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span><span class="lineCov">        906 : void gf_scene_ns_del(GF_SceneNamespace *sns, GF_Scene *root_scene)</span>
+<span class="lineNum">     454 </span>            : {
+<span class="lineNum">     455 </span><span class="lineCov">        906 :         gf_list_del_item(root_scene-&gt;namespaces, sns);</span>
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span><span class="lineCov">        906 :         if (sns-&gt;source_filter) {</span>
+<span class="lineNum">     458 </span><span class="lineCov">        230 :                 gf_filter_remove_src(root_scene-&gt;compositor-&gt;filter, sns-&gt;source_filter);</span>
+<span class="lineNum">     459 </span>            :         }
+<span class="lineNum">     460 </span><span class="lineCov">        906 :         if (sns-&gt;clocks) {</span>
+<span class="lineNum">     461 </span><span class="lineCov">       1747 :                 while (gf_list_count(sns-&gt;clocks)) {</span>
+<span class="lineNum">     462 </span><span class="lineCov">        841 :                         GF_Clock *ck = gf_list_pop_back(sns-&gt;clocks);</span>
+<span class="lineNum">     463 </span><span class="lineCov">        841 :                         gf_clock_del(ck);</span>
+<span class="lineNum">     464 </span>            :                 }
+<span class="lineNum">     465 </span><span class="lineCov">        906 :                 gf_list_del(sns-&gt;clocks);</span>
+<span class="lineNum">     466 </span>            :         }
+<span class="lineNum">     467 </span><span class="lineCov">        906 :         if (sns-&gt;url) gf_free(sns-&gt;url);</span>
+<span class="lineNum">     468 </span><span class="lineCov">        906 :         if (sns-&gt;url_frag) gf_free(sns-&gt;url_frag);</span>
+<span class="lineNum">     469 </span><span class="lineCov">        906 :         gf_free(sns);</span>
+<span class="lineNum">     470 </span><span class="lineCov">        906 : }</span>
+<a name="471"><span class="lineNum">     471 </span>            : </a>
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineCov">          3 : Bool scene_ns_remove_object(GF_Filter *filter, void *callback, u32 *reschedule_ms)</span>
+<span class="lineNum">     474 </span>            : {
+<span class="lineNum">     475 </span>            :         GF_ObjectManager *odm = (GF_ObjectManager *)callback;
+<span class="lineNum">     476 </span><span class="lineCov">          3 :         gf_odm_disconnect(odm, 2);</span>
+<span class="lineNum">     477 </span><span class="lineCov">          3 :         return GF_FALSE;</span>
+<span class="lineNum">     478 </span>            : }
+<a name="479"><span class="lineNum">     479 </span>            : </a>
+<span class="lineNum">     480 </span>            : /*connects given OD manager to its URL*/
+<span class="lineNum">     481 </span><span class="lineCov">        274 : void gf_scene_ns_connect_object(GF_Scene *scene, GF_ObjectManager *odm, char *serviceURL, char *parent_url)</span>
+<span class="lineNum">     482 </span>            : {
+<span class="lineNum">     483 </span>            :         GF_Err e;
+<span class="lineNum">     484 </span>            :         char *frag;
+<span class="lineNum">     485 </span>            :         Bool reloc_result=GF_FALSE;
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            :         /*check cache*/
+<span class="lineNum">     488 </span><span class="lineCov">        274 :         if (parent_url) {</span>
+<span class="lineNum">     489 </span>            :                 u32 i, count;
+<span class="lineNum">     490 </span><span class="lineCov">        260 :                 count = gf_opts_get_section_count();</span>
+<span class="lineNum">     491 </span><span class="lineCov">       2454 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     492 </span>            :                         u32 exp, sec, frac;
+<span class="lineNum">     493 </span>            :                         const char *opt, *service_cache;
+<span class="lineNum">     494 </span><span class="lineCov">       2194 :                         const char *name = gf_opts_get_section_name(i);</span>
+<span class="lineNum">     495 </span><span class="lineCov">       4388 :                         if (strncmp(name, &quot;@cache=&quot;, 7)) continue;</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :                         opt = gf_opts_get_key(name, &quot;serviceURL&quot;);</span>
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :                         if (!opt || stricmp(opt, parent_url)) continue;</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                         opt = gf_opts_get_key(name, &quot;cacheName&quot;);</span>
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :                         if (!opt || stricmp(opt, serviceURL)) continue;</span>
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :                         service_cache = (char*)gf_opts_get_key(name, &quot;cacheFile&quot;);</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :                         opt = gf_opts_get_key(name, &quot;expireAfterNTP&quot;);</span>
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :                         if (opt) {</span>
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :                                 sscanf(opt, &quot;%u&quot;, &amp;exp);</span>
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :                                 gf_net_get_ntp(&amp;sec, &amp;frac);</span>
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :                                 if (exp &amp;&amp; (exp&lt;sec)) {</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :                                         opt = gf_opts_get_key(name, &quot;cacheFile&quot;);</span>
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :                                         if (opt) gf_file_delete((char*) opt);</span>
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :                                         gf_opts_del_section(name);</span>
+<span class="lineNum">     510 </span>            :                                         service_cache = NULL;
+<span class="lineNum">     511 </span>            :                                 }
+<span class="lineNum">     512 </span>            :                         }
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :                         if (service_cache) serviceURL = (char *)service_cache;</span>
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     515 </span>            :                 }
+<span class="lineNum">     516 </span>            :         }
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span><span class="lineCov">        274 :         frag = strchr(serviceURL, '#');</span>
+<span class="lineNum">     519 </span><span class="lineCov">        274 :         if (frag) {</span>
+<span class="lineNum">     520 </span><span class="lineCov">         10 :                 frag[0] = 0;</span>
+<span class="lineNum">     521 </span><span class="lineCov">         10 :                 u32 i, count = gf_list_count(scene-&gt;compositor-&gt;root_scene-&gt;namespaces);</span>
+<span class="lineNum">     522 </span><span class="lineCov">         21 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     523 </span><span class="lineCov">         11 :                         GF_SceneNamespace *sns = gf_list_get(scene-&gt;compositor-&gt;root_scene-&gt;namespaces, i);</span>
+<span class="lineNum">     524 </span><span class="lineCov">         11 :                         if (sns-&gt;url &amp;&amp; !strcmp(sns-&gt;url, serviceURL)) {</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :                                 frag[0] = '#';</span>
+<span class="lineNum">     526 </span><span class="lineNoCov">          0 :                                 odm-&gt;scene_ns = sns;</span>
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :                                 sns-&gt;nb_odm_users++;</span>
+<span class="lineNum">     528 </span><span class="lineCov">          3 :                                 return;</span>
+<span class="lineNum">     529 </span>            :                         }
+<span class="lineNum">     530 </span>            :                 }
+<span class="lineNum">     531 </span>            :         }
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span><span class="lineCov">        274 :         odm-&gt;scene_ns = gf_scene_ns_new(scene-&gt;compositor-&gt;root_scene, odm, serviceURL, (odm-&gt;addon || reloc_result) ? NULL : parent_url);</span>
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span><span class="lineCov">        274 :         if (!odm-&gt;scene_ns) {</span>
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :                 gf_scene_message(scene, serviceURL, &quot;Cannot create scene service&quot;, GF_OUT_OF_MEM);</span>
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :                 gf_odm_disconnect(odm, 1);</span>
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :                 if (frag) frag[0] = '#';</span>
+<span class="lineNum">     539 </span>            :                 return;
+<span class="lineNum">     540 </span>            :         }
+<span class="lineNum">     541 </span><span class="lineCov">        274 :         odm-&gt;scene_ns-&gt;nb_odm_users++;</span>
+<span class="lineNum">     542 </span>            :         assert(odm-&gt;scene_ns-&gt;owner == odm);
+<span class="lineNum">     543 </span>            : 
+<span class="lineNum">     544 </span><span class="lineCov">        274 :         if (frag &amp;&amp; !odm-&gt;scene_ns-&gt;url_frag) {</span>
+<span class="lineNum">     545 </span><span class="lineCov">         10 :                 odm-&gt;scene_ns-&gt;url_frag = gf_strdup(frag+1);</span>
+<span class="lineNum">     546 </span>            :         }
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span><span class="lineCov">        274 :         if (!strncmp(serviceURL, &quot;gpid://&quot;, 7)) {</span>
+<span class="lineNum">     549 </span><span class="lineNoCov">          0 :                 gf_odm_service_media_event(odm, GF_EVENT_MEDIA_SETUP_BEGIN);</span>
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :                 gf_odm_service_media_event(odm, GF_EVENT_MEDIA_SETUP_DONE);</span>
+<span class="lineNum">     551 </span><span class="lineNoCov">          0 :                 odm-&gt;scene_ns-&gt;connect_ack = GF_TRUE;</span>
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :                 odm-&gt;flags |= GF_ODM_NOT_IN_OD_STREAM | GF_ODM_PASSTHROUGH;</span>
+<span class="lineNum">     553 </span><span class="lineNoCov">          0 :                 if (frag) frag[0] = '#';</span>
+<span class="lineNum">     554 </span>            :                 return;
+<span class="lineNum">     555 </span>            :         }
+<span class="lineNum">     556 </span><span class="lineCov">        274 :         if (!parent_url &amp;&amp; odm-&gt;parentscene &amp;&amp; odm-&gt;parentscene-&gt;root_od-&gt;scene_ns)</span>
+<span class="lineNum">     557 </span><span class="lineCov">          7 :                 parent_url = odm-&gt;parentscene-&gt;root_od-&gt;scene_ns-&gt;url;</span>
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span><span class="lineCov">        274 :         odm-&gt;scene_ns-&gt;source_filter = gf_filter_connect_source(scene-&gt;compositor-&gt;filter, serviceURL, parent_url, GF_FALSE, &amp;e);</span>
+<span class="lineNum">     560 </span>            : 
+<span class="lineNum">     561 </span><span class="lineCov">        274 :         if (frag) frag[0] = '#';</span>
+<span class="lineNum">     562 </span><span class="lineCov">        274 :         if (!odm-&gt;scene_ns-&gt;source_filter) {</span>
+<span class="lineNum">     563 </span>            :                 Bool remove_scene=GF_FALSE;
+<span class="lineNum">     564 </span><span class="lineCov">          3 :                 GF_Scene *target_scene = odm-&gt;subscene ? NULL : odm-&gt;parentscene;</span>
+<span class="lineNum">     565 </span><span class="lineCov">          3 :                 if (odm-&gt;mo) odm-&gt;mo-&gt;connect_failure = GF_TRUE;</span>
+<span class="lineNum">     566 </span><span class="lineCov">          3 :                 odm-&gt;skip_disconnect_state = 1;</span>
+<span class="lineNum">     567 </span>            :                 //prevent scene from being disconnected - this can happen if a script catches the event and triggers a disonnection of the parent scene
+<span class="lineNum">     568 </span><span class="lineCov">          3 :                 if (target_scene) target_scene-&gt;root_od-&gt;skip_disconnect_state = 1;</span>
+<span class="lineNum">     569 </span><span class="lineCov">          3 :                 gf_scene_notify_event(scene, GF_EVENT_SCENE_ATTACHED, NULL, NULL, e, GF_TRUE);</span>
+<span class="lineNum">     570 </span><span class="lineCov">          3 :                 gf_scene_message(scene, serviceURL, &quot;Cannot find filter for service&quot;, e);</span>
+<span class="lineNum">     571 </span><span class="lineCov">          3 :                 odm-&gt;skip_disconnect_state = 0;</span>
+<span class="lineNum">     572 </span>            : 
+<span class="lineNum">     573 </span><span class="lineCov">          3 :                 if (target_scene) {</span>
+<span class="lineNum">     574 </span><span class="lineCov">          2 :                         if (target_scene-&gt;root_od-&gt;skip_disconnect_state==2) remove_scene = GF_TRUE;</span>
+<span class="lineNum">     575 </span><span class="lineCov">          2 :                         target_scene-&gt;root_od-&gt;skip_disconnect_state = 0;</span>
+<span class="lineNum">     576 </span>            :                 }
+<span class="lineNum">     577 </span><span class="lineCov">          2 :                 if (remove_scene) {</span>
+<span class="lineNum">     578 </span><span class="lineNoCov">          0 :                         gf_filter_post_task(scene-&gt;compositor-&gt;filter, scene_ns_remove_object, target_scene-&gt;root_od, &quot;remove_odm&quot;);</span>
+<span class="lineNum">     579 </span>            :                 } else {
+<span class="lineNum">     580 </span><span class="lineCov">          3 :                         gf_filter_post_task(scene-&gt;compositor-&gt;filter, scene_ns_remove_object, odm, &quot;remove_odm&quot;);</span>
+<span class="lineNum">     581 </span>            :                 }
+<span class="lineNum">     582 </span>            :                 return;
+<span class="lineNum">     583 </span>            :         }
+<span class="lineNum">     584 </span>            :     //make sure we only connect this filter to ourselves 
+<span class="lineNum">     585 </span><span class="lineCov">        271 :     gf_filter_set_source_restricted(scene-&gt;compositor-&gt;filter, odm-&gt;scene_ns-&gt;source_filter, NULL);</span>
+<span class="lineNum">     586 </span>            :     
+<span class="lineNum">     587 </span><span class="lineCov">        271 :         gf_filter_set_setup_failure_callback(scene-&gt;compositor-&gt;filter, odm-&gt;scene_ns-&gt;source_filter, scene_ns_on_setup_error, odm);</span>
+<span class="lineNum">     588 </span>            : 
+<span class="lineNum">     589 </span>            :         /*OK connect*/
+<span class="lineNum">     590 </span><span class="lineCov">        271 :         gf_odm_service_media_event(odm, GF_EVENT_MEDIA_SETUP_BEGIN);</span>
+<span class="lineNum">     591 </span>            : }
+<span class="lineNum">     592 </span>            : 
+<a name="593"><span class="lineNum">     593 </span>            : </a>
+<span class="lineNum">     594 </span>            : GF_EXPORT
+<span class="lineNum">     595 </span><span class="lineCov">          2 : Bool gf_term_is_supported_url(GF_Terminal *term, const char *fileName, Bool use_parent_url, Bool no_mime_check)</span>
+<span class="lineNum">     596 </span>            : {
+<span class="lineNum">     597 </span>            : #ifdef FILTER_FIXME
+<span class="lineNum">     598 </span>            :         GF_InputService *ifce;
+<span class="lineNum">     599 </span>            :         GF_Err e;
+<span class="lineNum">     600 </span>            :         char *sURL;
+<span class="lineNum">     601 </span>            :         char *mime=NULL;
+<span class="lineNum">     602 </span>            :         char *parent_url = NULL;
+<span class="lineNum">     603 </span>            :         if (use_parent_url &amp;&amp; term-&gt;root_scene) parent_url = term-&gt;root_scene-&gt;root_od-&gt;net_service-&gt;url;
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span>            :         ifce = gf_term_can_handle_service(term, fileName, parent_url, no_mime_check, &amp;sURL, &amp;e, NULL, &amp;mime);
+<span class="lineNum">     606 </span>            :         if (!ifce) return 0;
+<span class="lineNum">     607 </span>            :         gf_modules_close_interface((GF_BaseInterface *) ifce);
+<span class="lineNum">     608 </span>            :         gf_free(sURL);
+<span class="lineNum">     609 </span>            :         if (mime) gf_free(mime);
+<span class="lineNum">     610 </span>            : #endif
+<span class="lineNum">     611 </span><span class="lineCov">          2 :         return 1;</span>
+<span class="lineNum">     612 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

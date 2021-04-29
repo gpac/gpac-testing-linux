@@ -1,0 +1,67 @@
+*** mp4box-io-counter_english.mlp logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:53 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/counter_english.mlp" ***
+Import probing results for ./external_media/import/counter_english.mlp:
+File has 1 tracks
+- Track 1 type: Audio - Codec Dolby TrueHD
+	SampleRate 44100 - 2 channels
+
+For more details, use `gpac -i counter_english.mlp inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/counter_english.mlp.mp4  (add) hash: 
+File hash (SHA-1): BB15B84F0EEBBB0C82A4A1C0B43E7DE4BA76207A
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/counter_english.mlp -new ./results/temp/counter_english.mlp.mp4" ***
+Track Importing Dolby TrueHD - SampleRate 44100 Num Channels 2
+
+Computing ./results/temp/counter_english.mlp.1.tmp  (diso) hash: 
+File hash (SHA-1): B1467BF40BB33AD077809984B018645C226AB2D1
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/counter_english.mlp.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.041
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 44100
+Media Duration 00:00:10.042 
+Media Info: Language "Undetermined (und)" - Type "soun:mlpa" - 11072 samples
+TrueHD Audio stream - Sample Rate 44100 - channels 2 - format 32768 peak rate 16384
+	RFC6381 Codec Parameters: mlpa
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 16 samples
+	Max sample duration: 40 / 44100
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/counter_english.mlp.mp4 -out ./results/temp/counter_english.mlp.1.tmp" ***
+
+Computing ./results/temp/counter_english.mlp.2.tmp  (dts) hash: 
+File hash (SHA-1): 4E99BD171B95853CFE9E515345F9C0201842E7B8
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/counter_english.mlp.mp4 -out ./results/temp/counter_english.mlp.2.tmp" ***
+
+Computing ./results/temp/counter_english.mlp.mp4.hint  (hint) hash: 
+
+	Error: Requested URL is not valid or cannot be found
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/counter_english.mlp.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 998D1F5C904C857B024E1EDC33C27AA5CF0B75A8
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/counter_english.mlp.mp4 -out ./results/temp/counter_english.mlp.mp4.hint" ***
+Cannot create hinter (Feature Not Supported)
+
+	Error: Feature Not Supported
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/counter_english.mlp.mp4.hint" ***
+
+Computing ./results/temp/counter_english.mlp.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 5DC84691C4F8CDC83A1F8B63FEAC767CC4EF2813

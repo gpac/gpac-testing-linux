@@ -1,0 +1,682 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/tilesplit.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - tilesplit.c<span style="font-size: 80%;"> (source / <a href="tilesplit.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">208</td>
+            <td class="headerCovTableEntry">248</td>
+            <td class="headerCovTableEntryMed">83.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2020-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / tile splitting filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/avparse.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;gpac/internal/media_dev.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #if !defined(GPAC_DISABLE_HEVC) &amp;&amp; !defined(GPAC_DISABLE_AV_PARSERS)
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : typedef struct
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      37 </span>            :         u32 x, y, w, h;
+<span class="lineNum">      38 </span>            :         GF_BitStream *pck_bs;
+<span class="lineNum">      39 </span>            :         u8 *pck_buf;
+<span class="lineNum">      40 </span>            :         u32 pck_buf_alloc;
+<span class="lineNum">      41 </span>            :         Bool all_intra;
+<span class="lineNum">      42 </span>            : } TileSplitPid;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : typedef struct
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span>            :         //options
+<span class="lineNum">      48 </span>            :         GF_PropUIntList tiledrop;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         //internal
+<span class="lineNum">      51 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      52 </span>            :         GF_FilterPid *base_opid;
+<span class="lineNum">      53 </span>            :         u32 base_id;
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :         u32 nb_tiles, nb_alloc_tiles;
+<span class="lineNum">      56 </span>            :         TileSplitPid *opids;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :         HEVCState hevc;
+<span class="lineNum">      59 </span>            :         u32 nalu_size_length;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :         Bool filter_disabled, passthrough;
+<span class="lineNum">      62 </span>            :         s32 cur_pps_idx;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :         u32 width, height;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :         GF_BitStream *pck_bs;
+<span class="lineNum">      67 </span>            :         u8 *pck_buf;
+<span class="lineNum">      68 </span>            :         u32 pck_buf_alloc;
+<a name="69"><span class="lineNum">      69 </span>            : } GF_TileSplitCtx;</a>
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineCov">         24 : static void tilesplit_update_pid_props(GF_TileSplitCtx *ctx, TileSplitPid *tinfo)</span>
+<span class="lineNum">      72 </span>            : {
+<span class="lineNum">      73 </span><span class="lineCov">         24 :         gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_WIDTH, &amp;PROP_UINT(tinfo-&gt;w) );</span>
+<span class="lineNum">      74 </span><span class="lineCov">         24 :         gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(tinfo-&gt;h) );</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : #if 0
+<span class="lineNum">      77 </span>            :         GF_PropertyValue pval;
+<span class="lineNum">      78 </span>            :         pval.type = GF_PROP_VEC2I;
+<span class="lineNum">      79 </span>            :         pval.value.vec2i.x = ctx-&gt;width;
+<span class="lineNum">      80 </span>            :         pval.value.vec2i.y = ctx-&gt;height;
+<span class="lineNum">      81 </span>            :         gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_SRD_REF, &amp;pval);
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :         pval.type = GF_PROP_VEC4I;
+<span class="lineNum">      84 </span>            :         pval.value.vec4i.x = tinfo-&gt;x;
+<span class="lineNum">      85 </span>            :         pval.value.vec4i.y = tinfo-&gt;y;
+<span class="lineNum">      86 </span>            :         pval.value.vec4i.z = tinfo-&gt;w;
+<span class="lineNum">      87 </span>            :         pval.value.vec4i.w = tinfo-&gt;h;
+<span class="lineNum">      88 </span>            :         gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_SRD, &amp;pval);
+<span class="lineNum">      89 </span>            : #else
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">         24 :         gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_CROP_POS, &amp;PROP_VEC2I_INT(tinfo-&gt;x, tinfo-&gt;y) );</span>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            : #endif
+<a name="94"><span class="lineNum">      94 </span><span class="lineCov">         24 : }</span></a>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">          3 : static GF_Err tilesplit_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      97 </span>            : {
+<span class="lineNum">      98 </span>            :         GF_PropertyValue pval;
+<span class="lineNum">      99 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     100 </span>            :         GF_HEVCConfig *hvcc;
+<span class="lineNum">     101 </span>            :         GF_HEVCConfig tile_cfg;
+<span class="lineNum">     102 </span>            :         HEVC_PPS *pps;
+<span class="lineNum">     103 </span>            :         HEVC_SPS *sps;
+<span class="lineNum">     104 </span>            :         u8 *dsi;
+<span class="lineNum">     105 </span>            :         u32 dsi_size, bitrate;
+<span class="lineNum">     106 </span>            :         u32 i, j, count, nb_tiles, PicWidthInCtbsY, PicHeightInCtbsY, tile_y, active_tiles;
+<span class="lineNum">     107 </span>            :         s32 pps_idx=-1, sps_idx=-1;
+<span class="lineNum">     108 </span><span class="lineCov">          3 :         GF_TileSplitCtx *ctx = (GF_TileSplitCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">          3 :         if (is_remove) {</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;ipid == pid) {</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                         for (i=0; i&lt;ctx-&gt;nb_tiles; i++) {</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                                 if (ctx-&gt;opids[i].opid) {</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_remove(ctx-&gt;opids[i].opid);</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :                                         ctx-&gt;opids[i].opid = NULL;</span>
+<span class="lineNum">     116 </span>            :                                 }
+<span class="lineNum">     117 </span>            :                         }
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :                         ctx-&gt;nb_tiles = 0;</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :                         ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">     120 </span>            :                 }
+<span class="lineNum">     121 </span>            :                 return GF_OK;
+<span class="lineNum">     122 </span>            :         }
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineCov">          3 :         if (!ctx-&gt;ipid) {</span>
+<span class="lineNum">     125 </span><span class="lineCov">          3 :                 ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     126 </span><span class="lineCov">          3 :                 ctx-&gt;base_opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     127 </span><span class="lineCov">          3 :                 gf_filter_pid_set_framing_mode(pid, GF_TRUE);</span>
+<span class="lineNum">     128 </span>            :         }
+<span class="lineNum">     129 </span><span class="lineCov">          3 :         gf_filter_pid_copy_properties(ctx-&gt;base_opid, pid);</span>
+<span class="lineNum">     130 </span>            :         //set SABT to true by default for link resolution
+<span class="lineNum">     131 </span><span class="lineCov">          3 :         gf_filter_pid_set_property(ctx-&gt;base_opid, GF_PROP_PID_TILE_BASE, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineCov">          3 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     134 </span><span class="lineCov">          3 :         if (!p) return GF_OK;</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">          3 :         hvcc = gf_odf_hevc_cfg_read(p-&gt;value.data.ptr, p-&gt;value.data.size, GF_FALSE);</span>
+<span class="lineNum">     137 </span><span class="lineCov">          3 :         if (!hvcc) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineCov">          3 :         ctx-&gt;nalu_size_length = hvcc-&gt;nal_unit_size;</span>
+<span class="lineNum">     140 </span><span class="lineCov">          3 :         memset(&amp;ctx-&gt;hevc, 0, sizeof(HEVCState));</span>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">          3 :         count = gf_list_count(hvcc-&gt;param_array);</span>
+<span class="lineNum">     143 </span><span class="lineCov">         12 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     144 </span><span class="lineCov">          9 :                 GF_NALUFFParamArray *ar = gf_list_get(hvcc-&gt;param_array, i);</span>
+<span class="lineNum">     145 </span><span class="lineCov">         18 :                 for (j=0; j &lt; gf_list_count(ar-&gt;nalus); j++) {</span>
+<span class="lineNum">     146 </span><span class="lineCov">          9 :                         GF_NALUFFParam *sl = gf_list_get(ar-&gt;nalus, j);</span>
+<span class="lineNum">     147 </span><span class="lineCov">          9 :                         if (!sl) continue;</span>
+<span class="lineNum">     148 </span><span class="lineCov">          9 :                         switch (ar-&gt;type) {</span>
+<span class="lineNum">     149 </span><span class="lineCov">          3 :                         case GF_HEVC_NALU_PIC_PARAM:</span>
+<span class="lineNum">     150 </span><span class="lineCov">          3 :                                 pps_idx = gf_hevc_read_pps(sl-&gt;data, sl-&gt;size, &amp;ctx-&gt;hevc);</span>
+<span class="lineNum">     151 </span><span class="lineCov">          3 :                                 break;</span>
+<span class="lineNum">     152 </span><span class="lineCov">          3 :                         case GF_HEVC_NALU_SEQ_PARAM:</span>
+<span class="lineNum">     153 </span><span class="lineCov">          3 :                                 sps_idx = gf_hevc_read_sps(sl-&gt;data, sl-&gt;size, &amp;ctx-&gt;hevc);</span>
+<span class="lineNum">     154 </span><span class="lineCov">          3 :                                 break;</span>
+<span class="lineNum">     155 </span><span class="lineCov">          3 :                         case GF_HEVC_NALU_VID_PARAM:</span>
+<span class="lineNum">     156 </span><span class="lineCov">          3 :                                 gf_hevc_read_vps(sl-&gt;data, sl-&gt;size, &amp;ctx-&gt;hevc);</span>
+<span class="lineNum">     157 </span><span class="lineCov">          3 :                                 break;</span>
+<span class="lineNum">     158 </span>            :                         }
+<span class="lineNum">     159 </span>            :                 }
+<span class="lineNum">     160 </span>            :         }
+<span class="lineNum">     161 </span><span class="lineCov">          3 :         if (pps_idx==-1) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     162 </span><span class="lineCov">          3 :         if (sps_idx==-1) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">          3 :         if (ctx-&gt;hevc.pps[pps_idx].loop_filter_across_tiles_enabled_flag)</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                 ctx-&gt;filter_disabled = GF_FALSE;</span>
+<span class="lineNum">     166 </span>            :         else
+<span class="lineNum">     167 </span><span class="lineCov">          3 :                 ctx-&gt;filter_disabled = GF_TRUE;</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineCov">          3 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_ID);</span>
+<span class="lineNum">     170 </span><span class="lineCov">          3 :         if (p) ctx-&gt;base_id = p-&gt;value.uint;</span>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineCov">          3 :         if (! ctx-&gt;hevc.pps[pps_idx].tiles_enabled_flag) {</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :                 gf_odf_hevc_cfg_del(hvcc);</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_AUTHOR, (&quot;[TileSplit] Tiles not enabled, using passthrough\n&quot;));</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;base_opid, GF_PROP_PID_TILE_BASE, NULL);</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :                 ctx-&gt;passthrough = GF_TRUE;</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     178 </span>            :         }
+<span class="lineNum">     179 </span><span class="lineCov">          3 :         ctx-&gt;passthrough = GF_FALSE;</span>
+<span class="lineNum">     180 </span><span class="lineCov">          3 :         nb_tiles = ctx-&gt;hevc.pps[pps_idx].num_tile_columns * ctx-&gt;hevc.pps[pps_idx].num_tile_rows;</span>
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span><span class="lineCov">          6 :         while (nb_tiles &lt; ctx-&gt;nb_tiles) {</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                 ctx-&gt;nb_tiles--;</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opids[ctx-&gt;nb_tiles].opid) {</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opids[ctx-&gt;nb_tiles].opid);</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                         ctx-&gt;opids[ctx-&gt;nb_tiles].opid = NULL;</span>
+<span class="lineNum">     187 </span>            :                 }
+<span class="lineNum">     188 </span>            :         }
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineCov">          3 :         if (nb_tiles&gt;ctx-&gt;nb_alloc_tiles) {</span>
+<span class="lineNum">     191 </span><span class="lineCov">          3 :                 ctx-&gt;opids = gf_realloc(ctx-&gt;opids, sizeof(TileSplitPid) * nb_tiles);</span>
+<span class="lineNum">     192 </span><span class="lineCov">          3 :                 memset(&amp;ctx-&gt;opids[ctx-&gt;nb_alloc_tiles], 0, sizeof(TileSplitPid) * (nb_tiles-ctx-&gt;nb_alloc_tiles) );</span>
+<span class="lineNum">     193 </span><span class="lineCov">          3 :                 ctx-&gt;nb_alloc_tiles = nb_tiles;</span>
+<span class="lineNum">     194 </span>            :         }
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :         /*setup tile info*/
+<span class="lineNum">     197 </span><span class="lineCov">          3 :         ctx-&gt;cur_pps_idx = pps_idx;</span>
+<span class="lineNum">     198 </span>            :         pps = &amp;ctx-&gt;hevc.pps[pps_idx];
+<span class="lineNum">     199 </span>            :         sps = &amp;ctx-&gt;hevc.sps[sps_idx];
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">          3 :         ctx-&gt;width = sps-&gt;width;</span>
+<span class="lineNum">     202 </span><span class="lineCov">          3 :         ctx-&gt;height = sps-&gt;height;</span>
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span><span class="lineCov">          3 :         PicWidthInCtbsY = sps-&gt;width / sps-&gt;max_CU_width;</span>
+<span class="lineNum">     205 </span><span class="lineCov">          3 :         if (PicWidthInCtbsY * sps-&gt;max_CU_width &lt; sps-&gt;width) PicWidthInCtbsY++;</span>
+<span class="lineNum">     206 </span><span class="lineCov">          3 :         PicHeightInCtbsY = sps-&gt;height / sps-&gt;max_CU_width;</span>
+<span class="lineNum">     207 </span><span class="lineCov">          3 :         if (PicHeightInCtbsY * sps-&gt;max_CU_width &lt; sps-&gt;height) PicHeightInCtbsY++;</span>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            :         //setup grid info before sending data
+<span class="lineNum">     210 </span>            :         //we fill the grid in order of the tiling
+<span class="lineNum">     211 </span>            :         tile_y = 0;
+<span class="lineNum">     212 </span><span class="lineCov">         12 :         for (i=0; i&lt;pps-&gt;num_tile_rows; i++) {</span>
+<span class="lineNum">     213 </span>            :                 u32 tile_x = 0;
+<span class="lineNum">     214 </span>            :                 u32 tile_height;
+<span class="lineNum">     215 </span><span class="lineCov">          9 :                 if (pps-&gt;uniform_spacing_flag) {</span>
+<span class="lineNum">     216 </span><span class="lineCov">          9 :                         tile_height = (i+1)*PicHeightInCtbsY / pps-&gt;num_tile_rows - i * PicHeightInCtbsY / pps-&gt;num_tile_rows;</span>
+<span class="lineNum">     217 </span>            :                 } else {
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :                         if (i &lt; pps-&gt;num_tile_rows-1) {</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :                                 tile_height = pps-&gt;row_height[i];</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                         } else if (i) {</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                                 tile_height = (PicHeightInCtbsY - pps-&gt;row_height[i-1]);</span>
+<span class="lineNum">     222 </span>            :                         } else {
+<span class="lineNum">     223 </span>            :                                 tile_height = PicHeightInCtbsY;
+<span class="lineNum">     224 </span>            :                         }
+<span class="lineNum">     225 </span>            :                 }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">         36 :                 for (j=0; j &lt; pps-&gt;num_tile_columns; j++) {</span>
+<span class="lineNum">     228 </span>            :                         TileSplitPid *tinfo;
+<span class="lineNum">     229 </span>            :                         u32 tile_width;
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span><span class="lineCov">         27 :                         if (pps-&gt;uniform_spacing_flag) {</span>
+<span class="lineNum">     232 </span><span class="lineCov">         27 :                                 tile_width = (j+1) * PicWidthInCtbsY / pps-&gt;num_tile_columns - j * PicWidthInCtbsY / pps-&gt;num_tile_columns;</span>
+<span class="lineNum">     233 </span>            :                         } else {
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :                                 if (j&lt;pps-&gt;num_tile_columns-1) {</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :                                         tile_width = pps-&gt;column_width[j];</span>
+<span class="lineNum">     236 </span>            :                                 } else {
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :                                         tile_width = (PicWidthInCtbsY - pps-&gt;column_width[j-1]);</span>
+<span class="lineNum">     238 </span>            :                                 }
+<span class="lineNum">     239 </span>            :                         }
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span><span class="lineCov">         27 :                         tinfo = &amp;ctx-&gt;opids[i * pps-&gt;num_tile_columns + j];</span>
+<span class="lineNum">     242 </span><span class="lineCov">         27 :                         tinfo-&gt;x = tile_x * sps-&gt;max_CU_width;</span>
+<span class="lineNum">     243 </span><span class="lineCov">         27 :                         tinfo-&gt;w = tile_width * sps-&gt;max_CU_width;</span>
+<span class="lineNum">     244 </span><span class="lineCov">         27 :                         tinfo-&gt;y = tile_y * sps-&gt;max_CU_width;</span>
+<span class="lineNum">     245 </span><span class="lineCov">         27 :                         tinfo-&gt;h = tile_height * sps-&gt;max_CU_width;</span>
+<span class="lineNum">     246 </span><span class="lineCov">         27 :                         tinfo-&gt;all_intra = GF_TRUE;</span>
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span><span class="lineCov">         27 :                         if (tinfo-&gt;x + tinfo-&gt;w &gt; sps-&gt;width)</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :                                 tinfo-&gt;w = sps-&gt;width - tinfo-&gt;x;</span>
+<span class="lineNum">     250 </span><span class="lineCov">         27 :                         if (tinfo-&gt;y + tinfo-&gt;h &gt; sps-&gt;height)</span>
+<span class="lineNum">     251 </span><span class="lineCov">          9 :                                 tinfo-&gt;h = sps-&gt;height - tinfo-&gt;y;</span>
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span><span class="lineCov">         27 :                         tile_x += tile_width;</span>
+<span class="lineNum">     254 </span>            :                 }
+<span class="lineNum">     255 </span><span class="lineCov">          9 :                 tile_y += tile_height;</span>
+<span class="lineNum">     256 </span>            :         }
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span><span class="lineCov">          3 :         pval.type = GF_PROP_VEC2I;</span>
+<span class="lineNum">     259 </span><span class="lineCov">          3 :         pval.value.vec2i.x = ctx-&gt;width;</span>
+<span class="lineNum">     260 </span><span class="lineCov">          3 :         pval.value.vec2i.y = ctx-&gt;height;</span>
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            :         memcpy(&amp;tile_cfg, hvcc, sizeof(GF_HEVCConfig));
+<span class="lineNum">     263 </span><span class="lineCov">          3 :         tile_cfg.param_array = NULL;</span>
+<span class="lineNum">     264 </span><span class="lineCov">          3 :         gf_odf_hevc_cfg_write(&amp;tile_cfg, &amp;dsi, &amp;dsi_size);</span>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">          3 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_BITRATE);</span>
+<span class="lineNum">     267 </span>            :         bitrate = 0;
+<span class="lineNum">     268 </span><span class="lineCov">          3 :         if (p &amp;&amp; (p-&gt;value.uint&gt;10000)) {</span>
+<span class="lineNum">     269 </span><span class="lineCov">          1 :                 bitrate = p-&gt;value.uint - 10000;</span>
+<span class="lineNum">     270 </span><span class="lineCov">          1 :                 bitrate /= nb_tiles-ctx-&gt;tiledrop.nb_items;</span>
+<span class="lineNum">     271 </span>            :         }
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineCov">          3 :         const char *pname = gf_filter_pid_get_name(ctx-&gt;ipid);</span>
+<span class="lineNum">     274 </span><span class="lineCov">          3 :         if (pname) pname = gf_file_basename(pname);</span>
+<span class="lineNum">     275 </span><span class="lineCov">          3 :         if (!pname) pname = &quot;video&quot;;</span>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span><span class="lineCov">         30 :         for (i=ctx-&gt;nb_tiles; i&lt;nb_tiles; i++) {</span>
+<span class="lineNum">     279 </span>            :                 char szName[GF_MAX_PATH];
+<span class="lineNum">     280 </span><span class="lineCov">         27 :                 TileSplitPid *tinfo = &amp;ctx-&gt;opids[i];</span>
+<span class="lineNum">     281 </span><span class="lineCov">         27 :                 if (!tinfo-&gt;opid) {</span>
+<span class="lineNum">     282 </span>            :                         Bool drop = GF_FALSE;
+<span class="lineNum">     283 </span><span class="lineCov">         21 :                         for (j=0; j&lt;ctx-&gt;tiledrop.nb_items; j++) {</span>
+<span class="lineNum">     284 </span><span class="lineCov">         24 :                                 if (ctx-&gt;tiledrop.vals[j]==i) {</span>
+<span class="lineNum">     285 </span>            :                                         drop = GF_TRUE;
+<span class="lineNum">     286 </span>            :                                         break;
+<span class="lineNum">     287 </span>            :                                 }
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            :                         }
+<span class="lineNum">     290 </span><span class="lineCov">         27 :                         if (!drop)</span>
+<span class="lineNum">     291 </span><span class="lineCov">         24 :                                 tinfo-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     292 </span>            :                 }
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span><span class="lineCov">         27 :                 if (!tinfo-&gt;opid) continue;</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineCov">         24 :                 gf_filter_pid_copy_properties(tinfo-&gt;opid, pid);</span>
+<span class="lineNum">     297 </span><span class="lineCov">         24 :                 gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_HEVC_TILES) );</span>
+<span class="lineNum">     298 </span><span class="lineCov">         24 :                 if (dsi)</span>
+<span class="lineNum">     299 </span><span class="lineCov">         24 :                         gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_DECODER_CONFIG, &amp;PROP_DATA(dsi, dsi_size) );</span>
+<span class="lineNum">     300 </span>            :                 else
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_DECODER_CONFIG, NULL);</span>
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span><span class="lineCov">         24 :                 gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_BITRATE, bitrate ? &amp;PROP_UINT(bitrate) : NULL);</span>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span><span class="lineCov">         24 :                 gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_ID, &amp;PROP_UINT(ctx-&gt;base_id + i + 1 ) );</span>
+<span class="lineNum">     306 </span><span class="lineCov">         24 :                 gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_TILE_ID, &amp;PROP_UINT(i + 1 ) );</span>
+<span class="lineNum">     307 </span><span class="lineCov">         24 :                 gf_filter_pid_set_property(tinfo-&gt;opid, GF_PROP_PID_DEPENDENCY_ID, &amp;PROP_UINT(ctx-&gt;base_id) );</span>
+<span class="lineNum">     308 </span><span class="lineCov">         24 :                 tilesplit_update_pid_props(ctx, tinfo);</span>
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :                 sprintf(szName, &quot;%s_tile%d&quot;, pname, i+1);
+<span class="lineNum">     311 </span><span class="lineCov">         24 :                 gf_filter_pid_set_name(tinfo-&gt;opid, szName);</span>
+<span class="lineNum">     312 </span>            :         }
+<span class="lineNum">     313 </span><span class="lineCov">          3 :         if (dsi) gf_free(dsi);</span>
+<span class="lineNum">     314 </span><span class="lineCov">          3 :         ctx-&gt;nb_tiles = nb_tiles;</span>
+<span class="lineNum">     315 </span>            :         active_tiles = 0;
+<span class="lineNum">     316 </span>            :         //setup tbas track ref
+<span class="lineNum">     317 </span><span class="lineCov">         30 :         for (i=0; i&lt;nb_tiles; i++) {</span>
+<span class="lineNum">     318 </span><span class="lineCov">         27 :                 if (!ctx-&gt;opids[i].opid)</span>
+<span class="lineNum">     319 </span><span class="lineCov">          3 :                         continue;</span>
+<span class="lineNum">     320 </span><span class="lineCov">         24 :                 pval.type = GF_PROP_4CC_LIST;</span>
+<span class="lineNum">     321 </span><span class="lineCov">         24 :                 pval.value.uint_list.nb_items = 1;</span>
+<span class="lineNum">     322 </span><span class="lineCov">         24 :                 pval.value.uint_list.vals = &amp;ctx-&gt;base_id;</span>
+<span class="lineNum">     323 </span><span class="lineCov">         24 :                 active_tiles ++;</span>
+<span class="lineNum">     324 </span><span class="lineCov">         24 :                 gf_filter_pid_set_property_str(ctx-&gt;opids[i].opid, &quot;isom:tbas&quot;, &amp;pval);</span>
+<span class="lineNum">     325 </span>            :         }
+<span class="lineNum">     326 </span>            :         //setup sabt track ref
+<span class="lineNum">     327 </span><span class="lineCov">          3 :         pval.type = GF_PROP_4CC_LIST;</span>
+<span class="lineNum">     328 </span><span class="lineCov">          3 :         pval.value.uint_list.nb_items = active_tiles;</span>
+<span class="lineNum">     329 </span><span class="lineCov">          3 :         pval.value.uint_list.vals = gf_malloc(sizeof(u32) * active_tiles);</span>
+<span class="lineNum">     330 </span>            :         active_tiles = 0;
+<span class="lineNum">     331 </span><span class="lineCov">         30 :         for (i=0; i&lt;nb_tiles; i++) {</span>
+<span class="lineNum">     332 </span><span class="lineCov">         27 :                 if (!ctx-&gt;opids[i].opid)</span>
+<span class="lineNum">     333 </span><span class="lineCov">          3 :                         continue;</span>
+<span class="lineNum">     334 </span><span class="lineCov">         24 :                 pval.value.uint_list.vals[active_tiles] = ctx-&gt;base_id + i + 1;</span>
+<span class="lineNum">     335 </span><span class="lineCov">         24 :                 active_tiles++;</span>
+<span class="lineNum">     336 </span>            :         }
+<span class="lineNum">     337 </span><span class="lineCov">          3 :         gf_filter_pid_set_property_str(ctx-&gt;base_opid, &quot;isom:sabt&quot;, &amp;pval);</span>
+<span class="lineNum">     338 </span><span class="lineCov">          3 :         gf_free(pval.value.uint_list.vals);</span>
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span><span class="lineCov">          3 :         gf_filter_pid_set_property(ctx-&gt;base_opid, GF_PROP_PID_ORIG_SIZE, &amp;PROP_VEC2I_INT(ctx-&gt;width, ctx-&gt;height) );</span>
+<span class="lineNum">     341 </span><span class="lineCov">          3 :         gf_filter_pid_set_property(ctx-&gt;base_opid, GF_PROP_PID_BITRATE, bitrate ? &amp;PROP_UINT(10000) : NULL);</span>
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span><span class="lineCov">          3 :         gf_odf_hevc_cfg_del(hvcc);</span>
+<span class="lineNum">     344 </span><span class="lineCov">          3 :         return GF_OK;</span>
+<a name="345"><span class="lineNum">     345 </span>            : }</a>
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span><span class="lineCov">          3 : static GF_Err tilesplit_set_eos(GF_Filter *filter, GF_TileSplitCtx *ctx)</span>
+<span class="lineNum">     348 </span>            : {
+<span class="lineNum">     349 </span>            :         u32 i;
+<span class="lineNum">     350 </span><span class="lineCov">         27 :         for (i=0; i&lt;ctx-&gt;nb_tiles; i++) {</span>
+<span class="lineNum">     351 </span><span class="lineCov">         27 :                 if (ctx-&gt;opids[i].opid)</span>
+<span class="lineNum">     352 </span><span class="lineCov">         24 :                         gf_filter_pid_set_eos(ctx-&gt;opids[i].opid);</span>
+<span class="lineNum">     353 </span>            :         }
+<span class="lineNum">     354 </span><span class="lineCov">          3 :         gf_filter_pid_set_eos(ctx-&gt;base_opid);</span>
+<span class="lineNum">     355 </span><span class="lineCov">          3 :         return GF_EOS;</span>
+<span class="lineNum">     356 </span>            : }
+<span class="lineNum">     357 </span>            : 
+<a name="358"><span class="lineNum">     358 </span>            : u32 hevc_get_tile_id(HEVCState *hevc, u32 *tile_x, u32 *tile_y, u32 *tile_width, u32 *tile_height);</a>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineCov">       4575 : static GF_Err tilesplit_process(GF_Filter *filter)</span>
+<span class="lineNum">     361 </span>            : {
+<span class="lineNum">     362 </span><span class="lineCov">       4575 :         GF_TileSplitCtx *ctx = (GF_TileSplitCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     363 </span>            :         GF_FilterPacket *in_pck, *opck;
+<span class="lineNum">     364 </span>            :         u32 pck_size, i;
+<span class="lineNum">     365 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">     366 </span>            :         const u8 *in_data;
+<span class="lineNum">     367 </span>            :         u8 *output;
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span><span class="lineCov">       4575 :         in_pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     370 </span><span class="lineCov">       4575 :         if (!in_pck) {</span>
+<span class="lineNum">     371 </span><span class="lineCov">       2325 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     372 </span><span class="lineCov">          3 :                         return tilesplit_set_eos(filter, ctx);</span>
+<span class="lineNum">     373 </span>            :                 }
+<span class="lineNum">     374 </span>            :                 return GF_OK;
+<span class="lineNum">     375 </span>            :         }
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span><span class="lineCov">       2250 :         if (ctx-&gt;passthrough) {</span>
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :                 gf_filter_pck_forward(in_pck, ctx-&gt;base_opid);</span>
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     381 </span>            :         }
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span><span class="lineCov">       2250 :         in_data = gf_filter_pck_get_data(in_pck, &amp;pck_size);</span>
+<span class="lineNum">     384 </span><span class="lineCov">       2250 :         if (!in_data) {</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     387 </span>            :         }
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span><span class="lineCov">       2250 :         if (!ctx-&gt;pck_bs) ctx-&gt;pck_bs = gf_bs_new(NULL, 0, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     390 </span><span class="lineCov">       2247 :         else gf_bs_reassign_buffer(ctx-&gt;pck_bs, ctx-&gt;pck_buf, ctx-&gt;pck_buf_alloc);</span>
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span><span class="lineCov">      20250 :         for (i=0; i&lt;ctx-&gt;nb_tiles; i++) {</span>
+<span class="lineNum">     393 </span><span class="lineCov">      20250 :                 TileSplitPid *tinfo = &amp;ctx-&gt;opids[i];</span>
+<span class="lineNum">     394 </span><span class="lineCov">      20250 :                 if (!tinfo-&gt;opid)</span>
+<span class="lineNum">     395 </span><span class="lineCov">       2250 :                         continue;</span>
+<span class="lineNum">     396 </span><span class="lineCov">      18000 :                 if (!tinfo-&gt;pck_bs) tinfo-&gt;pck_bs = gf_bs_new(NULL, 0, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     397 </span><span class="lineCov">      17976 :                 else gf_bs_reassign_buffer(tinfo-&gt;pck_bs, tinfo-&gt;pck_buf, tinfo-&gt;pck_buf_alloc);</span>
+<span class="lineNum">     398 </span>            :         }
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span><span class="lineCov">      24753 :         while (pck_size) {</span>
+<span class="lineNum">     401 </span>            :                 TileSplitPid *tinfo;
+<span class="lineNum">     402 </span>            :                 u8 temporal_id, layer_id;
+<span class="lineNum">     403 </span><span class="lineCov">      22503 :                 u8 nal_type = 0;</span>
+<span class="lineNum">     404 </span>            :                 u32 nalu_size = 0;
+<span class="lineNum">     405 </span>            :                 s32 ret;
+<span class="lineNum">     406 </span>            :                 u32 cur_tile;
+<span class="lineNum">     407 </span>            :                 u32 tx, ty, tw, th;
+<span class="lineNum">     408 </span><span class="lineCov">     112515 :                 for (i=0; i&lt;ctx-&gt;nalu_size_length; i++) {</span>
+<span class="lineNum">     409 </span><span class="lineCov">      90012 :                         nalu_size = (nalu_size&lt;&lt;8) + in_data[i];</span>
+<span class="lineNum">     410 </span>            :                 }
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span><span class="lineCov">      22503 :                 if (pck_size &lt; nalu_size + ctx-&gt;nalu_size_length) {</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[TileSplit] Corrupted NAL size, %d indicated but %d remaining\n&quot;, nalu_size + ctx-&gt;nalu_size_length, pck_size));</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     415 </span>            :                 }
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span><span class="lineCov">      22503 :                 ret = gf_hevc_parse_nalu((u8 *) in_data + ctx-&gt;nalu_size_length, nalu_size, &amp;ctx-&gt;hevc, &amp;nal_type, &amp;temporal_id, &amp;layer_id);</span>
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span>            :                 //error parsing NAL, set nal to fallback to regular import
+<span class="lineNum">     420 </span><span class="lineCov">      22503 :                 if (ret&lt;0) nal_type = GF_HEVC_NALU_VID_PARAM;</span>
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span><span class="lineCov">      22503 :                 switch (nal_type) {</span>
+<span class="lineNum">     423 </span><span class="lineCov">      20250 :                 case GF_HEVC_NALU_SLICE_TRAIL_N:</span>
+<span class="lineNum">     424 </span>            :                 case GF_HEVC_NALU_SLICE_TRAIL_R:
+<span class="lineNum">     425 </span>            :                 case GF_HEVC_NALU_SLICE_TSA_N:
+<span class="lineNum">     426 </span>            :                 case GF_HEVC_NALU_SLICE_TSA_R:
+<span class="lineNum">     427 </span>            :                 case GF_HEVC_NALU_SLICE_STSA_N:
+<span class="lineNum">     428 </span>            :                 case GF_HEVC_NALU_SLICE_STSA_R:
+<span class="lineNum">     429 </span>            :                 case GF_HEVC_NALU_SLICE_BLA_W_LP:
+<span class="lineNum">     430 </span>            :                 case GF_HEVC_NALU_SLICE_BLA_W_DLP:
+<span class="lineNum">     431 </span>            :                 case GF_HEVC_NALU_SLICE_BLA_N_LP:
+<span class="lineNum">     432 </span>            :                 case GF_HEVC_NALU_SLICE_IDR_W_DLP:
+<span class="lineNum">     433 </span>            :                 case GF_HEVC_NALU_SLICE_IDR_N_LP:
+<span class="lineNum">     434 </span>            :                 case GF_HEVC_NALU_SLICE_CRA:
+<span class="lineNum">     435 </span>            :                 case GF_HEVC_NALU_SLICE_RADL_R:
+<span class="lineNum">     436 </span>            :                 case GF_HEVC_NALU_SLICE_RADL_N:
+<span class="lineNum">     437 </span>            :                 case GF_HEVC_NALU_SLICE_RASL_R:
+<span class="lineNum">     438 </span>            :                 case GF_HEVC_NALU_SLICE_RASL_N:
+<span class="lineNum">     439 </span><span class="lineCov">      20250 :                         tx = ty = tw = th = 0;</span>
+<span class="lineNum">     440 </span><span class="lineCov">      20250 :                         cur_tile = hevc_get_tile_id(&amp;ctx-&gt;hevc, &amp;tx, &amp;ty, &amp;tw, &amp;th);</span>
+<span class="lineNum">     441 </span><span class="lineCov">      20250 :                         if (cur_tile &gt;= ctx-&gt;nb_tiles) {</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[TileSplit] Tile index %d is greater than number of tiles %d in PPS\n&quot;, cur_tile, ctx-&gt;nb_tiles));</span>
+<span class="lineNum">     443 </span>            :                                 e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :                                 goto err_exit;</span>
+<span class="lineNum">     445 </span>            :                         }
+<span class="lineNum">     446 </span><span class="lineCov">      20250 :                         tinfo = &amp;ctx-&gt;opids[cur_tile];</span>
+<span class="lineNum">     447 </span><span class="lineCov">      20250 :                         if (!tinfo-&gt;opid)</span>
+<span class="lineNum">     448 </span>            :                                 break;
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span><span class="lineCov">      18000 :                         if ((tinfo-&gt;x != tx) || (tinfo-&gt;w != tw) || (tinfo-&gt;y != ty) || (tinfo-&gt;h != th)) {</span>
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :                                 tinfo-&gt;x = tx;</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :                                 tinfo-&gt;y = ty;</span>
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :                                 tinfo-&gt;w = tw;</span>
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :                                 tinfo-&gt;h = th;</span>
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :                                 tilesplit_update_pid_props(ctx, tinfo);</span>
+<span class="lineNum">     457 </span>            :                         }
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span><span class="lineCov">      18000 :                         if (ctx-&gt;hevc.s_info.slice_type != GF_HEVC_SLICE_TYPE_I) {</span>
+<span class="lineNum">     460 </span><span class="lineCov">      17280 :                                 tinfo-&gt;all_intra = GF_FALSE;</span>
+<span class="lineNum">     461 </span>            :                         }
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span><span class="lineCov">      18000 :                         gf_bs_write_data(tinfo-&gt;pck_bs, (u8 *) in_data, nalu_size + ctx-&gt;nalu_size_length);</span>
+<span class="lineNum">     464 </span><span class="lineCov">      18000 :                         break;</span>
+<span class="lineNum">     465 </span>            :                 //note we don't need to care about sps or pps here, they are not in the bitstream
+<span class="lineNum">     466 </span><span class="lineCov">       2253 :                 default:</span>
+<span class="lineNum">     467 </span><span class="lineCov">       2253 :                         gf_bs_write_data(ctx-&gt;pck_bs, (u8 *) in_data, nalu_size + ctx-&gt;nalu_size_length);</span>
+<span class="lineNum">     468 </span><span class="lineCov">       2253 :                         break;</span>
+<span class="lineNum">     469 </span>            :                 }
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span><span class="lineCov">      24753 :                 in_data += nalu_size + ctx-&gt;nalu_size_length;</span>
+<span class="lineNum">     472 </span><span class="lineCov">      22503 :                 pck_size -= nalu_size + ctx-&gt;nalu_size_length;</span>
+<span class="lineNum">     473 </span>            :         }
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span><span class="lineCov">       2250 : err_exit:</span>
+<span class="lineNum">     476 </span>            :         //and flush
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span><span class="lineCov">       2250 :         gf_bs_get_content_no_truncate(ctx-&gt;pck_bs, &amp;ctx-&gt;pck_buf, &amp;pck_size, &amp;ctx-&gt;pck_buf_alloc);</span>
+<span class="lineNum">     479 </span><span class="lineCov">       2250 :         opck = gf_filter_pck_new_alloc(ctx-&gt;base_opid, pck_size, &amp;output);</span>
+<span class="lineNum">     480 </span><span class="lineCov">       2250 :         if (opck) {</span>
+<span class="lineNum">     481 </span><span class="lineCov">       2250 :                 memcpy(output, ctx-&gt;pck_buf, pck_size);</span>
+<span class="lineNum">     482 </span><span class="lineCov">       2250 :                 gf_filter_pck_merge_properties(in_pck, opck);</span>
+<span class="lineNum">     483 </span><span class="lineCov">       2250 :                 gf_filter_pck_send(opck);</span>
+<span class="lineNum">     484 </span>            :         } else {
+<span class="lineNum">     485 </span>            :                 e = GF_OUT_OF_MEM;
+<span class="lineNum">     486 </span>            :         }
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span><span class="lineCov">      20250 :         for (i=0; i&lt;ctx-&gt;nb_tiles; i++) {</span>
+<span class="lineNum">     489 </span><span class="lineCov">      20250 :                 TileSplitPid *tinfo = &amp;ctx-&gt;opids[i];</span>
+<span class="lineNum">     490 </span><span class="lineCov">      20250 :                 if (!tinfo-&gt;opid) continue;</span>
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span><span class="lineCov">      18000 :                 gf_bs_get_content_no_truncate(tinfo-&gt;pck_bs, &amp;tinfo-&gt;pck_buf, &amp;pck_size, &amp;tinfo-&gt;pck_buf_alloc);</span>
+<span class="lineNum">     493 </span><span class="lineCov">      18000 :                 opck = gf_filter_pck_new_alloc(tinfo-&gt;opid, pck_size, &amp;output);</span>
+<span class="lineNum">     494 </span><span class="lineCov">      18000 :                 if (opck) {</span>
+<span class="lineNum">     495 </span><span class="lineCov">      18000 :                         memcpy(output, tinfo-&gt;pck_buf, pck_size);</span>
+<span class="lineNum">     496 </span><span class="lineCov">      18000 :                         gf_filter_pck_merge_properties(in_pck, opck);</span>
+<span class="lineNum">     497 </span><span class="lineCov">      18000 :                         gf_filter_pck_send(opck);</span>
+<span class="lineNum">     498 </span>            :                 } else {
+<span class="lineNum">     499 </span>            :                         e = GF_OUT_OF_MEM;
+<span class="lineNum">     500 </span>            :                 }
+<span class="lineNum">     501 </span>            :         }
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineCov">       2250 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     504 </span><span class="lineCov">       2250 :         return e;</span>
+<a name="505"><span class="lineNum">     505 </span>            : }</a>
+<span class="lineNum">     506 </span>            : 
+<span class="lineNum">     507 </span><span class="lineCov">          3 : static GF_Err tilesplit_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     508 </span>            : {
+<span class="lineNum">     509 </span>            : //      GF_TileSplitCtx *ctx = (GF_TileSplitCtx *) gf_filter_get_udta(filter);
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span><span class="lineCov">          3 :         return GF_OK;</span>
+<a name="512"><span class="lineNum">     512 </span>            : }</a>
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span><span class="lineCov">          3 : static void tilesplit_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     515 </span>            : {
+<span class="lineNum">     516 </span>            :         u32 i;
+<span class="lineNum">     517 </span><span class="lineCov">          3 :         GF_TileSplitCtx *ctx = (GF_TileSplitCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span><span class="lineCov">         30 :         for (i=0; i&lt;ctx-&gt;nb_alloc_tiles; i++) {</span>
+<span class="lineNum">     520 </span><span class="lineCov">         27 :                 TileSplitPid *tinfo = &amp;ctx-&gt;opids[i];</span>
+<span class="lineNum">     521 </span><span class="lineCov">         27 :                 if (tinfo-&gt;pck_buf) gf_free(tinfo-&gt;pck_buf);</span>
+<span class="lineNum">     522 </span><span class="lineCov">         27 :                 if (tinfo-&gt;pck_bs) gf_bs_del(tinfo-&gt;pck_bs);</span>
+<span class="lineNum">     523 </span>            :         }
+<span class="lineNum">     524 </span><span class="lineCov">          3 :         if (ctx-&gt;opids)</span>
+<span class="lineNum">     525 </span><span class="lineCov">          3 :                 gf_free(ctx-&gt;opids);</span>
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span><span class="lineCov">          3 :         if (ctx-&gt;pck_bs) gf_bs_del(ctx-&gt;pck_bs);</span>
+<span class="lineNum">     528 </span><span class="lineCov">          3 :         if (ctx-&gt;pck_buf) gf_free(ctx-&gt;pck_buf);</span>
+<span class="lineNum">     529 </span><span class="lineCov">          3 : }</span>
+<span class="lineNum">     530 </span>            : 
+<span class="lineNum">     531 </span>            : #else
+<span class="lineNum">     532 </span>            : static GF_Err tilesplit_process(GF_Filter *filter)
+<span class="lineNum">     533 </span>            : {
+<span class="lineNum">     534 </span>            :         return GF_NOT_SUPPORTED;
+<span class="lineNum">     535 </span>            : }
+<span class="lineNum">     536 </span>            : #endif
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span>            : static const GF_FilterCapability TileSplitCaps[] =
+<span class="lineNum">     539 </span>            : {
+<span class="lineNum">     540 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     541 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     542 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_HEVC),
+<span class="lineNum">     543 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_TILE_BASE, GF_TRUE),
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     546 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_HEVC),
+<span class="lineNum">     547 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT, GF_PROP_PID_TILE_BASE, GF_TRUE),
+<span class="lineNum">     548 </span>            :         {0},
+<span class="lineNum">     549 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     550 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     551 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_HEVC),
+<span class="lineNum">     552 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_TILE_BASE, GF_TRUE),
+<span class="lineNum">     553 </span>            : 
+<span class="lineNum">     554 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     555 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_HEVC_TILES)
+<span class="lineNum">     556 </span>            : };
+<span class="lineNum">     557 </span>            : 
+<span class="lineNum">     558 </span>            : #define OFFS(_n)        #_n, offsetof(GF_TileSplitCtx, _n)
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span>            : static const GF_FilterArgs TileSplitArgs[] =
+<span class="lineNum">     561 </span>            : {
+<span class="lineNum">     562 </span>            :         { OFFS(tiledrop), &quot;specify indexes of tiles to drop (0-based, in tile raster scan order)&quot;, GF_PROP_UINT_LIST, &quot;&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     563 </span>            :         {0}
+<span class="lineNum">     564 </span>            : };
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span>            : GF_FilterRegister TileSplitRegister = {
+<span class="lineNum">     567 </span>            :         .name = &quot;tilesplit&quot;,
+<span class="lineNum">     568 </span>            :         .flags = GF_FS_REG_EXPLICIT_ONLY,
+<span class="lineNum">     569 </span>            :         GF_FS_SET_DESCRIPTION(&quot;HEVC tile bitstream splitter&quot;)
+<span class="lineNum">     570 </span>            :         GF_FS_SET_HELP(&quot;This filter splits an HEVC tiled stream into tiled HEVC streams (`hvt1` or `hvt2` in isobmff).&quot;
+<span class="lineNum">     571 </span>            :         &quot;\n&quot;
+<span class="lineNum">     572 </span>            :         &quot;The filter will move to passthrough mode if the bitstream is not tiled.\n&quot;
+<span class="lineNum">     573 </span>            :         &quot;If the `Bitrate` property is set on the input PID, the output tile PIDs will have a bitrate set to `(Bitrate - 10k)/nb_opids`, 10 kbps being reserved for the base.\n&quot;
+<span class="lineNum">     574 </span>            :         &quot;\n&quot;
+<span class="lineNum">     575 </span>            :         &quot;Each tile PID will be assigned the following properties:\n&quot;
+<span class="lineNum">     576 </span>            :         &quot;- `ID`: equal to the base PID ID (same as input) plus the 1-based index of the tile in raster scan order.\n&quot;
+<span class="lineNum">     577 </span>            :         &quot;- `TileID`: equal to the 1-based index of the tile in raster scan order.\n&quot;
+<span class="lineNum">     578 </span>            :         &quot;\n&quot;
+<span class="lineNum">     579 </span>            :         &quot;Warning: The filter does not check if tiles are independently-coded (MCTS) !\n&quot;
+<span class="lineNum">     580 </span>            :         &quot;\n&quot;
+<span class="lineNum">     581 </span>            :         &quot;Warning: Support for dynamic changes of tiling grid has not been tested !\n&quot;
+<span class="lineNum">     582 </span>            :         )
+<span class="lineNum">     583 </span>            :         .private_size = sizeof(GF_TileSplitCtx),
+<span class="lineNum">     584 </span>            :         SETCAPS(TileSplitCaps),
+<span class="lineNum">     585 </span>            : #if !defined(GPAC_DISABLE_HEVC) &amp;&amp; !defined(GPAC_DISABLE_AV_PARSERS)
+<span class="lineNum">     586 </span>            :         .initialize = tilesplit_initialize,
+<span class="lineNum">     587 </span>            :         .finalize = tilesplit_finalize,
+<span class="lineNum">     588 </span>            :         .args = TileSplitArgs,
+<span class="lineNum">     589 </span>            :         .configure_pid = tilesplit_configure_pid,
+<span class="lineNum">     590 </span>            : #endif
+<span class="lineNum">     591 </span>            :         .process = tilesplit_process,
+<span class="lineNum">     592 </span>            : 
+<span class="lineNum">     593 </span>            : };
+<a name="594"><span class="lineNum">     594 </span>            : </a>
+<span class="lineNum">     595 </span>            : 
+<span class="lineNum">     596 </span><span class="lineCov">       2877 : const GF_FilterRegister *tilesplit_register(GF_FilterSession *session)</span>
+<span class="lineNum">     597 </span>            : {
+<span class="lineNum">     598 </span>            : #if defined(GPAC_DISABLE_HEVC) || defined(GPAC_DISABLE_AV_PARSERS)
+<span class="lineNum">     599 </span>            :         if (!gf_opts_get_bool(&quot;temp&quot;, &quot;gendoc&quot;))
+<span class="lineNum">     600 </span>            :                 return NULL;
+<span class="lineNum">     601 </span>            :         TileSplitRegister.version = &quot;! Warning: NOT AVAILABLE IN THIS BUILD !&quot;;
+<span class="lineNum">     602 </span>            : #endif
+<span class="lineNum">     603 </span><span class="lineCov">       2877 :         return &amp;TileSplitRegister;</span>
+<span class="lineNum">     604 </span>            : }
+<span class="lineNum">     605 </span>            : 
+<span class="lineNum">     606 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

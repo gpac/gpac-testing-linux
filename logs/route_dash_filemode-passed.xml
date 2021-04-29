@@ -1,0 +1,12 @@
+ <test name="route_dash_filemode" result="OK" date="29/04/2021 23:44:08">
+
+  <stat subtest="dash" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52352" cpu_percent="100%" cpu_elapsed_time="0:00.09" cpu_user_time="0.07" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/counter.hvc:#ClampDur=4 -o ./results/temp/live.mpd</command_line>
+  </stat>
+  <stat subtest="receive" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52300" cpu_percent="11%" cpu_elapsed_time="0:02.19" cpu_user_time="0.16" cpu_kernel_time="0.09" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i route://225.1.1.0:6000 inspect:allp:deep:interleave=false:test=noprop:fmt=%dts%-%cts%-%sap%%lf%:dur=1:log=./results/temp/inspect.txt</command_line>
+  </stat>
+  <stat subtest="send" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51088" cpu_percent="10%" cpu_elapsed_time="0:04.19" cpu_user_time="0.38" cpu_kernel_time="0.04" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/live.mpd dashin:forward=file @ -o route://225.1.1.0:6000/</command_line>
+  </stat>
+ </test>

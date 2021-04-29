@@ -1,0 +1,49 @@
+*** reframer-avc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:54 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264 reframer @ -o ./results/temp/enst_video.h264  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 2058112896
+
+Filter stats - 6 filters
+	Filter fin (src=./media/auxiliary_files/enst_video.h264) : 0 input pids 1 output pids 13 tasks 718 us process time
+		10 packets sent 47679 bytes sent (13927.6 pck/sec 531.242 mbps)
+		* output PID enst_video.h264: 10 packets sent
+	Filter reframer ID _0x556c56988040_ : 1 input pids 1 output pids 181 tasks 468 us process time
+		173 packets processed 47611 bytes processed (369658 pck/sec 813.863 mbps)
+		173 packets sent 47611 bytes sent (369658 pck/sec 813.863 mbps)
+		* input PID enst_video.h264: 173 frames (174 packets) received
+		* output PID enst_video.h264: 173 packets sent
+	Filter fout (dst=./results/temp/enst_video.h264) : 1 input pids 0 output pids 175 tasks 296 us process time
+		173 packets processed 48717 bytes processed (584459 pck/sec 1316.68 mbps)
+		* input PID enst_video.h264: 173 packets received
+	Filter rfnalu : 1 input pids 1 output pids 189 tasks 1177 us process time
+		10 packets processed 47679 bytes processed (8496.18 pck/sec 324.071 mbps)
+		174 packets sent 47611 bytes sent (147833 pck/sec 323.609 mbps)
+		* input PID enst_video.h264: 10 packets received
+		* output PID enst_video.h264: 174 packets sent
+	Filter ufnalu : 1 input pids 1 output pids 187 tasks 371 us process time
+		173 packets processed 47611 bytes processed (466307 pck/sec 1026.65 mbps)
+		173 packets sent 48717 bytes sent (466307 pck/sec 1050.5 mbps)
+		* input PID enst_video.h264: 173 packets received
+		* output PID enst_video.h264: 173 packets sent
+	Filter writegen : 1 input pids 1 output pids 187 tasks 209 us process time
+		173 packets processed 48717 bytes processed (827751 pck/sec 1864.77 mbps)
+		173 packets sent 48717 bytes sent (827751 pck/sec 1864.77 mbps)
+		* input PID enst_video.h264: 173 packets received
+		* output PID enst_video.h264: 173 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3501 us active_time 3467 us nb_tasks 948
+
+Total: run_time 3501 us active_time 3467 us nb_tasks 948
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_video.h264) (ptr=0x556c569857f0)
+-(PID enst_video.h264) rfnalu (ptr=0x556c5698e330)
+--(PID enst_video.h264) reframer (ID=_0x556c56988040_)
+---(PID enst_video.h264) ufnalu (ptr=0x556c569a07d0)
+----(PID enst_video.h264) writegen (ptr=0x556c569a1870)
+-----(PID enst_video.h264) fout (dst=./results/temp/enst_video.h264) (ptr=0x556c56989260)
+
+Computing ./results/temp/enst_video.h264  (rewrite) hash: 
+File hash (SHA-1): DD7937BD92E81F918D6DC1C03589C0C23A59B3C7
+Hash OK for ./results/temp/enst_video.h264

@@ -1,0 +1,34 @@
+*** x3d-3D-TriangleStripSet logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:47:19 ***
+
+
+*** Subtest "play": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/x3d/x3d-3D-TriangleStripSet.x3dv compositor:osize=192x192:vfr:ogl=on:dur=5 @ -o ./results/temp/dump.rgb" ***
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 4BB9D30C302CD2AB0A2F8CC0AFF11368233086D4
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dump.rgb:size=192x192 inspect:allp:interleave=false:fmt=%cts%-%size%%lf%:log=./results/temp/inspect.txt -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 548929408
+
+Filter stats - 3 filters
+	Filter fin (src=./results/temp/dump.rgb:size=192x192) : 0 input pids 1 output pids 6 tasks 830 us process time
+		2 packets sent 115592 bytes sent (2409.64 pck/sec 1114.14 mbps)
+		* output PID dump.rgb: 2 packets sent
+	Filter inspect (allp:interleave=false:fmt=%cts%-%size%%lf%:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 3 tasks 79 us process time
+		1 packets processed 110592 bytes processed (12658.2 pck/sec 11199.2 mbps)
+		* input PID dump.rgb: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 10 tasks 59 us process time
+		2 packets processed 115592 bytes processed (33898.3 pck/sec 15673.5 mbps)
+		1 packets sent 110592 bytes sent (16949.2 pck/sec 14995.5 mbps)
+		* input PID dump.rgb: 2 packets received
+		* output PID dump.rgb: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 991 us active_time 976 us nb_tasks 24
+
+Total: run_time 991 us active_time 976 us nb_tasks 24
+
+Filters connected:
+fin (src=./results/temp/dump.rgb:size=192x192) (ptr=0x558f2e791840)
+-(PID dump.rgb) rfrawvid (ptr=0x558f2e797330)
+--(PID dump.rgb) inspect (allp:interleave=false:fmt=%cts%-%size%%lf%:log=./results/temp/inspect.txt) (ptr=0x558f2e794270)
+

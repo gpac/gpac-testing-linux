@@ -1,0 +1,155 @@
+*** evg-pixfmt-yvyu logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:01 ***
+
+
+*** Subtest "rgb_yvyu": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/raw/raw.rgb:size=128x128 compositor:!softblt:opfmt=yvyu @ -o ./results/temp/dump.yvyu  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1897353344
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/raw/raw.rgb:size=128x128) : 0 input pids 1 output pids 6 tasks 869 us process time
+		2 packets sent 54152 bytes sent (2301.5 pck/sec 498.522 mbps)
+		* output PID raw.rgb: 2 packets sent
+	Filter compositor ID _0x555e85396170_ (!softblt:opfmt=yvyu) : 1 input pids 1 output pids 12 tasks 1678 us process time
+		1 packets processed 49152 bytes processed (595.948 pck/sec 234.336 mbps)
+		1 packets sent 32768 bytes sent (595.948 pck/sec 156.224 mbps)
+		* input PID raw.rgb: 1 packets received
+		* output PID vout: 1 packets sent
+	Filter fout (dst=./results/temp/dump.yvyu) : 1 input pids 0 output pids 3 tasks 130 us process time
+		1 packets processed 32768 bytes processed (7692.31 pck/sec 2016.49 mbps)
+		* input PID vout: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 13 tasks 90 us process time
+		2 packets processed 54152 bytes processed (22222.2 pck/sec 4813.51 mbps)
+		1 packets sent 49152 bytes sent (11111.1 pck/sec 4369.07 mbps)
+		* input PID raw.rgb: 2 packets received
+		* output PID raw.rgb: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 5 tasks 72 us process time
+		1 packets processed 32768 bytes processed (13888.9 pck/sec 3640.89 mbps)
+		1 packets sent 32768 bytes sent (13888.9 pck/sec 3640.89 mbps)
+		* input PID vout: 1 packets received
+		* output PID vout: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2868 us active_time 2856 us nb_tasks 46
+
+Total: run_time 2868 us active_time 2856 us nb_tasks 46
+
+Filters connected:
+fin (src=./external_media/raw/raw.rgb:size=128x128) (ptr=0x555e853937f0)
+-(PID raw.rgb) rfrawvid (ptr=0x555e853bad10)
+--(PID raw.rgb) compositor (!softblt:opfmt=yvyu) (ID=_0x555e85396170_)
+---(PID vout) writegen (ptr=0x555e853ab750)
+----(PID vout) fout (dst=./results/temp/dump.yvyu) (ptr=0x555e853bd550)
+
+Computing ./results/temp/dump.yvyu  (rgb_yvyu) hash: 
+File hash (SHA-1): 2556DB20A72CEC7ACC60D0A023152B306FF1B396
+Hash OK for ./results/temp/dump.yvyu
+
+*** Subtest "yvyu_rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dump.yvyu:size=128x128 compositor:!softblt:opfmt=rgb @ -o ./results/temp/dump.rgb  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1087926400
+
+Filter stats - 5 filters
+	Filter fin (src=./results/temp/dump.yvyu:size=128x128) : 0 input pids 1 output pids 6 tasks 823 us process time
+		2 packets sent 37768 bytes sent (2430.13 pck/sec 367.125 mbps)
+		* output PID dump.yvyu: 2 packets sent
+	Filter compositor ID _0x55f5f6450160_ (!softblt:opfmt=rgb) : 1 input pids 1 output pids 12 tasks 1469 us process time
+		1 packets processed 32768 bytes processed (680.735 pck/sec 178.451 mbps)
+		1 packets sent 49152 bytes sent (680.735 pck/sec 267.676 mbps)
+		* input PID dump.yvyu: 1 packets received
+		* output PID vout: 1 packets sent
+	Filter fout (dst=./results/temp/dump.rgb) : 1 input pids 0 output pids 3 tasks 204 us process time
+		1 packets processed 49152 bytes processed (4901.96 pck/sec 1927.53 mbps)
+		* input PID vout: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 13 tasks 61 us process time
+		2 packets processed 37768 bytes processed (32786.9 pck/sec 4953.18 mbps)
+		1 packets sent 32768 bytes sent (16393.4 pck/sec 4297.44 mbps)
+		* input PID dump.yvyu: 2 packets received
+		* output PID dump.yvyu: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 5 tasks 60 us process time
+		1 packets processed 49152 bytes processed (16666.7 pck/sec 6553.6 mbps)
+		1 packets sent 49152 bytes sent (16666.7 pck/sec 6553.6 mbps)
+		* input PID vout: 1 packets received
+		* output PID vout: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2652 us active_time 2639 us nb_tasks 46
+
+Total: run_time 2652 us active_time 2639 us nb_tasks 46
+
+Filters connected:
+fin (src=./results/temp/dump.yvyu:size=128x128) (ptr=0x55f5f644d7f0)
+-(PID dump.yvyu) rfrawvid (ptr=0x55f5f6474ca0)
+--(PID dump.yvyu) compositor (!softblt:opfmt=rgb) (ID=_0x55f5f6450160_)
+---(PID vout) writegen (ptr=0x55f5f6465660)
+----(PID vout) fout (dst=./results/temp/dump.rgb) (ptr=0x55f5f6477540)
+
+Computing ./results/temp/dump.rgb  (yvyu_rgb) hash: 
+File hash (SHA-1): DB6E6A9E9683FD35B411C80AD20D789475445CF4
+Hash OK for ./results/temp/dump.rgb
+
+*** Subtest "compose_yvyu": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -font-dirs=./external_media/fonts/ -rescan-fonts -i ./results/temp/dump.yvyu:size=128x128 -i ./external_media/raw/overlay.bt compositor:!softblt:drv=no @ -o ./results/temp/compose.yvyu  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 589770624
+
+Filter stats - 10 filters
+	Filter fin (src=./results/temp/dump.yvyu:size=128x128) : 0 input pids 1 output pids 6 tasks 808 us process time
+		2 packets sent 37768 bytes sent (2475.25 pck/sec 373.941 mbps)
+		* output PID dump.yvyu: 2 packets sent
+	Filter fin (src=./external_media/raw/overlay.bt) : 0 input pids 1 output pids 5 tasks 524 us process time
+		1 packets sent 3171 bytes sent (1908.4 pck/sec 48.4122 mbps)
+		* output PID overlay.bt: 1 packets sent
+	Filter compositor ID _0x5653c73360a0_ (!softblt:drv=no) : 3 input pids 1 output pids 18 tasks 1839 us process time
+		2 packets processed 98304 bytes processed (1087.55 pck/sec 427.641 mbps)
+		1 packets sent 32768 bytes sent (543.774 pck/sec 142.547 mbps)
+		* input PID dump.yvyu: 1 packets received
+		* input PID overlay.bt: 0 packets received
+		* input PID logo.png: 1 packets received
+		* output PID dump.yvyu: 1 packets sent
+	Filter fout (dst=./results/temp/compose.yvyu) : 1 input pids 0 output pids 3 tasks 125 us process time
+		1 packets processed 32768 bytes processed (8000 pck/sec 2097.15 mbps)
+		* input PID dump.yvyu: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 11 tasks 55 us process time
+		2 packets processed 37768 bytes processed (36363.6 pck/sec 5493.53 mbps)
+		1 packets sent 32768 bytes sent (18181.8 pck/sec 4766.25 mbps)
+		* input PID dump.yvyu: 2 packets received
+		* output PID dump.yvyu: 1 packets sent
+	Filter btplay : 1 input pids 1 output pids 6 tasks 703 us process time
+		1 packets processed 3171 bytes processed (1422.48 pck/sec 36.0853 mbps)
+
+		* input PID overlay.bt: 1 packets received
+		* output PID overlay.bt: 0 packets sent
+	Filter writegen : 1 input pids 1 output pids 6 tasks 86 us process time
+		1 packets processed 32768 bytes processed (11627.9 pck/sec 3048.19 mbps)
+		1 packets sent 32768 bytes sent (11627.9 pck/sec 3048.19 mbps)
+		* input PID dump.yvyu: 1 packets received
+		* output PID dump.yvyu: 1 packets sent
+	Filter fin ID _0x5653c73711e0_ (src=./media/auxiliary_files/logo.png) : 0 input pids 1 output pids 6 tasks 620 us process time
+		4 packets sent 15681 bytes sent (6451.61 pck/sec 202.335 mbps)
+		* output PID logo.png: 4 packets sent
+	Filter rfimg : 1 input pids 1 output pids 7 tasks 344 us process time
+		1 packets processed 15681 bytes processed (2906.98 pck/sec 364.674 mbps)
+		1 packets sent 15681 bytes sent (2906.98 pck/sec 364.674 mbps)
+		* input PID logo.png: 1 frames (4 packets) received
+		* output PID logo.png: 1 packets sent
+	Filter imgdec "imgdec:libpng" : 1 input pids 1 output pids 6 tasks 599 us process time
+		1 packets processed 15681 bytes processed (1669.45 pck/sec 209.429 mbps)
+		1 packets sent 65536 bytes sent (1669.45 pck/sec 875.272 mbps)
+		* input PID logo.png: 1 packets received
+		* output PID logo.png: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 5748 us active_time 5733 us nb_tasks 87
+
+Total: run_time 5748 us active_time 5733 us nb_tasks 87
+
+Filters connected:
+fin (src=./results/temp/dump.yvyu:size=128x128) (ptr=0x5653c732fa00)
+-(PID dump.yvyu) rfrawvid (ptr=0x5653c734b2c0)
+--(PID dump.yvyu) compositor (!softblt:drv=no) (ID=_0x5653c73360a0_)
+---(PID dump.yvyu) writegen (ptr=0x5653c7353560)
+----(PID dump.yvyu) fout (dst=./results/temp/compose.yvyu) (ptr=0x5653c7346e80)
+fin (src=./external_media/raw/overlay.bt) (ptr=0x5653c73326b0)
+-(PID overlay.bt) btplay (ptr=0x5653c7350fd0)
+--(PID overlay.bt) compositor (!softblt:drv=no) (ID=_0x5653c73360a0_)
+fin (src=./media/auxiliary_files/logo.png) (ID=_0x5653c73711e0_)
+-(PID logo.png) rfimg (ptr=0x5653c738ac00)
+--(PID logo.png) imgdec "imgdec:libpng" (ptr=0x5653c7397370)
+---(PID logo.png) compositor (!softblt:drv=no) (ID=_0x5653c73360a0_)
+
+Computing ./results/temp/compose.yvyu  (compose_yvyu) hash: 
+File hash (SHA-1): 5F877B7A9BD8CA480A46A2F7547CE2612480F129
+Hash OK for ./results/temp/compose.yvyu

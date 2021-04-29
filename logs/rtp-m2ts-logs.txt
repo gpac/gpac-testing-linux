@@ -1,0 +1,57 @@
+*** rtp-m2ts logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:45:01 ***
+
+
+*** Subtest "play": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -for-test -i rtp://127.0.0.1:1234/:ifce=127.0.0.1 inspect:deep:allp:dur=1/1:log=./results/temp/inspect.txt -stats -graph" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 710229888
+
+Filter stats - 3 filters
+	Filter rtpin (src=rtp://127.0.0.1:1234/:ifce=127.0.0.1) : 0 input pids 1 output pids 281446 tasks 265310 us process time
+		22 packets sent 15792 bytes sent (82.9219 pck/sec 0.476183 mbps)
+		* output PID PID1: 22 packets sent
+	Filter inspect (deep:allp:dur=1/1:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 50 tasks 450 us process time
+		49 packets processed 12212 bytes processed (108889 pck/sec 217.102 mbps)
+		* input PID P1A2: 23 frames (51 packets) received
+	Filter m2tsdmx : 1 input pids 1 output pids 46 tasks 583 us process time
+		22 packets processed 15792 bytes processed (37735.8 pck/sec 216.7 mbps)
+		25 packets sent 12212 bytes sent (42881.6 pck/sec 167.575 mbps)
+		* input PID PID1: 22 packets received
+		* output PID P1A2: 51 packets sent
+Session stats - threads 1
+	Thread 1: run_time 1587277 us active_time 338981 us nb_tasks 281545
+
+Total: run_time 1587277 us active_time 338981 us nb_tasks 281545
+
+Filters connected:
+rtpin (src=rtp://127.0.0.1:1234/:ifce=127.0.0.1) (ptr=0x563ab4c73840)
+-(PID PID1) m2tsdmx (ptr=0x563ab4c78ea0)
+--(PID P1A2) inspect (deep:allp:dur=1/1:log=./results/temp/inspect.txt) (ptr=0x563ab4c74df0)
+
+Computing ./results/temp/inspect.txt  (stream-inspect) hash: 
+File hash (SHA-1): 263855665ADD35E6A61F0D978ECD317223FD00B7
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "stream": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -runfor=2000 -i ./media/auxiliary_files/enst_audio.aac -o rtp://127.0.0.1:1234/:ifce=127.0.0.1:ext=ts:tso=100000:loop=false -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1289543552
+
+Filter stats - 4 filters
+	Filter fin (src=./media/auxiliary_files/enst_audio.aac) : 0 input pids 1 output pids 11 tasks 1280 us process time
+		7 packets sent 35000 bytes sent (5468.75 pck/sec 218.75 mbps)
+		* output PID enst_audio.aac: 7 packets sent
+	Filter rtpout (dst=rtp://127.0.0.1:1234/:ifce=127.0.0.1:ext=ts:tso=100000:loop=false) : 1 input pids 0 output pids 1032144 tasks 157891 us process time
+		54 packets processed 37788 bytes processed (342.008 pck/sec 1.91464 mbps)
+		* input PID ts_mux: 54 packets received
+	Filter rfadts : 1 input pids 1 output pids 19 tasks 1652 us process time
+		6 packets processed 30000 bytes processed (3631.96 pck/sec 145.278 mbps)
+		117 packets sent 29024 bytes sent (70823.2 pck/sec 140.552 mbps)
+		* input PID enst_audio.aac: 7 packets received
+		* output PID enst_audio.aac: 117 packets sent
+	Filter m2tsmx : 1 input pids 1 output pids 10 tasks 1390 us process time
+		117 packets processed 29024 bytes processed (84172.7 pck/sec 167.045 mbps)
+		54 packets sent 37788 bytes sent (38848.9 pck/sec 217.485 mbps)
+		* input PID enst_audio.aac: 117 packets received
+		* output PID ts_mux: 54 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2447460 us active_time 424729 us nb_tasks 1032241
+
+Total: run_time 2447460 us active_time 424729 us nb_tasks 1032241
+

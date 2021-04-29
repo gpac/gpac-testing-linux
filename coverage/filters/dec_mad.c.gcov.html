@@ -1,0 +1,454 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dec_mad.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dec_mad.c<span style="font-size: 80%;"> (source / <a href="dec_mad.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">121</td>
+            <td class="headerCovTableEntry">157</td>
+            <td class="headerCovTableEntryMed">77.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2005-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / MP3 libmad decoder filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : #ifdef GPAC_HAS_MAD
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #if defined(_WIN32_WCE) || defined(_WIN64) || defined(__SYMBIAN32__)
+<span class="lineNum">      34 </span>            : #ifndef FPM_DEFAULT
+<span class="lineNum">      35 </span>            : #ifdef GPAC_64_BITS
+<span class="lineNum">      36 </span>            : #define FPM_64BIT
+<span class="lineNum">      37 </span>            : #else
+<span class="lineNum">      38 </span>            : #define FPM_DEFAULT
+<span class="lineNum">      39 </span>            : #endif
+<span class="lineNum">      40 </span>            : #endif
+<span class="lineNum">      41 </span>            : #endif
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : #include &lt;mad.h&gt;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : #if !defined(__GNUC__)
+<span class="lineNum">      46 </span>            : # if defined(_WIN32_WCE) || defined (WIN32)
+<span class="lineNum">      47 </span>            : #  pragma comment(lib, &quot;libmad&quot;)
+<span class="lineNum">      48 </span>            : # endif
+<span class="lineNum">      49 </span>            : #endif
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : typedef struct
+<span class="lineNum">      53 </span>            : {
+<span class="lineNum">      54 </span>            :         GF_FilterPid *ipid, *opid;
+<span class="lineNum">      55 </span>            :         
+<span class="lineNum">      56 </span>            :         Bool configured;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :         u32 sample_rate, num_samples, num_channels;
+<span class="lineNum">      59 </span>            :         u32 timescale;
+<span class="lineNum">      60 </span>            :         u64 last_cts;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :         unsigned char *buffer;
+<span class="lineNum">      63 </span>            :         u32 len;
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :         struct mad_frame frame;
+<span class="lineNum">      66 </span>            :         struct mad_stream stream;
+<span class="lineNum">      67 </span>            :         struct mad_synth synth;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :         Bool flush_done;
+<span class="lineNum">      70 </span>            :         u32 last_pck_dur;
+<span class="lineNum">      71 </span>            :         s64 delay;
+<span class="lineNum">      72 </span>            : 
+<a name="73"><span class="lineNum">      73 </span>            : } GF_MADCtx;</a>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">         19 : static void maddec_copy_props(GF_MADCtx *ctx)</span>
+<span class="lineNum">      76 </span>            : {
+<span class="lineNum">      77 </span>            :         //copy properties at init or reconfig
+<span class="lineNum">      78 </span><span class="lineCov">         19 :         gf_filter_pid_copy_properties(ctx-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">      79 </span><span class="lineCov">         19 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_RAW) );</span>
+<span class="lineNum">      80 </span><span class="lineCov">         19 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_AUDIO_FORMAT, &amp;PROP_UINT(GF_AUDIO_FMT_S16) );</span>
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span><span class="lineCov">         19 :         if (ctx-&gt;sample_rate)</span>
+<span class="lineNum">      83 </span><span class="lineCov">         19 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_SAMPLE_RATE, &amp;PROP_UINT(ctx-&gt;sample_rate) );</span>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">         19 :         if (ctx-&gt;num_channels) {</span>
+<span class="lineNum">      86 </span><span class="lineCov">         19 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_NUM_CHANNELS, &amp;PROP_UINT(ctx-&gt;num_channels) );</span>
+<span class="lineNum">      87 </span><span class="lineCov">         19 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CHANNEL_LAYOUT, &amp;PROP_LONGUINT((ctx-&gt;num_channels==1) ? GF_AUDIO_CH_FRONT_CENTER : GF_AUDIO_CH_FRONT_LEFT | GF_AUDIO_CH_FRONT_RIGHT) );</span>
+<span class="lineNum">      88 </span>            :         }
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">         19 :         if (!ctx-&gt;delay)</span>
+<span class="lineNum">      91 </span><span class="lineCov">         19 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DELAY, NULL);</span>
+<a name="92"><span class="lineNum">      92 </span><span class="lineCov">         19 : }</span></a>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">         19 : static GF_Err maddec_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      95 </span>            : {
+<span class="lineNum">      96 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">      97 </span><span class="lineCov">         19 :         GF_MADCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineCov">         19 :         if (is_remove) {</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">     103 </span>            :                 }
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     106 </span>            :         }
+<span class="lineNum">     107 </span><span class="lineCov">         19 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">     108 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span><span class="lineCov">         19 :         if (ctx-&gt;configured) {</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_NO_PRIMING);</span>
+<span class="lineNum">     113 </span>            :                 //no re-prime, skip if same config
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :                 if (p &amp;&amp; p-&gt;value.boolean) {</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :                         p = gf_filter_pid_get_property(pid, GF_PROP_PID_SAMPLE_RATE);</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :                         u32 sr = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :                         p = gf_filter_pid_get_property(pid, GF_PROP_PID_NUM_CHANNELS);</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :                         u32 ch = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :                         if ((ctx-&gt;sample_rate==sr) &amp;&amp; (ctx-&gt;num_channels==ch)) {</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :                                 maddec_copy_props(ctx);</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :                                 return GF_OK;</span>
+<span class="lineNum">     122 </span>            :                         }
+<span class="lineNum">     123 </span>            :                 }
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                 mad_stream_finish(&amp;ctx-&gt;stream);</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                 mad_frame_finish(&amp;ctx-&gt;frame);</span>
+<span class="lineNum">     127 </span>            :                 mad_synth_finish(&amp;ctx-&gt;synth);
+<span class="lineNum">     128 </span>            :         }
+<span class="lineNum">     129 </span><span class="lineCov">         19 :         mad_stream_init(&amp;ctx-&gt;stream);</span>
+<span class="lineNum">     130 </span><span class="lineCov">         19 :         mad_frame_init(&amp;ctx-&gt;frame);</span>
+<span class="lineNum">     131 </span><span class="lineCov">         19 :         mad_synth_init(&amp;ctx-&gt;synth);</span>
+<span class="lineNum">     132 </span><span class="lineCov">         19 :         ctx-&gt;configured = GF_TRUE;</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :         /*we need a frame to init, so use default values*/
+<span class="lineNum">     135 </span><span class="lineCov">         19 :         ctx-&gt;num_samples = 1152;</span>
+<span class="lineNum">     136 </span><span class="lineCov">         19 :         ctx-&gt;num_channels = 0;</span>
+<span class="lineNum">     137 </span><span class="lineCov">         19 :         ctx-&gt;sample_rate = 0;</span>
+<span class="lineNum">     138 </span><span class="lineCov">         19 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineCov">         19 :         if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     141 </span><span class="lineCov">         19 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     142 </span>            :         }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineCov">         19 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_SAMPLE_RATE);</span>
+<span class="lineNum">     145 </span><span class="lineCov">         19 :         if (p) ctx-&gt;sample_rate = p-&gt;value.uint;</span>
+<span class="lineNum">     146 </span><span class="lineCov">         19 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_NUM_CHANNELS);</span>
+<span class="lineNum">     147 </span><span class="lineCov">         19 :         if (p) ctx-&gt;num_channels = p-&gt;value.uint;</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineCov">         19 :         if (!ctx-&gt;buffer) {</span>
+<span class="lineNum">     150 </span><span class="lineCov">         19 :                 ctx-&gt;buffer = (unsigned char*)gf_malloc(sizeof(char) * 2*MAD_BUFFER_MDLEN);</span>
+<span class="lineNum">     151 </span>            :         }
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span><span class="lineCov">         19 :         gf_filter_set_name(filter, &quot;dec_mad:MAD &quot; MAD_VERSION);</span>
+<span class="lineNum">     154 </span><span class="lineCov">         19 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_DELAY);</span>
+<span class="lineNum">     155 </span><span class="lineCov">         19 :         ctx-&gt;delay = p ? p-&gt;value.longsint : 0;</span>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineCov">         19 :         gf_filter_pid_set_framing_mode(pid, GF_TRUE);</span>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineCov">         19 :         maddec_copy_props(ctx);</span>
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span><span class="lineCov">         19 :         return GF_OK;</span>
+<a name="162"><span class="lineNum">     162 </span>            : }</a>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">         19 : static void maddec_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     165 </span>            : {
+<span class="lineNum">     166 </span><span class="lineCov">         19 :         GF_MADCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span><span class="lineCov">         19 :         if (ctx-&gt;buffer) gf_free(ctx-&gt;buffer);</span>
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">         19 :         if (ctx-&gt;configured) {</span>
+<span class="lineNum">     171 </span><span class="lineCov">         19 :                 mad_stream_finish(&amp;ctx-&gt;stream);</span>
+<span class="lineNum">     172 </span><span class="lineCov">         19 :                 mad_frame_finish(&amp;ctx-&gt;frame);</span>
+<span class="lineNum">     173 </span>            :                 mad_synth_finish(&amp;ctx-&gt;synth);
+<span class="lineNum">     174 </span>            :         }
+<span class="lineNum">     175 </span><span class="lineCov">         19 : }</span>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : /*from miniMad.c*/
+<span class="lineNum">     178 </span>            : #define MAD_SCALE(ret, s_chan)  \
+<span class="lineNum">     179 </span>            :         chan = s_chan;                          \
+<span class="lineNum">     180 </span>            :         chan += (1L &lt;&lt; (MAD_F_FRACBITS - 16));            \
+<span class="lineNum">     181 </span>            :         if (chan &gt;= MAD_F_ONE)                                       \
+<span class="lineNum">     182 </span>            :                 chan = MAD_F_ONE - 1;                                   \
+<span class="lineNum">     183 </span>            :         else if (chan &lt; -MAD_F_ONE)                          \
+<span class="lineNum">     184 </span>            :                 chan = -MAD_F_ONE;                              \
+<a name="185"><span class="lineNum">     185 </span>            :         ret = chan &gt;&gt; (MAD_F_FRACBITS + 1 - 16);          \</a>
+<span class="lineNum">     186 </span>            :  
+<span class="lineNum">     187 </span><span class="lineCov">       8483 : static GF_Err maddec_process(GF_Filter *filter)</span>
+<span class="lineNum">     188 </span>            : {
+<span class="lineNum">     189 </span>            :         mad_fixed_t *left_ch, *right_ch, chan;
+<span class="lineNum">     190 </span>            :         u8 *ptr;
+<span class="lineNum">     191 </span>            :         u8 *data;
+<span class="lineNum">     192 </span>            :         u32 num, samples_to_trash, in_size; //, outSize=0;
+<span class="lineNum">     193 </span><span class="lineCov">       8483 :         GF_MADCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     194 </span>            :         GF_FilterPacket *dst_pck;
+<span class="lineNum">     195 </span><span class="lineCov">       8483 :         GF_FilterPacket *pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineCov">       8483 :         if (!pck) {</span>
+<span class="lineNum">     198 </span><span class="lineCov">       2704 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     199 </span><span class="lineCov">         38 :                         if (ctx-&gt;flush_done) {</span>
+<span class="lineNum">     200 </span><span class="lineCov">         28 :                                 gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     201 </span><span class="lineCov">         28 :                                 return GF_EOS;</span>
+<span class="lineNum">     202 </span>            :                         }
+<span class="lineNum">     203 </span><span class="lineCov">         10 :                         ctx-&gt;flush_done = GF_TRUE;</span>
+<span class="lineNum">     204 </span><span class="lineCov">         10 :                         memset(ctx-&gt;buffer + ctx-&gt;len, 0, MAD_BUFFER_GUARD);</span>
+<span class="lineNum">     205 </span><span class="lineCov">         10 :                         ctx-&gt;len += MAD_BUFFER_GUARD;</span>
+<span class="lineNum">     206 </span>            :                 } else {
+<span class="lineNum">     207 </span>            :                         return GF_OK;
+<span class="lineNum">     208 </span>            :                 }
+<span class="lineNum">     209 </span>            :         } else {
+<span class="lineNum">     210 </span><span class="lineCov">       5779 :                 data = (char *) gf_filter_pck_get_data(pck, &amp;in_size);</span>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineCov">       5779 :                 if (ctx-&gt;len + in_size &gt; 2*MAD_BUFFER_MDLEN) {</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_CODEC, (&quot;[MAD] MAD buffer overflow, truncating\n&quot;));</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                         in_size = 2*MAD_BUFFER_MDLEN - ctx-&gt;len;</span>
+<span class="lineNum">     215 </span>            :                 }
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineCov">       5779 :                 memcpy(ctx-&gt;buffer + ctx-&gt;len, data, in_size);</span>
+<span class="lineNum">     218 </span><span class="lineCov">       5779 :                 ctx-&gt;len += in_size;</span>
+<span class="lineNum">     219 </span><span class="lineCov">       5779 :                 ctx-&gt;last_pck_dur = gf_filter_pck_get_duration(pck);</span>
+<span class="lineNum">     220 </span>            :         }
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">       5789 : mad_resync:</span>
+<span class="lineNum">     223 </span><span class="lineCov">       5793 :         mad_stream_buffer(&amp;ctx-&gt;stream, ctx-&gt;buffer, ctx-&gt;len);</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineCov">       5793 :         if (mad_frame_decode(&amp;ctx-&gt;frame, &amp;ctx-&gt;stream) == -1) {</span>
+<span class="lineNum">     226 </span><span class="lineCov">         27 :                 if (!pck) return GF_OK;</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">         27 :                 if (ctx-&gt;stream.error==MAD_ERROR_BUFLEN) {</span>
+<span class="lineNum">     229 </span>            :                         if (pck) {
+<span class="lineNum">     230 </span><span class="lineCov">         23 :                                 ctx-&gt;last_cts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     231 </span><span class="lineCov">         23 :                                 ctx-&gt;timescale = gf_filter_pck_get_timescale(pck);</span>
+<span class="lineNum">     232 </span><span class="lineCov">         23 :                                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     233 </span>            :                         }
+<span class="lineNum">     234 </span><span class="lineCov">         23 :                         return GF_OK;</span>
+<span class="lineNum">     235 </span>            :                 }
+<span class="lineNum">     236 </span><span class="lineCov">          4 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[MAD] Decoding failed error %s (%d)\n&quot;, mad_stream_errorstr(&amp;ctx-&gt;stream), ctx-&gt;stream.error ) );</span>
+<span class="lineNum">     237 </span><span class="lineCov">          4 :                 if (ctx-&gt;len==in_size) {</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :                         if (pck) gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :                         return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     240 </span>            :                 }
+<span class="lineNum">     241 </span>            :                 //try resynchro
+<span class="lineNum">     242 </span><span class="lineCov">          4 :                 memcpy(ctx-&gt;buffer, data, in_size);</span>
+<span class="lineNum">     243 </span><span class="lineCov">          4 :                 ctx-&gt;len = in_size;</span>
+<span class="lineNum">     244 </span><span class="lineCov">          4 :                 goto mad_resync;</span>
+<span class="lineNum">     245 </span>            :         }
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineCov">       5766 :         mad_synth_frame(&amp;ctx-&gt;synth, &amp;ctx-&gt;frame);</span>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineCov">       5766 :         if ((ctx-&gt;sample_rate != ctx-&gt;synth.pcm.samplerate) || (ctx-&gt;num_channels != ctx-&gt;synth.pcm.channels) || (ctx-&gt;num_samples != ctx-&gt;synth.pcm.length)) {</span>
+<span class="lineNum">     250 </span><span class="lineCov">         19 :                 ctx-&gt;sample_rate = ctx-&gt;synth.pcm.samplerate;</span>
+<span class="lineNum">     251 </span><span class="lineCov">         19 :                 ctx-&gt;num_channels = (u8) ctx-&gt;synth.pcm.channels;</span>
+<span class="lineNum">     252 </span><span class="lineCov">         19 :                 ctx-&gt;num_samples = ctx-&gt;synth.pcm.length;</span>
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span><span class="lineCov">         19 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_SAMPLE_RATE, &amp;PROP_UINT(ctx-&gt;sample_rate) );</span>
+<span class="lineNum">     255 </span><span class="lineCov">         19 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_NUM_CHANNELS, &amp;PROP_UINT(ctx-&gt;num_channels) );</span>
+<span class="lineNum">     256 </span><span class="lineCov">         19 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CHANNEL_LAYOUT, &amp;PROP_LONGUINT((ctx-&gt;num_channels==1) ? GF_AUDIO_CH_FRONT_CENTER : GF_AUDIO_CH_FRONT_LEFT | GF_AUDIO_CH_FRONT_RIGHT) );</span>
+<span class="lineNum">     257 </span>            :         }
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span><span class="lineCov">       5766 :         if (ctx-&gt;stream.next_frame) {</span>
+<span class="lineNum">     260 </span><span class="lineCov">       5766 :                 ctx-&gt;len = (u32) (&amp;ctx-&gt;buffer[ctx-&gt;len] - ctx-&gt;stream.next_frame);</span>
+<span class="lineNum">     261 </span><span class="lineCov">       5766 :                 memmove(ctx-&gt;buffer, ctx-&gt;stream.next_frame, ctx-&gt;len);</span>
+<span class="lineNum">     262 </span>            :         }
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">       5766 :         num = ctx-&gt;synth.pcm.length;</span>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :         samples_to_trash = 0;
+<span class="lineNum">     267 </span><span class="lineCov">       5766 :         if (ctx-&gt;delay&lt;0) {</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                 if ((s64) ctx-&gt;last_cts + ctx-&gt;delay &lt; 0) {</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :                         s32 dur = num;</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;timescale != ctx-&gt;sample_rate) {</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :                                 dur *= ctx-&gt;sample_rate;</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :                                 dur /= ctx-&gt;timescale;</span>
+<span class="lineNum">     273 </span>            :                         }
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :                         if (dur + ctx-&gt;delay &lt; 0) {</span>
+<span class="lineNum">     275 </span>            :                                 num = 0;
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                                 ctx-&gt;delay += dur;</span>
+<span class="lineNum">     277 </span>            :                         } else {
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                                 samples_to_trash = (u32) -ctx-&gt;delay;</span>
+<span class="lineNum">     279 </span>            :                         }
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DELAY, NULL);</span>
+<span class="lineNum">     281 </span>            :                 } else {
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :                         ctx-&gt;delay = 0;</span>
+<span class="lineNum">     283 </span>            :                 }
+<span class="lineNum">     284 </span>            :         }
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span><span class="lineCov">       5766 :         if (!pck &amp;&amp; ctx-&gt;last_pck_dur) {</span>
+<span class="lineNum">     287 </span>            :                 u32 dur = ctx-&gt;last_pck_dur;
+<span class="lineNum">     288 </span><span class="lineCov">         10 :                 if (ctx-&gt;timescale != ctx-&gt;sample_rate) {</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :                         dur *= ctx-&gt;sample_rate;</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :                         dur /= ctx-&gt;timescale;</span>
+<span class="lineNum">     291 </span>            :                 }
+<span class="lineNum">     292 </span><span class="lineCov">         10 :                 if (dur &lt; num) {</span>
+<span class="lineNum">     293 </span>            :                         num = dur;
+<span class="lineNum">     294 </span>            :                 }
+<span class="lineNum">     295 </span>            :         }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineCov">       5766 :         left_ch = ctx-&gt;synth.pcm.samples[0] + samples_to_trash;</span>
+<span class="lineNum">     298 </span><span class="lineCov">       5766 :         right_ch = ctx-&gt;synth.pcm.samples[1] + samples_to_trash;</span>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">       5766 :         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, (num - samples_to_trash) * 2 * ctx-&gt;num_channels, &amp;ptr);</span>
+<span class="lineNum">     301 </span><span class="lineCov">       5766 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span><span class="lineCov">       5766 :         if (pck) {</span>
+<span class="lineNum">     304 </span><span class="lineCov">       5756 :                 ctx-&gt;last_cts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     305 </span><span class="lineCov">       5756 :                 ctx-&gt;timescale = gf_filter_pck_get_timescale(pck);</span>
+<span class="lineNum">     306 </span><span class="lineCov">       5756 :                 gf_filter_pck_merge_properties(pck, dst_pck);</span>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineCov">       5756 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     309 </span>            :         }
+<span class="lineNum">     310 </span><span class="lineCov">       5766 :         gf_filter_pck_set_cts(dst_pck, ctx-&gt;last_cts);</span>
+<span class="lineNum">     311 </span><span class="lineCov">       5766 :         if (ctx-&gt;timescale != ctx-&gt;sample_rate) {</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :                 u64 dur = num * ctx-&gt;timescale;</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :                 dur /= ctx-&gt;sample_rate;</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_duration(dst_pck, (u32) dur);</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                 ctx-&gt;last_cts += dur;</span>
+<span class="lineNum">     316 </span>            :         } else {
+<span class="lineNum">     317 </span><span class="lineCov">       5766 :                 gf_filter_pck_set_duration(dst_pck, num);</span>
+<span class="lineNum">     318 </span><span class="lineCov">       5766 :                 ctx-&gt;last_cts += num;</span>
+<span class="lineNum">     319 </span>            :         }
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">    3326982 :         while (num-- &gt; samples_to_trash) {</span>
+<span class="lineNum">     323 </span>            :                 s32 rs;
+<span class="lineNum">     324 </span><span class="lineCov">    3321216 :                 MAD_SCALE(rs, (*left_ch++) );</span>
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span><span class="lineCov">    3321216 :                 *ptr = (rs &gt;&gt; 0) &amp; 0xff;</span>
+<span class="lineNum">     327 </span><span class="lineCov">    3321216 :                 ptr++;</span>
+<span class="lineNum">     328 </span><span class="lineCov">    3321216 :                 *ptr = (rs &gt;&gt; 8) &amp; 0xff;</span>
+<span class="lineNum">     329 </span><span class="lineCov">    3321216 :                 ptr++;</span>
+<span class="lineNum">     330 </span>            :                 //outSize += 2;
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineCov">    3321216 :                 if (ctx-&gt;num_channels == 2) {</span>
+<span class="lineNum">     333 </span><span class="lineCov">    3321216 :                         MAD_SCALE(rs, (*right_ch++) );</span>
+<span class="lineNum">     334 </span><span class="lineCov">    3321216 :                         *ptr = (rs &gt;&gt; 0) &amp; 0xff;</span>
+<span class="lineNum">     335 </span><span class="lineCov">    3321216 :                         ptr++;</span>
+<span class="lineNum">     336 </span><span class="lineCov">    3321216 :                         *ptr = (rs &gt;&gt; 8) &amp; 0xff;</span>
+<span class="lineNum">     337 </span><span class="lineCov">    3321216 :                         ptr++;</span>
+<span class="lineNum">     338 </span>            :                         //outSize += 2;
+<span class="lineNum">     339 </span>            :                 }
+<span class="lineNum">     340 </span>            :         }
+<span class="lineNum">     341 </span><span class="lineCov">       5766 :         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     342 </span><span class="lineCov">       5766 :         return GF_OK;</span>
+<span class="lineNum">     343 </span>            : }
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span>            : static const GF_FilterCapability MADCaps[] =
+<span class="lineNum">     347 </span>            : {
+<span class="lineNum">     348 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     349 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     350 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_CODECID, GF_CODECID_MPEG2_PART3),
+<span class="lineNum">     351 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_CODECID, GF_CODECID_MPEG_AUDIO),
+<span class="lineNum">     352 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     353 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_RAW),
+<span class="lineNum">     354 </span>            : };
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            : GF_FilterRegister MADRegister = {
+<span class="lineNum">     357 </span>            :         .name = &quot;maddec&quot;,
+<span class="lineNum">     358 </span>            :         GF_FS_SET_DESCRIPTION(&quot;MAD decoder&quot;)
+<span class="lineNum">     359 </span>            :         GF_FS_SET_HELP(&quot;This filter decodes MPEG 1/2 audio streams through libmad library.&quot;)
+<span class="lineNum">     360 </span>            :         .private_size = sizeof(GF_MADCtx),
+<span class="lineNum">     361 </span>            :         .priority = 1,
+<span class="lineNum">     362 </span>            :         SETCAPS(MADCaps),
+<span class="lineNum">     363 </span>            :         .finalize = maddec_finalize,
+<span class="lineNum">     364 </span>            :         .configure_pid = maddec_configure_pid,
+<span class="lineNum">     365 </span>            :         .process = maddec_process,
+<span class="lineNum">     366 </span>            : };
+<span class="lineNum">     367 </span>            : 
+<a name="368"><span class="lineNum">     368 </span>            : #endif</a>
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span><span class="lineCov">       2877 : const GF_FilterRegister *maddec_register(GF_FilterSession *session)</span>
+<span class="lineNum">     371 </span>            : {
+<span class="lineNum">     372 </span>            : #ifdef GPAC_HAS_MAD
+<span class="lineNum">     373 </span><span class="lineCov">       2877 :         return &amp;MADRegister;</span>
+<span class="lineNum">     374 </span>            : #else
+<span class="lineNum">     375 </span>            :         return NULL;
+<span class="lineNum">     376 </span>            : #endif
+<span class="lineNum">     377 </span>            : }
+<span class="lineNum">     378 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

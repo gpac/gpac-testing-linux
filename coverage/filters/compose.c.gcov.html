@@ -1,0 +1,1127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/compose.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - compose.c<span style="font-size: 80%;"> (source / <a href="compose.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">335</td>
+            <td class="headerCovTableEntry">396</td>
+            <td class="headerCovTableEntryMed">84.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryHi">91.7 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / compositor filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/config_file.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/internal/compositor_dev.h&gt;
+<span class="lineNum">      29 </span>            : //to set caps in filter session, to cleanup!
+<span class="lineNum">      30 </span>            : #include &quot;../filter_core/filter_session.h&quot;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #ifndef GPAC_DISABLE_PLAYER
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : GF_Err compose_bifs_dec_config_input(GF_Scene *scene, GF_FilterPid *pid, u32 oti, Bool is_remove);
+<span class="lineNum">      35 </span>            : GF_Err compose_bifs_dec_process(GF_Scene *scene, GF_FilterPid *pid);
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : GF_Err compose_odf_dec_config_input(GF_Scene *scene, GF_FilterPid *pid, u32 oti, Bool is_remove);
+<span class="lineNum">      38 </span>            : GF_Err compose_odf_dec_process(GF_Scene *scene, GF_FilterPid *pid);
+<span class="lineNum">      39 </span>            : 
+<a name="40"><span class="lineNum">      40 </span>            : #define COMPOSITOR_MAGIC        GF_4CC('c','o','m','p')</a>
+<span class="lineNum">      41 </span>            : //a bit ugly, used by terminal (old APIs)
+<span class="lineNum">      42 </span><span class="lineCov">          7 : GF_Compositor *gf_sc_from_filter(GF_Filter *filter)</span>
+<span class="lineNum">      43 </span>            : {
+<span class="lineNum">      44 </span><span class="lineCov">          7 :         GF_Compositor *ctx = (GF_Compositor *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">      45 </span><span class="lineCov">          7 :         if (ctx-&gt;magic != COMPOSITOR_MAGIC) return NULL;</span>
+<span class="lineNum">      46 </span><span class="lineCov">          7 :         if (ctx-&gt;magic_ptr != ctx) return NULL;</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">          7 :         return ctx;</span>
+<a name="49"><span class="lineNum">      49 </span>            : }</a>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineCov">     131980 : static GF_Err compose_process(GF_Filter *filter)</span>
+<span class="lineNum">      52 </span>            : {
+<span class="lineNum">      53 </span>            :         u32 i, nb_sys_streams_active;
+<span class="lineNum">      54 </span><span class="lineCov">     131980 :         s32 ms_until_next = 0;</span>
+<span class="lineNum">      55 </span>            :         Bool ret;
+<span class="lineNum">      56 </span><span class="lineCov">     131980 :         GF_Compositor *ctx = (GF_Compositor *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">      57 </span><span class="lineCov">     131980 :         if (!ctx) return GF_BAD_PARAM;</span>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">     131980 :         if (ctx-&gt;check_eos_state == 2)</span>
+<span class="lineNum">      60 </span>            :                 return GF_EOS;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineCov">     124704 :         ctx-&gt;last_error = GF_OK;</span>
+<span class="lineNum">      63 </span><span class="lineCov">     124704 :         if (ctx-&gt;reload_config) {</span>
+<span class="lineNum">      64 </span><span class="lineCov">        599 :                 ctx-&gt;reload_config = GF_FALSE;</span>
+<span class="lineNum">      65 </span><span class="lineCov">        599 :                 gf_sc_reload_config(ctx);</span>
+<span class="lineNum">      66 </span>            :         }
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">     124704 :         nb_sys_streams_active = gf_list_count(ctx-&gt;systems_pids);</span>
+<span class="lineNum">      69 </span><span class="lineCov">     134252 :         for (i=0; i&lt;nb_sys_streams_active; i++) {</span>
+<span class="lineNum">      70 </span>            :                 GF_FilterPacket *pck;
+<span class="lineNum">      71 </span>            :                 GF_Err e;
+<span class="lineNum">      72 </span><span class="lineCov">       9548 :                 GF_FilterPid *pid = gf_list_get(ctx-&gt;systems_pids, i);</span>
+<span class="lineNum">      73 </span><span class="lineCov">       9548 :                 GF_ObjectManager *odm = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :                 assert (odm);
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :                 e = GF_OK;
+<span class="lineNum">      78 </span><span class="lineCov">       9548 :                 pck = gf_filter_pid_get_packet(pid);</span>
+<span class="lineNum">      79 </span><span class="lineCov">       9548 :                 if (!pck &amp;&amp; gf_filter_pid_is_eos(pid)) {</span>
+<span class="lineNum">      80 </span>            :                         e = GF_EOS;
+<span class="lineNum">      81 </span>            :                 }
+<span class="lineNum">      82 </span><span class="lineCov">       9548 :                 if (pck)</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                         gf_filter_pid_drop_packet(pid);</span>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">       9548 :                 if (e==GF_EOS) {</span>
+<span class="lineNum">      87 </span><span class="lineCov">        483 :                         gf_list_rem(ctx-&gt;systems_pids, i);</span>
+<span class="lineNum">      88 </span><span class="lineCov">        483 :                         i--;</span>
+<span class="lineNum">      89 </span><span class="lineCov">        483 :                         nb_sys_streams_active--;</span>
+<span class="lineNum">      90 </span><span class="lineCov">        483 :                         gf_odm_on_eos(odm, pid);</span>
+<span class="lineNum">      91 </span>            :                 }
+<span class="lineNum">      92 </span><span class="lineCov">       9548 :                 if (ctx-&gt;reload_scene_size) {</span>
+<span class="lineNum">      93 </span>            :                         u32 w, h;
+<span class="lineNum">      94 </span><span class="lineCov">         93 :                         gf_sg_get_scene_size_info(ctx-&gt;root_scene-&gt;graph, &amp;w, &amp;h);</span>
+<span class="lineNum">      95 </span><span class="lineCov">         93 :                         if ((ctx-&gt;scene_width!=w) || (ctx-&gt;scene_height!=h)) {</span>
+<span class="lineNum">      96 </span><span class="lineCov">         62 :                                 gf_sc_set_scene_size(ctx, w, h, GF_TRUE);</span>
+<span class="lineNum">      97 </span>            :                         }
+<span class="lineNum">      98 </span>            :                 }
+<span class="lineNum">      99 </span>            :         }
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">     124704 :         ret = gf_sc_draw_frame(ctx, GF_FALSE, &amp;ms_until_next);</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineCov">     124704 :         if (!ctx-&gt;player) {</span>
+<span class="lineNum">     104 </span>            :                 Bool forced_eos = GF_FALSE;
+<span class="lineNum">     105 </span>            :                 /*remember to check for eos*/
+<span class="lineNum">     106 </span><span class="lineCov">     124340 :                 if (ctx-&gt;dur&lt;0) {</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;frame_number &gt;= (u32) -ctx-&gt;dur)</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :                                 ctx-&gt;check_eos_state = 2;</span>
+<span class="lineNum">     109 </span><span class="lineCov">     124340 :                 } else if (ctx-&gt;dur&gt;0) {</span>
+<span class="lineNum">     110 </span><span class="lineCov">      59263 :                         Double n = ctx-&gt;scene_sampled_clock;</span>
+<span class="lineNum">     111 </span><span class="lineCov">      59263 :                         n /= 1000;</span>
+<span class="lineNum">     112 </span><span class="lineCov">      59263 :                         if (n&gt;=ctx-&gt;dur)</span>
+<span class="lineNum">     113 </span><span class="lineCov">        223 :                                 ctx-&gt;check_eos_state = 2;</span>
+<span class="lineNum">     114 </span><span class="lineCov">      59040 :                         else if (!ret &amp;&amp; ctx-&gt;vfr &amp;&amp; !ctx-&gt;check_eos_state &amp;&amp; !nb_sys_streams_active &amp;&amp; ctx-&gt;scene_sampled_clock &amp;&amp; !ctx-&gt;validator_mode) {</span>
+<span class="lineNum">     115 </span><span class="lineCov">      14170 :                                 ctx-&gt;check_eos_state = 1;</span>
+<span class="lineNum">     116 </span>            :                                 if (!ctx-&gt;validator_mode)
+<span class="lineNum">     117 </span><span class="lineCov">      14170 :                                         ctx-&gt;force_next_frame_redraw = GF_TRUE;</span>
+<span class="lineNum">     118 </span>            :                         }
+<span class="lineNum">     119 </span><span class="lineCov">      65077 :                 } else if (!ret &amp;&amp; !ctx-&gt;frame_was_produced &amp;&amp; !ctx-&gt;check_eos_state &amp;&amp; !nb_sys_streams_active) {</span>
+<span class="lineNum">     120 </span><span class="lineCov">        447 :                         ctx-&gt;check_eos_state = 1;</span>
+<span class="lineNum">     121 </span>            :                 }
+<span class="lineNum">     122 </span><span class="lineCov">     124340 :                 if (ctx-&gt;check_eos_state == 1) {</span>
+<span class="lineNum">     123 </span><span class="lineCov">      14666 :                         ctx-&gt;last_check_pass++;</span>
+<span class="lineNum">     124 </span><span class="lineCov">      14666 :                         if (ctx-&gt;last_check_pass &gt; 10000) {</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                                 ctx-&gt;check_eos_state = 2;</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_COMPOSE, (&quot;[Compositor] Could not detect end of stream(s) in %d render pass, aborting\n&quot;, ctx-&gt;last_check_pass));</span>
+<span class="lineNum">     127 </span>            :                                 forced_eos = GF_TRUE;
+<span class="lineNum">     128 </span>            :                         }
+<span class="lineNum">     129 </span>            :                 } else {
+<span class="lineNum">     130 </span><span class="lineCov">     109674 :                         ctx-&gt;last_check_pass = 0;</span>
+<span class="lineNum">     131 </span>            :                 }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineCov">     124340 :                 if ((ctx-&gt;check_eos_state==2) || (ctx-&gt;check_eos_state &amp;&amp; gf_sc_check_end_of_scene(ctx, GF_TRUE))) {</span>
+<span class="lineNum">     134 </span>            :                         u32 count;
+<span class="lineNum">     135 </span><span class="lineCov">        851 :                         ctx-&gt;force_next_frame_redraw = GF_FALSE;</span>
+<span class="lineNum">     136 </span><span class="lineCov">        851 :                         count = gf_filter_get_ipid_count(ctx-&gt;filter);</span>
+<span class="lineNum">     137 </span><span class="lineCov">        851 :                         if (ctx-&gt;root_scene) {</span>
+<span class="lineNum">     138 </span><span class="lineCov">        599 :                                 gf_filter_pid_set_eos(ctx-&gt;vout);</span>
+<span class="lineNum">     139 </span><span class="lineCov">        599 :                                 if (ctx-&gt;audio_renderer &amp;&amp; ctx-&gt;audio_renderer-&gt;aout)</span>
+<span class="lineNum">     140 </span><span class="lineCov">         15 :                                         gf_filter_pid_set_eos(ctx-&gt;audio_renderer-&gt;aout);</span>
+<span class="lineNum">     141 </span>            :                         }
+<span class="lineNum">     142 </span>            :                         //send stop
+<span class="lineNum">     143 </span><span class="lineCov">        851 :                         if (ctx-&gt;dur) {</span>
+<span class="lineNum">     144 </span><span class="lineCov">        528 :                                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     145 </span><span class="lineCov">        528 :                                         GF_FilterPid *pid = gf_filter_get_ipid(ctx-&gt;filter, i);</span>
+<span class="lineNum">     146 </span><span class="lineCov">        528 :                                         if (!gf_filter_pid_is_eos(pid)) {</span>
+<span class="lineNum">     147 </span>            :                                                 GF_FilterEvent evt;
+<span class="lineNum">     148 </span><span class="lineCov">         72 :                                                 GF_FEVT_INIT(evt, GF_FEVT_PLAY, pid);</span>
+<span class="lineNum">     149 </span><span class="lineCov">         72 :                                                 gf_filter_pid_send_event(pid, &amp;evt);</span>
+<span class="lineNum">     150 </span><span class="lineCov">         72 :                                                 GF_FEVT_INIT(evt, GF_FEVT_STOP, pid);</span>
+<span class="lineNum">     151 </span><span class="lineCov">         72 :                                                 gf_filter_pid_send_event(pid, &amp;evt);</span>
+<span class="lineNum">     152 </span>            :                                                 //and discard every incoming packet
+<span class="lineNum">     153 </span><span class="lineCov">         72 :                                                 gf_filter_pid_set_discard(pid, GF_TRUE);</span>
+<span class="lineNum">     154 </span>            :                                         }
+<span class="lineNum">     155 </span>            :                                 }
+<span class="lineNum">     156 </span>            :                         }
+<span class="lineNum">     157 </span><span class="lineCov">        851 :                         return forced_eos ? GF_SERVICE_ERROR : GF_EOS;</span>
+<span class="lineNum">     158 </span>            :                 }
+<span class="lineNum">     159 </span><span class="lineCov">     123489 :                 ctx-&gt;check_eos_state = 0;</span>
+<span class="lineNum">     160 </span>            :                 //always repost a process task since we maye have things to draw even though no new input
+<span class="lineNum">     161 </span><span class="lineCov">     123489 :                 gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     162 </span><span class="lineCov">     123489 :                 return ctx-&gt;last_error;</span>
+<span class="lineNum">     163 </span>            :         }
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :         //to clean up,depending on whether we use a thread to poll user inputs, etc...
+<span class="lineNum">     167 </span><span class="lineCov">        364 :         if ((u32) ms_until_next &gt; 100)</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                 ms_until_next = 100;</span>
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :         //ask for real-time reschedule
+<span class="lineNum">     171 </span><span class="lineCov">        364 :         gf_filter_ask_rt_reschedule(filter, ms_until_next ? ms_until_next*1000 : 1);</span>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">        364 :         return ctx-&gt;last_error;</span>
+<a name="174"><span class="lineNum">     174 </span>            : }</a>
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span><span class="lineCov">       1096 : static void merge_properties(GF_Compositor *ctx, GF_FilterPid *pid, u32 mtype, GF_Scene *parent_scene)</span>
+<span class="lineNum">     177 </span>            : {
+<span class="lineNum">     178 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     179 </span><span class="lineCov">       1096 :         if (!ctx-&gt;vout) return;</span>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">       1096 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_URL);</span>
+<span class="lineNum">     182 </span><span class="lineCov">       1096 :         if (!p) return;</span>
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineCov">       1096 :         if (mtype==GF_STREAM_SCENE) {</span>
+<span class="lineNum">     185 </span><span class="lineCov">        473 :                 if (!parent_scene || !parent_scene-&gt;is_dynamic_scene) {</span>
+<span class="lineNum">     186 </span><span class="lineCov">        473 :                         gf_filter_pid_set_property(ctx-&gt;vout, GF_PROP_PID_URL, p);</span>
+<span class="lineNum">     187 </span>            :                 }
+<span class="lineNum">     188 </span><span class="lineCov">        623 :         } else if (parent_scene &amp;&amp; parent_scene-&gt;is_dynamic_scene) {</span>
+<span class="lineNum">     189 </span><span class="lineCov">        274 :                 if (mtype==GF_STREAM_VISUAL)</span>
+<span class="lineNum">     190 </span><span class="lineCov">        269 :                         gf_filter_pid_set_property(ctx-&gt;vout, GF_PROP_PID_URL, p);</span>
+<span class="lineNum">     191 </span>            :         }
+<a name="192"><span class="lineNum">     192 </span>            : }</a>
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineCov">       1161 : static GF_Err compose_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     195 </span>            : {
+<span class="lineNum">     196 </span>            :         GF_ObjectManager *odm;
+<span class="lineNum">     197 </span>            :         const GF_PropertyValue *prop;
+<span class="lineNum">     198 </span>            :         u32 mtype, codecid;
+<span class="lineNum">     199 </span>            :         u32 i, count;
+<span class="lineNum">     200 </span>            :         GF_Scene *scene = NULL;
+<span class="lineNum">     201 </span>            :         GF_Scene *top_scene = NULL;
+<span class="lineNum">     202 </span><span class="lineCov">       1161 :         GF_Compositor *ctx = (GF_Compositor *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     203 </span>            :         GF_FilterEvent evt;
+<span class="lineNum">     204 </span>            :         Bool in_iod = GF_FALSE;
+<span class="lineNum">     205 </span>            :         Bool was_dyn_scene = GF_FALSE;
+<span class="lineNum">     206 </span><span class="lineCov">       1161 :         if (is_remove) {</span>
+<span class="lineNum">     207 </span>            :                 u32 ID=0;
+<span class="lineNum">     208 </span><span class="lineCov">         65 :                 odm = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">     209 </span>            :                 //already disconnected
+<span class="lineNum">     210 </span><span class="lineCov">         65 :                 if (!odm) return GF_OK;</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :                 ID = odm-&gt;ID;</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :                 scene = odm-&gt;parentscene;</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                 if (scene &amp;&amp; !scene-&gt;is_dynamic_scene)</span>
+<span class="lineNum">     214 </span>            :                         scene = NULL;
+<span class="lineNum">     215 </span>            :                 //destroy the object
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :                 gf_odm_disconnect(odm, 2);</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :                 if (scene) {</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :                         if (scene-&gt;visual_url.OD_ID == ID) {</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :                                 scene-&gt;visual_url.OD_ID = 0;</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                                 gf_scene_regenerate(scene);</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                         } else if (scene-&gt;audio_url.OD_ID == ID) {</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :                                 scene-&gt;audio_url.OD_ID = 0;</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :                                 gf_scene_regenerate(scene);</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :                         } else if (scene-&gt;text_url.OD_ID == ID) {</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :                                 scene-&gt;text_url.OD_ID = 0;</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :                                 gf_scene_regenerate(scene);</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :                         } else if (scene-&gt;dims_url.OD_ID == ID) {</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :                                 scene-&gt;dims_url.OD_ID = 0;</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :                                 gf_scene_regenerate(scene);</span>
+<span class="lineNum">     230 </span>            :                         }
+<span class="lineNum">     231 </span>            :                 }
+<span class="lineNum">     232 </span>            :                 return GF_OK;
+<span class="lineNum">     233 </span>            :         }
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">       1096 :         prop = gf_filter_pid_get_property(pid, GF_PROP_PID_STREAM_TYPE);</span>
+<span class="lineNum">     236 </span><span class="lineCov">       1096 :         if (!prop) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     237 </span><span class="lineCov">       1096 :         mtype = prop-&gt;value.uint;</span>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span><span class="lineCov">       1096 :         prop = gf_filter_pid_get_property(pid, GF_PROP_PID_CODECID);</span>
+<span class="lineNum">     240 </span><span class="lineCov">       1096 :         if (!prop) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     241 </span><span class="lineCov">       1096 :         codecid = prop-&gt;value.uint;</span>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineCov">       1096 :         odm = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">     244 </span><span class="lineCov">       1096 :         if (odm) {</span>
+<span class="lineNum">     245 </span><span class="lineCov">        209 :                 if (mtype==GF_STREAM_SCENE) { }</span>
+<span class="lineNum">     246 </span><span class="lineCov">        209 :                 else if (mtype==GF_STREAM_OD) { }</span>
+<span class="lineNum">     247 </span>            :                 //change of stream type for a given object, no use case yet
+<span class="lineNum">     248 </span>            :                 else {
+<span class="lineNum">     249 </span><span class="lineCov">        209 :                         if (odm-&gt;type != mtype)</span>
+<span class="lineNum">     250 </span>            :                                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     251 </span><span class="lineCov">        209 :                         if (odm-&gt;mo) {</span>
+<span class="lineNum">     252 </span><span class="lineCov">        209 :                                 odm-&gt;mo-&gt;config_changed = GF_TRUE;</span>
+<span class="lineNum">     253 </span><span class="lineCov">        209 :                                 if ((odm-&gt;type == GF_STREAM_VISUAL) &amp;&amp; odm-&gt;parentscene &amp;&amp; odm-&gt;parentscene-&gt;is_dynamic_scene) {</span>
+<span class="lineNum">     254 </span><span class="lineCov">         65 :                                         gf_scene_force_size_to_video(odm-&gt;parentscene, odm-&gt;mo);</span>
+<span class="lineNum">     255 </span><span class="lineCov">         65 :                                         odm-&gt;mo-&gt;config_changed = GF_TRUE;</span>
+<span class="lineNum">     256 </span>            :                                 }
+<span class="lineNum">     257 </span>            :                         }
+<span class="lineNum">     258 </span><span class="lineCov">        209 :                         gf_odm_update_duration(odm, pid);</span>
+<span class="lineNum">     259 </span><span class="lineCov">        209 :                         gf_odm_check_clock_mediatime(odm);</span>
+<span class="lineNum">     260 </span>            :                 }
+<span class="lineNum">     261 </span><span class="lineCov">        209 :                 merge_properties(ctx, pid, mtype, odm-&gt;parentscene);</span>
+<span class="lineNum">     262 </span><span class="lineCov">        209 :                 return GF_OK;</span>
+<span class="lineNum">     263 </span>            :         }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :         //create a default scene
+<span class="lineNum">     266 </span><span class="lineCov">        887 :         if (!ctx-&gt;root_scene) {</span>
+<span class="lineNum">     267 </span>            :                 const char *service_url = &quot;unknown&quot;;
+<span class="lineNum">     268 </span><span class="lineCov">        598 :                 const GF_PropertyValue *p = gf_filter_pid_get_property(pid, GF_PROP_PID_URL);</span>
+<span class="lineNum">     269 </span><span class="lineCov">        598 :                 if (p) service_url = p-&gt;value.string;</span>
+<span class="lineNum">     270 </span>            :                 
+<span class="lineNum">     271 </span><span class="lineCov">        598 :                 ctx-&gt;root_scene = gf_scene_new(ctx, NULL);</span>
+<span class="lineNum">     272 </span><span class="lineCov">        598 :                 ctx-&gt;root_scene-&gt;root_od = gf_odm_new();</span>
+<span class="lineNum">     273 </span><span class="lineCov">        598 :                 ctx-&gt;root_scene-&gt;root_od-&gt;scene_ns = gf_scene_ns_new(ctx-&gt;root_scene, ctx-&gt;root_scene-&gt;root_od, service_url, NULL);</span>
+<span class="lineNum">     274 </span><span class="lineCov">        598 :                 ctx-&gt;root_scene-&gt;root_od-&gt;subscene = ctx-&gt;root_scene;</span>
+<span class="lineNum">     275 </span><span class="lineCov">        598 :                 ctx-&gt;root_scene-&gt;root_od-&gt;scene_ns-&gt;nb_odm_users++;</span>
+<span class="lineNum">     276 </span>            :                 switch (mtype) {
+<span class="lineNum">     277 </span><span class="lineCov">        395 :                 case GF_STREAM_SCENE:</span>
+<span class="lineNum">     278 </span>            :                 case GF_STREAM_PRIVATE_SCENE:
+<span class="lineNum">     279 </span>            :                 case GF_STREAM_OD:
+<span class="lineNum">     280 </span><span class="lineCov">        395 :                         ctx-&gt;root_scene-&gt;is_dynamic_scene = GF_FALSE;</span>
+<span class="lineNum">     281 </span><span class="lineCov">        395 :                         break;</span>
+<span class="lineNum">     282 </span><span class="lineCov">        203 :                 default:</span>
+<span class="lineNum">     283 </span><span class="lineCov">        203 :                         ctx-&gt;root_scene-&gt;is_dynamic_scene = GF_TRUE;</span>
+<span class="lineNum">     284 </span><span class="lineCov">        203 :                         break;</span>
+<span class="lineNum">     285 </span>            :                 }
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineCov">        598 :                 if (!ctx-&gt;root_scene-&gt;root_od-&gt;scene_ns-&gt;url_frag) {</span>
+<span class="lineNum">     288 </span><span class="lineCov">        598 :                         p = gf_filter_pid_get_property(pid, GF_PROP_PID_ORIG_FRAG_URL);</span>
+<span class="lineNum">     289 </span><span class="lineCov">        598 :                         if (p &amp;&amp; p-&gt;value.string)</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :                                 ctx-&gt;root_scene-&gt;root_od-&gt;scene_ns-&gt;url_frag = gf_strdup(p-&gt;value.string);</span>
+<span class="lineNum">     291 </span>            :                 }
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineCov">        598 :                 if (!ctx-&gt;player)</span>
+<span class="lineNum">     294 </span><span class="lineCov">        598 :                         gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     295 </span>            :         }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :         //default scene is root one
+<span class="lineNum">     298 </span><span class="lineCov">        887 :         scene = ctx-&gt;root_scene;</span>
+<span class="lineNum">     299 </span>            :         top_scene = ctx-&gt;root_scene;
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span>            :         //browse all scene namespaces and figure out our parent scene
+<span class="lineNum">     302 </span><span class="lineCov">        887 :         count = gf_list_count(top_scene-&gt;namespaces);</span>
+<span class="lineNum">     303 </span><span class="lineCov">       1970 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     304 </span><span class="lineCov">       1360 :                 GF_SceneNamespace *sns = gf_list_get(top_scene-&gt;namespaces, i);</span>
+<span class="lineNum">     305 </span><span class="lineCov">       1360 :                 if (!sns-&gt;source_filter) {</span>
+<span class="lineNum">     306 </span><span class="lineCov">        962 :                         if (sns-&gt;connect_ack &amp;&amp; sns-&gt;owner) {</span>
+<span class="lineNum">     307 </span><span class="lineCov">         58 :                                 scene = sns-&gt;owner-&gt;subscene ? sns-&gt;owner-&gt;subscene : sns-&gt;owner-&gt;parentscene;</span>
+<span class="lineNum">     308 </span>            :                                 break;
+<span class="lineNum">     309 </span>            :                         }
+<span class="lineNum">     310 </span><span class="lineCov">        904 :                         continue;</span>
+<span class="lineNum">     311 </span>            :                 }
+<span class="lineNum">     312 </span>            :                 assert(sns-&gt;owner);
+<span class="lineNum">     313 </span><span class="lineCov">        398 :                 if (gf_filter_pid_is_filter_in_parents(pid, sns-&gt;source_filter)) {</span>
+<span class="lineNum">     314 </span><span class="lineCov">        219 :                         if (!sns-&gt;owner-&gt;subscene &amp;&amp; sns-&gt;owner-&gt;parentscene &amp;&amp; (mtype!=GF_STREAM_OD) &amp;&amp; (mtype!=GF_STREAM_SCENE)) {</span>
+<span class="lineNum">     315 </span>            :                                 u32 j;
+<span class="lineNum">     316 </span><span class="lineCov">        267 :                                 for (j=0; j&lt;gf_list_count(sns-&gt;owner-&gt;parentscene-&gt;scene_objects); j++) {</span>
+<span class="lineNum">     317 </span><span class="lineCov">        269 :                                         GF_MediaObject *mo = gf_list_get(sns-&gt;owner-&gt;parentscene-&gt;scene_objects, j);</span>
+<span class="lineNum">     318 </span><span class="lineCov">        269 :                                         if (mo-&gt;OD_ID == GF_MEDIA_EXTERNAL_ID) continue;</span>
+<span class="lineNum">     319 </span><span class="lineCov">        191 :                                         if (mo-&gt;OD_ID != sns-&gt;owner-&gt;ID) continue;</span>
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span><span class="lineCov">        120 :                                         if (mo-&gt;type != GF_MEDIA_OBJECT_SCENE) continue;</span>
+<span class="lineNum">     322 </span>            :                                         //this is a pid from a subservice (inline) inserted through OD commands, create the subscene
+<span class="lineNum">     323 </span><span class="lineCov">          2 :                                         sns-&gt;owner-&gt;subscene = gf_scene_new(NULL, sns-&gt;owner-&gt;parentscene);</span>
+<span class="lineNum">     324 </span><span class="lineCov">          2 :                                         sns-&gt;owner-&gt;subscene-&gt;root_od = sns-&gt;owner;</span>
+<span class="lineNum">     325 </span>            :                                         //scenes are by default dynamic
+<span class="lineNum">     326 </span><span class="lineCov">          2 :                                         sns-&gt;owner-&gt;subscene-&gt;is_dynamic_scene = GF_TRUE;</span>
+<span class="lineNum">     327 </span><span class="lineCov">          2 :                                         sns-&gt;owner-&gt;mo = mo;</span>
+<span class="lineNum">     328 </span><span class="lineCov">          2 :                                         mo-&gt;odm = sns-&gt;owner;</span>
+<span class="lineNum">     329 </span><span class="lineCov">          2 :                                         break;</span>
+<span class="lineNum">     330 </span>            :                                 }
+<span class="lineNum">     331 </span>            :                         }
+<span class="lineNum">     332 </span>            :                         //we are attaching an inline, create the subscene if not done already
+<span class="lineNum">     333 </span><span class="lineCov">        219 :                         if (!sns-&gt;owner-&gt;subscene &amp;&amp; ((mtype==GF_STREAM_OD) || (mtype==GF_STREAM_SCENE)) ) {</span>
+<span class="lineNum">     334 </span>            :                                 //ignore system PIDs from subservice - this is typically the case when playing a bt/xmt file
+<span class="lineNum">     335 </span>            :                                 //created from a container (mp4) and still referring to that container for the media streams
+<span class="lineNum">     336 </span><span class="lineCov">          5 :                                 if (sns-&gt;owner-&gt;ignore_sys) {</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :                                         GF_FEVT_INIT(evt, GF_FEVT_PLAY, pid);</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_send_event(pid, &amp;evt);</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :                                         GF_FEVT_INIT(evt, GF_FEVT_STOP, pid);</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_send_event(pid, &amp;evt);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                                         return GF_OK;</span>
+<span class="lineNum">     342 </span>            :                                 }
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :                                 assert(sns-&gt;owner-&gt;parentscene);
+<span class="lineNum">     345 </span><span class="lineCov">          5 :                                 sns-&gt;owner-&gt;subscene = gf_scene_new(ctx, sns-&gt;owner-&gt;parentscene);</span>
+<span class="lineNum">     346 </span><span class="lineCov">          5 :                                 sns-&gt;owner-&gt;subscene-&gt;root_od = sns-&gt;owner;</span>
+<span class="lineNum">     347 </span>            :                         }
+<span class="lineNum">     348 </span><span class="lineCov">        219 :                         scene = sns-&gt;owner-&gt;subscene ? sns-&gt;owner-&gt;subscene : sns-&gt;owner-&gt;parentscene;</span>
+<span class="lineNum">     349 </span>            :                         break;
+<span class="lineNum">     350 </span>            :                 }
+<span class="lineNum">     351 </span>            :         }
+<span class="lineNum">     352 </span>            :         assert(scene);
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span><span class="lineCov">        887 :         GF_LOG(GF_LOG_INFO, GF_LOG_COMPOSE, (&quot;[Compositor] Configuring PID %s\n&quot;, gf_stream_type_name(mtype)));</span>
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineCov">        887 :         was_dyn_scene = scene-&gt;is_dynamic_scene;</span>
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span>            :         //pure OCR streams are handled by dispatching OCR on the PID(s)
+<span class="lineNum">     359 </span><span class="lineCov">        887 :         if (codecid != GF_CODECID_RAW)</span>
+<span class="lineNum">     360 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span><span class="lineCov">        887 :         switch (mtype) {</span>
+<span class="lineNum">     363 </span><span class="lineCov">        479 :         case GF_STREAM_SCENE:</span>
+<span class="lineNum">     364 </span>            :         case GF_STREAM_OD:
+<span class="lineNum">     365 </span>            :                 //we have an MPEG-4 ESID defined for the PID, this is MPEG-4 systems
+<span class="lineNum">     366 </span><span class="lineCov">        479 :                 prop = gf_filter_pid_get_property(pid, GF_PROP_PID_ESID);</span>
+<span class="lineNum">     367 </span><span class="lineCov">        479 :                 if (prop &amp;&amp; scene-&gt;is_dynamic_scene) {</span>
+<span class="lineNum">     368 </span><span class="lineCov">          2 :                         scene-&gt;is_dynamic_scene = GF_FALSE;</span>
+<span class="lineNum">     369 </span>            :                 }
+<span class="lineNum">     370 </span><span class="lineCov">        479 :                 prop = gf_filter_pid_get_property(pid, GF_PROP_PID_IN_IOD);</span>
+<span class="lineNum">     371 </span><span class="lineCov">        479 :                 if (prop &amp;&amp; prop-&gt;value.boolean) {</span>
+<span class="lineNum">     372 </span><span class="lineCov">        479 :                         scene-&gt;is_dynamic_scene = GF_FALSE;</span>
+<span class="lineNum">     373 </span>            :                         in_iod = GF_TRUE;
+<span class="lineNum">     374 </span>            :                 }
+<span class="lineNum">     375 </span>            :                 break;
+<span class="lineNum">     376 </span>            :         }
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span><span class="lineCov">        887 :         if ((mtype==GF_STREAM_OD) &amp;&amp; !in_iod) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     379 </span>            : 
+<span class="lineNum">     380 </span>            :         //we inserted a root scene (bt/svg/...) after a pid (passthrough mode), we need to create a new namesapce for
+<span class="lineNum">     381 </span>            :         //the scene and reassign the old namespace to the previously created ODM
+<span class="lineNum">     382 </span><span class="lineCov">        887 :         if (!scene-&gt;root_od-&gt;parentscene &amp;&amp; was_dyn_scene &amp;&amp; (was_dyn_scene != scene-&gt;is_dynamic_scene)) {</span>
+<span class="lineNum">     383 </span>            :                 GF_SceneNamespace *new_sns=NULL;
+<span class="lineNum">     384 </span>            :                 const char *service_url = &quot;unknown&quot;;
+<span class="lineNum">     385 </span><span class="lineCov">         34 :                 const GF_PropertyValue *p = gf_filter_pid_get_property(pid, GF_PROP_PID_URL);</span>
+<span class="lineNum">     386 </span><span class="lineCov">         34 :                 if (p) service_url = p-&gt;value.string;</span>
+<span class="lineNum">     387 </span><span class="lineCov">         34 :                 new_sns = gf_scene_ns_new(ctx-&gt;root_scene, ctx-&gt;root_scene-&gt;root_od, service_url, NULL);</span>
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span><span class="lineCov">         34 :                 for (i=0; i&lt;gf_list_count(scene-&gt;resources); i++) {</span>
+<span class="lineNum">     390 </span><span class="lineCov">         29 :                         GF_ObjectManager *anodm = gf_list_get(scene-&gt;resources, i);</span>
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span><span class="lineCov">         29 :                         if (new_sns &amp;&amp; (anodm-&gt;scene_ns == scene-&gt;root_od-&gt;scene_ns) &amp;&amp; (scene-&gt;root_od-&gt;scene_ns-&gt;owner==scene-&gt;root_od)) {</span>
+<span class="lineNum">     393 </span><span class="lineCov">         29 :                                 scene-&gt;root_od-&gt;scene_ns-&gt;owner = anodm;</span>
+<span class="lineNum">     394 </span><span class="lineCov">         29 :                                 break;</span>
+<span class="lineNum">     395 </span>            :                         }
+<span class="lineNum">     396 </span>            :                 }
+<span class="lineNum">     397 </span><span class="lineCov">         34 :                 scene-&gt;root_od-&gt;scene_ns = new_sns;</span>
+<span class="lineNum">     398 </span><span class="lineCov">         34 :                 gf_sc_set_scene(ctx, NULL);</span>
+<span class="lineNum">     399 </span><span class="lineCov">         34 :                 gf_sg_reset(scene-&gt;graph);</span>
+<span class="lineNum">     400 </span><span class="lineCov">         34 :                 gf_sc_set_scene(ctx, scene-&gt;graph);</span>
+<span class="lineNum">     401 </span><span class="lineCov">         34 :                 ctx-&gt;reload_scene_size = GF_TRUE;</span>
+<span class="lineNum">     402 </span>            :         }
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span>            :         //setup object (clock) and playback requests
+<span class="lineNum">     405 </span><span class="lineCov">        887 :         gf_scene_insert_pid(scene, scene-&gt;root_od-&gt;scene_ns, pid, in_iod);</span>
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span><span class="lineCov">        887 :         if (was_dyn_scene != scene-&gt;is_dynamic_scene) {</span>
+<span class="lineNum">     408 </span><span class="lineCov">         29 :                 for (i=0; i&lt;gf_list_count(scene-&gt;resources); i++) {</span>
+<span class="lineNum">     409 </span><span class="lineCov">         29 :                         GF_ObjectManager *anodm = gf_list_get(scene-&gt;resources, i);</span>
+<span class="lineNum">     410 </span><span class="lineCov">         29 :                         if (anodm-&gt;mo)</span>
+<span class="lineNum">     411 </span><span class="lineCov">         29 :                                 anodm-&gt;flags |= GF_ODM_PASSTHROUGH;</span>
+<span class="lineNum">     412 </span>            :                 }
+<span class="lineNum">     413 </span>            :         }
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            :         //attach scene to input filters - may be true for dynamic scene (text rendering) and regular scenes
+<span class="lineNum">     417 </span><span class="lineCov">        887 :         if ((mtype==GF_STREAM_OD) || (mtype==GF_STREAM_SCENE) || (mtype==GF_STREAM_TEXT) ) {</span>
+<span class="lineNum">     418 </span>            :                 void gf_filter_pid_exec_event(GF_FilterPid *pid, GF_FilterEvent *evt);
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span><span class="lineCov">        489 :                 GF_FEVT_INIT(evt, GF_FEVT_ATTACH_SCENE, pid);</span>
+<span class="lineNum">     421 </span><span class="lineCov">        489 :                 evt.attach_scene.object_manager = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">     422 </span><span class="lineCov">        489 :                 gf_filter_pid_exec_event(pid, &amp;evt);</span>
+<span class="lineNum">     423 </span>            :         }
+<span class="lineNum">     424 </span>            :         //scene is dynamic
+<span class="lineNum">     425 </span><span class="lineCov">        887 :         if (scene-&gt;is_dynamic_scene) {</span>
+<span class="lineNum">     426 </span>            :                 Bool reset = GF_FALSE;
+<span class="lineNum">     427 </span>            :                 u32 scene_vr_type = 0;
+<span class="lineNum">     428 </span><span class="lineCov">        209 :                 char *sep = scene-&gt;root_od-&gt;scene_ns-&gt;url_frag;</span>
+<span class="lineNum">     429 </span><span class="lineCov">        209 :                 if (sep &amp;&amp; ( !strnicmp(sep, &quot;LIVE360&quot;, 7) || !strnicmp(sep, &quot;360&quot;, 3) || !strnicmp(sep, &quot;VR&quot;, 2) ) ) {</span>
+<span class="lineNum">     430 </span>            :                         scene_vr_type = 1;
+<span class="lineNum">     431 </span>            :                 }
+<span class="lineNum">     432 </span><span class="lineCov">        209 :                 if (!sep) {</span>
+<span class="lineNum">     433 </span><span class="lineCov">        207 :                         prop = gf_filter_pid_get_property(pid, GF_PROP_PID_PROJECTION_TYPE);</span>
+<span class="lineNum">     434 </span><span class="lineCov">        207 :                         if (prop &amp;&amp; (prop-&gt;value.uint==GF_PROJ360_EQR)) scene_vr_type = 1;</span>
+<span class="lineNum">     435 </span>            :                 }
+<span class="lineNum">     436 </span><span class="lineCov">        209 :                 if (scene_vr_type) {</span>
+<span class="lineNum">     437 </span><span class="lineCov">          2 :                         if (scene-&gt;vr_type != scene_vr_type) reset = GF_TRUE;</span>
+<span class="lineNum">     438 </span><span class="lineCov">          2 :                         scene-&gt;vr_type = scene_vr_type;</span>
+<span class="lineNum">     439 </span>            :                 }
+<span class="lineNum">     440 </span>            :                 if (reset)
+<span class="lineNum">     441 </span><span class="lineCov">          2 :                         gf_sg_reset(scene-&gt;graph);</span>
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span><span class="lineCov">        209 :                 gf_scene_regenerate(scene);</span>
+<span class="lineNum">     444 </span>            :         }
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span><span class="lineCov">        887 :         merge_properties(ctx, pid, mtype, scene);</span>
+<span class="lineNum">     447 </span><span class="lineCov">        887 :         return GF_OK;</span>
+<span class="lineNum">     448 </span>            : }
+<span class="lineNum">     449 </span>            : 
+<a name="450"><span class="lineNum">     450 </span>            : #include &quot;../compositor/visual_manager.h&quot;</a>
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span><span class="lineCov">         35 : static GF_Err compose_reconfig_output(GF_Filter *filter, GF_FilterPid *pid)</span>
+<span class="lineNum">     453 </span>            : {
+<span class="lineNum">     454 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     455 </span>            :         u32 sr, o_fmt, nb_ch, afmt;
+<span class="lineNum">     456 </span>            :         u64 cfg;
+<span class="lineNum">     457 </span>            :         Bool needs_reconfigure = GF_FALSE;
+<span class="lineNum">     458 </span><span class="lineCov">         35 :         GF_Compositor *ctx = (GF_Compositor *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     459 </span>            : 
+<span class="lineNum">     460 </span><span class="lineCov">         35 :         if (ctx-&gt;vout == pid) {</span>
+<span class="lineNum">     461 </span>            :                 u32 w, h;
+<span class="lineNum">     462 </span><span class="lineCov">         34 :                 p = gf_filter_pid_caps_query(pid, GF_PROP_PID_PIXFMT);</span>
+<span class="lineNum">     463 </span><span class="lineCov">         34 :                 if (p) {</span>
+<span class="lineNum">     464 </span>            :                         u32 stride;
+<span class="lineNum">     465 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">     466 </span><span class="lineCov">         34 :                         if (ctx-&gt;scene &amp;&amp; (ctx-&gt;hybrid_opengl || ctx-&gt;visual-&gt;type_3d)) {</span>
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :                                 switch (p-&gt;value.uint) {</span>
+<span class="lineNum">     468 </span>            :                                 case GF_PIXEL_RGBA:
+<span class="lineNum">     469 </span>            :                                 case GF_PIXEL_RGB:
+<span class="lineNum">     470 </span>            :                                         break;
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :                                 default:</span>
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :                                         return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     473 </span>            :                                 }
+<span class="lineNum">     474 </span><span class="lineCov">         34 :                         }</span>
+<span class="lineNum">     475 </span>            : #endif
+<span class="lineNum">     476 </span><span class="lineCov">         34 :                         ctx-&gt;opfmt = p-&gt;value.uint;</span>
+<span class="lineNum">     477 </span><span class="lineCov">         34 :                         gf_filter_pid_set_property(ctx-&gt;vout, GF_PROP_PID_PIXFMT, &amp;PROP_UINT(ctx-&gt;opfmt) );</span>
+<span class="lineNum">     478 </span><span class="lineCov">         34 :                         gf_pixel_get_size_info(ctx-&gt;opfmt, ctx-&gt;display_width, ctx-&gt;display_height, NULL, &amp;stride, NULL, NULL, NULL);</span>
+<span class="lineNum">     479 </span><span class="lineCov">         34 :                         gf_filter_pid_set_property(ctx-&gt;vout, GF_PROP_PID_STRIDE, &amp;PROP_UINT(stride) );</span>
+<span class="lineNum">     480 </span>            :                 }
+<span class="lineNum">     481 </span>            :                 
+<span class="lineNum">     482 </span>            :                 w = h = 0;
+<span class="lineNum">     483 </span><span class="lineCov">         34 :                 p = gf_filter_pid_caps_query(pid, GF_PROP_PID_WIDTH);</span>
+<span class="lineNum">     484 </span><span class="lineCov">         34 :                 if (p) w = p-&gt;value.uint;</span>
+<span class="lineNum">     485 </span><span class="lineCov">         34 :                 p = gf_filter_pid_caps_query(pid, GF_PROP_PID_HEIGHT);</span>
+<span class="lineNum">     486 </span><span class="lineCov">         34 :                 if (p) h = p-&gt;value.uint;</span>
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span><span class="lineCov">         34 :                 if (w &amp;&amp; h) {</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :                         ctx-&gt;osize.x = w;</span>
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :                         ctx-&gt;osize.y = h;</span>
+<span class="lineNum">     491 </span>            : /*                      gf_filter_pid_set_property(ctx-&gt;vout, GF_PROP_PID_WIDTH, &amp;PROP_UINT(w) );
+<span class="lineNum">     492 </span>            :                         gf_filter_pid_set_property(ctx-&gt;vout, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(h) );
+<span class="lineNum">     493 </span>            : */              }
+<span class="lineNum">     494 </span>            :                 return GF_OK;
+<span class="lineNum">     495 </span>            :         }
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span><span class="lineCov">          1 :         if (ctx-&gt;audio_renderer-&gt;aout == pid) {</span>
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span><span class="lineCov">          1 :                 gf_mixer_get_config(ctx-&gt;audio_renderer-&gt;mixer, &amp;sr, &amp;nb_ch, &amp;o_fmt, &amp;cfg);</span>
+<span class="lineNum">     500 </span><span class="lineCov">          1 :                 p = gf_filter_pid_caps_query(pid, GF_PROP_PID_SAMPLE_RATE);</span>
+<span class="lineNum">     501 </span><span class="lineCov">          1 :                 if (p &amp;&amp; (p-&gt;value.uint != sr)) {</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :                         sr = p-&gt;value.uint;</span>
+<span class="lineNum">     503 </span>            :                         needs_reconfigure = GF_TRUE;
+<span class="lineNum">     504 </span>            :                 }
+<span class="lineNum">     505 </span><span class="lineCov">          1 :                 p = gf_filter_pid_caps_query(pid, GF_PROP_PID_NUM_CHANNELS);</span>
+<span class="lineNum">     506 </span><span class="lineCov">          1 :                 if (p &amp;&amp; (p-&gt;value.uint != nb_ch)) {</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :                         nb_ch = p-&gt;value.uint;</span>
+<span class="lineNum">     508 </span>            :                         needs_reconfigure = GF_TRUE;
+<span class="lineNum">     509 </span>            :                 }
+<span class="lineNum">     510 </span><span class="lineCov">          1 :                 p = gf_filter_pid_caps_query(pid, GF_PROP_PID_AUDIO_FORMAT);</span>
+<span class="lineNum">     511 </span><span class="lineCov">          1 :                 if (p) afmt = p-&gt;value.uint;</span>
+<span class="lineNum">     512 </span>            :                 else afmt = GF_AUDIO_FMT_S16;
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span><span class="lineCov">          1 :                 if (o_fmt != afmt) {</span>
+<span class="lineNum">     515 </span>            :                         needs_reconfigure = GF_TRUE;
+<span class="lineNum">     516 </span>            :                 }
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :                 if (!needs_reconfigure) return GF_OK;</span>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span><span class="lineCov">          1 :                 GF_LOG(GF_LOG_INFO, GF_LOG_AUDIO, (&quot;[Compositor] Audio output caps negotiated to %d Hz %d channels %s \n&quot;, sr, nb_ch, gf_audio_fmt_name(afmt) ));</span>
+<span class="lineNum">     520 </span><span class="lineCov">          1 :                 gf_mixer_set_config(ctx-&gt;audio_renderer-&gt;mixer, sr, nb_ch, afmt, 0);</span>
+<span class="lineNum">     521 </span><span class="lineCov">          1 :                 ctx-&gt;audio_renderer-&gt;need_reconfig = GF_TRUE;</span>
+<span class="lineNum">     522 </span><span class="lineCov">          1 :                 return GF_OK;</span>
+<span class="lineNum">     523 </span>            :         }
+<span class="lineNum">     524 </span>            :         return GF_NOT_SUPPORTED;
+<a name="525"><span class="lineNum">     525 </span>            : }</a>
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span><span class="lineCov">       6428 : static Bool compose_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     528 </span>            : {
+<span class="lineNum">     529 </span><span class="lineCov">       6428 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     530 </span>            :         //event(s) we trigger on ourselves to go up the filter chain
+<span class="lineNum">     531 </span>            :         case GF_FEVT_CAPS_CHANGE:
+<span class="lineNum">     532 </span>            :                 return GF_FALSE;
+<span class="lineNum">     533 </span><span class="lineCov">          8 :         case GF_FEVT_CONNECT_FAIL:</span>
+<span class="lineNum">     534 </span>            :         {
+<span class="lineNum">     535 </span><span class="lineCov">          8 :                 GF_Compositor *ctx = (GF_Compositor *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     536 </span><span class="lineCov">          8 :                 if (ctx-&gt;audio_renderer &amp;&amp; (evt-&gt;base.on_pid == ctx-&gt;audio_renderer-&gt;aout))</span>
+<span class="lineNum">     537 </span><span class="lineCov">          1 :                         ctx-&gt;audio_renderer-&gt;non_rt_output = GF_FALSE;</span>
+<span class="lineNum">     538 </span>            :         }
+<span class="lineNum">     539 </span>            :                 return GF_FALSE;
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :         case GF_FEVT_BUFFER_REQ:</span>
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :                 return GF_TRUE;</span>
+<span class="lineNum">     542 </span>            :                 
+<span class="lineNum">     543 </span><span class="lineCov">       5783 :         case GF_FEVT_INFO_UPDATE:</span>
+<span class="lineNum">     544 </span>            :         {
+<span class="lineNum">     545 </span>            :                 u32 bps=0;
+<span class="lineNum">     546 </span>            :                 u64 tot_size=0, down_size=0;
+<span class="lineNum">     547 </span><span class="lineCov">       5783 :                 GF_ObjectManager *odm = gf_filter_pid_get_udta(evt-&gt;base.on_pid);</span>
+<span class="lineNum">     548 </span><span class="lineCov">       5783 :                 GF_PropertyEntry *pe=NULL;</span>
+<span class="lineNum">     549 </span><span class="lineCov">       5783 :                 GF_PropertyValue *p = (GF_PropertyValue *) gf_filter_pid_get_info(evt-&gt;base.on_pid, GF_PROP_PID_TIMESHIFT_STATE, &amp;pe);</span>
+<span class="lineNum">     550 </span><span class="lineCov">       5783 :                 if (p &amp;&amp; p-&gt;value.uint) {</span>
+<span class="lineNum">     551 </span>            :                         GF_Event an_evt;
+<span class="lineNum">     552 </span>            :                         memset(&amp;an_evt, 0, sizeof(GF_Event));
+<span class="lineNum">     553 </span><span class="lineNoCov">          0 :                         GF_Compositor *ctx = (GF_Compositor *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :                         if (p-&gt;value.uint==1) {</span>
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :                                 an_evt.type = GF_EVENT_TIMESHIFT_UNDERRUN;</span>
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :                                 gf_sc_send_event(ctx, &amp;an_evt);</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :                         } else if (p-&gt;value.uint==2) {</span>
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :                                 an_evt.type = GF_EVENT_TIMESHIFT_OVERFLOW;</span>
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :                                 gf_sc_send_event(ctx, &amp;an_evt);</span>
+<span class="lineNum">     560 </span>            :                         }
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :                         p-&gt;value.uint = 0;</span>
+<span class="lineNum">     562 </span>            :                 }
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span><span class="lineCov">       5783 :                 p = (GF_PropertyValue *) gf_filter_pid_get_info(evt-&gt;base.on_pid, GF_PROP_PID_DOWN_RATE, &amp;pe);</span>
+<span class="lineNum">     565 </span><span class="lineCov">       5783 :                 if (p) bps = p-&gt;value.uint;</span>
+<span class="lineNum">     566 </span><span class="lineCov">       5783 :                 p = (GF_PropertyValue *) gf_filter_pid_get_info(evt-&gt;base.on_pid, GF_PROP_PID_DOWN_SIZE, &amp;pe);</span>
+<span class="lineNum">     567 </span><span class="lineCov">       5783 :                 if (p) tot_size = p-&gt;value.longuint;</span>
+<span class="lineNum">     568 </span>            : 
+<span class="lineNum">     569 </span><span class="lineCov">       5783 :                 p = (GF_PropertyValue *) gf_filter_pid_get_info(evt-&gt;base.on_pid, GF_PROP_PID_DOWN_BYTES, &amp;pe);</span>
+<span class="lineNum">     570 </span><span class="lineCov">       5783 :                 if (p) down_size = p-&gt;value.longuint;</span>
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span><span class="lineCov">       5783 :                 if (bps &amp;&amp; down_size &amp;&amp; tot_size)  {</span>
+<span class="lineNum">     573 </span><span class="lineCov">         22 :                         odm = gf_filter_pid_get_udta(evt-&gt;base.on_pid);</span>
+<span class="lineNum">     574 </span><span class="lineCov">         22 :                         if ((down_size!=odm-&gt;last_filesize_signaled) || (down_size != tot_size)) {</span>
+<span class="lineNum">     575 </span><span class="lineCov">         10 :                                 odm-&gt;last_filesize_signaled = down_size;</span>
+<span class="lineNum">     576 </span><span class="lineCov">         10 :                                 gf_odm_service_media_event_with_download(odm, GF_EVENT_MEDIA_PROGRESS, down_size, tot_size, bps/8, 0, 0);</span>
+<span class="lineNum">     577 </span>            :                         }
+<span class="lineNum">     578 </span>            :                 }
+<span class="lineNum">     579 </span>            : 
+<span class="lineNum">     580 </span><span class="lineCov">       5783 :                 gf_filter_release_property(pe);</span>
+<span class="lineNum">     581 </span><span class="lineCov">       5783 :                 gf_odm_check_clock_mediatime(odm);</span>
+<span class="lineNum">     582 </span>            :         }
+<span class="lineNum">     583 </span><span class="lineCov">       5783 :                 return GF_TRUE;</span>
+<span class="lineNum">     584 </span>            : 
+<span class="lineNum">     585 </span><span class="lineNoCov">          0 :         case GF_FEVT_USER:</span>
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :                 return gf_sc_user_event(gf_filter_get_udta(filter), (GF_Event *) &amp;evt-&gt;user_event.event);</span>
+<span class="lineNum">     587 </span>            : 
+<span class="lineNum">     588 </span>            :         default:
+<span class="lineNum">     589 </span>            :                 break;
+<span class="lineNum">     590 </span>            :         }
+<span class="lineNum">     591 </span>            :         //all events cancelled (play/stop/etc...)
+<span class="lineNum">     592 </span><span class="lineCov">        637 :         return GF_TRUE;</span>
+<a name="593"><span class="lineNum">     593 </span>            : }</a>
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 : static GF_Err compose_update_arg(GF_Filter *filter, const char *arg_name, const GF_PropertyValue *arg_val)</span>
+<span class="lineNum">     596 </span>            : {
+<span class="lineNum">     597 </span><span class="lineCov">        599 :         GF_Compositor *compositor = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     598 </span><span class="lineCov">        599 :         compositor-&gt;reload_config = GF_TRUE;</span>
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<a name="600"><span class="lineNum">     600 </span>            : }</a>
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span><span class="lineCov">        604 : static void compose_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     603 </span>            : {
+<span class="lineNum">     604 </span><span class="lineCov">        604 :         GF_Compositor *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     605 </span>            : 
+<span class="lineNum">     606 </span><span class="lineCov">        604 :         if (ctx) {</span>
+<span class="lineNum">     607 </span><span class="lineCov">        604 :                 gf_sc_set_scene(ctx, NULL);</span>
+<span class="lineNum">     608 </span><span class="lineCov">        604 :                 if (ctx-&gt;root_scene) {</span>
+<span class="lineNum">     609 </span><span class="lineCov">        598 :                         gf_odm_disconnect(ctx-&gt;root_scene-&gt;root_od, GF_TRUE);</span>
+<span class="lineNum">     610 </span>            :                 }
+<span class="lineNum">     611 </span><span class="lineCov">        604 :                 gf_sc_unload(ctx);</span>
+<a name="612"><span class="lineNum">     612 </span>            :         }</a>
+<span class="lineNum">     613 </span><span class="lineCov">        604 : }</span>
+<span class="lineNum">     614 </span><span class="lineCov">         28 : void compositor_setup_aout(GF_Compositor *ctx)</span>
+<span class="lineNum">     615 </span>            : {
+<span class="lineNum">     616 </span><span class="lineCov">         28 :         if (! (ctx-&gt;init_flags &amp; GF_TERM_NO_AUDIO) &amp;&amp; ctx-&gt;audio_renderer &amp;&amp; !ctx-&gt;audio_renderer-&gt;aout) {</span>
+<span class="lineNum">     617 </span><span class="lineCov">         20 :                 GF_FilterPid *pid = ctx-&gt;audio_renderer-&gt;aout = gf_filter_pid_new(ctx-&gt;filter);</span>
+<span class="lineNum">     618 </span><span class="lineCov">         20 :                 gf_filter_pid_set_udta(pid, ctx);</span>
+<span class="lineNum">     619 </span><span class="lineCov">         20 :                 gf_filter_pid_set_name(pid, &quot;aout&quot;);</span>
+<span class="lineNum">     620 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_AUDIO) );</span>
+<span class="lineNum">     621 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_RAW) );</span>
+<span class="lineNum">     622 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_AUDIO_FORMAT, &amp;PROP_UINT(GF_AUDIO_FMT_S16) );</span>
+<span class="lineNum">     623 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(44100) );</span>
+<span class="lineNum">     624 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_SAMPLE_RATE, &amp;PROP_UINT(44100) );</span>
+<span class="lineNum">     625 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_NUM_CHANNELS, &amp;PROP_UINT(2) );</span>
+<span class="lineNum">     626 </span><span class="lineCov">         20 :                 gf_filter_pid_set_max_buffer(ctx-&gt;audio_renderer-&gt;aout, 1000*ctx-&gt;abuf);</span>
+<span class="lineNum">     627 </span><span class="lineCov">         20 :                 gf_filter_pid_set_loose_connect(pid);</span>
+<span class="lineNum">     628 </span>            :         }
+<a name="629"><span class="lineNum">     629 </span><span class="lineCov">         28 : }</span></a>
+<span class="lineNum">     630 </span>            : 
+<span class="lineNum">     631 </span><span class="lineCov">        605 : static GF_Err compose_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     632 </span>            : {
+<span class="lineNum">     633 </span>            :         GF_Err e;
+<span class="lineNum">     634 </span>            :         GF_FilterSessionCaps sess_caps;
+<span class="lineNum">     635 </span>            :         GF_FilterPid *pid;
+<span class="lineNum">     636 </span><span class="lineCov">        605 :         GF_Compositor *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     637 </span>            : 
+<span class="lineNum">     638 </span><span class="lineCov">        605 :         ctx-&gt;magic = COMPOSITOR_MAGIC;</span>
+<span class="lineNum">     639 </span><span class="lineCov">        605 :         ctx-&gt;magic_ptr = (void *) ctx;</span>
+<span class="lineNum">     640 </span><span class="lineCov">        605 :         ctx-&gt;filter = filter;</span>
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span><span class="lineCov">        605 :         if (gf_filter_is_dynamic(filter)) {</span>
+<span class="lineNum">     643 </span><span class="lineCov">         12 :                 ctx-&gt;dyn_filter_mode = GF_TRUE;</span>
+<span class="lineNum">     644 </span><span class="lineCov">         12 :                 ctx-&gt;vfr = GF_TRUE;</span>
+<span class="lineNum">     645 </span>            :         }
+<span class="lineNum">     646 </span>            : 
+<span class="lineNum">     647 </span>            :         //playout buffer not greater than max buffer
+<span class="lineNum">     648 </span><span class="lineCov">        605 :         if (ctx-&gt;buffer &gt; ctx-&gt;mbuffer)</span>
+<span class="lineNum">     649 </span><span class="lineNoCov">          0 :                 ctx-&gt;buffer = ctx-&gt;mbuffer;</span>
+<span class="lineNum">     650 </span>            : 
+<span class="lineNum">     651 </span>            :         //rebuffer level not greater than playout buffer
+<span class="lineNum">     652 </span><span class="lineCov">        605 :         if (ctx-&gt;rbuffer &gt;= ctx-&gt;buffer)</span>
+<span class="lineNum">     653 </span><span class="lineNoCov">          0 :                 ctx-&gt;rbuffer = 0;</span>
+<span class="lineNum">     654 </span>            : 
+<span class="lineNum">     655 </span>            : 
+<span class="lineNum">     656 </span><span class="lineCov">        605 :     if (ctx-&gt;player) {</span>
+<span class="lineNum">     657 </span>            :                 //explicit disable of openGL
+<span class="lineNum">     658 </span><span class="lineCov">          7 :                 if (ctx-&gt;drv==GF_SC_DRV_OFF)</span>
+<span class="lineNum">     659 </span><span class="lineNoCov">          0 :                         ctx-&gt;ogl = GF_SC_GLMODE_OFF;</span>
+<span class="lineNum">     660 </span>            : 
+<span class="lineNum">     661 </span><span class="lineCov">          7 :                 if (ctx-&gt;ogl == GF_SC_GLMODE_AUTO)</span>
+<span class="lineNum">     662 </span><span class="lineCov">          7 :                         ctx-&gt;ogl = GF_SC_GLMODE_HYBRID;</span>
+<span class="lineNum">     663 </span>            : 
+<span class="lineNum">     664 </span>            :                 //we operate video output directly and dispatch audio output, we need to disable blocking mode
+<span class="lineNum">     665 </span>            :                 //otherwise we will only get called when audio output is not blocking, and we will likely missed video frames
+<span class="lineNum">     666 </span><span class="lineCov">          7 :                 gf_filter_prevent_blocking(filter, GF_TRUE);</span>
+<span class="lineNum">     667 </span>            :         }
+<span class="lineNum">     668 </span>            : 
+<span class="lineNum">     669 </span><span class="lineCov">        605 :     e = gf_sc_load(ctx);</span>
+<span class="lineNum">     670 </span><span class="lineCov">        605 :         if (e) return e;</span>
+<span class="lineNum">     671 </span>            : 
+<span class="lineNum">     672 </span><span class="lineCov">        605 :         gf_filter_get_session_caps(filter, &amp;sess_caps);</span>
+<span class="lineNum">     673 </span>            : 
+<span class="lineNum">     674 </span><span class="lineCov">        605 :         sess_caps.max_screen_width = ctx-&gt;video_out-&gt;max_screen_width;</span>
+<span class="lineNum">     675 </span><span class="lineCov">        605 :         sess_caps.max_screen_height = ctx-&gt;video_out-&gt;max_screen_height;</span>
+<span class="lineNum">     676 </span><span class="lineCov">        605 :         sess_caps.max_screen_bpp = ctx-&gt;video_out-&gt;max_screen_bpp;</span>
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span><span class="lineCov">        605 :         gf_filter_set_session_caps(filter, &amp;sess_caps);</span>
+<span class="lineNum">     679 </span>            : 
+<span class="lineNum">     680 </span><span class="lineCov">        605 :         if (ctx-&gt;player) {</span>
+<span class="lineNum">     681 </span>            :                 //make filter sticky (no shutdown at eos)
+<span class="lineNum">     682 </span><span class="lineCov">          7 :                 gf_filter_make_sticky(filter);</span>
+<span class="lineNum">     683 </span>            : 
+<span class="lineNum">     684 </span>            :                 //load audio filter chain, declaring audio output pid first
+<span class="lineNum">     685 </span><span class="lineCov">          7 :                 if (! (ctx-&gt;init_flags &amp; (GF_TERM_NO_AUDIO|GF_TERM_NO_DEF_AUDIO_OUT)) ) {</span>
+<span class="lineNum">     686 </span><span class="lineCov">          5 :                         GF_Filter *audio_out = gf_filter_load_filter(filter, &quot;aout&quot;, &amp;e);</span>
+<span class="lineNum">     687 </span><span class="lineCov">          5 :                         ctx-&gt;audio_renderer-&gt;non_rt_output = GF_FALSE;</span>
+<span class="lineNum">     688 </span><span class="lineCov">          5 :                         if (!audio_out) {</span>
+<span class="lineNum">     689 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MEDIA, (&quot;[Terminal] Failed to load audio output filter (%s) - audio disabled\n&quot;, gf_error_to_string(e) ));</span>
+<span class="lineNum">     690 </span>            :                         }
+<span class="lineNum">     691 </span>            : //                      else {
+<span class="lineNum">     692 </span>            : //                              gf_filter_reconnect_output(filter);
+<span class="lineNum">     693 </span>            : //                      }
+<span class="lineNum">     694 </span>            :                 }
+<span class="lineNum">     695 </span><span class="lineCov">          7 :                 compositor_setup_aout(ctx);</span>
+<span class="lineNum">     696 </span>            :         }
+<span class="lineNum">     697 </span>            :         
+<span class="lineNum">     698 </span>            :         //declare video output pid
+<span class="lineNum">     699 </span><span class="lineCov">        605 :         pid = ctx-&gt;vout = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     700 </span><span class="lineCov">        605 :         gf_filter_pid_set_name(pid, &quot;vout&quot;);</span>
+<span class="lineNum">     701 </span>            :         //compositor initiated for RT playback, vout pid may not be connected
+<span class="lineNum">     702 </span><span class="lineCov">        605 :         if (! (ctx-&gt;init_flags &amp; GF_TERM_NO_DEF_AUDIO_OUT))</span>
+<span class="lineNum">     703 </span><span class="lineCov">        605 :                 gf_filter_pid_set_loose_connect(pid);</span>
+<span class="lineNum">     704 </span>            : 
+<span class="lineNum">     705 </span><span class="lineCov">        605 :         gf_filter_pid_set_property(pid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_RAW) );</span>
+<span class="lineNum">     706 </span><span class="lineCov">        605 :         gf_filter_pid_set_property(pid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_VISUAL) );</span>
+<span class="lineNum">     707 </span><span class="lineCov">        605 :         if (ctx-&gt;timescale)</span>
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(ctx-&gt;timescale) );</span>
+<span class="lineNum">     709 </span>            :         else
+<span class="lineNum">     710 </span><span class="lineCov">        605 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(ctx-&gt;fps.num) );</span>
+<span class="lineNum">     711 </span>            : 
+<span class="lineNum">     712 </span><span class="lineCov">        605 :         gf_filter_pid_set_property(pid, GF_PROP_PID_PIXFMT, &amp;PROP_UINT(ctx-&gt;opfmt ? ctx-&gt;opfmt : GF_PIXEL_RGB) );</span>
+<span class="lineNum">     713 </span><span class="lineCov">        605 :         gf_filter_pid_set_property(pid, GF_PROP_PID_WIDTH, &amp;PROP_UINT(ctx-&gt;output_width) );</span>
+<span class="lineNum">     714 </span><span class="lineCov">        605 :         gf_filter_pid_set_property(pid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(ctx-&gt;output_height) );</span>
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span><span class="lineCov">        605 :         gf_filter_pid_set_property(pid, GF_PROP_PID_FPS, &amp;PROP_FRAC(ctx-&gt;fps) );</span>
+<span class="lineNum">     717 </span>            : 
+<span class="lineNum">     718 </span>            :         //for coverage
+<span class="lineNum">     719 </span>            : #ifdef GPAC_ENABLE_COVERAGE
+<span class="lineNum">     720 </span><span class="lineCov">        605 :         if (gf_sys_is_cov_mode()) {</span>
+<span class="lineNum">     721 </span>            :                 compose_update_arg(filter, NULL, NULL);
+<span class="lineNum">     722 </span>            :         }
+<span class="lineNum">     723 </span>            : #endif
+<span class="lineNum">     724 </span>            : 
+<span class="lineNum">     725 </span>            :         //always request a process task since we don't depend on input packets arrival (animations, pure scene presentations)
+<span class="lineNum">     726 </span><span class="lineCov">        605 :         gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     727 </span>            : 
+<span class="lineNum">     728 </span><span class="lineCov">        605 :         gf_filter_set_event_target(filter, GF_TRUE);</span>
+<span class="lineNum">     729 </span><span class="lineCov">        605 :         if (ctx-&gt;player==2) {</span>
+<span class="lineNum">     730 </span><span class="lineNoCov">          0 :                 const char *gui_path = gf_opts_get_key(&quot;General&quot;, &quot;StartupFile&quot;);</span>
+<span class="lineNum">     731 </span><span class="lineNoCov">          0 :                 if (gui_path) {</span>
+<span class="lineNum">     732 </span><span class="lineNoCov">          0 :                         gf_sc_connect_from_time_ex(ctx, gui_path, 0, 0, 0, NULL);</span>
+<span class="lineNum">     733 </span><span class="lineNoCov">          0 :                         gf_opts_set_key(&quot;temp&quot;, &quot;gui_load_url&quot;, ctx-&gt;src);</span>
+<span class="lineNum">     734 </span>            :                 }
+<span class="lineNum">     735 </span>            :         }
+<span class="lineNum">     736 </span>            :         //src set, connect it (whether player mode or not)
+<span class="lineNum">     737 </span><span class="lineCov">        605 :         else if (ctx-&gt;src) {</span>
+<span class="lineNum">     738 </span><span class="lineNoCov">          0 :                 gf_sc_connect_from_time_ex(ctx, ctx-&gt;src, 0, 0, 0, NULL);</span>
+<span class="lineNum">     739 </span>            :         }
+<span class="lineNum">     740 </span>            :         return GF_OK;
+<a name="741"><span class="lineNum">     741 </span>            : }</a>
+<span class="lineNum">     742 </span>            : 
+<span class="lineNum">     743 </span><span class="lineCov">       2939 : GF_FilterProbeScore compose_probe_url(const char *url, const char *mime)</span>
+<span class="lineNum">     744 </span>            : {
+<span class="lineNum">     745 </span>            :         //check all our builtin URL schemes
+<span class="lineNum">     746 </span><span class="lineCov">       2939 :         if (!strnicmp(url, &quot;mosaic://&quot;, 9)) {</span>
+<span class="lineNum">     747 </span>            :                 return GF_FPROBE_FORCE;
+<span class="lineNum">     748 </span>            :         }
+<span class="lineNum">     749 </span><span class="lineCov">       2939 :         else if (!strnicmp(url, &quot;views://&quot;, 8)) {</span>
+<span class="lineNum">     750 </span>            :                 return GF_FPROBE_FORCE;
+<span class="lineNum">     751 </span>            :         }
+<span class="lineNum">     752 </span><span class="lineCov">       2939 :         return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">     753 </span>            : }
+<span class="lineNum">     754 </span>            : 
+<span class="lineNum">     755 </span>            : 
+<span class="lineNum">     756 </span>            : #define OFFS(_n)        #_n, offsetof(GF_Compositor, _n)
+<span class="lineNum">     757 </span>            : static GF_FilterArgs CompositorArgs[] =
+<span class="lineNum">     758 </span>            : {
+<span class="lineNum">     759 </span>            :         { OFFS(aa), &quot;set anti-aliasing mode for raster graphics; whether the setting is applied or not depends on the graphics module or graphic card\n&quot;\
+<span class="lineNum">     760 </span>            :                 &quot;- none: no anti-aliasing\n&quot;\
+<span class="lineNum">     761 </span>            :         &quot;- text: anti-aliasing for text only\n&quot;\
+<span class="lineNum">     762 </span>            :         &quot;- all: complete anti-aliasing&quot;, GF_PROP_UINT, &quot;all&quot;, &quot;none|text|all&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     763 </span>            :         { OFFS(hlfill), &quot;set highlight fill color (ARGB)&quot;, GF_PROP_UINT, &quot;0x0&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     764 </span>            :         { OFFS(hlline), &quot;set highlight stroke color (ARGB)&quot;, GF_PROP_UINT, &quot;0xFF000000&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     765 </span>            :         { OFFS(hllinew), &quot;set highlight stroke width&quot;, GF_PROP_FLOAT, &quot;1.0&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     766 </span>            :         { OFFS(sz), &quot;enable scalable zoom. When scalable zoom is enabled, resizing the output window will also recompute all vectorial objects. Otherwise only the final buffer is stretched&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     767 </span>            :         { OFFS(bc), &quot;default background color to use when displaying transparent images or video with no scene composition instructions&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     768 </span>            :         { OFFS(yuvhw), &quot;enable YUV hardware for 2D blits&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     769 </span>            :         { OFFS(blitp), &quot;partial hardware blits (if not set, will force more redraw)&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     770 </span>            :         { OFFS(softblt), &quot;enable software blit/stretch in 2D. If disabled, vector graphics rasterizer will always be used&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     771 </span>            : 
+<span class="lineNum">     772 </span>            :         { OFFS(stress), &quot;enable stress mode of compositor (rebuild all vector graphics and texture states at each frame)&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     773 </span>            :         { OFFS(fast), &quot;enable speed optimization - whether the setting is applied or not depends on the graphics module / graphic card&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     774 </span>            :         { OFFS(bvol), &quot;draw bounding volume of objects\n&quot;\
+<span class="lineNum">     775 </span>            :                         &quot;- no: disable bounding box\n&quot;\
+<span class="lineNum">     776 </span>            :                         &quot;- box: draws a rectangle (2D) or box (3D mode)\n&quot;\
+<span class="lineNum">     777 </span>            :                         &quot;- aabb: draws axis-aligned bounding-box tree (3D only)&quot;, GF_PROP_UINT, &quot;no&quot;, &quot;no|box|aabb&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     778 </span>            :         { OFFS(textxt), &quot;specify whether text shall be drawn to a texture and then rendered or directly rendered. Using textured text can improve text rendering in 3D and also improve text-on-video like content\n&quot;\
+<span class="lineNum">     779 </span>            :                 &quot;- default: use texturing for OpenGL rendering, no texture for 2D rasterizer\n&quot;\
+<span class="lineNum">     780 </span>            :                 &quot;- never: never uses text textures\n&quot;\
+<span class="lineNum">     781 </span>            :                 &quot;- always: always render text to texture before drawing&quot;\
+<span class="lineNum">     782 </span>            :                 &quot;&quot;, GF_PROP_UINT, &quot;default&quot;, &quot;default|never|always&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     783 </span>            :         { OFFS(out8b), &quot;convert 10-bit video to 8 bit texture before GPU upload&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     784 </span>            :         { OFFS(drop), &quot;drop late frame when drawing. By default frames are not dropped until a heavy desync of 1 sec is observed&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     785 </span>            :         { OFFS(sclock), &quot;force synchronizing all streams on a single clock&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     786 </span>            :         { OFFS(sgaze), &quot;simulate gaze events through mouse&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     787 </span>            :         { OFFS(ckey), &quot;color key to use in windowless mode (0xFFRRGGBB). GPAC currently does not support true alpha blitting to desktop due to limitations in most windowing toolkit, it therefore uses color keying mechanism. The alpha part of the key is used for global transparency of the output, if supported&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     788 </span>            :         { OFFS(timeout), &quot;timeout in ms after which a source is considered dead&quot;, GF_PROP_UINT, &quot;10000&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     789 </span>            :         { OFFS(fps), &quot;simulation frame rate when animation-only sources are played (ignored when video is present)&quot;, GF_PROP_FRACTION, &quot;30/1&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     790 </span>            :         { OFFS(timescale), &quot;timescale used for output packets when no input video pid. A value of 0 means fps numerator&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     791 </span>            :         { OFFS(autofps), &quot;use video input fps for output. If no video or not set, uses [-fps](). Ignored in player mode&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     792 </span>            :         { OFFS(vfr), &quot;only emit frames when changes are detected. Always true in player mode and when filter is dynamically loaded&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     793 </span>            : 
+<span class="lineNum">     794 </span>            :         { OFFS(dur), &quot;duration of generation. Mostly used when no video input is present. Negative values mean number of frames, positive values duration in second, 0 stops as soon as all streams are done&quot;, GF_PROP_DOUBLE, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     795 </span>            :         { OFFS(fsize), &quot;force the scene to resize to the biggest bitmap available if no size info is given in the BIFS configuration&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     796 </span>            :         { OFFS(mode2d), &quot;specify whether immediate drawing should be used or not\n&quot;\
+<span class="lineNum">     797 </span>            :         &quot;- immediate: the screen is completely redrawn at each frame (always on if passthrough mode is detected)\n&quot;\
+<span class="lineNum">     798 </span>            :         &quot;- defer: object positioning is tracked from frame to frame and dirty rectangles info is collected in order to redraw the minimal amount of the screen buffer\n&quot;\
+<span class="lineNum">     799 </span>            :         &quot;- debug: only renders changed areas, reseting other areas\n&quot;\
+<span class="lineNum">     800 </span>            :          &quot;Whether the setting is applied or not depends on the graphics module and player mode&quot;, GF_PROP_UINT, &quot;defer&quot;, &quot;defer|immediate|debug&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     801 </span>            :         { OFFS(amc), &quot;audio multichannel support; if disabled always downmix to stereo. Useful if the multichannel output does not work properly&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, 0},
+<span class="lineNum">     802 </span>            :         { OFFS(asr), &quot;force output sample rate - 0 for auto&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     803 </span>            :         { OFFS(ach), &quot;force output channels - 0 for auto&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     804 </span>            :         { OFFS(alayout), &quot;force output channel layout - 0 for auto&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     805 </span>            :         { OFFS(afmt), &quot;force output channel format - 0 for auto&quot;, GF_PROP_PCMFMT, &quot;s16&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     806 </span>            :         { OFFS(asize), &quot;audio output packet size in samples&quot;, GF_PROP_UINT, &quot;1024&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     807 </span>            :         { OFFS(abuf), &quot;audio output buffer duration in ms - the audio renderer fills the output pid up to this value. A too low value will lower latency but can have real-time playback issues&quot;, GF_PROP_UINT, 
+<span class="lineNum">     808 </span>            : #ifdef GPAC_CONFIG_ANDROID
+<span class="lineNum">     809 </span>            :                 &quot;200&quot;
+<span class="lineNum">     810 </span>            : #else
+<span class="lineNum">     811 </span>            :                 &quot;100&quot;
+<span class="lineNum">     812 </span>            : #endif
+<span class="lineNum">     813 </span>            :                 , NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     814 </span>            :         { OFFS(avol), &quot;audio volume in percent&quot;, GF_PROP_UINT, &quot;100&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     815 </span>            :         { OFFS(apan), &quot;audio pan in percent, 50 is no pan&quot;, GF_PROP_UINT, &quot;50&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     816 </span>            :         { OFFS(async), &quot;audio resynchronization; if disabled, audio data is never dropped but may get out of sync&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     817 </span>            :         { OFFS(max_aspeed), &quot;silence audio if playback speed is greater than sepcified value&quot;, GF_PROP_DOUBLE, &quot;2.0&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     818 </span>            :         { OFFS(max_vspeed), &quot;move to i-frame only decoding if playback speed is greater than sepcified value&quot;, GF_PROP_DOUBLE, &quot;4.0&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     819 </span>            : 
+<span class="lineNum">     820 </span>            :         { OFFS(buffer), &quot;playout buffer in ms. overridden by BufferLenth property of input pid&quot;, GF_PROP_UINT, &quot;3000&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     821 </span>            :         { OFFS(rbuffer), &quot;rebuffer trigger in ms. overridden by RebufferLenth property of input pid&quot;, GF_PROP_UINT, &quot;1000&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     822 </span>            :         { OFFS(mbuffer), &quot;max buffer in ms (must be greater than playout buffer). overridden by BufferMaxOccupancy property of input pid&quot;, GF_PROP_UINT, &quot;3000&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     823 </span>            :         { OFFS(ntpsync), &quot;ntp resync threshold in ms (drops frame if their NTP is more than the given threshold above local ntp), 0 disables ntp drop&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     824 </span>            : 
+<span class="lineNum">     825 </span>            :         { OFFS(nojs), &quot;disable javascript&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     826 </span>            :         { OFFS(noback), &quot;ignore background nodes and viewport fill (useful when dumping to PNG)&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     827 </span>            : 
+<span class="lineNum">     828 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">     829 </span>            :         { OFFS(ogl), &quot;specify 2D rendering mode\n&quot;\
+<span class="lineNum">     830 </span>            :                                 &quot;- auto: automatically decides between on, off and hybrid based on content\n&quot;\
+<span class="lineNum">     831 </span>            :                                 &quot;- off: disables OpenGL; 3D will not be rendered\n&quot;\
+<span class="lineNum">     832 </span>            :                                 &quot;- on: uses OpenGL for all graphics; this will involve polygon tesselation and 2D graphics will not look as nice as 2D mode\n&quot;\
+<span class="lineNum">     833 </span>            :                                 &quot;- hybrid: the compositor performs software drawing of 2D graphics with no textures (better quality) and uses OpenGL for all 2D objects with textures and 3D objects&quot;\
+<span class="lineNum">     834 </span>            :                                 , GF_PROP_UINT, &quot;auto&quot;, &quot;auto|off|hybrid|on&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     835 </span>            :         { OFFS(pbo), &quot;enable PixelBufferObjects to push YUV textures to GPU in OpenGL Mode. This may slightly increase the performances of the playback&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     836 </span>            :         { OFFS(nav), &quot;override the default navigation mode of MPEG-4/VRML (Walk) and X3D (Examine)\n&quot;\
+<span class="lineNum">     837 </span>            :         &quot;- none: disables navigation\n&quot;\
+<span class="lineNum">     838 </span>            :         &quot;- walk: 3D world walk\n&quot;\
+<span class="lineNum">     839 </span>            :         &quot;- fly: 3D world fly (no ground detection)\n&quot;\
+<span class="lineNum">     840 </span>            :         &quot;- pan: 2D/3D world zomm/pan\n&quot;\
+<span class="lineNum">     841 </span>            :         &quot;- game: 3D world game (mouse gives walk direction)\n&quot;\
+<span class="lineNum">     842 </span>            :         &quot;- slide: 2D/3D world slide\n&quot;\
+<span class="lineNum">     843 </span>            :         &quot;- exam: 2D/3D object examine\n&quot;\
+<span class="lineNum">     844 </span>            :         &quot;- orbit: 3D object orbit\n&quot;\
+<span class="lineNum">     845 </span>            :         &quot;- vr: 3D world VR (yaw/pitch/roll)&quot;\
+<span class="lineNum">     846 </span>            :         &quot;&quot;, GF_PROP_UINT, &quot;none&quot;, &quot;none|walk|fly|pan|game|slide|exam|orbit|vr&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     847 </span>            :         { OFFS(linegl), &quot;indicate that outlining shall be done through OpenGL pen width rather than vectorial outlining&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     848 </span>            :         { OFFS(epow2), &quot;emulate power-of-2 textures for openGL (old hardware). Ignored if OpenGL rectangular texture extension is enabled\n&quot;\
+<span class="lineNum">     849 </span>            :         &quot;- yes: video texture is not resized but emulated with padding. This usually speeds up video mapping on shapes but disables texture transformations\n&quot;\
+<span class="lineNum">     850 </span>            :         &quot;- no: video is resized to a power of 2 texture when mapping to a shape&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     851 </span>            :         { OFFS(paa), &quot;indicate whether polygon antialiasing should be used in full antialiasing mode. If not set, only lines and points antialiasing are used&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     852 </span>            :         { OFFS(bcull), &quot;indicate whether backface culling shall be disable or not\n&quot;\
+<span class="lineNum">     853 </span>            :                                 &quot;- on: enables backface culling\n&quot;\
+<span class="lineNum">     854 </span>            :                                 &quot;- off: disables backface culling\n&quot;\
+<span class="lineNum">     855 </span>            :                                 &quot;- alpha: only enables backface culling for transparent meshes&quot;\
+<span class="lineNum">     856 </span>            :                 &quot;&quot;, GF_PROP_UINT, &quot;on&quot;, &quot;off|on|alpha&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     857 </span>            :         { OFFS(wire), &quot;wireframe mode\n&quot;\
+<span class="lineNum">     858 </span>            :         &quot;- none: objects are drawn as solid\n&quot;\
+<span class="lineNum">     859 </span>            :     &quot;- only: objects are drawn as wireframe only\n&quot;\
+<span class="lineNum">     860 </span>            :     &quot;- solid: objects are drawn as solid and wireframe is then drawn&quot;, GF_PROP_UINT, &quot;none&quot;, &quot;none|only|solid&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     861 </span>            :         { OFFS(norms), &quot;normal vector drawing for debug\n&quot;
+<span class="lineNum">     862 </span>            :         &quot;- none: no normals drawn\n&quot;
+<span class="lineNum">     863 </span>            :         &quot;- face: one normal per face drawn\n&quot;
+<span class="lineNum">     864 </span>            :         &quot;- vertex: one normal per vertex drawn&quot;
+<span class="lineNum">     865 </span>            :         &quot;&quot;, GF_PROP_UINT, &quot;none&quot;, &quot;none|face|vertex&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     866 </span>            :         { OFFS(rext), &quot;use non power of two (rectangular) texture GL extension&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     867 </span>            :         { OFFS(cull), &quot;use aabb culling: large objects are rendered in multiple calls when not fully in viewport&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     868 </span>            :         { OFFS(depth_gl_scale), &quot;set depth scaler&quot;, GF_PROP_FLOAT, &quot;100&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     869 </span>            :         { OFFS(depth_gl_type), &quot;set geometry type used to draw depth video\n&quot;
+<span class="lineNum">     870 </span>            :         &quot;- none: no geometric conversion\n&quot;
+<span class="lineNum">     871 </span>            :         &quot;- point: compute point cloud from pixel+depth\n&quot;
+<span class="lineNum">     872 </span>            :         &quot;- strip: same as point but thins point set&quot;
+<span class="lineNum">     873 </span>            :         &quot;&quot;, GF_PROP_UINT, &quot;none&quot;, &quot;none|point|strip&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     874 </span>            :         { OFFS(nbviews), &quot;number of views to use in stereo mode&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     875 </span>            :         { OFFS(stereo), &quot;stereo output type. If your graphic card does not support OpenGL shaders, only `top` and `side` modes will be available\n&quot;\
+<span class="lineNum">     876 </span>            :                 &quot;- none: no stereo\n&quot;\
+<span class="lineNum">     877 </span>            :                 &quot;- side: images are displayed side by side from left to right\n&quot;\
+<span class="lineNum">     878 </span>            :                 &quot;- top: images are displayed from top (laft view) to bottom (right view)\n&quot;\
+<span class="lineNum">     879 </span>            :                 &quot;- hmd: same as side except that view aspect ratio is not changed\n&quot;\
+<span class="lineNum">     880 </span>            :                 &quot;- ana: standard color anaglyph (red for left view, green and blue for right view) is used (forces views=2)\n&quot;\
+<span class="lineNum">     881 </span>            :                 &quot;- cols: images are interleaved by columns, left view on even columns and left view on odd columns (forces views=2)\n&quot;\
+<span class="lineNum">     882 </span>            :                 &quot;- rows: images are interleaved by columns, left view on even rows and left view on odd rows (forces views=2)\n&quot;\
+<span class="lineNum">     883 </span>            :                 &quot;- spv5: images are interleaved by for SpatialView 5 views display, fullscreen mode (forces views=5)\n&quot;\
+<span class="lineNum">     884 </span>            :                 &quot;- alio8: images are interleaved by for Alioscopy 8 views displays, fullscreen mode (forces views=8)\n&quot;\
+<span class="lineNum">     885 </span>            :                 &quot;- custom: images are interleaved according to the shader file indicated in [-mvshader](). The shader is exposed each view as uniform sampler2D gfViewX, where X is the view number starting from the left&quot;, GF_PROP_UINT, &quot;none&quot;, &quot;none|top|side|hmd|custom|cols|rows|ana|spv5|alio8&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     886 </span>            :         { OFFS(mvshader), &quot;file path to the custom multiview interleaving shader&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     887 </span>            :         { OFFS(fpack), &quot;default frame packing of input video\n&quot;
+<span class="lineNum">     888 </span>            :                 &quot;- none: no frame packing\n&quot;
+<span class="lineNum">     889 </span>            :                 &quot;- top: top bottom frame packing\n&quot;
+<span class="lineNum">     890 </span>            :                 &quot;- side: side by side packing&quot;
+<span class="lineNum">     891 </span>            :         &quot;&quot;, GF_PROP_UINT, &quot;none&quot;, &quot;none|top|side&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     892 </span>            :         { OFFS(camlay), &quot;camera layout in multiview modes\n&quot;
+<span class="lineNum">     893 </span>            :                 &quot;- straight: camera is moved along a straight line, no rotation\n&quot;
+<span class="lineNum">     894 </span>            :                 &quot;- offaxis: off-axis projection is used\n&quot;
+<span class="lineNum">     895 </span>            :                 &quot;- linear: camera is moved along a straight line with rotation\n&quot;
+<span class="lineNum">     896 </span>            :                 &quot;- circular: camera is moved along a circle with rotation&quot;
+<span class="lineNum">     897 </span>            :         &quot;&quot;, GF_PROP_UINT, &quot;offaxis&quot;, &quot;straight|offaxis|linear|circular&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     898 </span>            :         { OFFS(iod), &quot;inter-occular distance (eye separation) in cm (distance between the cameras). &quot;, GF_PROP_FLOAT, &quot;6.4&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     899 </span>            :         { OFFS(rview), &quot;reverse view order&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     900 </span>            : 
+<span class="lineNum">     901 </span>            :         { OFFS(tvtn), &quot;number of point sampling for tile visibility algo&quot;, GF_PROP_UINT, &quot;30&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     902 </span>            :         { OFFS(tvtt), &quot;number of points above which the tile is considered visible&quot;, GF_PROP_UINT, &quot;8&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     903 </span>            :         { OFFS(tvtd), &quot;debug tiles and full coverage SRD\n&quot;
+<span class="lineNum">     904 </span>            :                 &quot;- off: regular draw\n&quot;
+<span class="lineNum">     905 </span>            :                 &quot;- partial: only displaying partial tiles, not the full sphere video\n&quot;
+<span class="lineNum">     906 </span>            :                 &quot;- full: only display the full sphere video&quot;, GF_PROP_UINT, &quot;off&quot;, &quot;off|partial|full&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     907 </span>            :         { OFFS(tvtf), &quot;force all tiles to be considered visible, regardless of viewpoint&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     908 </span>            :         { OFFS(fov), &quot;default field of view for VR&quot;, GF_PROP_FLOAT, &quot;1.570796326794897&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     909 </span>            :         { OFFS(vertshader), &quot;path to vertex shader file&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_HINT_EXPERT },
+<span class="lineNum">     910 </span>            :         { OFFS(fragshader), &quot;path to fragment shader file&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_HINT_EXPERT },
+<span class="lineNum">     911 </span>            : #endif
+<span class="lineNum">     912 </span>            : 
+<span class="lineNum">     913 </span>            : #ifdef GF_SR_USE_DEPTH
+<span class="lineNum">     914 </span>            :         { OFFS(autocal), &quot;auto callibration of znear/zfar in depth rendering mode&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     915 </span>            :         { OFFS(dispdepth), &quot;display depth, negative value uses default screen height&quot;, GF_PROP_SINT, &quot;-1&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     916 </span>            :         { OFFS(dispdist), &quot;distance in cm between the camera and the zero-disparity plane. There is currently no automatic calibration of depth in GPAC&quot;, GF_PROP_FLOAT, &quot;50&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     917 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">     918 </span>            :         { OFFS(focdist), &quot;distance of focus point&quot;, GF_PROP_FLOAT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     919 </span>            : #endif
+<span class="lineNum">     920 </span>            : #endif
+<span class="lineNum">     921 </span>            : 
+<span class="lineNum">     922 </span>            : #ifdef GF_SR_USE_VIDEO_CACHE
+<span class="lineNum">     923 </span>            :         { OFFS(vcsize), &quot;visual cache size when storing raster graphics to memory&quot;, GF_PROP_UINT, &quot;0&quot;, &quot;0,+I&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     924 </span>            :         { OFFS(vcscale), &quot;visual cache scale factor in percent when storing raster graphics to memory&quot;, GF_PROP_UINT, &quot;100&quot;, &quot;0,100&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     925 </span>            :         { OFFS(vctol), &quot;visual cache tolerance when storing raster graphics to memory. If the difference between the stored version scale and the target display scale is less than tolerance, the cache will be used, otherwise it will be recomputed&quot;, GF_PROP_UINT, &quot;30&quot;, &quot;0,100&quot;, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     926 </span>            : #endif
+<span class="lineNum">     927 </span>            :         { OFFS(osize), &quot;force output size. If not set, size is derived from inputs&quot;, GF_PROP_VEC2I, &quot;0x0&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     928 </span>            :         { OFFS(dpi), &quot;default dpi if not indicated by video output&quot;, GF_PROP_VEC2I, &quot;96x96&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     929 </span>            :         { OFFS(dbgpvr), &quot;debug scene used by PVR addon&quot;, GF_PROP_FLOAT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE|GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     930 </span>            :         { OFFS(player), &quot;set compositor in player mode, see filter help\n&quot;
+<span class="lineNum">     931 </span>            :         &quot;- no: regular mode\n&quot;
+<span class="lineNum">     932 </span>            :         &quot;- base: player mode\n&quot;
+<span class="lineNum">     933 </span>            :         &quot;- gui: player mode with GUI auto-start&quot;, GF_PROP_UINT, &quot;no&quot;, &quot;no|base|gui&quot;, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     934 </span>            :         { OFFS(noaudio), &quot;disable audio output&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     935 </span>            :         { OFFS(opfmt), &quot;pixel format to use for output. Ignored in [-player]() mode&quot;, GF_PROP_PIXFMT, &quot;none&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     936 </span>            :         { OFFS(drv), &quot;indicate if graphics driver should be used\n&quot;\
+<span class="lineNum">     937 </span>            :                                 &quot;- no: never loads a graphics driver, software blitting is used, no 3D possible (in player mode, disables OpenGL)\n&quot;\
+<span class="lineNum">     938 </span>            :                                 &quot;- yes: always loads a graphics driver, output pixel format will be RGB (in player mode, same to `auto`)\n&quot;\
+<span class="lineNum">     939 </span>            :                                 &quot;- auto: decides based on the loaded content&quot;\
+<span class="lineNum">     940 </span>            :                         , GF_PROP_UINT, &quot;auto&quot;, &quot;no|yes|auto&quot;, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     941 </span>            :         { OFFS(src), &quot;URL of source content&quot;, GF_PROP_NAME, NULL, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     942 </span>            : 
+<span class="lineNum">     943 </span>            :         { OFFS(gaze_x), &quot;horizontal gaze coordinate (0=left, width=right)&quot;, GF_PROP_SINT, &quot;0&quot;, NULL, GF_FS_ARG_HINT_EXPERT|GF_FS_ARG_UPDATE},
+<span class="lineNum">     944 </span>            :         { OFFS(gaze_y), &quot;vertical gaze coordinate (0=top, height=bottom)&quot;, GF_PROP_SINT, &quot;0&quot;, NULL, GF_FS_ARG_HINT_EXPERT|GF_FS_ARG_UPDATE},
+<span class="lineNum">     945 </span>            :         { OFFS(gazer_enabled), &quot;enable gaze event dispatch&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_EXPERT|GF_FS_ARG_UPDATE},
+<span class="lineNum">     946 </span>            :         {0}
+<span class="lineNum">     947 </span>            : };
+<span class="lineNum">     948 </span>            : 
+<span class="lineNum">     949 </span>            : static const GF_FilterCapability CompositorCaps[] =
+<span class="lineNum">     950 </span>            : {
+<span class="lineNum">     951 </span>            :         /*first cap bundle for explicitly loaded compositor: accepts audio and video as well as scene/od*/
+<span class="lineNum">     952 </span>            :         CAP_UINT(GF_CAPS_INPUT|GF_CAPFLAG_LOADED_FILTER, GF_PROP_PID_STREAM_TYPE, GF_STREAM_SCENE),
+<span class="lineNum">     953 </span>            :         CAP_UINT(GF_CAPS_INPUT|GF_CAPFLAG_LOADED_FILTER, GF_PROP_PID_STREAM_TYPE, GF_STREAM_OD),
+<span class="lineNum">     954 </span>            :         CAP_UINT(GF_CAPS_INPUT|GF_CAPFLAG_LOADED_FILTER, GF_PROP_PID_STREAM_TYPE, GF_STREAM_TEXT),
+<span class="lineNum">     955 </span>            :         CAP_UINT(GF_CAPS_INPUT_EXCLUDED|GF_CAPFLAG_LOADED_FILTER, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     956 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT|GF_CAPFLAG_LOADED_FILTER, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     957 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT|GF_CAPFLAG_LOADED_FILTER, GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     958 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT|GF_CAPFLAG_LOADED_FILTER, GF_PROP_PID_CODECID, GF_CODECID_RAW),
+<span class="lineNum">     959 </span>            :         {0},
+<span class="lineNum">     960 </span>            :         /*second cap bundle for dynmac loaded compositor: only accepts text/scene/od*/
+<span class="lineNum">     961 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_TEXT),
+<span class="lineNum">     962 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_SCENE),
+<span class="lineNum">     963 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_OD),
+<span class="lineNum">     964 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     965 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_RAW),
+<span class="lineNum">     966 </span>            : };
+<span class="lineNum">     967 </span>            : 
+<span class="lineNum">     968 </span>            : 
+<span class="lineNum">     969 </span>            : const GF_FilterRegister CompositorFilterRegister = {
+<span class="lineNum">     970 </span>            :         .name = &quot;compositor&quot;,
+<span class="lineNum">     971 </span>            :         GF_FS_SET_DESCRIPTION(&quot;Compositor&quot;)
+<span class="lineNum">     972 </span>            :         GF_FS_SET_HELP(&quot;The GPAC compositor allows mixing audio, video, text and graphics in a timed fashion.\n&quot;
+<span class="lineNum">     973 </span>            :         &quot;The compositor operates either in media-client or filter-only mode.\n&quot;
+<span class="lineNum">     974 </span>            :         &quot;\n&quot;
+<span class="lineNum">     975 </span>            :         &quot;# Media-client mode\n&quot;
+<span class="lineNum">     976 </span>            :         &quot;In this mode, the compositor acts as a pseudo-sink for the video side and creates its own output window.\n&quot;
+<span class="lineNum">     977 </span>            :         &quot;The video frames are dispatched to the output video pid in the form of frame pointers requiring later GPU read if used.\n&quot;
+<span class="lineNum">     978 </span>            :         &quot;The audio part acts as a regular filter, potentially mixing and resampling the audio inputs to generate its output.\n&quot;
+<span class="lineNum">     979 </span>            :         &quot;User events are directly processed by the filter in this mode.\n&quot;
+<span class="lineNum">     980 </span>            :         &quot;\n&quot;
+<span class="lineNum">     981 </span>            :         &quot;# Filter mode\n&quot;
+<span class="lineNum">     982 </span>            :         &quot;In this mode, the compositor acts as a regular filter generating frames based on the loaded scene.\n&quot;
+<span class="lineNum">     983 </span>            :         &quot;It will generate its outputs based on the input video frames and will not process any user event.\n&quot;
+<span class="lineNum">     984 </span>            :         &quot;If no input video frames (e.g. pure BIFS / SVG / VRML), the filter will generate frames based on the [-fps](), at constant or variable frame rate.\n&quot;
+<span class="lineNum">     985 </span>            :         &quot;It will stop generating frames as soon as all input streams are done, unless extended/reduced by [-dur]().\n&quot;
+<span class="lineNum">     986 </span>            :         &quot;If audio streams are loaded, an audio output pid is created.\n&quot;
+<span class="lineNum">     987 </span>            :         &quot;\n&quot;
+<span class="lineNum">     988 </span>            :         &quot;The default output pixel format in filter mode is:\n&quot;
+<span class="lineNum">     989 </span>            :         &quot;- `rgb` when the filter is explicitly loaded by the application\n&quot;
+<span class="lineNum">     990 </span>            :         &quot;- `rgba` when the filter is loaded during a link resolution\n&quot;
+<span class="lineNum">     991 </span>            :         &quot;This can be changed by assigning the [-opfmt]() option.\n&quot;
+<span class="lineNum">     992 </span>            :         &quot;\n&quot;
+<span class="lineNum">     993 </span>            :         &quot;In filter-only mode, the special URL `gpid://` is used to locate PIDs in the scene description, in order to design scenes independently from source media.\n&quot;
+<span class="lineNum">     994 </span>            :         &quot;When such a pid is associated to a `Background2D` node in BIFS (no SVG mapping yet), the compositor operates in passthrough mode.\n&quot;
+<span class="lineNum">     995 </span>            :         &quot;In this mode, only new input frames on the passthrough pid will generate new frames, and the scene clock matches the input packet time.\n&quot;
+<span class="lineNum">     996 </span>            :         &quot;The output size and pixel format will be set to the input size and pixel format, unless specified otherwise in the filter options.\n&quot;
+<span class="lineNum">     997 </span>            :         &quot;\n&quot;
+<span class="lineNum">     998 </span>            :         &quot;If only 2D graphics are used and display driver is not forced, 2D rasterizer will happen in the output pixel format (including YUV pixel formats).\n&quot;
+<span class="lineNum">     999 </span>            :         &quot;In this case, inplace processing (rasterizing over the input frame data) will be used whenever allowed by input data.\n&quot;\
+<span class="lineNum">    1000 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1001 </span>            :         &quot;If 3D graphics are used or display driver is forced, OpenGL will be used on offscreen surface and the output packet will be an OpenGL texture.\n&quot;
+<span class="lineNum">    1002 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1003 </span>            :         &quot;# Specific URL syntaxes\n&quot;
+<span class="lineNum">    1004 </span>            :         &quot;The compositor accepts any URL type supported by GPAC. It also accepts the following schemes for URLs:\n&quot;
+<span class="lineNum">    1005 </span>            :         &quot;- views:// : creates an auto-stereo scene of N views from `views://v1:.:vN`. vN can be any type of URL supported by GPAC.\n&quot;
+<span class="lineNum">    1006 </span>            :         &quot;- mosaic:// : creates a mosaic of N views from `mosaic://v1:.:vN`. vN can be any type of URL supported by GPAC.\n&quot;
+<span class="lineNum">    1007 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1008 </span>            :         &quot;The compositor can act as a source filter when the [-src]() option is explicitly set, independently from the operating mode:\n&quot;
+<span class="lineNum">    1009 </span>            :         &quot;EX gpac compositor:src=source.mp4 vout\n&quot;
+<span class="lineNum">    1010 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1011 </span>            :         &quot;The compositor can act as a source filter when the source url uses one of the compositor built-in protocol schemes:\n&quot;
+<span class="lineNum">    1012 </span>            :         &quot;EX gpac -i mosaic://URL1:URL2 vout\n&quot;
+<span class="lineNum">    1013 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1014 </span>            :         )
+<span class="lineNum">    1015 </span>            :         .private_size = sizeof(GF_Compositor),
+<span class="lineNum">    1016 </span>            :         .flags = GF_FS_REG_MAIN_THREAD,
+<span class="lineNum">    1017 </span>            :         .max_extra_pids = (u32) -1,
+<span class="lineNum">    1018 </span>            :         SETCAPS(CompositorCaps),
+<span class="lineNum">    1019 </span>            :         .args = CompositorArgs,
+<span class="lineNum">    1020 </span>            :         .initialize = compose_initialize,
+<span class="lineNum">    1021 </span>            :         .finalize = compose_finalize,
+<span class="lineNum">    1022 </span>            :         .process = compose_process,
+<span class="lineNum">    1023 </span>            :         .process_event = compose_process_event,
+<span class="lineNum">    1024 </span>            :         .configure_pid = compose_configure_pid,
+<span class="lineNum">    1025 </span>            :         .reconfigure_output = compose_reconfig_output,
+<span class="lineNum">    1026 </span>            :         .update_arg = compose_update_arg,
+<span class="lineNum">    1027 </span>            :         .probe_url = compose_probe_url,
+<a name="1028"><span class="lineNum">    1028 </span>            : };</a>
+<span class="lineNum">    1029 </span>            : 
+<span class="lineNum">    1030 </span><span class="lineCov">       2877 : const GF_FilterRegister *compose_filter_register(GF_FilterSession *session)</span>
+<span class="lineNum">    1031 </span>            : {
+<span class="lineNum">    1032 </span>            :         u32 i=0;
+<span class="lineNum">    1033 </span>            :         u32 nb_args = sizeof(CompositorArgs) / sizeof(GF_FilterArgs) - 1;
+<span class="lineNum">    1034 </span>            : 
+<span class="lineNum">    1035 </span><span class="lineCov">     250299 :         for (i=0; i&lt;nb_args; i++) {</span>
+<span class="lineNum">    1036 </span><span class="lineCov">     247422 :                 if (!strcmp(CompositorArgs[i].arg_name, &quot;afmt&quot;)) {</span>
+<span class="lineNum">    1037 </span><span class="lineCov">       2877 :                         CompositorArgs[i].min_max_enum = gf_audio_fmt_all_names();</span>
+<span class="lineNum">    1038 </span>            :                 }
+<span class="lineNum">    1039 </span><span class="lineCov">     244545 :                 else if (!strcmp(CompositorArgs[i].arg_name, &quot;opfmt&quot;)) {</span>
+<span class="lineNum">    1040 </span><span class="lineCov">       2877 :                         CompositorArgs[i].min_max_enum =  gf_pixel_fmt_all_names();</span>
+<span class="lineNum">    1041 </span>            :                 }
+<span class="lineNum">    1042 </span>            :         }
+<span class="lineNum">    1043 </span><span class="lineCov">       2877 :         return &amp;CompositorFilterRegister;</span>
+<span class="lineNum">    1044 </span>            : }
+<span class="lineNum">    1045 </span>            : #else
+<span class="lineNum">    1046 </span>            : const GF_FilterRegister *compose_filter_register(GF_FilterSession *session)
+<span class="lineNum">    1047 </span>            : {
+<span class="lineNum">    1048 </span>            :         return NULL;
+<span class="lineNum">    1049 </span>            : }
+<span class="lineNum">    1050 </span>            : #endif // GPAC_DISABLE_PLAYER
+<span class="lineNum">    1051 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

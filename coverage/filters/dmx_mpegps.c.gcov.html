@@ -1,0 +1,574 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dmx_mpegps.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dmx_mpegps.c<span style="font-size: 80%;"> (source / <a href="dmx_mpegps.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">202</td>
+            <td class="headerCovTableEntry">238</td>
+            <td class="headerCovTableEntryMed">84.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2005-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / MPEG Program Stream demuxer filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/thread.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/list.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #ifndef GPAC_DISABLE_MPEG2PS
+<span class="lineNum">      33 </span>            : #include &quot;../media_tools/mpeg2_ps.h&quot;
+<span class="lineNum">      34 </span>            : #include &lt;gpac/media_tools.h&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : typedef struct
+<span class="lineNum">      37 </span>            : {
+<span class="lineNum">      38 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      39 </span>            :         u32 stream_type;
+<span class="lineNum">      40 </span>            :         u32 stream_num;
+<span class="lineNum">      41 </span>            :         Bool in_use;
+<span class="lineNum">      42 </span>            :         u64 last_dts;
+<span class="lineNum">      43 </span>            : } M2PSStream;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : typedef struct
+<span class="lineNum">      47 </span>            : {
+<span class="lineNum">      48 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         const char *src_url;
+<span class="lineNum">      51 </span>            :         mpeg2ps_t *ps;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :         Double start_range;
+<span class="lineNum">      54 </span>            :         u64 first_dts;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :         u32 nb_playing;
+<span class="lineNum">      57 </span>            :         GF_Fraction64 duration;
+<span class="lineNum">      58 </span>            :         Bool in_seek;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :         GF_List *streams;
+<span class="lineNum">      61 </span>            :         Bool initial_play_done;
+<a name="62"><span class="lineNum">      62 </span>            : } GF_M2PSDmxCtx;</a>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineCov">          7 : static void m2psdmx_setup(GF_Filter *filter, GF_M2PSDmxCtx *ctx)</span>
+<span class="lineNum">      65 </span>            : {
+<span class="lineNum">      66 </span>            :         u32 i, nb_streams;
+<span class="lineNum">      67 </span>            :         u32 sync_id = 0;
+<span class="lineNum">      68 </span>            :         Double fps;
+<span class="lineNum">      69 </span>            :         GF_Fraction64 dur;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :         dur.den = 1000;
+<span class="lineNum">      72 </span><span class="lineCov">          7 :         dur.num = (s32) mpeg2ps_get_max_time_msec(ctx-&gt;ps);</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineCov">          7 :         ctx-&gt;first_dts = mpeg2ps_get_first_cts(ctx-&gt;ps);</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">          7 :         nb_streams = mpeg2ps_get_video_stream_count(ctx-&gt;ps);</span>
+<span class="lineNum">      77 </span><span class="lineCov">         12 :         for (i=0; i&lt;nb_streams; i++) {</span>
+<span class="lineNum">      78 </span>            :                 u32 par;
+<span class="lineNum">      79 </span>            :                 u32 id;
+<span class="lineNum">      80 </span>            :                 GF_Fraction frac;
+<span class="lineNum">      81 </span>            :                 M2PSStream *st = NULL;
+<span class="lineNum">      82 </span><span class="lineCov">          5 :                 u32 j, count = gf_list_count(ctx-&gt;streams);</span>
+<span class="lineNum">      83 </span><span class="lineCov">          5 :                 for (j=0; j&lt;count; j++) {</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :                         st = gf_list_get(ctx-&gt;streams, j);</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :                         if ((st-&gt;stream_type==GF_STREAM_VISUAL) &amp;&amp; !st-&gt;in_use) break;</span>
+<span class="lineNum">      86 </span>            :                         st = NULL;
+<span class="lineNum">      87 </span>            :                 }
+<span class="lineNum">      88 </span><span class="lineCov">          5 :                 if (!st) {</span>
+<span class="lineNum">      89 </span><span class="lineCov">          5 :                         GF_SAFEALLOC(st, M2PSStream);</span>
+<span class="lineNum">      90 </span><span class="lineCov">          5 :                         if (!st) continue;</span>
+<span class="lineNum">      91 </span><span class="lineCov">          5 :                         st-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">      92 </span><span class="lineCov">          5 :                         st-&gt;stream_type = GF_STREAM_VISUAL;</span>
+<span class="lineNum">      93 </span><span class="lineCov">          5 :                         gf_list_add(ctx-&gt;streams, st);</span>
+<span class="lineNum">      94 </span>            :                 }
+<span class="lineNum">      95 </span><span class="lineCov">          5 :                 st-&gt;in_use = GF_TRUE;</span>
+<span class="lineNum">      96 </span><span class="lineCov">          5 :                 st-&gt;stream_num = i;</span>
+<span class="lineNum">      97 </span><span class="lineCov">          5 :                 id = 0x100 | mpeg2ps_get_video_stream_id(ctx-&gt;ps, st-&gt;stream_num);</span>
+<span class="lineNum">      98 </span><span class="lineCov">          5 :                 if (!sync_id) sync_id = id;</span>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineCov">          5 :                 gf_filter_pid_copy_properties(st-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">     101 </span><span class="lineCov">          5 :                 gf_filter_pid_set_name(st-&gt;opid, &quot;Video&quot;);</span>
+<span class="lineNum">     102 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(st-&gt;stream_type) );</span>
+<span class="lineNum">     103 </span><span class="lineCov">          5 :                 switch (mpeg2ps_get_video_stream_type(ctx-&gt;ps, st-&gt;stream_num)) {</span>
+<span class="lineNum">     104 </span><span class="lineCov">          5 :                 case MPEG_VIDEO_MPEG1:</span>
+<span class="lineNum">     105 </span><span class="lineCov">          5 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_MPEG1) );</span>
+<span class="lineNum">     106 </span><span class="lineCov">          5 :                         break;</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :                 case MPEG_VIDEO_MPEG2:</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_MPEG2_MAIN) );</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     110 </span>            :                 default:
+<span class="lineNum">     111 </span>            :                         break;
+<span class="lineNum">     112 </span>            :                 }
+<span class="lineNum">     113 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(90000) );</span>
+<span class="lineNum">     114 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_ID, &amp;PROP_UINT( id) );</span>
+<span class="lineNum">     115 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CLOCK_ID, &amp;PROP_UINT( sync_id ) );</span>
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span><span class="lineCov">          5 :                 fps = mpeg2ps_get_video_stream_framerate(ctx-&gt;ps, i);</span>
+<span class="lineNum">     118 </span><span class="lineCov">          5 :                 if (fps) {</span>
+<span class="lineNum">     119 </span><span class="lineCov">          5 :                         gf_media_get_video_timing(fps, &amp;frac.num, &amp;frac.den);</span>
+<span class="lineNum">     120 </span><span class="lineCov">          5 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_FPS, &amp;PROP_FRAC( frac ) );</span>
+<span class="lineNum">     121 </span>            :                 }
+<span class="lineNum">     122 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_WIDTH, &amp;PROP_UINT( mpeg2ps_get_video_stream_width(ctx-&gt;ps, i) ) );</span>
+<span class="lineNum">     123 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT( mpeg2ps_get_video_stream_height(ctx-&gt;ps, i) ) );</span>
+<span class="lineNum">     124 </span><span class="lineCov">          5 :                 par = mpeg2ps_get_video_stream_aspect_ratio(ctx-&gt;ps, i);</span>
+<span class="lineNum">     125 </span><span class="lineCov">          5 :                 if (par) {</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                         frac.num = par&gt;&gt;16;</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :                         frac.den = (par&amp;0xffff);</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_SAR, &amp;PROP_FRAC( frac ) );</span>
+<span class="lineNum">     129 </span>            :                 }
+<span class="lineNum">     130 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_DURATION, &amp;PROP_FRAC64( dur ) );</span>
+<span class="lineNum">     131 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_UNFRAMED, &amp;PROP_BOOL( GF_TRUE ) );</span>
+<span class="lineNum">     132 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property_str(st-&gt;opid, &quot;nocts&quot;, &amp;PROP_BOOL(GF_TRUE ));</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_BITRATE, &amp;PROP_UINT((u32) mpeg2ps_get_video_stream_bitrate(ctx-&gt;ps, i) ) );</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">          5 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_PLAYBACK_MODE, &amp;PROP_UINT(GF_PLAYBACK_MODE_FASTFORWARD ) );</span>
+<span class="lineNum">     137 </span>            :         }
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineCov">          7 :         nb_streams = mpeg2ps_get_audio_stream_count(ctx-&gt;ps);</span>
+<span class="lineNum">     140 </span><span class="lineCov">         14 :         for (i=0; i&lt;nb_streams; i++) {</span>
+<span class="lineNum">     141 </span>            :                 u32 id;
+<span class="lineNum">     142 </span>            :                 char szName[20];
+<span class="lineNum">     143 </span>            :                 M2PSStream *st = NULL;
+<span class="lineNum">     144 </span><span class="lineCov">          7 :                 u32 j, count = gf_list_count(ctx-&gt;streams);</span>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          7 :                 if (mpeg2ps_get_audio_stream_type(ctx-&gt;ps, i) == MPEG_AUDIO_UNKNOWN) {</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     148 </span>            :                 }
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineCov">          5 :                 for (j=0; j&lt;count; j++) {</span>
+<span class="lineNum">     151 </span><span class="lineCov">          5 :                         st = gf_list_get(ctx-&gt;streams, j);</span>
+<span class="lineNum">     152 </span><span class="lineCov">          5 :                         if ((st-&gt;stream_type==GF_STREAM_AUDIO) &amp;&amp; !st-&gt;in_use) break;</span>
+<span class="lineNum">     153 </span>            :                         st = NULL;
+<span class="lineNum">     154 </span>            :                 }
+<span class="lineNum">     155 </span><span class="lineCov">          7 :                 if (!st) {</span>
+<span class="lineNum">     156 </span><span class="lineCov">          7 :                         GF_SAFEALLOC(st, M2PSStream);</span>
+<span class="lineNum">     157 </span><span class="lineCov">          7 :                         if (!st) continue;</span>
+<span class="lineNum">     158 </span><span class="lineCov">          7 :                         st-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     159 </span><span class="lineCov">          7 :                         st-&gt;stream_type = GF_STREAM_AUDIO;</span>
+<span class="lineNum">     160 </span><span class="lineCov">          7 :                         gf_list_add(ctx-&gt;streams, st);</span>
+<span class="lineNum">     161 </span>            :                 }
+<span class="lineNum">     162 </span><span class="lineCov">          7 :                 st-&gt;in_use = GF_TRUE;</span>
+<span class="lineNum">     163 </span><span class="lineCov">          7 :                 st-&gt;stream_num = i;</span>
+<span class="lineNum">     164 </span><span class="lineCov">          7 :                 id = 0x100 | mpeg2ps_get_audio_stream_id(ctx-&gt;ps, st-&gt;stream_num);</span>
+<span class="lineNum">     165 </span><span class="lineCov">          7 :                 if (!sync_id) sync_id = id;</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span><span class="lineCov">          7 :                 gf_filter_pid_copy_properties(st-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">     168 </span><span class="lineCov">          7 :                 sprintf(szName, &quot;Audio%d&quot;, i+1);</span>
+<span class="lineNum">     169 </span><span class="lineCov">          7 :                 gf_filter_pid_set_name(st-&gt;opid, szName);</span>
+<span class="lineNum">     170 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(st-&gt;stream_type) );</span>
+<span class="lineNum">     171 </span><span class="lineCov">          7 :                 switch (mpeg2ps_get_audio_stream_type(ctx-&gt;ps, st-&gt;stream_num)) {</span>
+<span class="lineNum">     172 </span><span class="lineCov">          5 :                 case MPEG_AUDIO_MPEG:</span>
+<span class="lineNum">     173 </span><span class="lineCov">          5 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT( GF_CODECID_MPEG_AUDIO) );</span>
+<span class="lineNum">     174 </span><span class="lineCov">          5 :                         break;</span>
+<span class="lineNum">     175 </span><span class="lineCov">          2 :                 case MPEG_AUDIO_AC3:</span>
+<span class="lineNum">     176 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT( GF_CODECID_AC3) );</span>
+<span class="lineNum">     177 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_UNFRAMED, &amp;PROP_BOOL( GF_TRUE) );</span>
+<span class="lineNum">     178 </span><span class="lineCov">          2 :                         break;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :                 case MPEG_AUDIO_LPCM:</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_4CC('L','P','C','M') ) );</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     182 </span>            :                 default:
+<span class="lineNum">     183 </span>            :                         break;
+<span class="lineNum">     184 </span>            :                 }
+<span class="lineNum">     185 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_SAMPLE_RATE, &amp;PROP_UINT( mpeg2ps_get_audio_stream_sample_freq(ctx-&gt;ps, i) ) );</span>
+<span class="lineNum">     186 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_NUM_CHANNELS, &amp;PROP_UINT( mpeg2ps_get_audio_stream_channels(ctx-&gt;ps, i) ) );</span>
+<span class="lineNum">     187 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_BITRATE, &amp;PROP_UINT( mpeg2ps_get_audio_stream_bitrate(ctx-&gt;ps, i) ) );</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(90000) );</span>
+<span class="lineNum">     190 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_ID, &amp;PROP_UINT( id) );</span>
+<span class="lineNum">     191 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CLOCK_ID, &amp;PROP_UINT( sync_id ) );</span>
+<span class="lineNum">     192 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_DURATION, &amp;PROP_FRAC64( dur ) );</span>
+<span class="lineNum">     193 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_UNFRAMED, &amp;PROP_BOOL( GF_TRUE ) );</span>
+<span class="lineNum">     194 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property_str(st-&gt;opid, &quot;nocts&quot;, &amp;PROP_BOOL(GF_TRUE ));</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_PLAYBACK_MODE, &amp;PROP_UINT(GF_PLAYBACK_MODE_FASTFORWARD ) );</span>
+<span class="lineNum">     197 </span>            :         }
+<span class="lineNum">     198 </span><span class="lineCov">          7 : }</span>
+<a name="199"><span class="lineNum">     199 </span>            : </a>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">          7 : GF_Err m2psdmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     202 </span>            : {
+<span class="lineNum">     203 </span>            :         u32 i;
+<span class="lineNum">     204 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     205 </span><span class="lineCov">          7 :         GF_M2PSDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineCov">          7 :         if (is_remove) {</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :                 while (gf_list_count(ctx-&gt;streams) ) {</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :                         M2PSStream *st = gf_list_pop_back(ctx-&gt;streams);</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :                         if (st-&gt;opid)</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_remove(st-&gt;opid);</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                         gf_free(st);</span>
+<span class="lineNum">     214 </span>            :                 }
+<span class="lineNum">     215 </span>            :                 return GF_OK;
+<span class="lineNum">     216 </span>            :         }
+<span class="lineNum">     217 </span><span class="lineCov">          7 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">     218 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineCov">          7 :         if (!ctx-&gt;ipid) {</span>
+<span class="lineNum">     221 </span>            :                 GF_FilterEvent fevt;
+<span class="lineNum">     222 </span><span class="lineCov">          7 :                 ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            :                 //we work with full file only, send a play event on source to indicate that
+<span class="lineNum">     225 </span><span class="lineCov">          7 :                 GF_FEVT_INIT(fevt, GF_FEVT_PLAY, pid);</span>
+<span class="lineNum">     226 </span>            :                 fevt.play.start_range = 0;
+<span class="lineNum">     227 </span><span class="lineCov">          7 :                 fevt.base.on_pid = ctx-&gt;ipid;</span>
+<span class="lineNum">     228 </span><span class="lineCov">          7 :                 fevt.play.full_file_only = GF_TRUE;</span>
+<span class="lineNum">     229 </span><span class="lineCov">          7 :                 gf_filter_pid_send_event(ctx-&gt;ipid, &amp;fevt);</span>
+<span class="lineNum">     230 </span>            :         }
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineCov">          7 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_FILEPATH);</span>
+<span class="lineNum">     233 </span><span class="lineCov">          7 :         if (!p) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">          7 :         if (ctx-&gt;src_url &amp;&amp; !strcmp(ctx-&gt;src_url, p-&gt;value.string)) return GF_OK;</span>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineCov">          7 :         if (ctx-&gt;ps) {</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :                 mpeg2ps_close(ctx-&gt;ps);</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;gf_list_count(ctx-&gt;streams); i++) {</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :                         M2PSStream *st = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :                         st-&gt;in_use = GF_FALSE;</span>
+<span class="lineNum">     242 </span>            :                 }
+<span class="lineNum">     243 </span>            :         }
+<span class="lineNum">     244 </span><span class="lineCov">          7 :         ctx-&gt;ps = NULL;</span>
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">          7 :         ctx-&gt;src_url = p-&gt;value.string;</span>
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span><span class="lineCov">          7 :         return GF_OK;</span>
+<a name="249"><span class="lineNum">     249 </span>            : }</a>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">       3388 : static Bool m2psdmx_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     252 </span>            : {
+<span class="lineNum">     253 </span>            :         u32 i;
+<span class="lineNum">     254 </span><span class="lineCov">       3388 :         GF_M2PSDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">       3388 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     257 </span><span class="lineCov">         12 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     258 </span><span class="lineCov">         12 :                 if (ctx-&gt;nb_playing &amp;&amp; (ctx-&gt;start_range ==  evt-&gt;play.start_range)) {</span>
+<span class="lineNum">     259 </span><span class="lineCov">          5 :                         ctx-&gt;nb_playing++;</span>
+<span class="lineNum">     260 </span><span class="lineCov">          5 :                         return GF_TRUE;</span>
+<span class="lineNum">     261 </span>            :                 }
+<span class="lineNum">     262 </span><span class="lineCov">          7 :                 ctx-&gt;nb_playing++;</span>
+<span class="lineNum">     263 </span><span class="lineCov">          7 :                 ctx-&gt;start_range = evt-&gt;play.start_range;</span>
+<span class="lineNum">     264 </span><span class="lineCov">          7 :                 gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">          7 :                 if (!ctx-&gt;initial_play_done) {</span>
+<span class="lineNum">     267 </span><span class="lineCov">          7 :                         ctx-&gt;initial_play_done = GF_TRUE;</span>
+<span class="lineNum">     268 </span>            :                         //seek will not change the current source state, don't send a seek
+<span class="lineNum">     269 </span><span class="lineCov">          7 :                         if (ctx-&gt;start_range&lt;0.5)</span>
+<span class="lineNum">     270 </span>            :                                 return GF_TRUE;
+<span class="lineNum">     271 </span>            :                 }
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineCov">          2 :                 for (i=0; i&lt;gf_list_count(ctx-&gt;streams); i++) {</span>
+<span class="lineNum">     274 </span><span class="lineCov">          2 :                         M2PSStream *pss = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     275 </span><span class="lineCov">          2 :                         if (pss-&gt;opid == evt-&gt;base.on_pid)</span>
+<span class="lineNum">     276 </span><span class="lineCov">          1 :                                 pss-&gt;in_use = GF_TRUE;</span>
+<span class="lineNum">     277 </span><span class="lineCov">          2 :                         if (!pss-&gt;in_use) continue;</span>
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span><span class="lineCov">          2 :                         if (pss-&gt;stream_type==GF_STREAM_VISUAL) {</span>
+<span class="lineNum">     280 </span><span class="lineCov">          1 :                                 mpeg2ps_seek_video_frame(ctx-&gt;ps, pss-&gt;stream_num, (u64) (ctx-&gt;start_range*1000));</span>
+<span class="lineNum">     281 </span>            :                         } else {
+<span class="lineNum">     282 </span><span class="lineCov">          1 :                                 mpeg2ps_seek_audio_frame(ctx-&gt;ps, pss-&gt;stream_num, (u64) (ctx-&gt;start_range*1000) );</span>
+<span class="lineNum">     283 </span>            :                         }
+<span class="lineNum">     284 </span>            :                 }
+<span class="lineNum">     285 </span>            :                 //cancel event
+<span class="lineNum">     286 </span>            :                 return GF_TRUE;
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span><span class="lineCov">          3 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     289 </span><span class="lineCov">          3 :                 ctx-&gt;nb_playing--;</span>
+<span class="lineNum">     290 </span><span class="lineCov">          8 :                 for (i=0; i&lt;gf_list_count(ctx-&gt;streams); i++) {</span>
+<span class="lineNum">     291 </span><span class="lineCov">          5 :                         M2PSStream *pss = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     292 </span><span class="lineCov">          5 :                         if (pss-&gt;opid == evt-&gt;base.on_pid)</span>
+<span class="lineNum">     293 </span><span class="lineCov">          3 :                                 pss-&gt;in_use = GF_FALSE;</span>
+<span class="lineNum">     294 </span>            :                 }
+<span class="lineNum">     295 </span>            :                 //cancel event if not last stream playing
+<span class="lineNum">     296 </span><span class="lineCov">          3 :                 if (ctx-&gt;nb_playing) return GF_TRUE;</span>
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span><span class="lineCov">          2 :                 return GF_FALSE;</span>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :         case GF_FEVT_SET_SPEED:
+<span class="lineNum">     301 </span>            :                 //cancel event
+<span class="lineNum">     302 </span>            :                 return GF_TRUE;
+<span class="lineNum">     303 </span>            :         default:
+<span class="lineNum">     304 </span>            :                 break;
+<span class="lineNum">     305 </span>            :         }
+<span class="lineNum">     306 </span>            :         //by default don't cancel event - to rework once we have downloading in place
+<span class="lineNum">     307 </span><span class="lineCov">       3373 :         return GF_FALSE;</span>
+<a name="308"><span class="lineNum">     308 </span>            : }</a>
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span><span class="lineCov">       9714 : GF_Err m2psdmx_process(GF_Filter *filter)</span>
+<span class="lineNum">     311 </span>            : {
+<span class="lineNum">     312 </span><span class="lineCov">       9714 :         GF_M2PSDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     313 </span>            :         Bool start, end;
+<span class="lineNum">     314 </span>            :         u32 i, count, nb_done;
+<span class="lineNum">     315 </span><span class="lineCov">       9714 :         if (!ctx-&gt;ps) {</span>
+<span class="lineNum">     316 </span><span class="lineCov">       3373 :                 GF_FilterPacket *pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     317 </span><span class="lineCov">       3373 :                 if (!pck) {</span>
+<span class="lineNum">     318 </span>            :                         return GF_OK;
+<span class="lineNum">     319 </span>            :                 }
+<span class="lineNum">     320 </span><span class="lineCov">       3373 :                 gf_filter_pck_get_framing(pck, &amp;start, &amp;end);</span>
+<span class="lineNum">     321 </span><span class="lineCov">       3373 :                 if (!end) {</span>
+<span class="lineNum">     322 </span><span class="lineCov">       3366 :                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     323 </span><span class="lineCov">       3366 :                         return GF_OK;</span>
+<span class="lineNum">     324 </span>            :                 }
+<span class="lineNum">     325 </span><span class="lineCov">          7 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineCov">          7 :                 ctx-&gt;ps = mpeg2ps_init(ctx-&gt;src_url);</span>
+<span class="lineNum">     328 </span><span class="lineCov">          7 :                 if (!ctx-&gt;ps) {</span>
+<span class="lineNum">     329 </span>            :                         GF_Err e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :                         if (! gf_file_exists(ctx-&gt;src_url)) e = GF_URL_ERROR;</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :                         gf_filter_setup_failure(filter, e);</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :                         return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     333 </span>            :                 }
+<span class="lineNum">     334 </span><span class="lineCov">          7 :                 m2psdmx_setup(filter, ctx);</span>
+<span class="lineNum">     335 </span>            :         }
+<span class="lineNum">     336 </span><span class="lineCov">       6348 :         if (!ctx-&gt;nb_playing) return GF_OK;</span>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :         nb_done = 0;
+<span class="lineNum">     340 </span><span class="lineCov">       6309 :         count = gf_list_count(ctx-&gt;streams);</span>
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineCov">       6309 :         if (ctx-&gt;in_seek) {</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                 u64 seek_to = (u64) (1000*ctx-&gt;start_range);</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;count;i++) {</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :                         M2PSStream *st = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                         if (!st-&gt;in_use) continue;</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :                         if (st-&gt;stream_type==GF_STREAM_VISUAL) {</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                                 mpeg2ps_seek_video_frame(ctx-&gt;ps, st-&gt;stream_num, seek_to);</span>
+<span class="lineNum">     349 </span>            :                         } else {
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                                 mpeg2ps_seek_audio_frame(ctx-&gt;ps, st-&gt;stream_num, seek_to);</span>
+<span class="lineNum">     351 </span>            :                         }
+<span class="lineNum">     352 </span>            :                 }
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                 ctx-&gt;in_seek = GF_FALSE;</span>
+<span class="lineNum">     354 </span>            :         }
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span><span class="lineCov">      12585 :         for (i=0; i&lt;count;i++) {</span>
+<span class="lineNum">     358 </span>            :                 u8 *buf;
+<span class="lineNum">     359 </span>            :                 u32 buf_len;
+<span class="lineNum">     360 </span>            :                 u8 *pck_data;
+<span class="lineNum">     361 </span>            :                 GF_FilterPacket *dst_pck;
+<span class="lineNum">     362 </span><span class="lineCov">      12585 :                 M2PSStream *st = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     363 </span><span class="lineCov">      12585 :                 if (!st-&gt;in_use) {</span>
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :                         nb_done++;</span>
+<span class="lineNum">     365 </span><span class="lineCov">       2871 :                         continue;</span>
+<span class="lineNum">     366 </span>            :                 }
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineCov">      12585 :                 if (gf_filter_pid_would_block(st-&gt;opid)) continue;</span>
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span><span class="lineCov">      11626 :                 if (st-&gt;stream_type==GF_STREAM_VISUAL) {</span>
+<span class="lineNum">     371 </span>            :                         u8 ftype;
+<span class="lineNum">     372 </span>            :                         u64 dts, cts;
+<span class="lineNum">     373 </span><span class="lineCov">       5320 :                         u32 res = mpeg2ps_get_video_frame(ctx-&gt;ps, st-&gt;stream_num, (u8 **) &amp;buf, &amp;buf_len, &amp;ftype, TS_90000, &amp;dts, &amp;cts);</span>
+<span class="lineNum">     374 </span><span class="lineCov">       5320 :                         if (!res) {</span>
+<span class="lineNum">     375 </span><span class="lineCov">       1495 :                                 nb_done++;</span>
+<span class="lineNum">     376 </span><span class="lineCov">       2990 :                                 continue;</span>
+<span class="lineNum">     377 </span>            :                         }
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            :                         //bug in some streams, make sure we don't dispatch twice the same ts
+<span class="lineNum">     380 </span><span class="lineCov">       3825 :                         if (st-&gt;last_dts == dts) dts++;;</span>
+<span class="lineNum">     381 </span><span class="lineCov">       3825 :                         st-&gt;last_dts = dts;</span>
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span><span class="lineCov">       3825 :                         if ((buf[buf_len - 4] == 0) &amp;&amp; (buf[buf_len - 3] == 0) &amp;&amp; (buf[buf_len - 2] == 1)) buf_len -= 4;</span>
+<span class="lineNum">     384 </span><span class="lineCov">       3825 :                         dst_pck = gf_filter_pck_new_alloc(st-&gt;opid, buf_len, &amp;pck_data);</span>
+<span class="lineNum">     385 </span><span class="lineCov">       3825 :                         if (!dst_pck) continue;</span>
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span><span class="lineCov">       3825 :                         memcpy(pck_data, buf, buf_len);</span>
+<span class="lineNum">     388 </span><span class="lineCov">       3825 :                         if (ftype==1) gf_filter_pck_set_sap(dst_pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span><span class="lineCov">       3825 :                         if (cts != GF_FILTER_NO_TS) {</span>
+<span class="lineNum">     391 </span><span class="lineCov">       3825 :                                 if (dts == GF_FILTER_NO_TS) dts = cts;</span>
+<span class="lineNum">     392 </span><span class="lineCov">       3825 :                                 dts -= ctx-&gt;first_dts;</span>
+<span class="lineNum">     393 </span><span class="lineCov">       3825 :                                 cts -= ctx-&gt;first_dts;</span>
+<span class="lineNum">     394 </span><span class="lineCov">       3825 :                                 gf_filter_pck_set_dts(dst_pck, dts);</span>
+<span class="lineNum">     395 </span><span class="lineCov">       3825 :                                 gf_filter_pck_set_cts(dst_pck, cts);</span>
+<span class="lineNum">     396 </span><span class="lineCov">       3825 :                                 gf_filter_pck_set_framing(dst_pck, GF_TRUE, GF_FALSE);</span>
+<span class="lineNum">     397 </span>            :                         } else {
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_set_framing(dst_pck, GF_FALSE, GF_FALSE);</span>
+<span class="lineNum">     399 </span>            :                         }
+<span class="lineNum">     400 </span><span class="lineCov">       3825 :                         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     401 </span>            :                 } else {
+<span class="lineNum">     402 </span>            :                         u64 cts;
+<span class="lineNum">     403 </span><span class="lineCov">       6306 :                         u32 res = mpeg2ps_get_audio_frame(ctx-&gt;ps, st-&gt;stream_num, (u8**)&amp;buf, &amp;buf_len, TS_90000, NULL, &amp;cts);</span>
+<span class="lineNum">     404 </span><span class="lineCov">       6306 :                         if (!res) {</span>
+<span class="lineNum">     405 </span><span class="lineCov">        417 :                                 nb_done++;</span>
+<span class="lineNum">     406 </span><span class="lineCov">        834 :                                 continue;</span>
+<span class="lineNum">     407 </span>            :                         }
+<span class="lineNum">     408 </span><span class="lineCov">       5889 :                         dst_pck = gf_filter_pck_new_alloc(st-&gt;opid, buf_len, &amp;pck_data);</span>
+<span class="lineNum">     409 </span><span class="lineCov">       5889 :                         if (!dst_pck) continue;</span>
+<span class="lineNum">     410 </span>            :                         
+<span class="lineNum">     411 </span><span class="lineCov">       5889 :                         memcpy(pck_data, buf, buf_len);</span>
+<span class="lineNum">     412 </span><span class="lineCov">       5889 :                         if (cts != GF_FILTER_NO_TS) {</span>
+<span class="lineNum">     413 </span><span class="lineCov">       5889 :                                 cts -= ctx-&gt;first_dts;</span>
+<span class="lineNum">     414 </span><span class="lineCov">       5889 :                                 gf_filter_pck_set_cts(dst_pck, cts);</span>
+<span class="lineNum">     415 </span><span class="lineCov">       5889 :                                 gf_filter_pck_set_framing(dst_pck, GF_TRUE, GF_FALSE);</span>
+<span class="lineNum">     416 </span>            :                         } else {
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_set_framing(dst_pck, GF_FALSE, GF_FALSE);</span>
+<span class="lineNum">     418 </span>            :                         }
+<span class="lineNum">     419 </span><span class="lineCov">       5889 :                         gf_filter_pck_set_sap(dst_pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span><span class="lineCov">       5889 :                         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     422 </span>            :                 }
+<span class="lineNum">     423 </span>            :         }
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span><span class="lineCov">       6309 :         if (nb_done==count) {</span>
+<span class="lineNum">     426 </span><span class="lineCov">          9 :                 for (i=0; i&lt;count;i++) {</span>
+<span class="lineNum">     427 </span><span class="lineCov">          9 :                         M2PSStream *st = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     428 </span><span class="lineCov">          9 :                         gf_filter_pid_set_eos(st-&gt;opid);</span>
+<span class="lineNum">     429 </span>            :                 }
+<span class="lineNum">     430 </span>            :                 return GF_EOS;
+<span class="lineNum">     431 </span>            :         }
+<span class="lineNum">     432 </span>            :         return GF_OK;
+<a name="433"><span class="lineNum">     433 </span>            : }</a>
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span><span class="lineCov">          7 : GF_Err m2psdmx_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     436 </span>            : {
+<span class="lineNum">     437 </span><span class="lineCov">          7 :         GF_M2PSDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     438 </span><span class="lineCov">          7 :         ctx-&gt;streams = gf_list_new();</span>
+<span class="lineNum">     439 </span><span class="lineCov">          7 :         return GF_OK;</span>
+<a name="440"><span class="lineNum">     440 </span>            : }</a>
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span><span class="lineCov">          7 : void m2psdmx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     443 </span>            : {
+<span class="lineNum">     444 </span><span class="lineCov">          7 :         GF_M2PSDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span><span class="lineCov">         26 :         while (gf_list_count(ctx-&gt;streams)) {</span>
+<span class="lineNum">     447 </span><span class="lineCov">         12 :                 M2PSStream *st = gf_list_pop_back(ctx-&gt;streams);</span>
+<span class="lineNum">     448 </span><span class="lineCov">         12 :                 gf_free(st);</span>
+<span class="lineNum">     449 </span>            :         }
+<span class="lineNum">     450 </span><span class="lineCov">          7 :         gf_list_del(ctx-&gt;streams);</span>
+<span class="lineNum">     451 </span><span class="lineCov">          7 :         if (ctx-&gt;ps) mpeg2ps_close(ctx-&gt;ps);</span>
+<a name="452"><span class="lineNum">     452 </span><span class="lineCov">          7 : }</span></a>
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span><span class="lineCov">       3072 : static const char *m2psdmx_probe_data(const u8 *data, u32 size, GF_FilterProbeScore *score)</span>
+<span class="lineNum">     455 </span>            : {
+<span class="lineNum">     456 </span><span class="lineCov">       3072 :         *score = GF_FPROBE_EXT_MATCH;</span>
+<span class="lineNum">     457 </span><span class="lineCov">       3072 :         return &quot;mpg|mpeg|vob&quot;;</span>
+<span class="lineNum">     458 </span>            : }
+<span class="lineNum">     459 </span>            : 
+<span class="lineNum">     460 </span>            : static const GF_FilterCapability M2PSDmxCaps[] =
+<span class="lineNum">     461 </span>            : {
+<span class="lineNum">     462 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     463 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_FILE_EXT, &quot;mpg|mpeg|vob&quot;),
+<span class="lineNum">     464 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_MIME, &quot;video/mpeg|audio/mpeg&quot;),
+<span class="lineNum">     465 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     466 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     467 </span>            :         CAP_UINT(GF_CAPS_OUTPUT_EXCLUDED, GF_PROP_PID_CODECID, GF_CODECID_RAW),
+<span class="lineNum">     468 </span>            : };
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            : GF_FilterRegister M2PSDmxRegister = {
+<span class="lineNum">     473 </span>            :         .name = &quot;m2psdmx&quot;,
+<span class="lineNum">     474 </span>            :         GF_FS_SET_DESCRIPTION(&quot;MPEG PS demuxer&quot;)
+<span class="lineNum">     475 </span>            :         GF_FS_SET_HELP(&quot;This filter demultiplexes MPEG-2 program stream files/data to produce media PIDs and frames.&quot;)
+<span class="lineNum">     476 </span>            :         .private_size = sizeof(GF_M2PSDmxCtx),
+<span class="lineNum">     477 </span>            :         .initialize = m2psdmx_initialize,
+<span class="lineNum">     478 </span>            :         .finalize = m2psdmx_finalize,
+<span class="lineNum">     479 </span>            :         SETCAPS(M2PSDmxCaps),
+<span class="lineNum">     480 </span>            :         .configure_pid = m2psdmx_configure_pid,
+<span class="lineNum">     481 </span>            :         .process = m2psdmx_process,
+<span class="lineNum">     482 </span>            :         .process_event = m2psdmx_process_event,
+<span class="lineNum">     483 </span>            :         .probe_data = m2psdmx_probe_data,
+<span class="lineNum">     484 </span>            :         //this filter is not very reliable, prefer ffmpeg when available
+<span class="lineNum">     485 </span>            :         .priority = 255
+<span class="lineNum">     486 </span>            : };
+<span class="lineNum">     487 </span>            : 
+<a name="488"><span class="lineNum">     488 </span>            : #endif // GPAC_DISABLE_MPEG2PS</a>
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span><span class="lineCov">       2877 : const GF_FilterRegister *m2psdmx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     491 </span>            : {
+<span class="lineNum">     492 </span>            : #ifndef GPAC_DISABLE_MPEG2PS
+<span class="lineNum">     493 </span><span class="lineCov">       2877 :         return &amp;M2PSDmxRegister;</span>
+<span class="lineNum">     494 </span>            : #else
+<span class="lineNum">     495 </span>            :         return NULL;
+<span class="lineNum">     496 </span>            : #endif
+<span class="lineNum">     497 </span>            : }
+<span class="lineNum">     498 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

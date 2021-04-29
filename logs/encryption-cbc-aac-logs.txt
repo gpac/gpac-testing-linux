@@ -1,0 +1,63 @@
+*** encryption-cbc-aac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:34:06 ***
+
+Computing ./results/temp/cbc-aac-crypted.mp4  (crypt) hash: 
+File hash (SHA-1): 2606CD1AE067C7E4EE4660EAA07B57FCF6B2B204
+Hash OK for ./results/temp/cbc-aac-crypted.mp4
+
+*** Subtest "Encrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/cbc.xml -out ./results/temp/cbc-aac-crypted.mp4 ./results/temp/source_media.mp4" ***
+[CENC] Unrecognized roll parameter IDX=1, ignoring
+
+Computing ./results/temp/cbc-aac-decrypted.mp4  (decrypt) hash: 
+File hash (SHA-1): F7CFAAEDCF593450996465F690B9B80C976937A4
+Hash OK for ./results/temp/cbc-aac-decrypted.mp4
+
+*** Subtest "Decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/cbc.xml -out ./results/temp/cbc-aac-decrypted.mp4 ./results/temp/cbc-aac-crypted.mp4" ***
+[CENC] Unrecognized roll parameter IDX=1, ignoring
+
+Same Hash for ./results/temp/source_media.mp4 and ./results/temp/cbc-aac-decrypted.mp4
+
+*** Subtest "INFO": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/cbc-aac-crypted.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:07.040
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: No visual capability required (0xff)
+Audio PL: AAC Profile @ Level 2 (0x29)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 48000
+Media Duration 00:00:07.040 
+Media Info: Language "Undetermined (und)" - Type "soun:enca" - 330 samples
+Unknown track type
+
+	Protected by CENC scheme cbc1 version 0x00010000
+		KID 279926496A7F5D25DA69F2B3B2799A7F - IV size 39 
+
+	RFC6381 Codec Parameters: mp4a.40.2
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1024 / 48000
+
+
+Computing ./results/temp/cbc-aac-crypted_dashinit.mp4  (crypt-dash-init) hash: 
+File hash (SHA-1): 8F17F77E67C8AA9CBE718DC1F6302E984B1A151B
+Hash OK for ./results/temp/cbc-aac-crypted_dashinit.mp4
+Computing ./results/temp/cbc-aac-crypted_dash1.m4s  (crypt-dash-seg) hash: 
+File hash (SHA-1): 216453D5625877D37400EED1456C53173F6BA736
+Hash OK for ./results/temp/cbc-aac-crypted_dash1.m4s
+
+*** Subtest "DASH": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/cbc-aac-crypted.mp4" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 3.98933 end 2
+[MPD] Generating MPD at time 2021-04-29T23:34:07.549Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 7.04 end 3
+
+

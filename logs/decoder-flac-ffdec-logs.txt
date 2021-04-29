@@ -1,0 +1,49 @@
+*** decoder-flac-ffdec logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:32 ***
+
+
+*** Subtest "decoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4 -o ./results/temp/test.pcm -graph -stats " ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1818615680
+
+Filter stats - 6 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 6 tasks 636 us process time
+		1 packets sent 5000 bytes sent (1572.33 pck/sec 62.8931 mbps)
+		* output PID in.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/test.pcm) : 1 input pids 0 output pids 7 tasks 263 us process time
+		5 packets processed 92160 bytes processed (19011.4 pck/sec 2803.35 mbps)
+		* input PID in.mp4: 5 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 8 tasks 698 us process time
+		2 packets processed 5000 bytes processed (2865.33 pck/sec 57.3066 mbps)
+		5 packets sent 50608 bytes sent (7163.32 pck/sec 580.034 mbps)
+		* input PID in.mp4: 2 packets received
+		* output PID in.mp4: 5 packets sent
+	Filter ffdec "ffdec:flac" : 1 input pids 1 output pids 5 tasks 1178 us process time
+		5 packets processed 50608 bytes processed (4244.48 pck/sec 343.688 mbps)
+		5 packets sent 184320 bytes sent (4244.48 pck/sec 1251.75 mbps)
+		* input PID in.mp4: 5 packets received
+		* output PID in.mp4: 5 packets sent
+	Filter writegen : 1 input pids 1 output pids 11 tasks 84 us process time
+		5 packets processed 92160 bytes processed (59523.8 pck/sec 8777.14 mbps)
+		5 packets sent 92160 bytes sent (59523.8 pck/sec 8777.14 mbps)
+		* input PID in.mp4: 5 packets received
+		* output PID in.mp4: 5 packets sent
+	Filter resample : 1 input pids 1 output pids 4 tasks 1156 us process time
+		5 packets processed 184320 bytes processed (4325.26 pck/sec 1275.57 mbps)
+		5 packets sent 92160 bytes sent (4325.26 pck/sec 637.785 mbps)
+		* input PID in.mp4: 5 packets received
+		* output PID in.mp4: 5 packets sent
+Session stats - threads 1
+	Thread 1: run_time 4045 us active_time 4034 us nb_tasks 47
+
+Total: run_time 4045 us active_time 4034 us nb_tasks 47
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x563fe591e840)
+-(PID in.mp4) mp4dmx (ptr=0x563fe5924aa0)
+--(PID in.mp4) ffdec "ffdec:flac" (ptr=0x563fe592dc50)
+---(PID in.mp4) resample (ptr=0x563fe5940ab0)
+----(PID in.mp4) writegen (ptr=0x563fe592edf0)
+-----(PID in.mp4) fout (dst=./results/temp/test.pcm) (ptr=0x563fe5921220)
+
+Computing ./results/temp/test.pcm  (decoder) hash: 
+File hash (SHA-1): C9917DBC766AF320DC386A5144D1E672C35CAA27
+Hash OK for ./results/temp/test.pcm

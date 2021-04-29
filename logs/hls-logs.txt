@@ -1,0 +1,79 @@
+*** hls logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:51 ***
+
+
+*** Subtest "convert": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -mpd ./external_media/hls/index.m3u8 -out ./external_media/hls/file1.mpd" ***
+[MPD] No namespace found while writing. Setting to default.
+[MPD] Generating MPD at time 1970-01-01T00:00:00.000Z
+Done converting HLS (./external_media/hls/index.m3u8) to MPD (./external_media/hls/file1.mpd)
+
+Computing ./external_media/hls/file1.mpd  (convert) hash: 
+File hash (SHA-1): 63577BE26D237F566FC45D53F6DA527944EBF88B
+Hash OK for ./external_media/hls/file1.mpd
+
+*** Subtest "convert-baseurl": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -mpd ./external_media/hls/index.m3u8 -out ./results/temp/file2.mpd" ***
+[MPD] No namespace found while writing. Setting to default.
+[MPD] Generating MPD at time 1970-01-01T00:00:00.000Z
+Done converting HLS (./external_media/hls/index.m3u8) to MPD (./results/temp/file2.mpd)
+
+Computing ./results/temp/file2.mpd  (convert-baseurl) hash: 
+File hash (SHA-1): F1467F5B5C0F83D54FEC9A038A133BA750FFDF75
+Hash OK for ./results/temp/file2.mpd
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file2.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -stats -graph" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1878626176
+
+Filter stats - 7 filters
+	Filter fin (src=./results/temp/file2.mpd) : 0 input pids 1 output pids 6 tasks 823 us process time
+		1 packets sent 1048 bytes sent (1215.07 pck/sec 10.1871 mbps)
+		* output PID file2.mpd: 1 packets sent
+	Filter inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) : 2 input pids 0 output pids 5796 tasks 11010 us process time
+		5793 packets processed 961876 bytes processed (526158 pck/sec 698.911 mbps)
+		* input PID AS1: 1293 frames (3093 packets) received
+		* input PID AS1: 900 frames (4500 packets) received
+	Filter dashin : 3 input pids 2 output pids 2681 tasks 7755 us process time
+		5794 packets processed 962924 bytes processed (747131 pck/sec 993.345 mbps)
+		3993 packets sent 961876 bytes sent (514894 pck/sec 992.264 mbps)
+		* input PID file2.mpd: 1 packets received
+		* input PID P1A2: 2193 packets received
+		* input PID P1V3: 3600 packets received
+		* output PID AS1: 3093 packets sent
+		* output PID AS1: 4500 packets sent
+	Filter fin (src=./external_media/hls/fileSequence0.ts) : 0 input pids 1 output pids 332 tasks 1961 us process time
+		316 packets sent 1566152 bytes sent (161142 pck/sec 6389.2 mbps)
+		* output PID fileSequence5.ts: 316 packets sent
+	Filter m2tsdmx : 1 input pids 2 output pids 335 tasks 9327 us process time
+		316 packets processed 1566152 bytes processed (33880.1 pck/sec 1343.33 mbps)
+		2193 packets sent 974556 bytes sent (235124 pck/sec 835.901 mbps)
+		* input PID fileSequence5.ts: 316 packets received
+		* output PID P1A2: 2193 packets sent
+		* output PID P1V3: 1800 packets sent
+	Filter rfadts : 1 input pids 1 output pids 1431 tasks 2743 us process time
+		2193 packets processed 42994 bytes processed (799490 pck/sec 125.393 mbps)
+		1293 packets sent 33943 bytes sent (471382 pck/sec 98.9953 mbps)
+		* input PID P1A2: 2193 packets received
+		* output PID P1A2: 2193 packets sent
+	Filter rfnalu : 1 input pids 1 output pids 4470 tasks 8816 us process time
+		1800 packets processed 931562 bytes processed (204174 pck/sec 845.338 mbps)
+		2700 packets sent 927933 bytes sent (306261 pck/sec 842.044 mbps)
+		* input PID P1V3: 1800 packets received
+		* output PID P1V3: 3600 packets sent
+Session stats - threads 1
+	Thread 1: run_time 46843 us active_time 46129 us nb_tasks 15585
+
+Total: run_time 46843 us active_time 46129 us nb_tasks 15585
+
+Filters connected:
+fin (src=./results/temp/file2.mpd) (ptr=0x562784aca840)
+-(PID file2.mpd) dashin (ptr=0x562784ad1610)
+--(PID AS1) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x562784acd140)
+--(PID AS1) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x562784acd140)
+fin (src=./external_media/hls/fileSequence0.ts) (ptr=0x562784ad4f30)
+-(PID fileSequence5.ts) m2tsdmx (ptr=0x562784ae5b70)
+--(PID P1A2) rfadts (ptr=0x562784af3cc0)
+---(PID P1A2) dashin (ptr=0x562784ad1610)
+--(PID P1V3) rfnalu (ptr=0x562784b076d0)
+---(PID P1V3) dashin (ptr=0x562784ad1610)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 46D1BBE9B2D3B492C1D201F5AF488CD32CFF6491
+Hash fail, ref hash ./hash_refs/hls-inspect.hash was CE7D4F73916EF8D52C3C82AD47016FCB909943C2

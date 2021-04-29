@@ -1,0 +1,530 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/rewrite_adts.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - rewrite_adts.c<span style="font-size: 80%;"> (source / <a href="rewrite_adts.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">144</td>
+            <td class="headerCovTableEntry">176</td>
+            <td class="headerCovTableEntryMed">81.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / AAC ADTS write filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &lt;gpac/avparse.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : typedef struct
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            :         //opts
+<span class="lineNum">      36 </span>            :         Bool exporter, mpeg2;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :         //only one input pid declared
+<span class="lineNum">      39 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      40 </span>            :         //only one output pid declared
+<span class="lineNum">      41 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :         u32 codecid, channels, sr_idx, aac_type, ch_cfg;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :         Bool is_latm;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :         GF_BitStream *bs_w;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">      50 </span>            :         GF_M4ADecSpecInfo acfg;
+<span class="lineNum">      51 </span>            :         u8 *pce;
+<span class="lineNum">      52 </span>            :         u32 pce_size;
+<span class="lineNum">      53 </span>            : #else
+<span class="lineNum">      54 </span>            :         u8 *dsi;
+<span class="lineNum">      55 </span>            :         u32 dsi_size;
+<span class="lineNum">      56 </span>            : #endif
+<span class="lineNum">      57 </span>            :         u32 dsi_crc;
+<span class="lineNum">      58 </span>            :         Bool update_dsi;
+<span class="lineNum">      59 </span>            :         GF_Fraction fdsi;
+<span class="lineNum">      60 </span>            :         u64 last_cts;
+<span class="lineNum">      61 </span>            :         u32 timescale;
+<span class="lineNum">      62 </span>            : } GF_ADTSMxCtx;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : 
+<a name="65"><span class="lineNum">      65 </span>            : </a>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">         13 : GF_Err adtsmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      68 </span>            : {
+<span class="lineNum">      69 </span>            :         u32 i, sr, chan_cfg=0;
+<span class="lineNum">      70 </span>            :         Bool patch_channels = GF_FALSE;
+<span class="lineNum">      71 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">      72 </span><span class="lineCov">         13 :         GF_ADTSMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineCov">         13 :         if (is_remove) {</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">      79 </span>            :                 }
+<span class="lineNum">      80 </span>            :                 return GF_OK;
+<span class="lineNum">      81 </span>            :         }
+<span class="lineNum">      82 </span><span class="lineCov">         13 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">      83 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">         13 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_CODECID);</span>
+<span class="lineNum">      86 </span><span class="lineCov">         13 :         if (!p) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">      87 </span><span class="lineCov">         13 :         ctx-&gt;codecid = p-&gt;value.uint;</span>
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span><span class="lineCov">         13 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_SAMPLE_RATE);</span>
+<span class="lineNum">      90 </span><span class="lineCov">         13 :         if (!p) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">      91 </span><span class="lineCov">         13 :         sr = p-&gt;value.uint;</span>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span><span class="lineCov">         13 :         ctx-&gt;channels = 0;</span>
+<span class="lineNum">      94 </span><span class="lineCov">         13 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_NUM_CHANNELS);</span>
+<span class="lineNum">      95 </span><span class="lineCov">         13 :         if (p)</span>
+<span class="lineNum">      96 </span><span class="lineCov">         13 :                 ctx-&gt;channels = p-&gt;value.uint;</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">      99 </span><span class="lineCov">         13 :         memset(&amp;ctx-&gt;acfg, 0, sizeof(GF_M4ADecSpecInfo));</span>
+<span class="lineNum">     100 </span>            : #endif
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">         13 :         ctx-&gt;aac_type = 0;</span>
+<span class="lineNum">     103 </span><span class="lineCov">         13 :         if (ctx-&gt;is_latm) {</span>
+<span class="lineNum">     104 </span>            :                 u32 crc;
+<span class="lineNum">     105 </span><span class="lineCov">          2 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     106 </span><span class="lineCov">          2 :                 if (!p) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineCov">          2 :                 crc = gf_crc_32(p-&gt;value.data.ptr, p-&gt;value.data.size);</span>
+<span class="lineNum">     109 </span><span class="lineCov">          2 :                 if (crc != ctx-&gt;dsi_crc) {</span>
+<span class="lineNum">     110 </span><span class="lineCov">          2 :                         ctx-&gt;dsi_crc = crc;</span>
+<span class="lineNum">     111 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     112 </span><span class="lineCov">          2 :                         gf_m4a_get_config(p-&gt;value.data.ptr, p-&gt;value.data.size, &amp;ctx-&gt;acfg);</span>
+<span class="lineNum">     113 </span>            : #endif
+<span class="lineNum">     114 </span><span class="lineCov">          2 :                         ctx-&gt;update_dsi = GF_TRUE;</span>
+<span class="lineNum">     115 </span>            :                 }
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span><span class="lineCov">          2 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_TIMESCALE);</span>
+<span class="lineNum">     118 </span><span class="lineCov">          2 :                 if (!p) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     119 </span><span class="lineCov">          2 :                 ctx-&gt;timescale = p-&gt;value.uint;</span>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineCov">         11 :         } else if (ctx-&gt;codecid==GF_CODECID_AAC_MPEG4) {</span>
+<span class="lineNum">     122 </span>            :                 //setup default config
+<span class="lineNum">     123 </span><span class="lineCov">         11 :                 chan_cfg = ctx-&gt;channels;</span>
+<span class="lineNum">     124 </span><span class="lineCov">         11 :                 if (chan_cfg==8)</span>
+<span class="lineNum">     125 </span>            :                         chan_cfg = 7;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">         11 :                 if (!ctx-&gt;mpeg2) {</span>
+<span class="lineNum">     128 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     129 </span><span class="lineCov">         11 :                         p = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     130 </span><span class="lineCov">         11 :                         if (p) {</span>
+<span class="lineNum">     131 </span><span class="lineCov">          9 :                                 gf_m4a_get_config(p-&gt;value.data.ptr, p-&gt;value.data.size, &amp;ctx-&gt;acfg);</span>
+<span class="lineNum">     132 </span><span class="lineCov">          9 :                                 ctx-&gt;aac_type = ctx-&gt;acfg.base_object_type - 1;</span>
+<span class="lineNum">     133 </span><span class="lineCov">          9 :                                 chan_cfg = ctx-&gt;acfg.chan_cfg;</span>
+<span class="lineNum">     134 </span><span class="lineCov">          9 :                                 sr = ctx-&gt;acfg.base_sr;</span>
+<span class="lineNum">     135 </span>            :                         } else
+<span class="lineNum">     136 </span>            : #endif
+<span class="lineNum">     137 </span>            :                         {
+<span class="lineNum">     138 </span><span class="lineCov">          2 :                                 GF_LOG(GF_LOG_INFO, GF_LOG_CONTAINER, (&quot;[RFADTS] no AAC decoder config, assuming AAC-LC\n&quot;));</span>
+<span class="lineNum">     139 </span><span class="lineCov">          2 :                                 ctx-&gt;aac_type = GF_M4A_AAC_LC;</span>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineCov">          2 :                                 if (!ctx-&gt;channels) {</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, (&quot;[RFADTS] no channel config found for ADTS, forcing stereo\n&quot;));</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                                         chan_cfg = ctx-&gt;channels = 2;</span>
+<span class="lineNum">     144 </span>            :                                         patch_channels = GF_TRUE;
+<span class="lineNum">     145 </span>            :                                 }
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">          2 :                                 if (!chan_cfg) {</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, (&quot;[RFADTS] Unkown channel config, will not be able to signal it in ADTS\n&quot;));</span>
+<span class="lineNum">     149 </span>            :                                 }
+<span class="lineNum">     150 </span>            :                         }
+<span class="lineNum">     151 </span>            :                 }
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span><span class="lineCov">         11 :                 if (chan_cfg&gt;7) {</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, (&quot;[RFADTS] Unkown channel config, will not be able to signal it in ADTS\n&quot;));</span>
+<span class="lineNum">     155 </span>            :                         chan_cfg = 0;
+<span class="lineNum">     156 </span>            :                 }
+<span class="lineNum">     157 </span>            :         } else {
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :                 ctx-&gt;aac_type = ctx-&gt;codecid - GF_CODECID_AAC_MPEG2_MP;</span>
+<span class="lineNum">     159 </span>            :         }
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     162 </span><span class="lineCov">         13 :         if (ctx-&gt;channels &amp;&amp; ctx-&gt;acfg.nb_chan &amp;&amp; (ctx-&gt;channels != ctx-&gt;acfg.nb_chan)) {</span>
+<span class="lineNum">     163 </span>            :                 //do not warn here, as most MP4 files will use nbChan=2 for multichan
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_CONTAINER, (&quot;[RFADTS] Mismatch between container number of channels (%d) and AAC config (%d), using AAC config\n&quot;, ctx-&gt;channels, ctx-&gt;acfg.nb_chan));</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                 ctx-&gt;channels = ctx-&gt;acfg.nb_chan;</span>
+<span class="lineNum">     166 </span>            :                 patch_channels = GF_TRUE;
+<span class="lineNum">     167 </span>            :         }
+<span class="lineNum">     168 </span><span class="lineCov">         13 :         if ((ctx-&gt;acfg.base_object_type==2) &amp;&amp; (ctx-&gt;acfg.base_sr!=sr)) {</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, (&quot;[RFADTS] Mismatch between container samplerate (%d) and AAC config SBR base samplerate (%d), using AAC config\n&quot;, sr, ctx-&gt;acfg.base_sr));</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                 sr = ctx-&gt;acfg.base_sr;</span>
+<span class="lineNum">     171 </span>            :         }
+<span class="lineNum">     172 </span><span class="lineCov">         13 :         if (!ctx-&gt;acfg.chan_cfg &amp;&amp; ctx-&gt;acfg.program_config_element_present) {</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :                 GF_BitStream *bs = gf_bs_new(NULL, 0, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :                 gf_m4a_write_program_config_element_bs(bs, &amp;ctx-&gt;acfg);</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;pce) gf_free(ctx-&gt;pce);</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :                 ctx-&gt;pce = NULL;</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                 gf_bs_get_content(bs, &amp;ctx-&gt;pce, &amp;ctx-&gt;pce_size);</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :                 gf_bs_del(bs);</span>
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, (&quot;[RFADTS] ADTS will use multiple raw blocks to signal channel configuration\n&quot;));</span>
+<span class="lineNum">     181 </span>            :         }
+<span class="lineNum">     182 </span>            : #else
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);
+<span class="lineNum">     185 </span>            :         if (!p) return GF_NOT_SUPPORTED;
+<span class="lineNum">     186 </span>            :         ctx-&gt;dsi = p-&gt;value.data.ptr;
+<span class="lineNum">     187 </span>            :         ctx-&gt;dsi_size = p-&gt;value.data.size;
+<span class="lineNum">     188 </span>            : #endif
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">         13 :         ctx-&gt;ch_cfg = chan_cfg;</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineCov">         68 :         for (i=0; i&lt;16; i++) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">         68 :                 if (GF_M4ASampleRates[i] == (u32) sr) {</span>
+<span class="lineNum">     195 </span><span class="lineCov">         13 :                         ctx-&gt;sr_idx = i;</span>
+<span class="lineNum">     196 </span><span class="lineCov">         13 :                         break;</span>
+<span class="lineNum">     197 </span>            :                 }
+<span class="lineNum">     198 </span>            :         }
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">         13 :         if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     202 </span><span class="lineCov">         11 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     203 </span>            :         }
+<span class="lineNum">     204 </span><span class="lineCov">         13 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     205 </span><span class="lineCov">         13 :         gf_filter_pid_copy_properties(ctx-&gt;opid, pid);</span>
+<span class="lineNum">     206 </span><span class="lineCov">         13 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG, NULL);</span>
+<span class="lineNum">     207 </span><span class="lineCov">         13 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_UNFRAMED, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     208 </span><span class="lineCov">         13 :         if (ctx-&gt;is_latm)</span>
+<span class="lineNum">     209 </span><span class="lineCov">          2 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_UNFRAMED_LATM, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineCov">         13 :         if (patch_channels)</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_NUM_CHANNELS, &amp;PROP_UINT(ctx-&gt;channels));</span>
+<span class="lineNum">     213 </span><span class="lineCov">         13 :         gf_filter_pid_set_framing_mode(ctx-&gt;ipid, GF_TRUE);</span>
+<span class="lineNum">     214 </span><span class="lineCov">         13 :         return GF_OK;</span>
+<span class="lineNum">     215 </span>            : }
+<span class="lineNum">     216 </span>            : 
+<a name="217"><span class="lineNum">     217 </span>            : </a>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">       2772 : GF_Err adtsmx_process(GF_Filter *filter)</span>
+<span class="lineNum">     220 </span>            : {
+<span class="lineNum">     221 </span><span class="lineCov">       2772 :         GF_ADTSMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     222 </span>            :         GF_FilterPacket *pck, *dst_pck;
+<span class="lineNum">     223 </span>            :         u8 *data, *output;
+<span class="lineNum">     224 </span>            :         u32 pck_size, size;
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineCov">       2772 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     227 </span><span class="lineCov">       2772 :         if (!pck) {</span>
+<span class="lineNum">     228 </span><span class="lineCov">        374 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     229 </span><span class="lineCov">         24 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     230 </span><span class="lineCov">         24 :                         return GF_EOS;</span>
+<span class="lineNum">     231 </span>            :                 }
+<span class="lineNum">     232 </span>            :                 return GF_OK;
+<span class="lineNum">     233 </span>            :         }
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">       2398 :         data = (char *) gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineCov">       2398 :         if (ctx-&gt;is_latm) {</span>
+<span class="lineNum">     238 </span>            :                 u32 asize;
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">        377 :                 size = pck_size+20;</span>
+<span class="lineNum">     241 </span><span class="lineCov">        377 :                 dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, size, &amp;output);</span>
+<span class="lineNum">     242 </span><span class="lineCov">        377 :                 if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span><span class="lineCov">        377 :                 if (!ctx-&gt;bs_w) ctx-&gt;bs_w = gf_bs_new(output, size, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     245 </span><span class="lineCov">        375 :                 else gf_bs_reassign_buffer(ctx-&gt;bs_w, output, size);</span>
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineCov">        377 :                 gf_bs_write_int(ctx-&gt;bs_w, 0x2B7, 11);</span>
+<span class="lineNum">     248 </span><span class="lineCov">        377 :                 gf_bs_write_int(ctx-&gt;bs_w, 0, 13);</span>
+<span class="lineNum">     249 </span><span class="lineCov">        377 :                 if (ctx-&gt;codecid==GF_CODECID_USAC) {</span>
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :                         GF_FilterSAPType sap = gf_filter_pck_get_sap(pck);</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :                         if ((sap == GF_FILTER_SAP_1) || (sap == GF_FILTER_SAP_4_PROL)) {</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :                                 ctx-&gt;update_dsi = GF_TRUE;</span>
+<span class="lineNum">     253 </span>            :                         }
+<span class="lineNum">     254 </span>            :                 } else {
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">        377 :                         if (ctx-&gt;fdsi.num &amp;&amp; ctx-&gt;fdsi.den) {</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :                                 u64 ts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                                 if (ts != GF_FILTER_NO_TS) {</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                                         if ((ts - ctx-&gt;last_cts) * ctx-&gt;fdsi.den &gt;= ctx-&gt;timescale * ctx-&gt;fdsi.num) {</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :                                                 ctx-&gt;last_cts = ts;</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :                                                 ctx-&gt;update_dsi = GF_TRUE;</span>
+<span class="lineNum">     262 </span>            :                                         }
+<span class="lineNum">     263 </span>            :                                 }
+<span class="lineNum">     264 </span>            :                         }
+<span class="lineNum">     265 </span>            :                 }
+<span class="lineNum">     266 </span>            :                 /*same mux config = 0 (refresh aac config)*/
+<span class="lineNum">     267 </span><span class="lineCov">        377 :                 if (ctx-&gt;update_dsi) {</span>
+<span class="lineNum">     268 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 1);</span>
+<span class="lineNum">     269 </span>            :                         /*mux config */
+<span class="lineNum">     270 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 1);/*audio mux version = 0*/</span>
+<span class="lineNum">     271 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 1, 1);/*allStreamsSameTimeFraming*/</span>
+<span class="lineNum">     272 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 6);/*numSubFrames*/</span>
+<span class="lineNum">     273 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 4);/*numProgram*/</span>
+<span class="lineNum">     274 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 3);/*numLayer prog 1*/</span>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     277 </span><span class="lineCov">          2 :                         gf_m4a_write_config_bs(ctx-&gt;bs_w, &amp;ctx-&gt;acfg);</span>
+<span class="lineNum">     278 </span>            : #else
+<span class="lineNum">     279 </span>            :                         gf_bs_write_data(ctx-&gt;bs_w, ctx-&gt;dsi, ctx-&gt;dsi_size);
+<span class="lineNum">     280 </span>            : #endif
+<span class="lineNum">     281 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 3);/*frameLengthType*/</span>
+<span class="lineNum">     282 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 8);/*latmBufferFullness*/</span>
+<span class="lineNum">     283 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 1);/*other data present*/</span>
+<span class="lineNum">     284 </span><span class="lineCov">          2 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 1);/*crcCheckPresent*/</span>
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span><span class="lineCov">          2 :                         ctx-&gt;update_dsi = 0;</span>
+<span class="lineNum">     287 </span>            :                 } else {
+<span class="lineNum">     288 </span><span class="lineCov">        375 :                         gf_bs_write_int(ctx-&gt;bs_w, 1, 1);</span>
+<span class="lineNum">     289 </span>            :                 }
+<span class="lineNum">     290 </span>            :                 /*write payloadLengthInfo*/
+<span class="lineNum">     291 </span><span class="lineCov">        377 :                 asize = pck_size;</span>
+<span class="lineNum">     292 </span>            :                 while (1) {
+<span class="lineNum">     293 </span><span class="lineCov">        745 :                         if (asize&gt;=255) {</span>
+<span class="lineNum">     294 </span><span class="lineCov">        184 :                                 gf_bs_write_int(ctx-&gt;bs_w, 255, 8);</span>
+<span class="lineNum">     295 </span><span class="lineCov">        184 :                                 asize -= 255;</span>
+<span class="lineNum">     296 </span>            :                         } else {
+<span class="lineNum">     297 </span><span class="lineCov">        377 :                                 gf_bs_write_int(ctx-&gt;bs_w, asize, 8);</span>
+<span class="lineNum">     298 </span>            :                                 break;
+<span class="lineNum">     299 </span>            :                         }
+<span class="lineNum">     300 </span>            :                 }
+<span class="lineNum">     301 </span><span class="lineCov">        377 :                 gf_bs_write_data(ctx-&gt;bs_w, data, pck_size);</span>
+<span class="lineNum">     302 </span><span class="lineCov">        377 :                 gf_bs_align(ctx-&gt;bs_w);</span>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span><span class="lineCov">        377 :                 size = (u32) gf_bs_get_position(ctx-&gt;bs_w);</span>
+<span class="lineNum">     305 </span><span class="lineCov">        377 :                 gf_filter_pck_truncate(dst_pck, size);</span>
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :                 /*rewrite LATM frame header*/
+<span class="lineNum">     308 </span><span class="lineCov">        377 :                 output[1] |= ((size-3) &gt;&gt; 8 ) &amp; 0x1F;</span>
+<span class="lineNum">     309 </span><span class="lineCov">        377 :                 output[2] = (size-3) &amp; 0xFF;</span>
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :         } else {
+<span class="lineNum">     312 </span>            :                 u32 nb_blocks = 0;
+<span class="lineNum">     313 </span><span class="lineCov">       2021 :                 size = pck_size+7;</span>
+<span class="lineNum">     314 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     315 </span><span class="lineCov">       2021 :                 if (! ctx-&gt;acfg.chan_cfg &amp;&amp; ctx-&gt;pce_size) {</span>
+<span class="lineNum">     316 </span>            :                         nb_blocks = 2;
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :                         size += ctx-&gt;pce_size;</span>
+<span class="lineNum">     318 </span>            :                 }
+<span class="lineNum">     319 </span>            : #endif
+<span class="lineNum">     320 </span><span class="lineCov">       2021 :                 dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, size, &amp;output);</span>
+<span class="lineNum">     321 </span><span class="lineCov">       2021 :                 if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span><span class="lineCov">       2021 :                 if (!ctx-&gt;bs_w) ctx-&gt;bs_w = gf_bs_new(output, size, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     324 </span><span class="lineCov">       2012 :                 else gf_bs_reassign_buffer(ctx-&gt;bs_w, output, size);</span>
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, 0xFFF, 12);/*sync*/</span>
+<span class="lineNum">     327 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, (ctx-&gt;mpeg2==1) ? 1 : 0, 1);/*mpeg2 aac*/</span>
+<span class="lineNum">     328 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, 0, 2); /*layer*/</span>
+<span class="lineNum">     329 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, 1, 1); /* protection_absent*/</span>
+<span class="lineNum">     330 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, ctx-&gt;aac_type, 2);</span>
+<span class="lineNum">     331 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, ctx-&gt;sr_idx, 4);</span>
+<span class="lineNum">     332 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, 0, 1);</span>
+<span class="lineNum">     333 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, ctx-&gt;ch_cfg, 3);</span>
+<span class="lineNum">     334 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, 0, 4);</span>
+<span class="lineNum">     335 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, size, 13);</span>
+<span class="lineNum">     336 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, 0x7FF, 11);</span>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineCov">       2021 :                 gf_bs_write_int(ctx-&gt;bs_w, nb_blocks, 2);</span>
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span><span class="lineCov">       2021 :                 output += 7;</span>
+<span class="lineNum">     341 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     342 </span><span class="lineCov">       2021 :                 if (nb_blocks) {</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                         memcpy(output, ctx-&gt;pce, ctx-&gt;pce_size);</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :                         output += ctx-&gt;pce_size;</span>
+<span class="lineNum">     345 </span>            :                 }
+<span class="lineNum">     346 </span>            : #endif
+<span class="lineNum">     347 </span><span class="lineCov">       2021 :                 memcpy(output, data, pck_size);</span>
+<span class="lineNum">     348 </span>            :         }
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span><span class="lineCov">       2398 :         gf_filter_pck_merge_properties(pck, dst_pck);</span>
+<span class="lineNum">     351 </span><span class="lineCov">       2398 :         gf_filter_pck_set_byte_offset(dst_pck, GF_FILTER_NO_BO);</span>
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span><span class="lineCov">       2398 :         gf_filter_pck_set_framing(dst_pck, GF_TRUE, GF_TRUE);</span>
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineCov">       2398 :         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     357 </span><span class="lineCov">       2398 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     358 </span><span class="lineCov">       2398 :         return GF_OK;</span>
+<a name="359"><span class="lineNum">     359 </span>            : }</a>
+<span class="lineNum">     360 </span>            : 
+<span class="lineNum">     361 </span><span class="lineCov">         11 : static void adtsmx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     362 </span>            : {
+<span class="lineNum">     363 </span><span class="lineCov">         11 :         GF_ADTSMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     364 </span><span class="lineCov">         11 :         if (ctx-&gt;bs_w) gf_bs_del(ctx-&gt;bs_w);</span>
+<span class="lineNum">     365 </span><span class="lineCov">         11 :         if (ctx-&gt;pce) gf_free(ctx-&gt;pce);</span>
+<span class="lineNum">     366 </span><span class="lineCov">         11 : }</span>
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            : static const GF_FilterCapability ADTSMxCaps[] =
+<span class="lineNum">     369 </span>            : {
+<span class="lineNum">     370 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     371 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_AAC_MPEG4),
+<span class="lineNum">     372 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT_OPT, GF_PROP_PID_CODECID, GF_CODECID_AAC_MPEG2_MP),
+<span class="lineNum">     373 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT_OPT, GF_PROP_PID_CODECID, GF_CODECID_AAC_MPEG2_LCP),
+<span class="lineNum">     374 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT_OPT, GF_PROP_PID_CODECID, GF_CODECID_AAC_MPEG2_SSRP),
+<span class="lineNum">     375 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     376 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     377 </span>            : };
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            : 
+<span class="lineNum">     380 </span>            : #define OFFS(_n)        #_n, offsetof(GF_ADTSMxCtx, _n)
+<span class="lineNum">     381 </span>            : static const GF_FilterArgs ADTSMxArgs[] =
+<span class="lineNum">     382 </span>            : {
+<span class="lineNum">     383 </span>            :         { OFFS(mpeg2), &quot;signal as MPEG2 AAC\n&quot;
+<span class="lineNum">     384 </span>            :         &quot;- auto: selects based on AAC profile\n&quot;
+<span class="lineNum">     385 </span>            :         &quot;- no: always signals as MPEG-4 AAC\n&quot;
+<span class="lineNum">     386 </span>            :         &quot;- yes: always signals as MPEG-2 AAC&quot;
+<span class="lineNum">     387 </span>            :         &quot;&quot;, GF_PROP_UINT, &quot;auto&quot;, &quot;auto|no|yes&quot;, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     388 </span>            :         {0}
+<span class="lineNum">     389 </span>            : };
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span>            : GF_FilterRegister ADTSMxRegister = {
+<span class="lineNum">     393 </span>            :         .name = &quot;ufadts&quot;,
+<span class="lineNum">     394 </span>            :         GF_FS_SET_DESCRIPTION(&quot;ADTS writer&quot;)
+<span class="lineNum">     395 </span>            :         GF_FS_SET_HELP(&quot;This filter converts AAC streams into ADTS encapsulated data.&quot;)
+<span class="lineNum">     396 </span>            :         .private_size = sizeof(GF_ADTSMxCtx),
+<span class="lineNum">     397 </span>            :         .args = ADTSMxArgs,
+<span class="lineNum">     398 </span>            :         .finalize = adtsmx_finalize,
+<span class="lineNum">     399 </span>            :         SETCAPS(ADTSMxCaps),
+<span class="lineNum">     400 </span>            :         .configure_pid = adtsmx_configure_pid,
+<span class="lineNum">     401 </span>            :         .process = adtsmx_process
+<span class="lineNum">     402 </span>            : };
+<a name="403"><span class="lineNum">     403 </span>            : </a>
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span><span class="lineCov">       2877 : const GF_FilterRegister *adtsmx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     406 </span>            : {
+<span class="lineNum">     407 </span><span class="lineCov">       2877 :         return &amp;ADTSMxRegister;</span>
+<a name="408"><span class="lineNum">     408 </span>            : }</a>
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span><span class="lineCov">          2 : static GF_Err latmmx_initialize(GF_Filter*filter)</span>
+<span class="lineNum">     411 </span>            : {
+<span class="lineNum">     412 </span><span class="lineCov">          2 :         GF_ADTSMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     413 </span><span class="lineCov">          2 :         ctx-&gt;is_latm = GF_TRUE;</span>
+<span class="lineNum">     414 </span><span class="lineCov">          2 :         return GF_OK;</span>
+<span class="lineNum">     415 </span>            : }
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            : #define OFFS(_n)        #_n, offsetof(GF_ADTSMxCtx, _n)
+<span class="lineNum">     418 </span>            : static const GF_FilterArgs LATMMxArgs[] =
+<span class="lineNum">     419 </span>            : {
+<span class="lineNum">     420 </span>            :         { OFFS(fdsi), &quot;set delay between two LATM Audio Config&quot;, GF_PROP_FRACTION, &quot;0&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     421 </span>            :         {0}
+<span class="lineNum">     422 </span>            : };
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            : static const GF_FilterCapability LATMMxCaps[] =
+<span class="lineNum">     426 </span>            : {
+<span class="lineNum">     427 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     428 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_AAC_MPEG4),
+<span class="lineNum">     429 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_AAC_MPEG2_MP),
+<span class="lineNum">     430 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_AAC_MPEG2_LCP),
+<span class="lineNum">     431 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_AAC_MPEG2_SSRP),
+<span class="lineNum">     432 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_USAC),
+<span class="lineNum">     433 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     434 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT, GF_PROP_PID_UNFRAMED_LATM, GF_TRUE),
+<span class="lineNum">     435 </span>            : };
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            : GF_FilterRegister LATMMxRegister = {
+<span class="lineNum">     438 </span>            :         .name = &quot;uflatm&quot;,
+<span class="lineNum">     439 </span>            :         GF_FS_SET_DESCRIPTION(&quot;Raw AAC to LATM writer&quot;)
+<span class="lineNum">     440 </span>            :         GF_FS_SET_HELP(&quot;This filter converts AAC streams into LATM encapsulated data.&quot;)
+<span class="lineNum">     441 </span>            :         .private_size = sizeof(GF_ADTSMxCtx),
+<span class="lineNum">     442 </span>            :         .args = LATMMxArgs,
+<span class="lineNum">     443 </span>            :         .initialize = latmmx_initialize,
+<span class="lineNum">     444 </span>            :         .finalize = adtsmx_finalize,
+<span class="lineNum">     445 </span>            :         SETCAPS(LATMMxCaps),
+<span class="lineNum">     446 </span>            :         .configure_pid = adtsmx_configure_pid,
+<span class="lineNum">     447 </span>            :         .process = adtsmx_process
+<span class="lineNum">     448 </span>            : };
+<a name="449"><span class="lineNum">     449 </span>            : </a>
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span><span class="lineCov">       2877 : const GF_FilterRegister *latm_mx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     452 </span>            : {
+<span class="lineNum">     453 </span><span class="lineCov">       2877 :         return &amp;LATMMxRegister;</span>
+<span class="lineNum">     454 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,770 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/reframe_flac.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - reframe_flac.c<span style="font-size: 80%;"> (source / <a href="reframe_flac.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">237</td>
+            <td class="headerCovTableEntry">295</td>
+            <td class="headerCovTableEntryMed">80.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryHi">90.9 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2019-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / FLAC reframer filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/avparse.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : typedef struct
+<span class="lineNum">      31 </span>            : {
+<span class="lineNum">      32 </span>            :         u64 pos;
+<span class="lineNum">      33 </span>            :         Double duration;
+<span class="lineNum">      34 </span>            : } FLACIdx;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : typedef struct
+<span class="lineNum">      37 </span>            : {
+<span class="lineNum">      38 </span>            :         u32 block_size;
+<span class="lineNum">      39 </span>            :         u32 sample_rate;
+<span class="lineNum">      40 </span>            : } FLACHeader;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : typedef struct
+<span class="lineNum">      43 </span>            : {
+<span class="lineNum">      44 </span>            :         //filter args
+<span class="lineNum">      45 </span>            :         Double index;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :         //only one input pid declared
+<span class="lineNum">      48 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      49 </span>            :         //only one output pid declared
+<span class="lineNum">      50 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :         GF_BitStream *bs;
+<span class="lineNum">      53 </span>            :         u64 file_pos, cts, prev_cts;
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :         GF_Fraction64 duration;
+<span class="lineNum">      56 </span>            :         Double start_range;
+<span class="lineNum">      57 </span>            :         Bool in_seek;
+<span class="lineNum">      58 </span>            :         u32 timescale;
+<span class="lineNum">      59 </span>            :         Bool is_playing;
+<span class="lineNum">      60 </span>            :         Bool is_file;
+<span class="lineNum">      61 </span>            :         Bool initial_play_done, file_loaded;
+<span class="lineNum">      62 </span>            :         Bool in_error;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :         Bool initialized;
+<span class="lineNum">      65 </span>            :         u32 sample_rate, nb_channels, bits_per_sample, block_size;
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :         u8 *flac_buffer;
+<span class="lineNum">      68 </span>            :         u32 flac_buffer_size, flac_buffer_alloc, resume_from;
+<span class="lineNum">      69 </span>            :         u64 byte_offset;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :         GF_FilterPacket *src_pck;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :         Bool recompute_cts;
+<span class="lineNum">      74 </span>            :         FLACIdx *indexes;
+<span class="lineNum">      75 </span>            :         u32 index_alloc_size, index_size;
+<span class="lineNum">      76 </span>            :         u32 bitrate;
+<span class="lineNum">      77 </span>            : } GF_FLACDmxCtx;
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : 
+<a name="80"><span class="lineNum">      80 </span>            : </a>
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span><span class="lineCov">          4 : GF_Err flac_dmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      83 </span>            : {
+<span class="lineNum">      84 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">      85 </span><span class="lineCov">          4 :         GF_FLACDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineCov">          4 :         if (is_remove) {</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">      92 </span>            :                 }
+<span class="lineNum">      93 </span>            :                 return GF_OK;
+<span class="lineNum">      94 </span>            :         }
+<span class="lineNum">      95 </span><span class="lineCov">          4 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">      96 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineCov">          4 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">      99 </span><span class="lineCov">          4 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_TIMESCALE);</span>
+<span class="lineNum">     100 </span><span class="lineCov">          4 :         if (p) ctx-&gt;timescale = p-&gt;value.uint;</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">          4 :         p = gf_filter_pid_get_property_str(pid, &quot;nocts&quot;);</span>
+<span class="lineNum">     103 </span><span class="lineCov">          4 :         if (p &amp;&amp; p-&gt;value.boolean) ctx-&gt;recompute_cts = GF_TRUE;</span>
+<span class="lineNum">     104 </span><span class="lineCov">          4 :         else ctx-&gt;recompute_cts = GF_FALSE;</span>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">          4 :         if (ctx-&gt;timescale &amp;&amp; !ctx-&gt;opid) {</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :                 gf_filter_pid_copy_properties(ctx-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_UNFRAMED, NULL);</span>
+<span class="lineNum">     110 </span>            :         }
+<span class="lineNum">     111 </span>            :         return GF_OK;
+<a name="112"><span class="lineNum">     112 </span>            : }</a>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">         13 : static void flac_dmx_check_dur(GF_Filter *filter, GF_FLACDmxCtx *ctx)</span>
+<span class="lineNum">     115 </span>            : {
+<span class="lineNum">     116 </span>            :         u64 rate;
+<span class="lineNum">     117 </span>            :         FILE *stream;
+<span class="lineNum">     118 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     119 </span><span class="lineCov">         13 :         if (!ctx-&gt;opid || ctx-&gt;timescale || ctx-&gt;file_loaded) return;</span>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineCov">          4 :         if (ctx-&gt;index&lt;=0) {</span>
+<span class="lineNum">     122 </span><span class="lineCov">          3 :                 ctx-&gt;file_loaded = GF_TRUE;</span>
+<span class="lineNum">     123 </span>            :                 return;
+<span class="lineNum">     124 </span>            :         }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineCov">          1 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_FILEPATH);</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :         if (!p || !p-&gt;value.string || !strncmp(p-&gt;value.string, &quot;gmem://&quot;, 7)) {</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :                 ctx-&gt;is_file = GF_FALSE;</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :                 ctx-&gt;file_loaded = GF_TRUE;</span>
+<span class="lineNum">     130 </span>            :                 return;
+<span class="lineNum">     131 </span>            :         }
+<span class="lineNum">     132 </span><span class="lineCov">          1 :         ctx-&gt;is_file = GF_TRUE;</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">          1 :         stream = gf_fopen(p-&gt;value.string, &quot;rb&quot;);</span>
+<span class="lineNum">     135 </span><span class="lineCov">          1 :         if (!stream) return;</span>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :         gf_fseek(stream, 0, SEEK_END);</span>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">          1 :         rate = gf_ftell(stream);</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :         gf_fclose(stream);</span>
+<span class="lineNum">     140 </span><span class="lineCov">          1 :         if (ctx-&gt;duration.num &amp;&amp; !gf_sys_is_test_mode() ) {</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :                 rate *= 8 * ctx-&gt;duration.den;</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :                 rate /= ctx-&gt;duration.num;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                 ctx-&gt;bitrate = (u32) rate;</span>
+<span class="lineNum">     144 </span>            :         }
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          1 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_FILE_CACHED);</span>
+<span class="lineNum">     147 </span><span class="lineCov">          1 :         if (p &amp;&amp; p-&gt;value.boolean) ctx-&gt;file_loaded = GF_TRUE;</span>
+<span class="lineNum">     148 </span><span class="lineCov">          1 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CAN_DATAREF, &amp; PROP_BOOL(GF_TRUE ) );</span>
+<a name="149"><span class="lineNum">     149 </span>            : }</a>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineCov">          4 : static void flac_dmx_check_pid(GF_Filter *filter, GF_FLACDmxCtx *ctx, u8 *dsi, u32 dsi_size)</span>
+<span class="lineNum">     152 </span>            : {
+<span class="lineNum">     153 </span><span class="lineCov">          4 :         if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     154 </span><span class="lineCov">          4 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     155 </span><span class="lineCov">          4 :                 flac_dmx_check_dur(filter, ctx);</span>
+<span class="lineNum">     156 </span>            :         }
+<span class="lineNum">     157 </span>            :         //copy properties at init or reconfig
+<span class="lineNum">     158 </span><span class="lineCov">          4 :         gf_filter_pid_copy_properties(ctx-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">     159 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STREAM_TYPE, &amp; PROP_UINT( GF_STREAM_AUDIO));</span>
+<span class="lineNum">     160 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_UNFRAMED, NULL );</span>
+<span class="lineNum">     161 </span><span class="lineCov">          4 :         if (ctx-&gt;is_file &amp;&amp; ctx-&gt;index) {</span>
+<span class="lineNum">     162 </span><span class="lineCov">          1 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_PLAYBACK_MODE, &amp; PROP_UINT(GF_PLAYBACK_MODE_FASTFORWARD) );</span>
+<span class="lineNum">     163 </span>            :         }
+<span class="lineNum">     164 </span><span class="lineCov">          4 :         if (ctx-&gt;duration.num)</span>
+<span class="lineNum">     165 </span><span class="lineCov">          4 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DURATION, &amp; PROP_FRAC64(ctx-&gt;duration));</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span><span class="lineCov">          4 :         if (!ctx-&gt;timescale) gf_filter_pid_set_name(ctx-&gt;opid, &quot;audio&quot;);</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG, &amp; PROP_DATA( dsi, dsi_size ) );</span>
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CODECID, &amp; PROP_UINT( GF_CODECID_FLAC ) );</span>
+<span class="lineNum">     172 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_TIMESCALE, &amp; PROP_UINT(ctx-&gt;timescale ? ctx-&gt;timescale : ctx-&gt;sample_rate));</span>
+<span class="lineNum">     173 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_SAMPLE_RATE, &amp; PROP_UINT(ctx-&gt;sample_rate));</span>
+<span class="lineNum">     174 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_NUM_CHANNELS, &amp; PROP_UINT(ctx-&gt;nb_channels) );</span>
+<span class="lineNum">     175 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_SAMPLES_PER_FRAME, &amp; PROP_UINT(ctx-&gt;block_size) );</span>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_AUDIO_BPS, &amp; PROP_UINT(ctx-&gt;bits_per_sample) );</span>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineCov">          4 :         if (ctx-&gt;bitrate) {</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_BITRATE, &amp; PROP_UINT(ctx-&gt;bitrate));</span>
+<span class="lineNum">     181 </span>            :         }
+<span class="lineNum">     182 </span>            : 
+<a name="183"><span class="lineNum">     183 </span><span class="lineCov">          4 : }</span></a>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">        412 : static Bool flac_dmx_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     186 </span>            : {
+<span class="lineNum">     187 </span>            :         u32 i;
+<span class="lineNum">     188 </span>            :         GF_FilterEvent fevt;
+<span class="lineNum">     189 </span><span class="lineCov">        412 :         GF_FLACDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">        412 :         if (evt-&gt;base.on_pid != ctx-&gt;opid) return GF_TRUE;</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineCov">          6 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">          4 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     195 </span><span class="lineCov">          4 :                 if (!ctx-&gt;is_playing) {</span>
+<span class="lineNum">     196 </span><span class="lineCov">          4 :                         ctx-&gt;is_playing = GF_TRUE;</span>
+<span class="lineNum">     197 </span>            :                 }
+<span class="lineNum">     198 </span><span class="lineCov">          4 :                 if (! ctx-&gt;is_file) {</span>
+<span class="lineNum">     199 </span><span class="lineCov">          3 :                         if (evt-&gt;play.start_range || ctx-&gt;initial_play_done) {</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                                 ctx-&gt;flac_buffer_size = 0;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                                 ctx-&gt;resume_from = 0;</span>
+<span class="lineNum">     202 </span>            :                         }
+<span class="lineNum">     203 </span><span class="lineCov">          3 :                         ctx-&gt;initial_play_done = GF_TRUE;</span>
+<span class="lineNum">     204 </span><span class="lineCov">          3 :                         return GF_FALSE;</span>
+<span class="lineNum">     205 </span>            :                 }
+<span class="lineNum">     206 </span><span class="lineCov">          1 :                 flac_dmx_check_dur(filter, ctx);</span>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineCov">          1 :                 ctx-&gt;start_range = evt-&gt;play.start_range;</span>
+<span class="lineNum">     209 </span><span class="lineCov">          1 :                 ctx-&gt;in_seek = GF_TRUE;</span>
+<span class="lineNum">     210 </span><span class="lineCov">          1 :                 ctx-&gt;file_pos = 0;</span>
+<span class="lineNum">     211 </span><span class="lineCov">          1 :                 if (ctx-&gt;start_range) {</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :                         for (i=1; i&lt;ctx-&gt;index_size; i++) {</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                                 if (ctx-&gt;indexes[i].duration&gt;ctx-&gt;start_range) {</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                                         ctx-&gt;cts = (u64) (ctx-&gt;indexes[i-1].duration * ctx-&gt;sample_rate);</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                                         ctx-&gt;file_pos = ctx-&gt;indexes[i-1].pos;</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :                                         break;</span>
+<span class="lineNum">     217 </span>            :                                 }
+<span class="lineNum">     218 </span>            :                         }
+<span class="lineNum">     219 </span>            :                 }
+<span class="lineNum">     220 </span><span class="lineCov">          1 :                 if (!ctx-&gt;initial_play_done) {</span>
+<span class="lineNum">     221 </span><span class="lineCov">          1 :                         ctx-&gt;initial_play_done = GF_TRUE;</span>
+<span class="lineNum">     222 </span>            :                         //seek will not change the current source state, don't send a seek
+<span class="lineNum">     223 </span><span class="lineCov">          1 :                         if (!ctx-&gt;file_pos)</span>
+<span class="lineNum">     224 </span>            :                                 return GF_TRUE;
+<span class="lineNum">     225 </span>            :                 }
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :                 ctx-&gt;flac_buffer_size = 0;</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :                 ctx-&gt;resume_from = 0;</span>
+<span class="lineNum">     228 </span>            :                 //post a seek
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :                 GF_FEVT_INIT(fevt, GF_FEVT_SOURCE_SEEK, ctx-&gt;ipid);</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :                 fevt.seek.start_offset = ctx-&gt;file_pos;</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :                 gf_filter_pid_send_event(ctx-&gt;ipid, &amp;fevt);</span>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            :                 //cancel event
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :                 return GF_TRUE;</span>
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineCov">          2 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     237 </span><span class="lineCov">          2 :                 ctx-&gt;is_playing = GF_FALSE;</span>
+<span class="lineNum">     238 </span><span class="lineCov">          2 :                 if (ctx-&gt;src_pck) gf_filter_pck_unref(ctx-&gt;src_pck);</span>
+<span class="lineNum">     239 </span><span class="lineCov">          2 :                 ctx-&gt;src_pck = NULL;</span>
+<span class="lineNum">     240 </span>            :                 //don't cancel event
+<span class="lineNum">     241 </span><span class="lineCov">          2 :                 return GF_FALSE;</span>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :         case GF_FEVT_SET_SPEED:
+<span class="lineNum">     244 </span>            :                 //cancel event
+<span class="lineNum">     245 </span>            :                 return GF_TRUE;
+<span class="lineNum">     246 </span>            :         default:
+<span class="lineNum">     247 </span>            :                 break;
+<span class="lineNum">     248 </span>            :         }
+<span class="lineNum">     249 </span>            :         //by default don't cancel event - to rework once we have downloading in place
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :         return GF_FALSE;</span>
+<span class="lineNum">     251 </span>            : }
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            : static GFINLINE void flac_dmx_update_cts(GF_FLACDmxCtx *ctx, u32 nb_samp)
+<span class="lineNum">     254 </span>            : {
+<span class="lineNum">     255 </span><span class="lineCov">        154 :         if (ctx-&gt;timescale) {</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :                 u64 inc = nb_samp;</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :                 inc *= ctx-&gt;timescale;</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                 inc /= ctx-&gt;sample_rate;</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                 ctx-&gt;cts += inc;</span>
+<span class="lineNum">     260 </span>            :         } else {
+<span class="lineNum">     261 </span><span class="lineCov">        154 :                 ctx-&gt;cts += nb_samp;</span>
+<span class="lineNum">     262 </span>            :         }
+<span class="lineNum">     263 </span>            : }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            : u8 const flac_dmx_crc8_table[256] = {
+<span class="lineNum">     267 </span>            :         0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15,
+<span class="lineNum">     268 </span>            :         0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D,
+<span class="lineNum">     269 </span>            :         0x70, 0x77, 0x7E, 0x79, 0x6C, 0x6B, 0x62, 0x65,
+<span class="lineNum">     270 </span>            :         0x48, 0x4F, 0x46, 0x41, 0x54, 0x53, 0x5A, 0x5D,
+<span class="lineNum">     271 </span>            :         0xE0, 0xE7, 0xEE, 0xE9, 0xFC, 0xFB, 0xF2, 0xF5,
+<span class="lineNum">     272 </span>            :         0xD8, 0xDF, 0xD6, 0xD1, 0xC4, 0xC3, 0xCA, 0xCD,
+<span class="lineNum">     273 </span>            :         0x90, 0x97, 0x9E, 0x99, 0x8C, 0x8B, 0x82, 0x85,
+<span class="lineNum">     274 </span>            :         0xA8, 0xAF, 0xA6, 0xA1, 0xB4, 0xB3, 0xBA, 0xBD,
+<span class="lineNum">     275 </span>            :         0xC7, 0xC0, 0xC9, 0xCE, 0xDB, 0xDC, 0xD5, 0xD2,
+<span class="lineNum">     276 </span>            :         0xFF, 0xF8, 0xF1, 0xF6, 0xE3, 0xE4, 0xED, 0xEA,
+<span class="lineNum">     277 </span>            :         0xB7, 0xB0, 0xB9, 0xBE, 0xAB, 0xAC, 0xA5, 0xA2,
+<span class="lineNum">     278 </span>            :         0x8F, 0x88, 0x81, 0x86, 0x93, 0x94, 0x9D, 0x9A,
+<span class="lineNum">     279 </span>            :         0x27, 0x20, 0x29, 0x2E, 0x3B, 0x3C, 0x35, 0x32,
+<span class="lineNum">     280 </span>            :         0x1F, 0x18, 0x11, 0x16, 0x03, 0x04, 0x0D, 0x0A,
+<span class="lineNum">     281 </span>            :         0x57, 0x50, 0x59, 0x5E, 0x4B, 0x4C, 0x45, 0x42,
+<span class="lineNum">     282 </span>            :         0x6F, 0x68, 0x61, 0x66, 0x73, 0x74, 0x7D, 0x7A,
+<span class="lineNum">     283 </span>            :         0x89, 0x8E, 0x87, 0x80, 0x95, 0x92, 0x9B, 0x9C,
+<span class="lineNum">     284 </span>            :         0xB1, 0xB6, 0xBF, 0xB8, 0xAD, 0xAA, 0xA3, 0xA4,
+<span class="lineNum">     285 </span>            :         0xF9, 0xFE, 0xF7, 0xF0, 0xE5, 0xE2, 0xEB, 0xEC,
+<span class="lineNum">     286 </span>            :         0xC1, 0xC6, 0xCF, 0xC8, 0xDD, 0xDA, 0xD3, 0xD4,
+<span class="lineNum">     287 </span>            :         0x69, 0x6E, 0x67, 0x60, 0x75, 0x72, 0x7B, 0x7C,
+<span class="lineNum">     288 </span>            :         0x51, 0x56, 0x5F, 0x58, 0x4D, 0x4A, 0x43, 0x44,
+<span class="lineNum">     289 </span>            :         0x19, 0x1E, 0x17, 0x10, 0x05, 0x02, 0x0B, 0x0C,
+<span class="lineNum">     290 </span>            :         0x21, 0x26, 0x2F, 0x28, 0x3D, 0x3A, 0x33, 0x34,
+<span class="lineNum">     291 </span>            :         0x4E, 0x49, 0x40, 0x47, 0x52, 0x55, 0x5C, 0x5B,
+<span class="lineNum">     292 </span>            :         0x76, 0x71, 0x78, 0x7F, 0x6A, 0x6D, 0x64, 0x63,
+<span class="lineNum">     293 </span>            :         0x3E, 0x39, 0x30, 0x37, 0x22, 0x25, 0x2C, 0x2B,
+<span class="lineNum">     294 </span>            :         0x06, 0x01, 0x08, 0x0F, 0x1A, 0x1D, 0x14, 0x13,
+<span class="lineNum">     295 </span>            :         0xAE, 0xA9, 0xA0, 0xA7, 0xB2, 0xB5, 0xBC, 0xBB,
+<span class="lineNum">     296 </span>            :         0x96, 0x91, 0x98, 0x9F, 0x8A, 0x8D, 0x84, 0x83,
+<span class="lineNum">     297 </span>            :         0xDE, 0xD9, 0xD0, 0xD7, 0xC2, 0xC5, 0xCC, 0xCB,
+<span class="lineNum">     298 </span>            :         0xE6, 0xE1, 0xE8, 0xEF, 0xFA, 0xFD, 0xF4, 0xF3
+<a name="299"><span class="lineNum">     299 </span>            : };</a>
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 : u8 flac_dmx_crc8(u8 *data, u32 len)</span>
+<span class="lineNum">     302 </span>            : {
+<span class="lineNum">     303 </span>            :         u8 crc = 0;
+<span class="lineNum">     304 </span><span class="lineCov">       2624 :         while (len--)</span>
+<span class="lineNum">     305 </span><span class="lineCov">       2198 :                 crc = flac_dmx_crc8_table[crc ^ *data++];</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :         return crc;</span>
+<span class="lineNum">     307 </span>            : }
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            : static u32 flac_dmx_block_sizes[] =
+<span class="lineNum">     310 </span>            : {
+<span class="lineNum">     311 </span>            :         0, 192, 576, 1152, 2304, 4608, 0, 0, 256, 512, 1024, 2048, 4096, 8192, 16384,  32768
+<span class="lineNum">     312 </span>            : };
+<span class="lineNum">     313 </span>            : static u32 flac_dmx_samplerates[] =
+<span class="lineNum">     314 </span>            : {
+<span class="lineNum">     315 </span>            :         0, 88200, 176400, 192000, 8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000
+<a name="316"><span class="lineNum">     316 </span>            : };</a>
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span><span class="lineCov">        554 : static Bool flac_parse_header(GF_FLACDmxCtx *ctx, char *data, u32 size, FLACHeader *hdr)</span>
+<span class="lineNum">     319 </span>            : {
+<span class="lineNum">     320 </span>            :         u32 block_size, sample_rate, res, top, pos, crc, crc_hdr;
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">        554 :         gf_bs_reassign_buffer(ctx-&gt;bs, data, size);</span>
+<span class="lineNum">     323 </span><span class="lineCov">        554 :         gf_bs_read_int(ctx-&gt;bs, 15);</span>
+<span class="lineNum">     324 </span><span class="lineCov">        554 :         /*block_strategy = */gf_bs_read_int(ctx-&gt;bs, 1);</span>
+<span class="lineNum">     325 </span><span class="lineCov">        554 :         block_size = gf_bs_read_int(ctx-&gt;bs, 4);</span>
+<span class="lineNum">     326 </span><span class="lineCov">        554 :         sample_rate = gf_bs_read_int(ctx-&gt;bs, 4);</span>
+<span class="lineNum">     327 </span><span class="lineCov">        554 :         /*u32 channel_layout = */gf_bs_read_int(ctx-&gt;bs, 4);</span>
+<span class="lineNum">     328 </span><span class="lineCov">        554 :         /*u32 bps = */gf_bs_read_int(ctx-&gt;bs, 3);</span>
+<span class="lineNum">     329 </span><span class="lineCov">        554 :         gf_bs_read_int(ctx-&gt;bs, 1);</span>
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span><span class="lineCov">        554 :         res = gf_bs_read_u8(ctx-&gt;bs);</span>
+<span class="lineNum">     332 </span><span class="lineCov">        554 :         top = (res &amp; 128) &gt;&gt; 1;</span>
+<span class="lineNum">     333 </span><span class="lineCov">        554 :         if ((res &amp; 0xC0) == 0x80 || (res &gt;= 0xFE)) return GF_FALSE;</span>
+<span class="lineNum">     334 </span><span class="lineCov">        508 :         while (res &amp; top) {</span>
+<span class="lineNum">     335 </span><span class="lineCov">         82 :                 s32 tmp = gf_bs_read_u8(ctx-&gt;bs);</span>
+<span class="lineNum">     336 </span><span class="lineCov">         82 :                 tmp -= 128;</span>
+<span class="lineNum">     337 </span><span class="lineCov">         82 :                 if(tmp&gt;&gt;6)</span>
+<span class="lineNum">     338 </span>            :                         return GF_FALSE;
+<span class="lineNum">     339 </span><span class="lineCov">         36 :                 res = (res&lt;&lt;6) + tmp;</span>
+<span class="lineNum">     340 </span><span class="lineCov">         36 :                 top &lt;&lt;= 5;</span>
+<span class="lineNum">     341 </span>            :         }
+<span class="lineNum">     342 </span>            :         //res &amp;= (top &lt;&lt; 1) - 1;
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span><span class="lineCov">        426 :         if (block_size==6) block_size = 1 + gf_bs_read_int(ctx-&gt;bs, 8);</span>
+<span class="lineNum">     345 </span><span class="lineCov">        420 :         else if (block_size==7) block_size = 1 + gf_bs_read_int(ctx-&gt;bs, 16);</span>
+<span class="lineNum">     346 </span>            :         else {
+<span class="lineNum">     347 </span><span class="lineCov">        410 :                 block_size = flac_dmx_block_sizes[block_size];</span>
+<span class="lineNum">     348 </span>            :         }
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            : #if 0
+<span class="lineNum">     351 </span>            :         if (bps==0) bps = ctx-&gt;bits_per_sample;
+<span class="lineNum">     352 </span>            :         else if (bps==1) bps = 8;
+<span class="lineNum">     353 </span>            :         else if (bps==2) bps = 12;
+<span class="lineNum">     354 </span>            :         else if (bps==4) bps = 16;
+<span class="lineNum">     355 </span>            :         else if (bps==5) bps = 20;
+<span class="lineNum">     356 </span>            :         else if (bps==6) bps = 24;
+<span class="lineNum">     357 </span>            : #endif
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineCov">        426 :         if (sample_rate==0) sample_rate = ctx-&gt;sample_rate;</span>
+<span class="lineNum">     360 </span><span class="lineCov">        420 :         else if ((sample_rate&amp;0xC)==0xC) {</span>
+<span class="lineNum">     361 </span><span class="lineCov">         17 :                 if (sample_rate==0xC) sample_rate = gf_bs_read_u8(ctx-&gt;bs);</span>
+<span class="lineNum">     362 </span><span class="lineCov">         13 :                 else if (sample_rate==0xD) sample_rate = gf_bs_read_u16(ctx-&gt;bs);</span>
+<span class="lineNum">     363 </span><span class="lineCov">         13 :                 else if (sample_rate==0xE) sample_rate = 10*gf_bs_read_u16(ctx-&gt;bs);</span>
+<span class="lineNum">     364 </span>            :         } else {
+<span class="lineNum">     365 </span><span class="lineCov">        403 :                 sample_rate = flac_dmx_samplerates[sample_rate];</span>
+<span class="lineNum">     366 </span>            :         }
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineCov">        426 :         pos = (u32) gf_bs_get_position(ctx-&gt;bs);</span>
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span><span class="lineCov">        426 :         crc = gf_bs_read_u8(ctx-&gt;bs);</span>
+<span class="lineNum">     371 </span><span class="lineCov">        426 :         crc_hdr = flac_dmx_crc8(data, pos);</span>
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span><span class="lineCov">        426 :         if (crc != crc_hdr) {</span>
+<span class="lineNum">     374 </span>            :                 return GF_FALSE;
+<span class="lineNum">     375 </span>            :         }
+<span class="lineNum">     376 </span><span class="lineCov">        310 :         hdr-&gt;sample_rate = sample_rate;</span>
+<span class="lineNum">     377 </span><span class="lineCov">        310 :         hdr-&gt;block_size = block_size;</span>
+<span class="lineNum">     378 </span>            :         return GF_TRUE;
+<a name="379"><span class="lineNum">     379 </span>            : }</a>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span><span class="lineCov">        426 : GF_Err flac_dmx_process(GF_Filter *filter)</span>
+<span class="lineNum">     382 </span>            : {
+<span class="lineNum">     383 </span><span class="lineCov">        426 :         GF_FLACDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     384 </span>            :         GF_FilterPacket *pck, *dst_pck;
+<span class="lineNum">     385 </span>            :         u8 *output;
+<span class="lineNum">     386 </span>            :         u8 *start;
+<span class="lineNum">     387 </span>            :         Bool final_flush=GF_FALSE;
+<span class="lineNum">     388 </span>            :         u32 pck_size, remain, prev_pck_size;
+<span class="lineNum">     389 </span>            :         u64 cts = GF_FILTER_NO_TS;
+<span class="lineNum">     390 </span>            :         FLACHeader hdr;
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span><span class="lineCov">        426 :         if (ctx-&gt;in_error)</span>
+<span class="lineNum">     393 </span>            :                 return GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span>            :         //always reparse duration
+<span class="lineNum">     396 </span><span class="lineCov">        426 :         if (!ctx-&gt;duration.num)</span>
+<span class="lineNum">     397 </span><span class="lineCov">          8 :                 flac_dmx_check_dur(filter, ctx);</span>
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span><span class="lineCov">        426 :         if (ctx-&gt;opid &amp;&amp; !ctx-&gt;is_playing)</span>
+<span class="lineNum">     400 </span>            :                 return GF_OK;
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span><span class="lineCov">        410 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     403 </span><span class="lineCov">        410 :         if (!pck) {</span>
+<span class="lineNum">     404 </span><span class="lineCov">          4 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     405 </span><span class="lineCov">          4 :                         if (!ctx-&gt;flac_buffer_size) {</span>
+<span class="lineNum">     406 </span><span class="lineCov">          2 :                                 if (ctx-&gt;opid)</span>
+<span class="lineNum">     407 </span><span class="lineCov">          2 :                                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     408 </span><span class="lineCov">          2 :                                 if (ctx-&gt;src_pck) gf_filter_pck_unref(ctx-&gt;src_pck);</span>
+<span class="lineNum">     409 </span><span class="lineCov">          2 :                                 ctx-&gt;src_pck = NULL;</span>
+<span class="lineNum">     410 </span><span class="lineCov">          2 :                                 return GF_EOS;</span>
+<span class="lineNum">     411 </span>            :                         }
+<span class="lineNum">     412 </span>            :                         final_flush = GF_TRUE;
+<span class="lineNum">     413 </span>            :                 } else {
+<span class="lineNum">     414 </span>            :                         return GF_OK;
+<span class="lineNum">     415 </span>            :                 }
+<span class="lineNum">     416 </span>            :         }
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span><span class="lineCov">        408 :         prev_pck_size = ctx-&gt;flac_buffer_size;</span>
+<span class="lineNum">     419 </span><span class="lineCov">        408 :         if (pck &amp;&amp; !ctx-&gt;resume_from) {</span>
+<span class="lineNum">     420 </span><span class="lineCov">        406 :                 u8 *data = (u8 *) gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span><span class="lineCov">        406 :                 if (ctx-&gt;byte_offset != GF_FILTER_NO_BO) {</span>
+<span class="lineNum">     423 </span><span class="lineCov">        406 :                         u64 byte_offset = gf_filter_pck_get_byte_offset(pck);</span>
+<span class="lineNum">     424 </span><span class="lineCov">        406 :                         if (!ctx-&gt;flac_buffer_size) {</span>
+<span class="lineNum">     425 </span><span class="lineCov">          4 :                                 ctx-&gt;byte_offset = byte_offset;</span>
+<span class="lineNum">     426 </span><span class="lineCov">        402 :                         } else if (ctx-&gt;byte_offset + ctx-&gt;flac_buffer_size != byte_offset) {</span>
+<span class="lineNum">     427 </span><span class="lineCov">        154 :                                 ctx-&gt;byte_offset = GF_FILTER_NO_BO;</span>
+<span class="lineNum">     428 </span><span class="lineCov">        154 :                                 if ((byte_offset != GF_FILTER_NO_BO) &amp;&amp; (byte_offset&gt;ctx-&gt;flac_buffer_size) ) {</span>
+<span class="lineNum">     429 </span><span class="lineCov">        154 :                                         ctx-&gt;byte_offset = byte_offset - ctx-&gt;flac_buffer_size;</span>
+<span class="lineNum">     430 </span>            :                                 }
+<span class="lineNum">     431 </span>            :                         }
+<span class="lineNum">     432 </span>            :                 }
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span><span class="lineCov">        406 :                 if (ctx-&gt;flac_buffer_size + pck_size &gt; ctx-&gt;flac_buffer_alloc) {</span>
+<span class="lineNum">     435 </span><span class="lineCov">         33 :                         ctx-&gt;flac_buffer_alloc = ctx-&gt;flac_buffer_size + pck_size;</span>
+<span class="lineNum">     436 </span><span class="lineCov">         33 :                         ctx-&gt;flac_buffer = gf_realloc(ctx-&gt;flac_buffer, ctx-&gt;flac_buffer_alloc);</span>
+<span class="lineNum">     437 </span>            :                 }
+<span class="lineNum">     438 </span><span class="lineCov">        406 :                 memcpy(ctx-&gt;flac_buffer + ctx-&gt;flac_buffer_size, data, pck_size);</span>
+<span class="lineNum">     439 </span><span class="lineCov">        406 :                 ctx-&gt;flac_buffer_size += pck_size;</span>
+<span class="lineNum">     440 </span>            :         }
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span>            :         //input pid sets some timescale - we flushed pending data , update cts
+<span class="lineNum">     443 </span><span class="lineCov">        408 :         if (ctx-&gt;timescale &amp;&amp; pck) {</span>
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :                 cts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     445 </span>            :         }
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :         if (cts == GF_FILTER_NO_TS) {</span>
+<span class="lineNum">     448 </span>            :                 //avoids updating cts
+<span class="lineNum">     449 </span>            :                 prev_pck_size = 0;
+<span class="lineNum">     450 </span>            :         }
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span><span class="lineCov">        408 :         remain = ctx-&gt;flac_buffer_size;</span>
+<span class="lineNum">     453 </span><span class="lineCov">        408 :         start = ctx-&gt;flac_buffer;</span>
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span><span class="lineCov">        408 :         if (ctx-&gt;resume_from) {</span>
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :                 start += ctx-&gt;resume_from - 1;</span>
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :                 remain -= ctx-&gt;resume_from - 1;</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :                 ctx-&gt;resume_from = 0;</span>
+<span class="lineNum">     459 </span>            :         }
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span><span class="lineCov">        562 :         while (remain&gt;2) {</span>
+<span class="lineNum">     462 </span>            :                 u32 next_frame=0, nb_samp;
+<span class="lineNum">     463 </span><span class="lineCov">        560 :                 u32 cur_size = remain-2;</span>
+<span class="lineNum">     464 </span><span class="lineCov">        560 :                 u8 *cur_buf = start+2;</span>
+<span class="lineNum">     465 </span>            :                 u8 *hdr_start = NULL;
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span><span class="lineCov">        560 :                 if (final_flush) {</span>
+<span class="lineNum">     468 </span>            :                         next_frame = remain;
+<span class="lineNum">     469 </span>            :                 } else {
+<span class="lineNum">     470 </span><span class="lineCov">      15752 :                         while (cur_size) {</span>
+<span class="lineNum">     471 </span>            :                                 //wait till we have a frame header
+<span class="lineNum">     472 </span><span class="lineCov">      15750 :                                 hdr_start = memchr(cur_buf, 0xFF, cur_size);</span>
+<span class="lineNum">     473 </span><span class="lineCov">      15750 :                                 if (!hdr_start) break;</span>
+<span class="lineNum">     474 </span><span class="lineCov">      15350 :                                 next_frame = (u32) (hdr_start-start);</span>
+<span class="lineNum">     475 </span><span class="lineCov">      15350 :                                 if (next_frame == remain)</span>
+<span class="lineNum">     476 </span>            :                                         break;
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span><span class="lineCov">      15350 :                                 if ((hdr_start[1]&amp;0xFC) == 0xF8) {</span>
+<span class="lineNum">     479 </span><span class="lineCov">        400 :                                         if (flac_parse_header(ctx, hdr_start, (u32) remain - next_frame, &amp;hdr))</span>
+<span class="lineNum">     480 </span>            :                                                 break;
+<span class="lineNum">     481 </span>            :                                 }
+<span class="lineNum">     482 </span><span class="lineCov">      15194 :                                 cur_buf = hdr_start+1;</span>
+<span class="lineNum">     483 </span><span class="lineCov">      15194 :                                 cur_size = (u32) (cur_buf - start);</span>
+<span class="lineNum">     484 </span>            :                                 assert(cur_size&lt;=remain);
+<span class="lineNum">     485 </span><span class="lineCov">      15194 :                                 cur_size = remain - cur_size;</span>
+<span class="lineNum">     486 </span>            :                                 hdr_start = NULL;
+<span class="lineNum">     487 </span>            :                         }
+<span class="lineNum">     488 </span><span class="lineCov">        558 :                         if (!hdr_start) break;</span>
+<span class="lineNum">     489 </span><span class="lineCov">        156 :                         if (next_frame == remain)</span>
+<span class="lineNum">     490 </span>            :                                 break;
+<span class="lineNum">     491 </span>            :                 }
+<span class="lineNum">     492 </span>            : 
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span><span class="lineCov">        158 :                 if (!ctx-&gt;initialized) {</span>
+<span class="lineNum">     495 </span>            :                         u32 size = next_frame;
+<span class="lineNum">     496 </span>            :                         u32 dsi_end = 0;
+<span class="lineNum">     497 </span>            :                         //we have a header
+<span class="lineNum">     498 </span><span class="lineCov">          4 :                         gf_bs_reassign_buffer(ctx-&gt;bs, ctx-&gt;flac_buffer, size);</span>
+<span class="lineNum">     499 </span><span class="lineCov">          4 :                         u32 magic = gf_bs_read_u32(ctx-&gt;bs);</span>
+<span class="lineNum">     500 </span><span class="lineCov">          4 :                         if (magic != GF_4CC('f','L','a','C')) {</span>
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[FLACDmx] invalid FLAC magic\n&quot;));</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :                                 ctx-&gt;in_error = GF_TRUE;</span>
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :                                 ctx-&gt;flac_buffer_size = 0;</span>
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :                                 if (pck)</span>
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     506 </span>            :                                 return GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     507 </span>            :                         }
+<span class="lineNum">     508 </span><span class="lineCov">         12 :                         while (gf_bs_available(ctx-&gt;bs)) {</span>
+<span class="lineNum">     509 </span><span class="lineCov">         12 :                                 Bool last = gf_bs_read_int(ctx-&gt;bs, 1);</span>
+<span class="lineNum">     510 </span><span class="lineCov">         12 :                                 u32 type = gf_bs_read_int(ctx-&gt;bs, 7);</span>
+<span class="lineNum">     511 </span><span class="lineCov">         12 :                                 u32 len = gf_bs_read_int(ctx-&gt;bs, 24);</span>
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span><span class="lineCov">         12 :                                 if (type==0) {</span>
+<span class="lineNum">     514 </span><span class="lineCov">          4 :                                         u16 min_block_size = gf_bs_read_u16(ctx-&gt;bs);</span>
+<span class="lineNum">     515 </span><span class="lineCov">          4 :                                         u16 max_block_size = gf_bs_read_u16(ctx-&gt;bs);</span>
+<span class="lineNum">     516 </span><span class="lineCov">          4 :                                         /*u32 min_frame_size = */gf_bs_read_u24(ctx-&gt;bs);</span>
+<span class="lineNum">     517 </span><span class="lineCov">          4 :                                         /*u32 max_frame_size = */gf_bs_read_u24(ctx-&gt;bs);</span>
+<span class="lineNum">     518 </span><span class="lineCov">          4 :                                         ctx-&gt;sample_rate = gf_bs_read_int(ctx-&gt;bs, 20);</span>
+<span class="lineNum">     519 </span><span class="lineCov">          4 :                                         ctx-&gt;nb_channels = 1 + gf_bs_read_int(ctx-&gt;bs, 3);</span>
+<span class="lineNum">     520 </span><span class="lineCov">          4 :                                         ctx-&gt;bits_per_sample = 1 + gf_bs_read_int(ctx-&gt;bs, 5);</span>
+<span class="lineNum">     521 </span><span class="lineCov">          4 :                                         if (min_block_size==max_block_size) ctx-&gt;block_size = min_block_size;</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :                                         else ctx-&gt;block_size = 0;</span>
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span><span class="lineCov">          4 :                                         ctx-&gt;duration.num = gf_bs_read_long_int(ctx-&gt;bs, 36);</span>
+<span class="lineNum">     525 </span><span class="lineCov">          4 :                                         ctx-&gt;duration.den = ctx-&gt;sample_rate;</span>
+<span class="lineNum">     526 </span>            :                                         //ignore the rest
+<span class="lineNum">     527 </span><span class="lineCov">          4 :                                         gf_bs_skip_bytes(ctx-&gt;bs, 16);</span>
+<span class="lineNum">     528 </span><span class="lineCov">          4 :                                         dsi_end = (u32) gf_bs_get_position(ctx-&gt;bs);</span>
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span>            :                                 } else {
+<span class="lineNum">     531 </span>            :                                         //ignore the rest for now
+<span class="lineNum">     532 </span>            :                                         //TODO: expose metadata, pictures and co
+<span class="lineNum">     533 </span><span class="lineCov">          8 :                                         gf_bs_skip_bytes(ctx-&gt;bs, len);</span>
+<span class="lineNum">     534 </span>            :                                 }
+<span class="lineNum">     535 </span><span class="lineCov">         12 :                                 if (last) break;</span>
+<span class="lineNum">     536 </span>            :                         }
+<span class="lineNum">     537 </span><span class="lineCov">          4 :                         if (!dsi_end) {</span>
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[FLACDmx] invalid FLAC header\n&quot;));</span>
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :                                 ctx-&gt;in_error = GF_TRUE;</span>
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :                                 ctx-&gt;flac_buffer_size = 0;</span>
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :                                 if (pck)</span>
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     543 </span>            :                                 return GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     544 </span>            :                         }
+<span class="lineNum">     545 </span><span class="lineCov">          4 :                         flac_dmx_check_pid(filter, ctx, ctx-&gt;flac_buffer+4, dsi_end-4);</span>
+<span class="lineNum">     546 </span><span class="lineCov">          4 :                         remain -= size;</span>
+<span class="lineNum">     547 </span><span class="lineCov">          4 :                         start += size;</span>
+<span class="lineNum">     548 </span><span class="lineCov">          4 :                         ctx-&gt;initialized = GF_TRUE;</span>
+<span class="lineNum">     549 </span><span class="lineCov">          4 :                         if (!ctx-&gt;is_playing) break;</span>
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     551 </span>            :                 }
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span>            :                 //we have a next frame, check we are synchronize
+<span class="lineNum">     554 </span><span class="lineCov">        154 :                 if ((start[0] != 0xFF) &amp;&amp; ((start[1]&amp;0xFC) != 0xF8)) {</span>
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_PARSER, (&quot;[FLACDmx] invalid frame, dropping %d bytes and resyncing\n&quot;, next_frame));</span>
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :                         start += next_frame;</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :                         remain -= next_frame;</span>
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     559 </span>            :                 }
+<span class="lineNum">     560 </span>            : 
+<span class="lineNum">     561 </span><span class="lineCov">        154 :                 flac_parse_header(ctx,start, next_frame, &amp;hdr);</span>
+<span class="lineNum">     562 </span><span class="lineCov">        154 :                 if (hdr.sample_rate != ctx-&gt;sample_rate) {</span>
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :                         ctx-&gt;sample_rate = hdr.sample_rate;</span>
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_SAMPLE_RATE, &amp; PROP_UINT(ctx-&gt;sample_rate));</span>
+<span class="lineNum">     565 </span>            :                 }
+<span class="lineNum">     566 </span>            : 
+<span class="lineNum">     567 </span><span class="lineCov">        154 :                 nb_samp = hdr.block_size;</span>
+<span class="lineNum">     568 </span>            : 
+<span class="lineNum">     569 </span><span class="lineCov">        154 :                 if (ctx-&gt;in_seek) {</span>
+<span class="lineNum">     570 </span><span class="lineCov">          1 :                         u64 nb_samples_at_seek = (u64) (ctx-&gt;start_range * ctx-&gt;sample_rate);</span>
+<span class="lineNum">     571 </span><span class="lineCov">          1 :                         if (ctx-&gt;cts + nb_samp &gt;= nb_samples_at_seek) {</span>
+<span class="lineNum">     572 </span>            :                                 //u32 samples_to_discard = (ctx-&gt;cts + nb_samp ) - nb_samples_at_seek;
+<span class="lineNum">     573 </span><span class="lineCov">          1 :                                 ctx-&gt;in_seek = GF_FALSE;</span>
+<span class="lineNum">     574 </span>            :                         }
+<span class="lineNum">     575 </span>            :                 }
+<span class="lineNum">     576 </span>            : 
+<span class="lineNum">     577 </span><span class="lineCov">        154 :                 if (ctx-&gt;timescale &amp;&amp; !prev_pck_size &amp;&amp; (cts != GF_FILTER_NO_TS) ) {</span>
+<span class="lineNum">     578 </span><span class="lineNoCov">          0 :                         ctx-&gt;cts = cts;</span>
+<span class="lineNum">     579 </span>            :                         cts = GF_FILTER_NO_TS;
+<span class="lineNum">     580 </span>            :                 }
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span><span class="lineCov">        154 :                 if (!ctx-&gt;in_seek) {</span>
+<span class="lineNum">     583 </span><span class="lineCov">        154 :                         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, next_frame, &amp;output);</span>
+<span class="lineNum">     584 </span><span class="lineCov">        154 :                         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     585 </span><span class="lineCov">        154 :                         memcpy(output, start, next_frame);</span>
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineCov">        154 :                         gf_filter_pck_set_cts(dst_pck, ctx-&gt;cts);</span>
+<span class="lineNum">     588 </span><span class="lineCov">        154 :                         if (!ctx-&gt;timescale || (ctx-&gt;timescale==ctx-&gt;sample_rate) )</span>
+<span class="lineNum">     589 </span><span class="lineCov">        154 :                                 gf_filter_pck_set_duration(dst_pck, nb_samp);</span>
+<span class="lineNum">     590 </span>            :                         else {
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_set_duration(dst_pck, (nb_samp * ctx-&gt;timescale) / ctx-&gt;sample_rate);</span>
+<span class="lineNum">     592 </span>            :                         }
+<span class="lineNum">     593 </span><span class="lineCov">        154 :                         gf_filter_pck_set_sap(dst_pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     594 </span><span class="lineCov">        154 :                         gf_filter_pck_set_framing(dst_pck, GF_TRUE, GF_TRUE);</span>
+<span class="lineNum">     595 </span>            : 
+<span class="lineNum">     596 </span><span class="lineCov">        154 :                         if (ctx-&gt;byte_offset != GF_FILTER_NO_BO) {</span>
+<span class="lineNum">     597 </span><span class="lineCov">        154 :                                 gf_filter_pck_set_byte_offset(dst_pck, ctx-&gt;byte_offset);</span>
+<span class="lineNum">     598 </span>            :                         }
+<span class="lineNum">     599 </span><span class="lineCov">        154 :                         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     600 </span>            :                 }
+<span class="lineNum">     601 </span>            :                 flac_dmx_update_cts(ctx, nb_samp);
+<span class="lineNum">     602 </span>            : 
+<span class="lineNum">     603 </span>            :                 assert (start[0] == 0xFF);
+<span class="lineNum">     604 </span>            :                 assert((start[1]&amp;0xFC) == 0xF8);
+<span class="lineNum">     605 </span>            : 
+<span class="lineNum">     606 </span><span class="lineCov">        154 :                 start += next_frame;</span>
+<span class="lineNum">     607 </span>            :                 assert(remain &gt;= next_frame);
+<span class="lineNum">     608 </span><span class="lineCov">        154 :                 remain -= next_frame;</span>
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span>            :         }
+<span class="lineNum">     611 </span>            : 
+<span class="lineNum">     612 </span><span class="lineCov">        408 :         if (!pck) {</span>
+<span class="lineNum">     613 </span><span class="lineCov">          2 :                 ctx-&gt;flac_buffer_size = 0;</span>
+<span class="lineNum">     614 </span><span class="lineCov">          2 :                 return flac_dmx_process(filter);</span>
+<span class="lineNum">     615 </span>            :         } else {
+<span class="lineNum">     616 </span><span class="lineCov">        406 :                 if (remain &lt; ctx-&gt;flac_buffer_size) {</span>
+<span class="lineNum">     617 </span><span class="lineCov">        156 :                         memmove(ctx-&gt;flac_buffer, start, remain);</span>
+<span class="lineNum">     618 </span>            :                 }
+<span class="lineNum">     619 </span><span class="lineCov">        406 :                 ctx-&gt;flac_buffer_size = remain;</span>
+<span class="lineNum">     620 </span><span class="lineCov">        406 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     621 </span>            :         }
+<span class="lineNum">     622 </span><span class="lineCov">        406 :         return GF_OK;</span>
+<a name="623"><span class="lineNum">     623 </span>            : }</a>
+<span class="lineNum">     624 </span>            : 
+<span class="lineNum">     625 </span><span class="lineCov">          4 : static GF_Err flac_dmx_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     626 </span>            : {
+<span class="lineNum">     627 </span><span class="lineCov">          4 :         GF_FLACDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     628 </span><span class="lineCov">          4 :         ctx-&gt;bs = gf_bs_new((u8 *)ctx, 1, GF_BITSTREAM_READ);</span>
+<a name="629"><span class="lineNum">     629 </span><span class="lineCov">          4 :         return GF_OK;</span></a>
+<span class="lineNum">     630 </span>            : }
+<span class="lineNum">     631 </span><span class="lineCov">          4 : static void flac_dmx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     632 </span>            : {
+<span class="lineNum">     633 </span><span class="lineCov">          4 :         GF_FLACDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     634 </span><span class="lineCov">          4 :         if (ctx-&gt;bs) gf_bs_del(ctx-&gt;bs);</span>
+<span class="lineNum">     635 </span><span class="lineCov">          4 :         if (ctx-&gt;indexes) gf_free(ctx-&gt;indexes);</span>
+<span class="lineNum">     636 </span><span class="lineCov">          4 :         if (ctx-&gt;flac_buffer) gf_free(ctx-&gt;flac_buffer);</span>
+<span class="lineNum">     637 </span><span class="lineCov">          4 :         if (ctx-&gt;src_pck) gf_filter_pck_unref(ctx-&gt;src_pck);</span>
+<span class="lineNum">     638 </span><span class="lineCov">          4 : }</span>
+<a name="639"><span class="lineNum">     639 </span>            : </a>
+<span class="lineNum">     640 </span>            : 
+<span class="lineNum">     641 </span><span class="lineCov">       3065 : static const char *flac_dmx_probe_data(const u8 *data, u32 size, GF_FilterProbeScore *score)</span>
+<span class="lineNum">     642 </span>            : {
+<span class="lineNum">     643 </span><span class="lineCov">       3065 :         if ((size&gt;4) &amp;&amp; !strncmp(data, &quot;fLaC&quot;, 4)) {</span>
+<span class="lineNum">     644 </span><span class="lineCov">          4 :                 *score = GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     645 </span><span class="lineCov">          4 :                 return &quot;audio/flac&quot;;</span>
+<span class="lineNum">     646 </span>            :         }
+<span class="lineNum">     647 </span>            :         return NULL;
+<span class="lineNum">     648 </span>            : }
+<span class="lineNum">     649 </span>            : 
+<span class="lineNum">     650 </span>            : static const GF_FilterCapability FLACDmxCaps[] =
+<span class="lineNum">     651 </span>            : {
+<span class="lineNum">     652 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     653 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_FILE_EXT, &quot;flac&quot;),
+<span class="lineNum">     654 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_MIME, &quot;audio/flac&quot;),
+<span class="lineNum">     655 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     656 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_FLAC),
+<span class="lineNum">     657 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     658 </span>            :         {0},
+<span class="lineNum">     659 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     660 </span>            :         CAP_BOOL(GF_CAPS_INPUT,GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     661 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_FLAC),
+<span class="lineNum">     662 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     663 </span>            : };
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span>            : 
+<span class="lineNum">     666 </span>            : 
+<span class="lineNum">     667 </span>            : #define OFFS(_n)        #_n, offsetof(GF_FLACDmxCtx, _n)
+<span class="lineNum">     668 </span>            : static const GF_FilterArgs FLACDmxArgs[] =
+<span class="lineNum">     669 </span>            : {
+<span class="lineNum">     670 </span>            :         { OFFS(index), &quot;indexing window length&quot;, GF_PROP_DOUBLE, &quot;1.0&quot;, NULL, 0},
+<span class="lineNum">     671 </span>            :         {0}
+<span class="lineNum">     672 </span>            : };
+<span class="lineNum">     673 </span>            : 
+<span class="lineNum">     674 </span>            : 
+<span class="lineNum">     675 </span>            : GF_FilterRegister FLACDmxRegister = {
+<span class="lineNum">     676 </span>            :         .name = &quot;rfflac&quot;,
+<span class="lineNum">     677 </span>            :         GF_FS_SET_DESCRIPTION(&quot;FLAC reframer&quot;)
+<span class="lineNum">     678 </span>            :         GF_FS_SET_HELP(&quot;This filter parses FLAC files/data and outputs corresponding audio PID and frames.&quot;)
+<span class="lineNum">     679 </span>            :         .private_size = sizeof(GF_FLACDmxCtx),
+<span class="lineNum">     680 </span>            :         .args = FLACDmxArgs,
+<span class="lineNum">     681 </span>            :         .finalize = flac_dmx_finalize,
+<span class="lineNum">     682 </span>            :         .initialize = flac_dmx_initialize,
+<span class="lineNum">     683 </span>            :         SETCAPS(FLACDmxCaps),
+<span class="lineNum">     684 </span>            :         .configure_pid = flac_dmx_configure_pid,
+<span class="lineNum">     685 </span>            :         .process = flac_dmx_process,
+<span class="lineNum">     686 </span>            :         .probe_data = flac_dmx_probe_data,
+<span class="lineNum">     687 </span>            :         .process_event = flac_dmx_process_event
+<span class="lineNum">     688 </span>            : };
+<a name="689"><span class="lineNum">     689 </span>            : </a>
+<span class="lineNum">     690 </span>            : 
+<span class="lineNum">     691 </span><span class="lineCov">       2877 : const GF_FilterRegister *flac_dmx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     692 </span>            : {
+<span class="lineNum">     693 </span><span class="lineCov">       2877 :         return &amp;FLACDmxRegister;</span>
+<span class="lineNum">     694 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

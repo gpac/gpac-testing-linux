@@ -1,0 +1,666 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/out_sock.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - out_sock.c<span style="font-size: 80%;"> (source / <a href="out_sock.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">185</td>
+            <td class="headerCovTableEntry">252</td>
+            <td class="headerCovTableEntryLo">73.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2019
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / generic socket output filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : typedef struct
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :         GF_Socket *socket;
+<span class="lineNum">      34 </span>            :         Bool is_tuned;
+<span class="lineNum">      35 </span>            :         char address[GF_MAX_IP_NAME_LEN];
+<span class="lineNum">      36 </span>            :         Bool pck_pending;
+<span class="lineNum">      37 </span>            : } GF_SockOutClient;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : typedef struct
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span>            :         //options
+<span class="lineNum">      42 </span>            :         Double start, speed;
+<span class="lineNum">      43 </span>            :         char *dst, *mime, *ext, *ifce;
+<span class="lineNum">      44 </span>            :         Bool listen;
+<span class="lineNum">      45 </span>            :         u32 maxc, port, sockbuf, ka, kp, rate, ttl;
+<span class="lineNum">      46 </span>            :         GF_Fraction pckr, pckd;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :         GF_Socket *socket;
+<span class="lineNum">      49 </span>            :         //only one output pid
+<span class="lineNum">      50 </span>            :         GF_FilterPid *pid;
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :         GF_List *clients;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :         Bool pid_started;
+<span class="lineNum">      55 </span>            :         Bool had_clients;
+<span class="lineNum">      56 </span>            :         Bool pck_pending;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :         GF_FilterCapability in_caps[2];
+<span class="lineNum">      59 </span>            :         char szExt[10];
+<span class="lineNum">      60 </span>            :         char szFileName[GF_MAX_PATH];
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :         u32 nb_pck_processed;
+<span class="lineNum">      63 </span>            :         u64 start_time;
+<span class="lineNum">      64 </span>            :         u64 nb_bytes_sent;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :         GF_FilterPacket *rev_pck;
+<span class="lineNum">      67 </span>            :         u32 next_pckd_idx, next_pckr_idx;
+<span class="lineNum">      68 </span>            :         u32 nb_pckd_wnd, nb_pckr_wnd;
+<span class="lineNum">      69 </span>            : } GF_SockOutCtx;
+<a name="70"><span class="lineNum">      70 </span>            : </a>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineCov">         10 : static GF_Err sockout_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      73 </span>            : {
+<span class="lineNum">      74 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">      75 </span><span class="lineCov">         10 :         GF_SockOutCtx *ctx = (GF_SockOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">      76 </span><span class="lineCov">         10 :         if (is_remove) {</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :                 ctx-&gt;pid = NULL;</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :                 gf_sk_del(ctx-&gt;socket);</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :                 ctx-&gt;socket = NULL;</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">      81 </span>            :         }
+<span class="lineNum">      82 </span><span class="lineCov">         10 :         gf_filter_pid_check_caps(pid);</span>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">         10 :         if (!ctx-&gt;pid &amp;&amp; (!ctx-&gt;listen || gf_list_count(ctx-&gt;clients) ) ) {</span>
+<span class="lineNum">      85 </span>            :                 GF_FilterEvent evt;
+<span class="lineNum">      86 </span><span class="lineCov">          7 :                 gf_filter_pid_init_play_event(pid, &amp;evt, ctx-&gt;start, ctx-&gt;speed, &quot;SockOut&quot;);</span>
+<span class="lineNum">      87 </span><span class="lineCov">          7 :                 gf_filter_pid_send_event(pid, &amp;evt);</span>
+<span class="lineNum">      88 </span><span class="lineCov">          7 :                 ctx-&gt;pid_started = GF_TRUE;</span>
+<span class="lineNum">      89 </span>            :         }
+<span class="lineNum">      90 </span><span class="lineCov">         10 :         ctx-&gt;pid = pid;</span>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span><span class="lineCov">         10 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_DISABLE_PROGRESSIVE);</span>
+<span class="lineNum">      93 </span><span class="lineCov">         10 :         if (p &amp;&amp; p-&gt;value.uint) {</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_NETWORK, (&quot;[SockOut] Block patching is not supported by socket output\n&quot;));</span>
+<span class="lineNum">      95 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      96 </span>            :         }
+<span class="lineNum">      97 </span>            :         return GF_OK;
+<a name="98"><span class="lineNum">      98 </span>            : }</a>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineCov">         10 : static GF_Err sockout_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     101 </span>            : {
+<span class="lineNum">     102 </span>            :         GF_Err e;
+<span class="lineNum">     103 </span>            :         char *str, *url;
+<span class="lineNum">     104 </span>            :         u16 port;
+<span class="lineNum">     105 </span>            :         char *ext;
+<span class="lineNum">     106 </span>            :         u32 sock_type = 0;
+<span class="lineNum">     107 </span><span class="lineCov">         10 :         GF_SockOutCtx *ctx = (GF_SockOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineCov">         10 :         if (!ctx || !ctx-&gt;dst) return GF_OK;</span>
+<span class="lineNum">     110 </span>            :         e = GF_NOT_SUPPORTED;
+<span class="lineNum">     111 </span><span class="lineCov">         10 :         if (!strncmp(ctx-&gt;dst, &quot;tcp://&quot;, 6)) e = GF_OK;</span>
+<span class="lineNum">     112 </span><span class="lineCov">          4 :         else if (!strncmp(ctx-&gt;dst, &quot;udp://&quot;, 6)) e = GF_OK;</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :         else if (!strncmp(ctx-&gt;dst, &quot;tcpu://&quot;, 7)) e = GF_OK;</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         else if (!strncmp(ctx-&gt;dst, &quot;udpu://&quot;, 7)) e = GF_OK;</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :         if (e)  {
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_NOT_SUPPORTED);</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :                 return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     120 </span>            :         }
+<span class="lineNum">     121 </span><span class="lineCov">         10 :         if (ctx-&gt;ext) ext = ctx-&gt;ext;</span>
+<span class="lineNum">     122 </span>            :         else {
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                 ext = gf_file_ext_start(ctx-&gt;dst);</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :                 if (ext) ext++;</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                 if (ext) {</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                         const char *szport = strchr(ext, ':');</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :                         if (szport)</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :                                 ext = gf_file_ext_start(szport);</span>
+<span class="lineNum">     129 </span>            :                 }
+<span class="lineNum">     130 </span>            :         }
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">         10 :         if (!ext &amp;&amp; !ctx-&gt;mime) {</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_NETWORK, (&quot;[SockOut] No extension provided nor mime type for output file %s, cannot infer format\n&quot;, ctx-&gt;dst));</span>
+<span class="lineNum">     134 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     135 </span>            :         }
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">         10 :         if (ctx-&gt;listen) {</span>
+<span class="lineNum">     138 </span><span class="lineCov">          3 :                 ctx-&gt;clients = gf_list_new();</span>
+<span class="lineNum">     139 </span><span class="lineCov">          3 :                 if (!ctx-&gt;clients) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     140 </span>            :         }
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :         //static cap, streamtype = file
+<span class="lineNum">     143 </span><span class="lineCov">         10 :         ctx-&gt;in_caps[0].code = GF_PROP_PID_STREAM_TYPE;</span>
+<span class="lineNum">     144 </span><span class="lineCov">         10 :         ctx-&gt;in_caps[0].val = PROP_UINT(GF_STREAM_FILE);</span>
+<span class="lineNum">     145 </span><span class="lineCov">         10 :         ctx-&gt;in_caps[0].flags = GF_CAPS_INPUT_STATIC;</span>
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">         10 :         if (ctx-&gt;mime) {</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :                 ctx-&gt;in_caps[1].code = GF_PROP_PID_MIME;</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :                 ctx-&gt;in_caps[1].val = PROP_NAME( ctx-&gt;mime );</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                 ctx-&gt;in_caps[1].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">     151 </span>            :         } else {
+<span class="lineNum">     152 </span><span class="lineCov">         10 :                 strncpy(ctx-&gt;szExt, ext, 9);</span>
+<span class="lineNum">     153 </span><span class="lineCov">         10 :                 ctx-&gt;szExt[9] = 0;</span>
+<span class="lineNum">     154 </span><span class="lineCov">         10 :                 strlwr(ctx-&gt;szExt);</span>
+<span class="lineNum">     155 </span><span class="lineCov">         10 :                 ctx-&gt;in_caps[1].code = GF_PROP_PID_FILE_EXT;</span>
+<span class="lineNum">     156 </span><span class="lineCov">         10 :                 ctx-&gt;in_caps[1].val = PROP_NAME( ctx-&gt;szExt );</span>
+<span class="lineNum">     157 </span><span class="lineCov">         10 :                 ctx-&gt;in_caps[1].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">     158 </span>            :         }
+<span class="lineNum">     159 </span><span class="lineCov">         10 :         gf_filter_override_caps(filter, ctx-&gt;in_caps, 2);</span>
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            :         /*create our ourput socket*/
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span><span class="lineCov">         10 :         if (!strnicmp(ctx-&gt;dst, &quot;udp://&quot;, 6)) {</span>
+<span class="lineNum">     164 </span>            :                 sock_type = GF_SOCK_TYPE_UDP;
+<span class="lineNum">     165 </span><span class="lineCov">          4 :                 ctx-&gt;listen = GF_FALSE;</span>
+<span class="lineNum">     166 </span><span class="lineCov">          6 :         } else if (!strnicmp(ctx-&gt;dst, &quot;tcp://&quot;, 6)) {</span>
+<span class="lineNum">     167 </span>            :                 sock_type = GF_SOCK_TYPE_TCP;
+<span class="lineNum">     168 </span>            : #ifdef GPAC_HAS_SOCK_UN
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :         } else if (!strnicmp(ctx-&gt;dst, &quot;udpu://&quot;, 7)) {</span>
+<span class="lineNum">     170 </span>            :                 sock_type = GF_SOCK_TYPE_UDP_UN;
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :                 ctx-&gt;listen = GF_FALSE;</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :         } else if (!strnicmp(ctx-&gt;dst, &quot;tcpu://&quot;, 7)) {</span>
+<span class="lineNum">     173 </span>            :                 sock_type = GF_SOCK_TYPE_TCP_UN;
+<span class="lineNum">     174 </span>            : #endif
+<span class="lineNum">     175 </span>            :         } else {
+<span class="lineNum">     176 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     177 </span>            :         }
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :         //skip ://
+<span class="lineNum">     180 </span><span class="lineCov">         10 :         url = strchr(ctx-&gt;dst, ':');</span>
+<span class="lineNum">     181 </span><span class="lineCov">         10 :         url += 3;</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">         10 :         ctx-&gt;socket = gf_sk_new(sock_type);</span>
+<span class="lineNum">     184 </span><span class="lineCov">         10 :         if (! ctx-&gt;socket ) {</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_NETWORK, (&quot;[SockOut] Failed to open socket for %s\n&quot;, ctx-&gt;dst));</span>
+<span class="lineNum">     186 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     187 </span>            :         }
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :         /*setup port and src*/
+<span class="lineNum">     190 </span><span class="lineCov">         10 :         port = ctx-&gt;port;</span>
+<span class="lineNum">     191 </span><span class="lineCov">         10 :         str = strrchr(url, ':');</span>
+<span class="lineNum">     192 </span>            :         /*take care of IPv6 address*/
+<span class="lineNum">     193 </span><span class="lineCov">         10 :         if (str &amp;&amp; strchr(str, ']')) str = strchr(url, ':');</span>
+<span class="lineNum">     194 </span><span class="lineCov">         10 :         if (str) {</span>
+<span class="lineNum">     195 </span><span class="lineCov">         20 :                 port = atoi(str+1);</span>
+<span class="lineNum">     196 </span><span class="lineCov">         10 :                 str[0] = 0;</span>
+<span class="lineNum">     197 </span>            :         }
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span><span class="lineCov">         10 :         if (gf_sk_is_multicast_address(url)) {</span>
+<span class="lineNum">     200 </span>            :                 //server socket, do not bind
+<span class="lineNum">     201 </span><span class="lineCov">          1 :                 e = gf_sk_setup_multicast(ctx-&gt;socket, url, port, ctx-&gt;ttl, GF_TRUE, ctx-&gt;ifce);</span>
+<span class="lineNum">     202 </span><span class="lineCov">          1 :                 ctx-&gt;listen = GF_FALSE;</span>
+<span class="lineNum">     203 </span><span class="lineCov">         18 :         } else if ((sock_type == GF_SOCK_TYPE_UDP)</span>
+<span class="lineNum">     204 </span>            : #ifdef GPAC_HAS_SOCK_UN
+<span class="lineNum">     205 </span><span class="lineCov">          9 :                 || (sock_type == GF_SOCK_TYPE_UDP_UN)</span>
+<span class="lineNum">     206 </span>            : #endif
+<span class="lineNum">     207 </span>            :         ) {
+<span class="lineNum">     208 </span><span class="lineCov">          3 :                 e = gf_sk_bind(ctx-&gt;socket, ctx-&gt;ifce, port, url, port, GF_SOCK_REUSE_PORT | GF_SOCK_FAKE_BIND);</span>
+<span class="lineNum">     209 </span><span class="lineCov">          3 :                 ctx-&gt;listen = GF_FALSE;</span>
+<span class="lineNum">     210 </span><span class="lineCov">          6 :         } else if (ctx-&gt;listen) {</span>
+<span class="lineNum">     211 </span><span class="lineCov">          3 :                 e = gf_sk_bind(ctx-&gt;socket, NULL, port, url, 0, GF_SOCK_REUSE_PORT);</span>
+<span class="lineNum">     212 </span><span class="lineCov">          3 :                 if (!e) e = gf_sk_listen(ctx-&gt;socket, ctx-&gt;maxc);</span>
+<span class="lineNum">     213 </span><span class="lineCov">          3 :                 if (!e) {</span>
+<span class="lineNum">     214 </span><span class="lineCov">          3 :                         gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     215 </span><span class="lineCov">          3 :                         gf_sk_server_mode(ctx-&gt;socket, GF_TRUE);</span>
+<span class="lineNum">     216 </span>            :                 }
+<span class="lineNum">     217 </span>            :         } else {
+<span class="lineNum">     218 </span><span class="lineCov">          3 :                 e = gf_sk_connect(ctx-&gt;socket, url, port, NULL);</span>
+<span class="lineNum">     219 </span>            :         }
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span><span class="lineCov">         10 :         if (str) str[0] = ':';</span>
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineCov">         10 :         if (e) {</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :                 gf_sk_del(ctx-&gt;socket);</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :                 ctx-&gt;socket = NULL;</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :                 return e;</span>
+<span class="lineNum">     227 </span>            :         }
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span><span class="lineCov">         10 :         gf_sk_set_buffer_size(ctx-&gt;socket, 0, ctx-&gt;sockbuf);</span>
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span><span class="lineCov">         10 :         return GF_OK;</span>
+<a name="232"><span class="lineNum">     232 </span>            : }</a>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineCov">         10 : static void sockout_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     235 </span>            : {
+<span class="lineNum">     236 </span><span class="lineCov">         10 :         GF_SockOutCtx *ctx = (GF_SockOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     237 </span><span class="lineCov">         10 :         if (ctx-&gt;clients) {</span>
+<span class="lineNum">     238 </span><span class="lineCov">          6 :                 while (gf_list_count(ctx-&gt;clients)) {</span>
+<span class="lineNum">     239 </span><span class="lineCov">          3 :                         GF_SockOutClient *sc = gf_list_pop_back(ctx-&gt;clients);</span>
+<span class="lineNum">     240 </span><span class="lineCov">          3 :                         if (sc-&gt;socket) gf_sk_del(sc-&gt;socket);</span>
+<span class="lineNum">     241 </span><span class="lineCov">          3 :                         gf_free(sc);</span>
+<span class="lineNum">     242 </span>            :                 }
+<span class="lineNum">     243 </span><span class="lineCov">          3 :                 gf_list_del(ctx-&gt;clients);</span>
+<span class="lineNum">     244 </span>            :         }
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">         10 :         if (ctx-&gt;socket) gf_sk_del(ctx-&gt;socket);</span>
+<a name="247"><span class="lineNum">     247 </span><span class="lineCov">         10 : }</span></a>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineCov">       1175 : static GF_Err sockout_send_packet(GF_SockOutCtx *ctx, GF_FilterPacket *pck, GF_Socket *dst_sock)</span>
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span>            :         GF_Err e;
+<span class="lineNum">     252 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     253 </span>            :         u32 w, h, stride, stride_uv, pf;
+<span class="lineNum">     254 </span>            :         u32 nb_planes, uv_height;
+<span class="lineNum">     255 </span>            :         const char *pck_data;
+<span class="lineNum">     256 </span>            :         u32 pck_size;
+<span class="lineNum">     257 </span>            :         GF_FilterFrameInterface *hwf=NULL;
+<span class="lineNum">     258 </span><span class="lineCov">       1175 :         if (!dst_sock) return GF_OK;</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineCov">       1175 :         pck_data = gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     261 </span><span class="lineCov">       1175 :         if (pck_data) {</span>
+<span class="lineNum">     262 </span><span class="lineCov">       1175 :                 e = gf_sk_send(dst_sock, pck_data, pck_size);</span>
+<span class="lineNum">     263 </span><span class="lineCov">       1175 :                 if (e) {</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_NETWORK, (&quot;[SockOut] Write error: %s\n&quot;, gf_error_to_string(e) ));</span>
+<span class="lineNum">     265 </span>            :                 }
+<span class="lineNum">     266 </span><span class="lineCov">       1175 :                 ctx-&gt;nb_bytes_sent += pck_size;</span>
+<span class="lineNum">     267 </span>            :                 return e;
+<span class="lineNum">     268 </span>            :         }
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :         hwf = gf_filter_pck_get_frame_interface(pck);</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :         if (!hwf) {</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_NETWORK, (&quot;[SockOut] output file handle is not opened, discarding %d bytes\n&quot;, pck_size));</span>
+<span class="lineNum">     272 </span>            :                 return GF_OK;
+<span class="lineNum">     273 </span>            :         }
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :         p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_WIDTH);</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :         w = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :         p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_HEIGHT);</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :         h = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :         p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_PIXFMT);</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :         pf = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span>            :         //get stride/stride_uv with no padding
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :         stride = stride_uv = 0;</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :         if (gf_pixel_get_size_info(pf, w, h, NULL, &amp;stride, &amp;stride_uv, &amp;nb_planes, &amp;uv_height) == GF_TRUE) {</span>
+<span class="lineNum">     285 </span>            :                 u32 i;
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;nb_planes; i++) {</span>
+<span class="lineNum">     287 </span>            :                         u32 j, write_h, lsize;
+<span class="lineNum">     288 </span>            :                         const u8 *out_ptr;
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :                         u32 out_stride = i ? stride_uv : stride;</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :                         e = hwf-&gt;get_plane(hwf, i, &amp;out_ptr, &amp;out_stride);</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                         if (e) {</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_NETWORK, (&quot;[SockOut] Failed to fetch plane data from hardware frame, cannot write\n&quot;));</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     294 </span>            :                         }
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :                         if (i) {</span>
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :                                 write_h = uv_height;</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                                 lsize = stride_uv;</span>
+<span class="lineNum">     298 </span>            :                         } else {
+<span class="lineNum">     299 </span>            :                                 write_h = h;
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :                                 lsize = stride;</span>
+<span class="lineNum">     301 </span>            :                         }
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :                         for (j=0; j&lt;write_h; j++) {</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :                                 e = gf_sk_send(dst_sock, out_ptr, lsize);</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :                                 if (e) {</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_NETWORK, (&quot;[SockOut] Write error: %s\n&quot;, gf_error_to_string(e) ));</span>
+<span class="lineNum">     306 </span>            :                                 }
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                                 out_ptr += out_stride;</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :                                 ctx-&gt;nb_bytes_sent += lsize;</span>
+<span class="lineNum">     309 </span>            :                         }
+<span class="lineNum">     310 </span>            :                 }
+<span class="lineNum">     311 </span>            :         }
+<span class="lineNum">     312 </span>            :         return GF_OK;
+<span class="lineNum">     313 </span>            : }
+<a name="314"><span class="lineNum">     314 </span>            : </a>
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span><span class="lineCov">       2545 : static GF_Err sockout_process(GF_Filter *filter)</span>
+<span class="lineNum">     317 </span>            : {
+<span class="lineNum">     318 </span>            :         GF_Err e;
+<span class="lineNum">     319 </span>            :         Bool is_pck_ref = GF_FALSE;
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     322 </span><span class="lineCov">       2545 :         GF_SockOutCtx *ctx = (GF_SockOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span><span class="lineCov">       2545 :         if (!ctx-&gt;socket)</span>
+<span class="lineNum">     325 </span>            :                 return GF_EOS;
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineCov">       2540 :         if (ctx-&gt;rate) {</span>
+<span class="lineNum">     328 </span><span class="lineCov">       1236 :                 if (!ctx-&gt;start_time) ctx-&gt;start_time = gf_sys_clock_high_res();</span>
+<span class="lineNum">     329 </span>            :                 else {
+<span class="lineNum">     330 </span><span class="lineCov">       1232 :                         u64 now = gf_sys_clock_high_res() - ctx-&gt;start_time;</span>
+<span class="lineNum">     331 </span><span class="lineCov">       1232 :                         if (ctx-&gt;nb_bytes_sent*8*1000000 &gt; ctx-&gt;rate * now) {</span>
+<span class="lineNum">     332 </span><span class="lineCov">        833 :                                 u64 diff = ctx-&gt;nb_bytes_sent*8*1000000 / ctx-&gt;rate - now;</span>
+<span class="lineNum">     333 </span><span class="lineCov">        833 :                                 gf_filter_ask_rt_reschedule(filter, (u32) MAX(diff, 1000) );</span>
+<span class="lineNum">     334 </span><span class="lineCov">        833 :                                 return GF_OK;</span>
+<span class="lineNum">     335 </span><span class="lineCov">        399 :                         } else if (gf_filter_reporting_enabled(filter)) {</span>
+<span class="lineNum">     336 </span>            :                                 char szMsg[200];
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :                                 snprintf(szMsg, 199, &quot;Sending at &quot;LLU&quot; kbps\r&quot;, ctx-&gt;nb_bytes_sent*8*1000/now);</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :                                 szMsg[199] = 0;</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :                                 gf_filter_update_status(filter, 0, szMsg);</span>
+<span class="lineNum">     340 </span>            :                         }
+<span class="lineNum">     341 </span>            :                 }
+<span class="lineNum">     342 </span>            :         }
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span><span class="lineCov">       1707 :         if (ctx-&gt;listen) {</span>
+<span class="lineNum">     345 </span><span class="lineCov">        915 :                 GF_Socket *new_conn=NULL;</span>
+<span class="lineNum">     346 </span><span class="lineCov">        915 :                 e = gf_sk_accept(ctx-&gt;socket, &amp;new_conn);</span>
+<span class="lineNum">     347 </span><span class="lineCov">        915 :                 if ((e==GF_OK) &amp;&amp; new_conn) {</span>
+<span class="lineNum">     348 </span>            :                         GF_SockOutClient *sc;
+<span class="lineNum">     349 </span><span class="lineCov">          3 :                         GF_SAFEALLOC(sc, GF_SockOutClient);</span>
+<span class="lineNum">     350 </span><span class="lineCov">          3 :                         if (!sc) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     351 </span>            :                         
+<span class="lineNum">     352 </span><span class="lineCov">          3 :                         sc-&gt;socket = new_conn;</span>
+<span class="lineNum">     353 </span><span class="lineCov">          3 :                         strcpy(sc-&gt;address, &quot;unknown&quot;);</span>
+<span class="lineNum">     354 </span><span class="lineCov">          3 :                         gf_sk_get_remote_address(new_conn, sc-&gt;address);</span>
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineCov">          3 :                         GF_LOG(GF_LOG_INFO, GF_LOG_NETWORK, (&quot;[SockOut] Accepting new connection from %s\n&quot;, sc-&gt;address));</span>
+<span class="lineNum">     357 </span><span class="lineCov">          3 :                         gf_list_add(ctx-&gt;clients, sc);</span>
+<span class="lineNum">     358 </span><span class="lineCov">          3 :                         ctx-&gt;had_clients = GF_TRUE;</span>
+<span class="lineNum">     359 </span><span class="lineCov">          3 :                         if (!ctx-&gt;pid_started &amp;&amp; ctx-&gt;pid) {</span>
+<span class="lineNum">     360 </span>            :                                 GF_FilterEvent evt;
+<span class="lineNum">     361 </span><span class="lineCov">          3 :                                 gf_filter_pid_init_play_event(ctx-&gt;pid, &amp;evt, ctx-&gt;start, ctx-&gt;speed, &quot;SockOut&quot;);</span>
+<span class="lineNum">     362 </span><span class="lineCov">          3 :                                 gf_filter_pid_send_event(ctx-&gt;pid, &amp;evt);</span>
+<span class="lineNum">     363 </span><span class="lineCov">          3 :                                 ctx-&gt;pid_started = GF_TRUE;</span>
+<span class="lineNum">     364 </span>            :                         }
+<span class="lineNum">     365 </span><span class="lineCov">          3 :                         sc-&gt;pck_pending = ctx-&gt;pck_pending;</span>
+<span class="lineNum">     366 </span><span class="lineCov">          3 :                         if (!ctx-&gt;nb_pck_processed)</span>
+<span class="lineNum">     367 </span><span class="lineCov">          3 :                                 sc-&gt;is_tuned = GF_TRUE;</span>
+<span class="lineNum">     368 </span>            :                 }
+<span class="lineNum">     369 </span>            :         }
+<span class="lineNum">     370 </span><span class="lineCov">       1707 :         if (!ctx-&gt;pid) {</span>
+<span class="lineNum">     371 </span><span class="lineCov">          6 :                 if (ctx-&gt;listen) gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     372 </span>            :                 return GF_OK;
+<span class="lineNum">     373 </span>            :         }
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span><span class="lineCov">       1701 :         pck = gf_filter_pid_get_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     376 </span><span class="lineCov">       1701 :         if (!pck) {</span>
+<span class="lineNum">     377 </span><span class="lineCov">         13 :                 if (gf_filter_pid_is_eos(ctx-&gt;pid)) {</span>
+<span class="lineNum">     378 </span><span class="lineCov">         10 :                         if (ctx-&gt;rev_pck) {</span>
+<span class="lineNum">     379 </span>            :                                 is_pck_ref = GF_TRUE;
+<span class="lineNum">     380 </span>            :                                 pck = ctx-&gt;rev_pck;
+<span class="lineNum">     381 </span>            :                         } else {
+<span class="lineNum">     382 </span><span class="lineCov">         10 :                                 if (!ctx-&gt;listen) {</span>
+<span class="lineNum">     383 </span><span class="lineCov">          7 :                                         gf_sk_del(ctx-&gt;socket);</span>
+<span class="lineNum">     384 </span><span class="lineCov">          7 :                                         ctx-&gt;socket = NULL;</span>
+<span class="lineNum">     385 </span><span class="lineCov">          7 :                                         return GF_EOS;</span>
+<span class="lineNum">     386 </span>            :                                 }
+<span class="lineNum">     387 </span><span class="lineCov">          3 :                                 if (!ctx-&gt;ka)</span>
+<span class="lineNum">     388 </span>            :                                         return GF_EOS;
+<span class="lineNum">     389 </span>            :                                 //keep alive, ask for real-time reschedule of 100 ms - we should use socket groups and selects !
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :                                 gf_filter_ask_rt_reschedule(filter, 100000);</span>
+<span class="lineNum">     391 </span>            :                         }
+<span class="lineNum">     392 </span>            :                 }
+<span class="lineNum">     393 </span><span class="lineCov">          3 :                 if (!pck)</span>
+<span class="lineNum">     394 </span>            :                         return GF_OK;
+<span class="lineNum">     395 </span>            :         }
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span><span class="lineCov">       1688 :         if (ctx-&gt;pckd.den &amp;&amp; !ctx-&gt;rev_pck) {</span>
+<span class="lineNum">     398 </span><span class="lineCov">        315 :                 u32 pck_idx = ctx-&gt;pckd.num;</span>
+<span class="lineNum">     399 </span><span class="lineCov">        315 :                 u32 nb_pck = ctx-&gt;nb_pckd_wnd * ctx-&gt;pckd.den;</span>
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span><span class="lineCov">        315 :                 if (!pck_idx) {</span>
+<span class="lineNum">     402 </span><span class="lineCov">        315 :                         if (!ctx-&gt;next_pckd_idx) ctx-&gt;next_pckd_idx = gf_rand() % ctx-&gt;pckd.den;</span>
+<span class="lineNum">     403 </span><span class="lineCov">        315 :                         pck_idx = ctx-&gt;next_pckd_idx;</span>
+<span class="lineNum">     404 </span>            :                 }
+<span class="lineNum">     405 </span><span class="lineCov">        315 :                 nb_pck += pck_idx;</span>
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span><span class="lineCov">        315 :                 if (nb_pck == 1+ctx-&gt;nb_pck_processed) {</span>
+<span class="lineNum">     408 </span><span class="lineCov">          1 :                         ctx-&gt;nb_pck_processed++;</span>
+<span class="lineNum">     409 </span><span class="lineCov">          1 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_NETWORK, (&quot;[SockOut] dropping packet %d per user request\r&quot;, ctx-&gt;nb_pck_processed));</span>
+<span class="lineNum">     410 </span><span class="lineCov">          1 :                         gf_filter_pid_drop_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     411 </span><span class="lineCov">          1 :                         ctx-&gt;next_pckd_idx = 0;</span>
+<span class="lineNum">     412 </span><span class="lineCov">          1 :                         ctx-&gt;nb_pckd_wnd ++;</span>
+<span class="lineNum">     413 </span><span class="lineCov">          1 :                         return GF_OK;</span>
+<span class="lineNum">     414 </span>            :                 }
+<span class="lineNum">     415 </span>            :         }
+<span class="lineNum">     416 </span><span class="lineCov">       1687 :         if (ctx-&gt;pckr.den &amp;&amp; !ctx-&gt;rev_pck) {</span>
+<span class="lineNum">     417 </span><span class="lineCov">        314 :                 u32 pck_idx = ctx-&gt;pckr.num;</span>
+<span class="lineNum">     418 </span><span class="lineCov">        314 :                 u32 nb_pck = ctx-&gt;nb_pckr_wnd * ctx-&gt;pckr.den;</span>
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span><span class="lineCov">        314 :                 if (!pck_idx) {</span>
+<span class="lineNum">     421 </span><span class="lineCov">        314 :                         if (!ctx-&gt;next_pckr_idx) ctx-&gt;next_pckr_idx = gf_rand() % ctx-&gt;pckr.den;</span>
+<span class="lineNum">     422 </span><span class="lineCov">        314 :                         pck_idx = ctx-&gt;next_pckr_idx;</span>
+<span class="lineNum">     423 </span>            :                 }
+<span class="lineNum">     424 </span><span class="lineCov">        314 :                 nb_pck += pck_idx;</span>
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span><span class="lineCov">        314 :                 if (nb_pck == 1+ctx-&gt;nb_pck_processed) {</span>
+<span class="lineNum">     427 </span><span class="lineCov">         35 :                         ctx-&gt;rev_pck = pck;</span>
+<span class="lineNum">     428 </span><span class="lineCov">         35 :                         gf_filter_pck_ref(&amp;ctx-&gt;rev_pck);</span>
+<span class="lineNum">     429 </span><span class="lineCov">         35 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_NETWORK, (&quot;[SockOut] Reverting packet %d per user request\r&quot;, ctx-&gt;nb_pck_processed));</span>
+<span class="lineNum">     430 </span><span class="lineCov">         35 :                         ctx-&gt;nb_pck_processed++;</span>
+<span class="lineNum">     431 </span><span class="lineCov">         35 :                         gf_filter_pid_drop_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     432 </span><span class="lineCov">         35 :                         pck = gf_filter_pid_get_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     433 </span><span class="lineCov">         35 :                         if (!pck) return GF_OK;</span>
+<span class="lineNum">     434 </span>            :                 }
+<span class="lineNum">     435 </span>            :         }
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span><span class="lineCov">       1657 :         if (ctx-&gt;listen) {</span>
+<span class="lineNum">     438 </span><span class="lineCov">        903 :                 Bool had_pck_pending = ctx-&gt;pck_pending;</span>
+<span class="lineNum">     439 </span><span class="lineCov">        903 :                 u32 i, nb_clients = gf_list_count(ctx-&gt;clients);</span>
+<span class="lineNum">     440 </span><span class="lineCov">        903 :                 u8 dep_flags = gf_filter_pck_get_dependency_flags(pck);</span>
+<span class="lineNum">     441 </span>            :                 if ((dep_flags &amp; 0x3) == 1) {
+<span class="lineNum">     442 </span>            :                 }
+<span class="lineNum">     443 </span><span class="lineCov">        903 :                 ctx-&gt;pck_pending = GF_FALSE;</span>
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span><span class="lineCov">        903 :                 if (!nb_clients) {</span>
+<span class="lineNum">     446 </span>            :                         //client disconnected, drop packet if needed
+<span class="lineNum">     447 </span><span class="lineCov">        517 :                         if (ctx-&gt;had_clients &amp;&amp; !ctx-&gt;kp) {</span>
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 :                                 if (is_pck_ref) {</span>
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :                                         gf_filter_pck_unref(pck);</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :                                         ctx-&gt;rev_pck = NULL;</span>
+<span class="lineNum">     451 </span>            :                                 } else {
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_drop_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     453 </span>            :                                 }
+<span class="lineNum">     454 </span>            :                         }
+<span class="lineNum">     455 </span>            :                         return GF_OK;
+<span class="lineNum">     456 </span>            :                 }
+<span class="lineNum">     457 </span><span class="lineCov">        386 :                 for (i=0; i&lt;nb_clients; i++) {</span>
+<span class="lineNum">     458 </span><span class="lineCov">        386 :                         GF_SockOutClient *sc = gf_list_get(ctx-&gt;clients, i);</span>
+<span class="lineNum">     459 </span>            :                         if (!sc-&gt;is_tuned) {
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            :                         }
+<span class="lineNum">     462 </span><span class="lineCov">        386 :                         if (had_pck_pending &amp;&amp; !sc-&gt;pck_pending) {</span>
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :                                 continue;</span>
+<span class="lineNum">     464 </span>            :                         }
+<span class="lineNum">     465 </span><span class="lineCov">        386 :                         sc-&gt;pck_pending = GF_FALSE;</span>
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span><span class="lineCov">        386 :                         e = sockout_send_packet(ctx, pck, sc-&gt;socket);</span>
+<span class="lineNum">     468 </span><span class="lineCov">        386 :                         if (e == GF_BUFFER_TOO_SMALL) {</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :                                 sc-&gt;pck_pending = GF_TRUE;</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :                                 ctx-&gt;pck_pending = GF_TRUE;</span>
+<span class="lineNum">     471 </span>            :                         }
+<span class="lineNum">     472 </span>            :                 }
+<span class="lineNum">     473 </span><span class="lineCov">        386 :                 if (ctx-&gt;pck_pending) return GF_OK;</span>
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span>            :         } else {
+<span class="lineNum">     476 </span><span class="lineCov">        754 :                 e = sockout_send_packet(ctx, pck, ctx-&gt;socket);</span>
+<span class="lineNum">     477 </span><span class="lineCov">        754 :                 if (e == GF_BUFFER_TOO_SMALL) return GF_OK;</span>
+<span class="lineNum">     478 </span>            :         }
+<span class="lineNum">     479 </span>            : 
+<span class="lineNum">     480 </span><span class="lineCov">       1140 :         ctx-&gt;nb_pck_processed++;</span>
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span><span class="lineCov">       1140 :         if (is_pck_ref) {</span>
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :                 gf_filter_pck_unref(pck);</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :                 ctx-&gt;rev_pck = NULL;</span>
+<span class="lineNum">     485 </span>            :         } else {
+<span class="lineNum">     486 </span><span class="lineCov">       1140 :                 gf_filter_pid_drop_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     487 </span><span class="lineCov">       1140 :                 if (ctx-&gt;rev_pck) {</span>
+<span class="lineNum">     488 </span><span class="lineCov">         35 :                         e = sockout_send_packet(ctx, ctx-&gt;rev_pck, ctx-&gt;socket);</span>
+<span class="lineNum">     489 </span><span class="lineCov">         35 :                         if (e == GF_BUFFER_TOO_SMALL) return GF_OK;</span>
+<span class="lineNum">     490 </span><span class="lineCov">         35 :                         gf_filter_pck_unref(ctx-&gt;rev_pck);</span>
+<span class="lineNum">     491 </span><span class="lineCov">         35 :                         ctx-&gt;rev_pck = NULL;</span>
+<span class="lineNum">     492 </span><span class="lineCov">         35 :                         ctx-&gt;next_pckr_idx=0;</span>
+<span class="lineNum">     493 </span><span class="lineCov">         35 :                         ctx-&gt;nb_pckr_wnd++;</span>
+<span class="lineNum">     494 </span>            :                 }
+<span class="lineNum">     495 </span>            :         }
+<span class="lineNum">     496 </span>            :         return GF_OK;
+<a name="497"><span class="lineNum">     497 </span>            : }</a>
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span><span class="lineCov">       2198 : static GF_FilterProbeScore sockout_probe_url(const char *url, const char *mime)</span>
+<span class="lineNum">     500 </span>            : {
+<span class="lineNum">     501 </span><span class="lineCov">       2198 :         if (!strnicmp(url, &quot;tcp://&quot;, 6)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     502 </span><span class="lineCov">       2192 :         if (!strnicmp(url, &quot;udp://&quot;, 6)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     503 </span>            : #ifdef GPAC_HAS_SOCK_UN
+<span class="lineNum">     504 </span><span class="lineCov">       2188 :         if (!strnicmp(url, &quot;tcpu://&quot;, 7)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     505 </span><span class="lineCov">       2188 :         if (!strnicmp(url, &quot;udpu://&quot;, 7)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     506 </span>            : #endif
+<span class="lineNum">     507 </span><span class="lineCov">       2188 :         return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">     508 </span>            : }
+<span class="lineNum">     509 </span>            : 
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            : #define OFFS(_n)        #_n, offsetof(GF_SockOutCtx, _n)
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            : static const GF_FilterArgs SockOutArgs[] =
+<span class="lineNum">     514 </span>            : {
+<span class="lineNum">     515 </span>            :         { OFFS(dst), &quot;URL of destination - see filter help&quot;, GF_PROP_NAME, NULL, NULL, 0},
+<span class="lineNum">     516 </span>            :         { OFFS(sockbuf), &quot;block size used to read file&quot;, GF_PROP_UINT, &quot;65536&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     517 </span>            :         { OFFS(port), &quot;default port if not specified&quot;, GF_PROP_UINT, &quot;1234&quot;, NULL, 0},
+<span class="lineNum">     518 </span>            :         { OFFS(ifce), &quot;default multicast interface&quot;, GF_PROP_NAME, NULL, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     519 </span>            :         { OFFS(ext), &quot;file extension of pipe data - see filter help&quot;, GF_PROP_STRING, NULL, NULL, 0},
+<span class="lineNum">     520 </span>            :         { OFFS(mime), &quot;mime type of pipe data - see filter help&quot;, GF_PROP_STRING, NULL, NULL, 0},
+<span class="lineNum">     521 </span>            :         { OFFS(listen), &quot;indicate the output socket works in server mode&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     522 </span>            :         { OFFS(maxc), &quot;max number of concurrent connections&quot;, GF_PROP_UINT, &quot;+I&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     523 </span>            :         { OFFS(ka), &quot;keep socket alive if no more connections&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     524 </span>            :         { OFFS(kp), &quot;keep packets in queue if no more clients&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     525 </span>            :         { OFFS(start), &quot;set playback start offset. Negative value means percent of media duration with -1 equal to duration&quot;, GF_PROP_DOUBLE, &quot;0.0&quot;, NULL, 0},
+<span class="lineNum">     526 </span>            :         { OFFS(speed), &quot;set playback speed. If speed is negative and start is 0, start is set to -1&quot;, GF_PROP_DOUBLE, &quot;1.0&quot;, NULL, 0},
+<span class="lineNum">     527 </span>            :         { OFFS(rate), &quot;set send rate in bps, disabled by default (as fast as possible)&quot;, GF_PROP_UINT, &quot;0&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     528 </span>            :         { OFFS(pckr), &quot;reverse packet every N - see filter help&quot;, GF_PROP_FRACTION, &quot;0/0&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     529 </span>            :         { OFFS(pckd), &quot;drop packet every N - see filter help&quot;, GF_PROP_FRACTION, &quot;0/0&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     530 </span>            :         { OFFS(ttl), &quot;multicast TTL&quot;, GF_PROP_UINT, &quot;0&quot;, &quot;0-127&quot;, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     531 </span>            :         {0}
+<span class="lineNum">     532 </span>            : };
+<span class="lineNum">     533 </span>            : 
+<span class="lineNum">     534 </span>            : static const GF_FilterCapability SockOutCaps[] =
+<span class="lineNum">     535 </span>            : {
+<span class="lineNum">     536 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     537 </span>            :         CAP_STRING(GF_CAPS_INPUT,GF_PROP_PID_FILE_EXT, &quot;*&quot;),
+<span class="lineNum">     538 </span>            :         CAP_STRING(GF_CAPS_INPUT,GF_PROP_PID_MIME, &quot;*&quot;),
+<span class="lineNum">     539 </span>            : };
+<span class="lineNum">     540 </span>            : 
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            : GF_FilterRegister SockOutRegister = {
+<span class="lineNum">     543 </span>            :         .name = &quot;sockout&quot;,
+<span class="lineNum">     544 </span>            :         GF_FS_SET_DESCRIPTION(&quot;UDP/TCP output&quot;)
+<span class="lineNum">     545 </span>            : #ifndef GPAC_DISABLE_DOC
+<span class="lineNum">     546 </span>            :         .help = &quot;This filter handles generic output sockets (mono-directional) in blocking mode only.\n&quot;
+<span class="lineNum">     547 </span>            :                 &quot;The filter can work in server mode, waiting for source connections, or or in client mode, directly connecting.\n&quot;
+<span class="lineNum">     548 </span>            :                 &quot;In server mode, the filter can be instructed to keep running at the end of the stream.\n&quot;
+<span class="lineNum">     549 </span>            :                 &quot;In server mode, the default behavior is to keep input packets when no more clients are connected; &quot;
+<span class="lineNum">     550 </span>            :                 &quot;this can be adjusted though the [-kp]() option, however there is no realtime regulation of how fast packets are dropped.\n&quot;
+<span class="lineNum">     551 </span>            :                 &quot;If your sources are not real time, consider adding a real-time scheduler in the chain (cf reframer filter), or set the send [-rate]() option.\n&quot;
+<span class="lineNum">     552 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     553 </span>            :                 &quot;- UDP sockets are used for destinations URLs formatted as `udp://NAME`\n&quot;
+<span class="lineNum">     554 </span>            :                 &quot;- TCP sockets are used for destinations URLs formatted as `tcp://NAME`\n&quot;
+<span class="lineNum">     555 </span>            : #ifdef GPAC_HAS_SOCK_UN
+<span class="lineNum">     556 </span>            :                 &quot;- UDP unix domain sockets are used for destinations URLs formatted as `udpu://NAME`\n&quot;
+<span class="lineNum">     557 </span>            :                 &quot;- TCP unix domain sockets are used for destinations URLs formatted as `tcpu://NAME`\n&quot;
+<span class="lineNum">     558 </span>            : #else
+<span class="lineNum">     559 </span>            :                 &quot;Your platform does not supports unix domain sockets&quot;
+<span class="lineNum">     560 </span>            : #endif
+<span class="lineNum">     561 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     562 </span>            :                 &quot;When ports are specified in the URL and the default option separators are used (see `gpac -h doc`), the URL must either:\n&quot;
+<span class="lineNum">     563 </span>            :                 &quot;- have a trailing '/', eg `udp://localhost:1234/[:opts]`\n&quot;
+<span class="lineNum">     564 </span>            :                 &quot;- use `gpac` '/', eg `udp://localhost:1234[:gpac:opts]`\n&quot;
+<span class="lineNum">     565 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     566 </span>            :                 &quot;The socket output can be configured to drop or revert packet order for test purposes.\n&quot;
+<span class="lineNum">     567 </span>            :                 &quot;For both mode, a window size in packets is specified as the drop/revert fraction denominator, and the index of the packet to drop/revert is given as the numerator/\n&quot;
+<span class="lineNum">     568 </span>            :                 &quot;If the numerator is 0, a packet is randomly chosen in that window.\n&quot;
+<span class="lineNum">     569 </span>            :                 &quot;EX :pckd=4/10\n&quot;\
+<span class="lineNum">     570 </span>            :                 &quot;This drops every 4th packet of each 10 packet window.\n&quot;
+<span class="lineNum">     571 </span>            :                 &quot;EX :pckr=0/100\n&quot;\
+<span class="lineNum">     572 </span>            :                 &quot;This reverts the send order of one random packet in each 100 packet window.\n&quot;
+<span class="lineNum">     573 </span>            :                 &quot;\n&quot;,
+<span class="lineNum">     574 </span>            : #endif //GPAC_DISABLE_DOC
+<span class="lineNum">     575 </span>            :         .private_size = sizeof(GF_SockOutCtx),
+<span class="lineNum">     576 </span>            :         .args = SockOutArgs,
+<span class="lineNum">     577 </span>            :         SETCAPS(SockOutCaps),
+<span class="lineNum">     578 </span>            :         .probe_url = sockout_probe_url,
+<span class="lineNum">     579 </span>            :         .initialize = sockout_initialize,
+<span class="lineNum">     580 </span>            :         .finalize = sockout_finalize,
+<span class="lineNum">     581 </span>            :         .configure_pid = sockout_configure_pid,
+<span class="lineNum">     582 </span>            :         .process = sockout_process
+<span class="lineNum">     583 </span>            : };
+<a name="584"><span class="lineNum">     584 </span>            : </a>
+<span class="lineNum">     585 </span>            : 
+<span class="lineNum">     586 </span><span class="lineCov">       2877 : const GF_FilterRegister *sockout_register(GF_FilterSession *session)</span>
+<span class="lineNum">     587 </span>            : {
+<span class="lineNum">     588 </span><span class="lineCov">       2877 :         return &amp;SockOutRegister;</span>
+<span class="lineNum">     589 </span>            : }
+<span class="lineNum">     590 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

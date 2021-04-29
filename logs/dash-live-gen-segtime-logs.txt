@@ -1,0 +1,55 @@
+*** dash-live-gen-segtime logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:40 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264:dur=10 -add ./external_media/counter/counter_30s_audio.aac:dur=10 -new ./results/temp/file.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+[MP4Mux] Imported 252 frames - media duration 10.08 - track duration 10.08
+AVC|H264 duration specified at import time, may have parsed more frames than imported
+AVC|H264 parsed 256 samples (289 NALUs) - Slices: 11 I 245 P 0 B - 1 SEI - 11 IDR
+AVC|H264 Max NALU size is 32815 - stream could be optimized by setting nal_length=2
+Track Importing AAC  - SampleRate 44100 Num Channels 1
+[MP4Mux] Imported 431 frames - media duration 10.0078 - track duration 10.0067
+
+
+*** Subtest "dash-live1": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -segment-timeline -mpd-refresh 10 -time-shift 0 -dash-ctx ./results/temp/dash_ctx2 -subdur 1000 -dynamic -profile live -dash 1000 ./results/temp/file.mp4 -out ./results/temp/file.mpd" ***
+DASH Warning: using -segment-timeline with no -url-template. Forcing URL template.
+[Dasher] No template assigned, using $File$_dash$FS$$Time$
+[Dasher] Input ./results/temp/file.mp4: max audio duration 441344/44100 in the period is less than duration 1008/100, clamping will happen
+[Dasher] MPD Availability start time initialized to 1619739100669 ms
+[MPD] Generating MPD at time 2021-04-29T23:31:40.670Z
+[Dasher] AS-1 Rep 1 segment 1 done 998 ms before UTC due time
+[Dasher] updated period DID1 duration 1000 MPD time 1000
+[MPD] Generating MPD at time 2021-04-29T23:31:40.671Z
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[Dasher] updated period DID1 duration 1000 MPD time 1000
+[MPD] Generating MPD at time 2021-04-29T23:31:40.672Z
+
+
+
+*** Subtest "dash-live2": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -segment-timeline -mpd-refresh 10 -time-shift 0 -dash-ctx ./results/temp/dash_ctx2 -subdur 1000 -dynamic -profile live -dash 1000 ./results/temp/file.mp4 -out ./results/temp/file.mpd" ***
+DASH Warning: using -segment-timeline with no -url-template. Forcing URL template.
+[Dasher] No template assigned, using $File$_dash$FS$$Time$
+[Dasher] Input ./results/temp/file.mp4: max audio duration 441344/44100 in the period is less than duration 1008/100, clamping will happen
+[Dasher] AS-1 Rep 1 segment 2 done 404 ms before UTC due time
+[Dasher] removing segment file_dash0.m4s
+[Dasher] updated period DID1 duration 2000 MPD time 2000
+[MPD] Generating MPD at time 2021-04-29T23:31:42.264Z
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 2
+[Dasher] updated period DID1 duration 2000 MPD time 2000
+[MPD] Generating MPD at time 2021-04-29T23:31:42.265Z
+
+
+
+*** Subtest "dash-live3": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -segment-timeline -mpd-refresh 10 -time-shift 0 -dash-ctx ./results/temp/dash_ctx2 -subdur 1000 -last-dynamic -profile live -dash 1000 ./results/temp/file.mp4 -out ./results/temp/file.mpd" ***
+DASH Warning: using -segment-timeline with no -url-template. Forcing URL template.
+[Dasher] No template assigned, using $File$_dash$FS$$Time$
+[MPD] Generating MPD at time 2021-04-29T23:31:43.854Z
+
+
+Computing ./results/temp/file.mpd  (mpd-final) hash: 
+File hash (SHA-1): 38364001742F614BF6E667C61AEE7348AF5DB54F
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/file_dash100.m4s  (segment) hash: 
+File hash (SHA-1): 080A620CD38F68EDA8EAC838FA162D953B284414
+Hash OK for ./results/temp/file_dash100.m4s

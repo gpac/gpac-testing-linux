@@ -1,0 +1,15 @@
+ <test name="encoder-m4v-ffenc" result="OK" date="29/04/2021 23:33:38">
+
+  <stat subtest="encoder" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="55740" cpu_percent="99%" cpu_elapsed_time="0:00.10" cpu_user_time="0.08" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264  -o ./results/temp/test.cmp -graph -stats -blacklist=vtbdec,nvdec,ohevcdec</command_line>
+  </stat>
+  <stat subtest="inspect" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50708" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.cmp inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump.txt:test=encx</command_line>
+  </stat>
+  <stat subtest="encoder-mp4" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="55592" cpu_percent="100%" cpu_elapsed_time="0:00.08" cpu_user_time="0.07" cpu_kernel_time="0.00" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4  -o ./results/temp/mp4-test.cmp -graph -stats -blacklist=vtbdec,nvdec,ohevcdec</command_line>
+  </stat>
+  <stat subtest="inspect-mp4" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50344" cpu_percent="97%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/mp4-test.cmp inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump2.txt:test=encx</command_line>
+  </stat>
+ </test>

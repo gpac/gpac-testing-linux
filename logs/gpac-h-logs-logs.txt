@@ -1,0 +1,60 @@
+*** gpac-h-logs logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:19 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -h log" ***
+
+libgpac logs options:
+
+-noprog:                       disable progress messages
+-quiet:                        disable all messages, including errors
+-log-file,-lf (string):        set output log file
+-log-clock,-lc:                log time in micro sec since start time of GPAC before each log line
+-log-utc,-lu:                  log UTC time in ms before each log line
+-logs (string):                set log tools and levels.  
+  
+You can independently log different tools involved in a session.  
+log_args is formatted as a colon (':') separated list of toolX[:toolZ]@levelX  
+levelX can be one of:
+	* quiet: skip logs
+	* error: logs only error messages
+	* warning: logs error+warning messages
+	* info: logs error+warning+info messages
+	* debug: logs all messages
+
+toolX can be one of:
+	* core: libgpac core
+	* coding: bitstream formats (audio, video, scene)
+	* container: container formats (ISO File, MPEG-2 TS, AVI, ...)
+	* network: network data except RTP traffic
+	* http: HTTP traffic
+	* rtp: RTP traffic
+	* author: authoring tools (hint, import, export)
+	* sync: terminal sync layer
+	* codec: terminal codec messages
+	* parser: scene parsers (svg, xmt, bt) and other
+	* media: terminal media object management
+	* scene: scene graph and scene manager
+	* script: scripting engine messages
+	* interact: interaction engine (events, scripts, etc)
+	* smil: SMIL timing engine
+	* compose: composition engine (2D, 3D, etc)
+	* mmio: Audio/Video HW I/O management
+	* rti: various run-time stats
+	* cache: HTTP cache subsystem
+	* audio: Audio renderer and mixers
+	* mem: GPAC memory tracker
+	* dash: HTTP streaming logs
+	* module: GPAC modules (av out, font engine, 2D rasterizer)
+	* filter: filters debugging
+	* sched: filter session scheduler debugging
+	* mutex: log all mutex calls
+	* route: ROUTE (ATSC3) debugging
+	* all: all tools logged - other tools can be specified afterwards.  
+The special keyword ncl can be set to disable color logs.  
+The special keyword strict can be set to exit at first error.  
+
+Example:
+-logs=all@info:dash@debug:ncl
+This moves all log to info level, dash to debug level and disable color logs
+-proglf:                       use new line at each progress messages
+

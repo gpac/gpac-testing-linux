@@ -1,0 +1,126 @@
+*** encoder-aac-ffenc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:42 ***
+
+
+*** Subtest "encoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/count_french.mp3  -o ./results/temp/test.aac:c=aac -graph -stats " ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1219923840
+
+Filter stats - 8 filters
+	Filter fin (src=./media/auxiliary_files/count_french.mp3) : 0 input pids 1 output pids 16 tasks 715 us process time
+		13 packets sent 60060 bytes sent (18181.8 pck/sec 672 mbps)
+		* output PID count_french.mp3: 13 packets sent
+	Filter fout (dst=./results/temp/test.aac:c=aac) : 1 input pids 0 output pids 220 tasks 1255 us process time
+		218 packets processed 144485 bytes processed (173705 pck/sec 921.02 mbps)
+		* input PID audio: 218 packets received
+	Filter rfmp3 : 1 input pids 1 output pids 30 tasks 1215 us process time
+		13 packets processed 60060 bytes processed (10699.6 pck/sec 395.457 mbps)
+		385 packets sent 60060 bytes sent (316872 pck/sec 395.457 mbps)
+		* input PID count_french.mp3: 13 packets received
+		* output PID audio: 385 packets sent
+	Filter maddec "dec_mad:MAD 0.15.1 (beta)" : 1 input pids 1 output pids 391 tasks 13585 us process time
+		385 packets processed 60060 bytes processed (28340.1 pck/sec 35.3684 mbps)
+		385 packets sent 887040 bytes sent (28340.1 pck/sec 522.364 mbps)
+		* input PID audio: 385 packets received
+		* output PID audio: 385 packets sent
+	Filter ffenc "ffenc:aac" : 1 input pids 1 output pids 394 tasks 315345 us process time
+		385 packets processed 1774080 bytes processed (1220.89 pck/sec 45.0067 mbps)
+		218 packets sent 142959 bytes sent (691.306 pck/sec 3.62673 mbps)
+		* input PID audio: 385 packets received
+		* output PID audio: 218 packets sent
+	Filter ufadts : 1 input pids 1 output pids 388 tasks 647 us process time
+		218 packets processed 142959 bytes processed (336940 pck/sec 1767.65 mbps)
+		218 packets sent 144485 bytes sent (336940 pck/sec 1786.52 mbps)
+		* input PID audio: 218 packets received
+		* output PID audio: 218 packets sent
+	Filter writegen : 1 input pids 1 output pids 388 tasks 472 us process time
+		218 packets processed 144485 bytes processed (461864 pck/sec 2448.9 mbps)
+		218 packets sent 144485 bytes sent (461864 pck/sec 2448.9 mbps)
+		* input PID audio: 218 packets received
+		* output PID audio: 218 packets sent
+	Filter resample : 1 input pids 1 output pids 390 tasks 9834 us process time
+		385 packets processed 887040 bytes processed (39149.9 pck/sec 721.611 mbps)
+		385 packets sent 1774080 bytes sent (39149.9 pck/sec 1443.22 mbps)
+		* input PID audio: 385 packets received
+		* output PID audio: 385 packets sent
+Session stats - threads 1
+	Thread 1: run_time 343940 us active_time 343802 us nb_tasks 2247
+
+Total: run_time 343940 us active_time 343802 us nb_tasks 2247
+
+Filters connected:
+fin (src=./media/auxiliary_files/count_french.mp3) (ptr=0x55c58c825840)
+-(PID count_french.mp3) rfmp3 (ptr=0x55c58c82bbc0)
+--(PID audio) maddec "dec_mad:MAD 0.15.1 (beta)" (ptr=0x55c58c830ef0)
+---(PID audio) resample (ptr=0x55c58c8439b0)
+----(PID audio) ffenc "ffenc:aac" (ptr=0x55c58c837930)
+-----(PID audio) ufadts (ptr=0x55c58c840b40)
+------(PID audio) writegen (ptr=0x55c58c841eb0)
+-------(PID audio) fout (dst=./results/temp/test.aac:c=aac) (ptr=0x55c58c8282d0)
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.aac inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump.txt:test=encx" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 9D889DA1DAE22C29B42AF951A60910C23D7F5841
+Hash fail, ref hash ./hash_refs/encoder-aac-ffenc-inspect.hash was 8D8AB2E720B692ABD6B6E9FE3C8BE0CCA65C09DA
+
+*** Subtest "encoder-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4  -o ./results/temp/mp4-test.aac:c=aac -graph -stats " ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1604399232
+
+Filter stats - 8 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 5 tasks 582 us process time
+		1 packets sent 3098 bytes sent (1718.21 pck/sec 42.5842 mbps)
+		* output PID in.mp4: 1 packets sent
+	Filter fout (dst=./results/temp/mp4-test.aac:c=aac) : 1 input pids 0 output pids 12 tasks 179 us process time
+		10 packets processed 6936 bytes processed (55865.9 pck/sec 309.989 mbps)
+		* input PID in.mp4: 10 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 8 tasks 713 us process time
+		1 packets processed 3098 bytes processed (1402.52 pck/sec 34.7602 mbps)
+		16 packets sent 2496 bytes sent (22440.4 pck/sec 28.0056 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 16 packets sent
+	Filter maddec "dec_mad:MAD 0.15.1 (beta)" : 1 input pids 1 output pids 22 tasks 730 us process time
+		16 packets processed 2496 bytes processed (21917.8 pck/sec 27.3534 mbps)
+		16 packets sent 36864 bytes sent (21917.8 pck/sec 403.989 mbps)
+		* input PID in.mp4: 16 packets received
+		* output PID in.mp4: 16 packets sent
+	Filter ffenc "ffenc:aac" : 1 input pids 1 output pids 24 tasks 15614 us process time
+		16 packets processed 73728 bytes processed (1024.72 pck/sec 37.7753 mbps)
+		10 packets sent 6866 bytes sent (640.451 pck/sec 3.51787 mbps)
+		* input PID in.mp4: 16 packets received
+		* output PID in.mp4: 10 packets sent
+	Filter ufadts : 1 input pids 1 output pids 18 tasks 105 us process time
+		10 packets processed 6866 bytes processed (95238.1 pck/sec 523.124 mbps)
+		10 packets sent 6936 bytes sent (95238.1 pck/sec 528.457 mbps)
+		* input PID in.mp4: 10 packets received
+		* output PID in.mp4: 10 packets sent
+	Filter writegen : 1 input pids 1 output pids 18 tasks 91 us process time
+		10 packets processed 6936 bytes processed (109890 pck/sec 609.758 mbps)
+		10 packets sent 6936 bytes sent (109890 pck/sec 609.758 mbps)
+		* input PID in.mp4: 10 packets received
+		* output PID in.mp4: 10 packets sent
+	Filter resample : 1 input pids 1 output pids 21 tasks 487 us process time
+		16 packets processed 36864 bytes processed (32854.2 pck/sec 605.569 mbps)
+		16 packets sent 73728 bytes sent (32854.2 pck/sec 1211.14 mbps)
+		* input PID in.mp4: 16 packets received
+		* output PID in.mp4: 16 packets sent
+Session stats - threads 1
+	Thread 1: run_time 18579 us active_time 18561 us nb_tasks 136
+
+Total: run_time 18579 us active_time 18561 us nb_tasks 136
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x55de85dd9840)
+-(PID in.mp4) mp4dmx (ptr=0x55de85de0270)
+--(PID in.mp4) maddec "dec_mad:MAD 0.15.1 (beta)" (ptr=0x55de85de91f0)
+---(PID in.mp4) resample (ptr=0x55de85dfc010)
+----(PID in.mp4) ffenc "ffenc:aac" (ptr=0x55de85dea300)
+-----(PID in.mp4) ufadts (ptr=0x55de85df9120)
+------(PID in.mp4) writegen (ptr=0x55de85dfa490)
+-------(PID in.mp4) fout (dst=./results/temp/mp4-test.aac:c=aac) (ptr=0x55de85ddc230)
+
+
+*** Subtest "inspect-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/mp4-test.aac inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump2.txt:test=encx" ***
+
+Computing ./results/temp/dump2.txt  (inspect-mp4) hash: 
+File hash (SHA-1): 24F0D3A1EBA1C242C8767FCB4FB5291A75BFF078
+Hash fail, ref hash ./hash_refs/encoder-aac-ffenc-inspect-mp4.hash was 25E480D5D71BDD6A33D7C3E8D651463F724DAF52

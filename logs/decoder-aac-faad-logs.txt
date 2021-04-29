@@ -1,0 +1,40 @@
+*** decoder-aac-faad logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:28 ***
+
+
+*** Subtest "decoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4 -o ./results/temp/test.pcm -graph -stats -blacklist=ffdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1843544192
+
+Filter stats - 5 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 6 tasks 584 us process time
+		1 packets sent 5000 bytes sent (1712.33 pck/sec 68.4932 mbps)
+		* output PID in.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/test.pcm) : 1 input pids 0 output pids 20 tasks 199 us process time
+		18 packets processed 73728 bytes processed (90452.3 pck/sec 2963.94 mbps)
+		* input PID in.mp4: 18 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 9 tasks 728 us process time
+		2 packets processed 5000 bytes processed (2747.25 pck/sec 54.9451 mbps)
+		19 packets sent 4288 bytes sent (26098.9 pck/sec 47.1209 mbps)
+		* input PID in.mp4: 2 packets received
+		* output PID in.mp4: 19 packets sent
+	Filter faad "dec_faad:FAAD2" : 1 input pids 1 output pids 23 tasks 889 us process time
+		19 packets processed 4288 bytes processed (21372.3 pck/sec 38.5872 mbps)
+		18 packets sent 73728 bytes sent (20247.5 pck/sec 663.469 mbps)
+		* input PID in.mp4: 19 packets received
+		* output PID in.mp4: 18 packets sent
+	Filter writegen : 1 input pids 1 output pids 22 tasks 74 us process time
+		18 packets processed 73728 bytes processed (243243 pck/sec 7970.59 mbps)
+		18 packets sent 73728 bytes sent (243243 pck/sec 7970.59 mbps)
+		* input PID in.mp4: 18 packets received
+		* output PID in.mp4: 18 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2518 us active_time 2504 us nb_tasks 84
+
+Total: run_time 2518 us active_time 2504 us nb_tasks 84
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x5637e37dc5b0)
+-(PID in.mp4) mp4dmx (ptr=0x5637e37e20e0)
+--(PID in.mp4) faad "dec_faad:FAAD2" (ptr=0x5637e37ec550)
+---(PID in.mp4) writegen (ptr=0x5637e37ed670)
+----(PID in.mp4) fout (dst=./results/temp/test.pcm) (ptr=0x5637e37decb0)
+

@@ -1,0 +1,599 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - scenegraph/vrml_route.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">scenegraph</a> - vrml_route.c<span style="font-size: 80%;"> (source / <a href="vrml_route.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">199</td>
+            <td class="headerCovTableEntry">227</td>
+            <td class="headerCovTableEntryMed">87.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryHi">95.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2012
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / Scene Graph sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/internal/scenegraph_dev.h&gt;
+<span class="lineNum">      27 </span>            : /*MPEG4 &amp; X3D tags (for node tables &amp; script handling)*/
+<span class="lineNum">      28 </span>            : #include &lt;gpac/nodes_mpeg4.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/nodes_x3d.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #ifndef GPAC_DISABLE_VRML
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : GF_Route* gf_sg_route_exists(GF_SceneGraph *sg, GF_Node *fromNode, u32 fromField, GF_Node *toNode, u32 toField);
+<a name="34"><span class="lineNum">      34 </span>            : </a>
+<span class="lineNum">      35 </span>            : GF_EXPORT
+<span class="lineNum">      36 </span><span class="lineCov">      14227 : GF_Route *gf_sg_route_new(GF_SceneGraph *sg, GF_Node *fromNode, u32 fromField, GF_Node *toNode, u32 toField)</span>
+<span class="lineNum">      37 </span>            : {
+<span class="lineNum">      38 </span>            :         GF_Route *r;
+<span class="lineNum">      39 </span><span class="lineCov">      14227 :         if (!sg || !toNode || !fromNode) return NULL;</span>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">      14227 :         if ( (r = gf_sg_route_exists(sg, fromNode, fromField, toNode, toField)) )</span>
+<span class="lineNum">      42 </span>            :                 return r;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">      14222 :         GF_SAFEALLOC(r, GF_Route)</span>
+<span class="lineNum">      45 </span><span class="lineCov">      14222 :         if (!r) return NULL;</span>
+<span class="lineNum">      46 </span><span class="lineCov">      14222 :         r-&gt;FromNode = fromNode;</span>
+<span class="lineNum">      47 </span><span class="lineCov">      14222 :         r-&gt;FromField.fieldIndex = fromField;</span>
+<span class="lineNum">      48 </span><span class="lineCov">      14222 :         r-&gt;ToNode = toNode;</span>
+<span class="lineNum">      49 </span><span class="lineCov">      14222 :         r-&gt;ToField.fieldIndex = toField;</span>
+<span class="lineNum">      50 </span><span class="lineCov">      14222 :         r-&gt;graph = sg;</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineCov">      14222 :         if (!fromNode-&gt;sgprivate-&gt;interact) {</span>
+<span class="lineNum">      53 </span><span class="lineCov">       7038 :                 GF_SAFEALLOC(fromNode-&gt;sgprivate-&gt;interact, struct _node_interactive_ext);</span>
+<span class="lineNum">      54 </span><span class="lineCov">       7038 :                 if (!fromNode-&gt;sgprivate-&gt;interact) {</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_SCENE, (&quot;[VRML] Failed to create interact storage\n&quot;));</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :                         gf_free(r);</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :                         return NULL;</span>
+<span class="lineNum">      58 </span>            :                 }
+<span class="lineNum">      59 </span>            :         }
+<span class="lineNum">      60 </span><span class="lineCov">      14222 :         if (!fromNode-&gt;sgprivate-&gt;interact-&gt;routes) fromNode-&gt;sgprivate-&gt;interact-&gt;routes = gf_list_new();</span>
+<span class="lineNum">      61 </span><span class="lineCov">      14222 :         gf_list_add(fromNode-&gt;sgprivate-&gt;interact-&gt;routes, r);</span>
+<span class="lineNum">      62 </span><span class="lineCov">      14222 :         gf_list_add(sg-&gt;Routes, r);</span>
+<span class="lineNum">      63 </span><span class="lineCov">      14222 :         return r;</span>
+<a name="64"><span class="lineNum">      64 </span>            : }</a>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">      14227 : GF_Route* gf_sg_route_exists(GF_SceneGraph *sg, GF_Node *fromNode, u32 fromField, GF_Node *toNode, u32 toField)</span>
+<span class="lineNum">      67 </span>            : {
+<span class="lineNum">      68 </span><span class="lineCov">      14227 :         u32 i = 0;</span>
+<span class="lineNum">      69 </span>            :         GF_Route* rt;
+<span class="lineNum">      70 </span><span class="lineCov">      14227 :         if ( !fromNode-&gt;sgprivate-&gt;interact || !fromNode-&gt;sgprivate-&gt;interact-&gt;routes )</span>
+<span class="lineNum">      71 </span>            :                 return NULL;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">      33678 :         while ( (rt = (GF_Route*)gf_list_enum(fromNode-&gt;sgprivate-&gt;interact-&gt;routes, &amp;i) )) {</span>
+<span class="lineNum">      74 </span><span class="lineCov">      26504 :                 if ( rt-&gt;FromField.fieldIndex == fromField &amp;&amp; rt-&gt;ToNode == toNode &amp;&amp; rt-&gt;ToField.fieldIndex == toField )</span>
+<span class="lineNum">      75 </span>            :                         return rt;
+<span class="lineNum">      76 </span>            :         }
+<span class="lineNum">      77 </span>            :         return NULL;
+<span class="lineNum">      78 </span>            : }
+<a name="79"><span class="lineNum">      79 </span>            : </a>
+<span class="lineNum">      80 </span>            : GF_EXPORT
+<span class="lineNum">      81 </span><span class="lineCov">      15697 : void gf_sg_route_del(GF_Route *r)</span>
+<span class="lineNum">      82 </span>            : {
+<span class="lineNum">      83 </span>            :         GF_SceneGraph *sg;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :         /*remove declared routes*/
+<span class="lineNum">      86 </span><span class="lineCov">      15697 :         gf_list_del_item(r-&gt;graph-&gt;Routes, r);</span>
+<span class="lineNum">      87 </span>            :         /*remove route from node - do this regardless of setup state since the route is registered upon creation*/
+<span class="lineNum">      88 </span><span class="lineCov">      15697 :         if (r-&gt;FromNode &amp;&amp; r-&gt;FromNode-&gt;sgprivate-&gt;interact &amp;&amp; r-&gt;FromNode-&gt;sgprivate-&gt;interact-&gt;routes) {</span>
+<span class="lineNum">      89 </span><span class="lineCov">      15153 :                 gf_list_del_item(r-&gt;FromNode-&gt;sgprivate-&gt;interact-&gt;routes, r);</span>
+<span class="lineNum">      90 </span><span class="lineCov">      15153 :                 if (!gf_list_count(r-&gt;FromNode-&gt;sgprivate-&gt;interact-&gt;routes)) {</span>
+<span class="lineNum">      91 </span><span class="lineCov">       7642 :                         gf_list_del(r-&gt;FromNode-&gt;sgprivate-&gt;interact-&gt;routes);</span>
+<span class="lineNum">      92 </span><span class="lineCov">       7642 :                         r-&gt;FromNode-&gt;sgprivate-&gt;interact-&gt;routes = NULL;</span>
+<span class="lineNum">      93 </span>            :                 }
+<span class="lineNum">      94 </span>            :         }
+<span class="lineNum">      95 </span>            :         /*special case for script events: notify desdctruction*/
+<span class="lineNum">      96 </span><span class="lineCov">      15697 :         if (r-&gt;ToNode &amp;&amp; (r-&gt;ToField.fieldType==GF_SG_VRML_SCRIPT_FUNCTION) &amp;&amp; r-&gt;ToField.on_event_in) {</span>
+<span class="lineNum">      97 </span><span class="lineCov">        236 :                 r-&gt;is_setup = 0;</span>
+<span class="lineNum">      98 </span><span class="lineCov">        236 :                 r-&gt;FromNode = NULL;</span>
+<span class="lineNum">      99 </span><span class="lineCov">        236 :                 if (!r-&gt;graph-&gt;pOwningProto) r-&gt;ToField.on_event_in(r-&gt;ToNode, r);</span>
+<span class="lineNum">     100 </span>            :         }
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">      15697 :         r-&gt;is_setup = 0;</span>
+<span class="lineNum">     103 </span><span class="lineCov">      15697 :         sg = r-&gt;graph;</span>
+<span class="lineNum">     104 </span><span class="lineCov">      15697 :         while (sg-&gt;parent_scene) sg = sg-&gt;parent_scene;</span>
+<span class="lineNum">     105 </span><span class="lineCov">      15697 :         gf_list_add(sg-&gt;routes_to_destroy, r);</span>
+<span class="lineNum">     106 </span><span class="lineCov">      15697 :         gf_list_del_item(sg-&gt;routes_to_activate, r);</span>
+<span class="lineNum">     107 </span><span class="lineCov">      15697 : }</span>
+<a name="108"><span class="lineNum">     108 </span>            : </a>
+<span class="lineNum">     109 </span>            : GF_EXPORT
+<span class="lineNum">     110 </span><span class="lineCov">         38 : GF_Err gf_sg_route_del_by_id(GF_SceneGraph *sg,u32 routeID)</span>
+<span class="lineNum">     111 </span>            : {
+<span class="lineNum">     112 </span>            :         GF_Route *r;
+<span class="lineNum">     113 </span><span class="lineCov">         38 :         if(!sg) return GF_BAD_PARAM;</span>
+<span class="lineNum">     114 </span><span class="lineCov">         38 :         r = gf_sg_route_find(sg, routeID);</span>
+<span class="lineNum">     115 </span><span class="lineCov">         38 :         if (!r) return GF_BAD_PARAM;</span>
+<span class="lineNum">     116 </span><span class="lineCov">         37 :         gf_sg_route_del(r);</span>
+<span class="lineNum">     117 </span><span class="lineCov">         37 :         return GF_OK;</span>
+<a name="118"><span class="lineNum">     118 </span>            : }</a>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineCov">      51988 : void gf_sg_destroy_routes(GF_SceneGraph *sg)</span>
+<span class="lineNum">     121 </span>            : {
+<span class="lineNum">     122 </span><span class="lineCov">     119673 :         while (gf_list_count(sg-&gt;routes_to_destroy) ) {</span>
+<span class="lineNum">     123 </span><span class="lineCov">      15697 :                 GF_Route *r = (GF_Route *)gf_list_get(sg-&gt;routes_to_destroy, 0);</span>
+<span class="lineNum">     124 </span><span class="lineCov">      15697 :                 gf_list_rem(sg-&gt;routes_to_destroy, 0);</span>
+<span class="lineNum">     125 </span>            :                 gf_sg_route_unqueue(sg, r);
+<span class="lineNum">     126 </span><span class="lineCov">      15697 :                 if (r-&gt;name) gf_free(r-&gt;name);</span>
+<span class="lineNum">     127 </span><span class="lineCov">      15697 :                 gf_free(r);</span>
+<span class="lineNum">     128 </span>            :         }
+<span class="lineNum">     129 </span><span class="lineCov">      51988 : }</span>
+<a name="130"><span class="lineNum">     130 </span>            : </a>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">      49960 : void gf_sg_route_queue(GF_SceneGraph *sg, GF_Route *r)</span>
+<span class="lineNum">     133 </span>            : {
+<span class="lineNum">     134 </span>            :         u32 now;
+<span class="lineNum">     135 </span><span class="lineCov">      49960 :         if (!sg) return;</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :         /*get the top level scene (that's the only reliable one regarding simulatioin tick)*/
+<span class="lineNum">     138 </span><span class="lineCov">      59865 :         while (sg-&gt;parent_scene) sg = sg-&gt;parent_scene;</span>
+<span class="lineNum">     139 </span>            :         /*a single route may not be activated more than once in a simulation tick*/
+<span class="lineNum">     140 </span><span class="lineCov">      49960 :         now = 1 + sg-&gt;simulation_tick;</span>
+<span class="lineNum">     141 </span><span class="lineCov">      49960 :         if (r-&gt;lastActivateTime &gt;= now) return;</span>
+<span class="lineNum">     142 </span><span class="lineCov">      48440 :         r-&gt;lastActivateTime = now;</span>
+<span class="lineNum">     143 </span><span class="lineCov">      48440 :         gf_list_add(sg-&gt;routes_to_activate, r);</span>
+<span class="lineNum">     144 </span>            : }
+<span class="lineNum">     145 </span>            : 
+<a name="146"><span class="lineNum">     146 </span>            : /*activate all routes in the order they where triggered*/</a>
+<span class="lineNum">     147 </span>            : GF_EXPORT
+<span class="lineNum">     148 </span><span class="lineCov">      46389 : void gf_sg_activate_routes(GF_SceneGraph *sg)</span>
+<span class="lineNum">     149 </span>            : {
+<span class="lineNum">     150 </span>            :         GF_Route *r;
+<span class="lineNum">     151 </span>            :         GF_Node *targ;
+<span class="lineNum">     152 </span><span class="lineCov">      46389 :         if (!sg) return;</span>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineCov">      46389 :         sg-&gt;simulation_tick++;</span>
+<span class="lineNum">     155 </span><span class="lineCov">      46389 :         gf_sg_destroy_routes(sg);</span>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineCov">     141200 :         while (gf_list_count(sg-&gt;routes_to_activate)) {</span>
+<span class="lineNum">     158 </span><span class="lineCov">      48422 :                 r = (GF_Route *)gf_list_get(sg-&gt;routes_to_activate, 0);</span>
+<span class="lineNum">     159 </span><span class="lineCov">      48422 :                 gf_list_rem(sg-&gt;routes_to_activate, 0);</span>
+<span class="lineNum">     160 </span><span class="lineCov">      48422 :                 if (r) {</span>
+<span class="lineNum">     161 </span><span class="lineCov">      48422 :                         targ = r-&gt;ToNode;</span>
+<span class="lineNum">     162 </span><span class="lineCov">      48422 :                         if (gf_sg_route_activate(r)) {</span>
+<span class="lineNum">     163 </span>            : #ifdef GF_SELF_REPLACE_ENABLE
+<span class="lineNum">     164 </span>            :                                 if (sg-&gt;graph_has_been_reset) {
+<span class="lineNum">     165 </span>            :                                         sg-&gt;graph_has_been_reset = 0;
+<span class="lineNum">     166 </span>            :                                         return;
+<span class="lineNum">     167 </span>            :                                 }
+<span class="lineNum">     168 </span>            : #endif
+<span class="lineNum">     169 </span><span class="lineCov">      46736 :                                 if (r-&gt;is_setup) gf_node_changed(targ, &amp;r-&gt;ToField);</span>
+<span class="lineNum">     170 </span>            :                         }
+<span class="lineNum">     171 </span>            :                 }
+<span class="lineNum">     172 </span>            :         }
+<a name="173"><span class="lineNum">     173 </span>            : }</a>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 : void gf_sg_route_unqueue(GF_SceneGraph *sg, GF_Route *r)</span>
+<span class="lineNum">     176 </span>            : {
+<span class="lineNum">     177 </span>            :         /*get the top level scene*/
+<span class="lineNum">     178 </span><span class="lineCov">      15697 :         while (sg-&gt;parent_scene) sg = sg-&gt;parent_scene;</span>
+<span class="lineNum">     179 </span>            :         /*remove route from queue list*/
+<span class="lineNum">     180 </span><span class="lineCov">      15697 :         gf_list_del_item(sg-&gt;routes_to_activate, r);</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 : }</span>
+<a name="182"><span class="lineNum">     182 </span>            : </a>
+<span class="lineNum">     183 </span>            : GF_EXPORT
+<span class="lineNum">     184 </span><span class="lineCov">        182 : GF_Route *gf_sg_route_find(GF_SceneGraph *sg, u32 RouteID)</span>
+<span class="lineNum">     185 </span>            : {
+<span class="lineNum">     186 </span>            :         GF_Route *r;
+<span class="lineNum">     187 </span><span class="lineCov">        182 :         u32 i=0;</span>
+<span class="lineNum">     188 </span><span class="lineCov">        834 :         while ((r = (GF_Route*)gf_list_enum(sg-&gt;Routes, &amp;i))) {</span>
+<span class="lineNum">     189 </span><span class="lineCov">        527 :                 if (r-&gt;ID == RouteID) return r;</span>
+<span class="lineNum">     190 </span>            :         }
+<span class="lineNum">     191 </span>            :         return NULL;
+<span class="lineNum">     192 </span>            : }
+<a name="193"><span class="lineNum">     193 </span>            : </a>
+<span class="lineNum">     194 </span>            : GF_EXPORT
+<span class="lineNum">     195 </span><span class="lineCov">        208 : GF_Route *gf_sg_route_find_by_name(GF_SceneGraph *sg, char *name)</span>
+<span class="lineNum">     196 </span>            : {
+<span class="lineNum">     197 </span>            :         GF_Route *r;
+<span class="lineNum">     198 </span>            :         u32 i;
+<span class="lineNum">     199 </span><span class="lineCov">        208 :         if (!sg || !name) return NULL;</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">        208 :         i=0;</span>
+<span class="lineNum">     202 </span><span class="lineCov">        873 :         while ((r = (GF_Route*)gf_list_enum(sg-&gt;Routes, &amp;i))) {</span>
+<span class="lineNum">     203 </span><span class="lineCov">        462 :                 if (r-&gt;name &amp;&amp; !strcmp(r-&gt;name, name)) return r;</span>
+<span class="lineNum">     204 </span>            :         }
+<span class="lineNum">     205 </span>            :         return NULL;
+<span class="lineNum">     206 </span>            : }
+<a name="207"><span class="lineNum">     207 </span>            : </a>
+<span class="lineNum">     208 </span>            : GF_EXPORT
+<span class="lineNum">     209 </span><span class="lineCov">         84 : GF_Err gf_sg_route_set_id(GF_Route *route, u32 ID)</span>
+<span class="lineNum">     210 </span>            : {
+<span class="lineNum">     211 </span>            :         GF_Route *ptr;
+<span class="lineNum">     212 </span><span class="lineCov">         84 :         if (!route || !ID) return GF_BAD_PARAM;</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span><span class="lineCov">         84 :         ptr = gf_sg_route_find(route-&gt;graph, ID);</span>
+<span class="lineNum">     215 </span><span class="lineCov">         84 :         if (ptr) return GF_BAD_PARAM;</span>
+<span class="lineNum">     216 </span><span class="lineCov">         84 :         route-&gt;ID = ID;</span>
+<span class="lineNum">     217 </span><span class="lineCov">         84 :         return GF_OK;</span>
+<span class="lineNum">     218 </span>            : }
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            : #if 0 //unused
+<span class="lineNum">     221 </span>            : u32 gf_sg_route_get_id(GF_Route *route)
+<span class="lineNum">     222 </span>            : {
+<span class="lineNum">     223 </span>            :         return route-&gt;ID;
+<span class="lineNum">     224 </span>            : }
+<span class="lineNum">     225 </span>            : #endif
+<a name="226"><span class="lineNum">     226 </span>            : </a>
+<span class="lineNum">     227 </span>            : GF_EXPORT
+<span class="lineNum">     228 </span><span class="lineCov">         69 : GF_Err gf_sg_route_set_name(GF_Route *route, char *name)</span>
+<span class="lineNum">     229 </span>            : {
+<span class="lineNum">     230 </span>            :         GF_Route *ptr;
+<span class="lineNum">     231 </span><span class="lineCov">         69 :         if (!name || !route) return GF_BAD_PARAM;</span>
+<span class="lineNum">     232 </span><span class="lineCov">         69 :         ptr = gf_sg_route_find_by_name(route-&gt;graph, name);</span>
+<span class="lineNum">     233 </span><span class="lineCov">         69 :         if (ptr) return GF_BAD_PARAM;</span>
+<span class="lineNum">     234 </span><span class="lineCov">         69 :         if (route-&gt;name) gf_free(route-&gt;name);</span>
+<span class="lineNum">     235 </span><span class="lineCov">         69 :         route-&gt;name = gf_strdup(name);</span>
+<span class="lineNum">     236 </span><span class="lineCov">         69 :         return GF_OK;</span>
+<span class="lineNum">     237 </span>            : }
+<a name="238"><span class="lineNum">     238 </span>            : </a>
+<span class="lineNum">     239 </span>            : GF_EXPORT
+<span class="lineNum">     240 </span><span class="lineCov">          3 : char *gf_sg_route_get_name(GF_Route *route)</span>
+<span class="lineNum">     241 </span>            : {
+<span class="lineNum">     242 </span><span class="lineCov">          3 :         return route-&gt;name;</span>
+<a name="243"><span class="lineNum">     243 </span>            : }</a>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">      10162 : void gf_sg_route_setup(GF_Route *r)</span>
+<span class="lineNum">     246 </span>            : {
+<span class="lineNum">     247 </span><span class="lineCov">      10162 :         gf_node_get_field(r-&gt;FromNode, r-&gt;FromField.fieldIndex, &amp;r-&gt;FromField);</span>
+<span class="lineNum">     248 </span><span class="lineCov">      10162 :         gf_node_get_field(r-&gt;ToNode, r-&gt;ToField.fieldIndex, &amp;r-&gt;ToField);</span>
+<span class="lineNum">     249 </span><span class="lineCov">      10162 :         switch (r-&gt;FromField.fieldType) {</span>
+<span class="lineNum">     250 </span><span class="lineCov">         12 :         case GF_SG_VRML_MFNODE:</span>
+<span class="lineNum">     251 </span><span class="lineCov">         12 :                 if (r-&gt;ToField.fieldType != GF_SG_VRML_MFNODE) return;</span>
+<span class="lineNum">     252 </span>            :                 break;
+<span class="lineNum">     253 </span><span class="lineCov">         52 :         case GF_SG_VRML_SFNODE:</span>
+<span class="lineNum">     254 </span><span class="lineCov">         52 :                 if (r-&gt;ToField.fieldType != GF_SG_VRML_SFNODE) return;</span>
+<span class="lineNum">     255 </span>            :                 break;
+<span class="lineNum">     256 </span>            :         }
+<span class="lineNum">     257 </span><span class="lineCov">      10162 :         r-&gt;is_setup = 1;</span>
+<span class="lineNum">     258 </span>            : }
+<a name="259"><span class="lineNum">     259 </span>            : </a>
+<span class="lineNum">     260 </span>            : /*send event out of proto - all ISed fields are ignored*/
+<span class="lineNum">     261 </span><span class="lineCov">      37835 : void gf_node_event_out_proto(GF_Node *node, u32 FieldIndex)</span>
+<span class="lineNum">     262 </span>            : {
+<span class="lineNum">     263 </span>            :         u32 i;
+<span class="lineNum">     264 </span>            :         GF_Route *r;
+<span class="lineNum">     265 </span><span class="lineCov">      38595 :         if (!node) return;</span>
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span><span class="lineCov">      37835 :         if (!node-&gt;sgprivate-&gt;interact) return;</span>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            :         //search for routes to activate in the order they where declared
+<span class="lineNum">     270 </span><span class="lineCov">      37075 :         i=0;</span>
+<span class="lineNum">     271 </span><span class="lineCov">     318017 :         while ((r = (GF_Route*)gf_list_enum(node-&gt;sgprivate-&gt;interact-&gt;routes, &amp;i))) {</span>
+<span class="lineNum">     272 </span><span class="lineCov">     243867 :                 if (r-&gt;IS_route) continue;</span>
+<span class="lineNum">     273 </span><span class="lineCov">      25690 :                 if (r-&gt;FromNode != node) continue;</span>
+<span class="lineNum">     274 </span><span class="lineCov">      25690 :                 if (r-&gt;FromField.fieldIndex != FieldIndex) continue;</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :                 gf_sg_route_queue(node-&gt;sgprivate-&gt;scenegraph, r);</span>
+<span class="lineNum">     276 </span>            :         }
+<a name="277"><span class="lineNum">     277 </span>            : }</a>
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span><span class="lineCov">      71110 : Bool gf_sg_route_activate(GF_Route *r)</span>
+<span class="lineNum">     280 </span>            : {
+<span class="lineNum">     281 </span>            :         Bool ret;
+<span class="lineNum">     282 </span>            :         /*URL/String conversion clone*/
+<span class="lineNum">     283 </span>            :         void VRML_FieldCopyCast(void *dest, u32 dst_field_type, void *orig, u32 ori_field_type);
+<span class="lineNum">     284 </span>            :         assert(r-&gt;FromNode);
+<span class="lineNum">     285 </span><span class="lineCov">      71110 :         if (!r-&gt;is_setup) {</span>
+<span class="lineNum">     286 </span><span class="lineCov">       9298 :                 gf_sg_route_setup(r);</span>
+<span class="lineNum">     287 </span><span class="lineCov">       9298 :                 if (!r-&gt;is_setup) return 0;</span>
+<span class="lineNum">     288 </span>            :                 /*special case when initing ISed routes on eventOuts: skip*/
+<span class="lineNum">     289 </span><span class="lineCov">       9298 :                 if (r-&gt;IS_route) {</span>
+<span class="lineNum">     290 </span><span class="lineCov">       8506 :                         if (r-&gt;FromField.eventType == GF_SG_EVENT_OUT) return 0;</span>
+<span class="lineNum">     291 </span><span class="lineCov">       7714 :                         if (r-&gt;ToField.eventType == GF_SG_EVENT_OUT) return 0;</span>
+<span class="lineNum">     292 </span>            :                 }
+<span class="lineNum">     293 </span><span class="lineCov">      16220 :                 if (r-&gt;IS_route &amp;&amp; ((r-&gt;ToNode-&gt;sgprivate-&gt;tag==TAG_MPEG4_Script)</span>
+<span class="lineNum">     294 </span>            : #ifndef GPAC_DISABLE_X3D
+<span class="lineNum">     295 </span><span class="lineCov">       7714 :                                     || (r-&gt;ToNode-&gt;sgprivate-&gt;tag==TAG_X3D_Script)</span>
+<span class="lineNum">     296 </span>            : #endif
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                                    ) &amp;&amp; ((r-&gt;ToField.eventType==GF_SG_EVENT_IN) /*|| (r-&gt;ToField.eventType==GF_SG_EVENT_FIELD)*/)</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :                         &amp;&amp; r-&gt;FromField.eventType==GF_SG_EVENT_IN) {</span>
+<span class="lineNum">     299 </span>            :                         return 0;
+<span class="lineNum">     300 </span>            :                 }
+<span class="lineNum">     301 </span>            :         }
+<span class="lineNum">     302 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     303 </span><span class="lineCov">      70318 :         if (gf_log_tool_level_on(GF_LOG_INTERACT, GF_LOG_DEBUG)) {</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :                 if (r-&gt;IS_route) {</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_INTERACT, (&quot;[VRML Event] executing %s.%s IS %s.%s&quot;, gf_node_get_name(r-&gt;FromNode), r-&gt;FromField.name, gf_node_get_name(r-&gt;ToNode), r-&gt;ToField.name));</span>
+<span class="lineNum">     306 </span>            :                 } else {
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_INTERACT, (&quot;[VRML Event] executing ROUTE %s.%s TO %s.%s&quot;, gf_node_get_name(r-&gt;FromNode), r-&gt;FromField.name, gf_node_get_name(r-&gt;ToNode), r-&gt;ToField.name));</span>
+<span class="lineNum">     308 </span>            :                 }
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :                 if (r-&gt;FromField.fieldType==GF_SG_VRML_SFBOOL) {</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_INTERACT, (&quot;\tBOOL VAL: %d\n&quot;, *((SFBool*)r-&gt;FromField.far_ptr)));</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :                 } else if (r-&gt;FromField.fieldType==GF_SG_VRML_SFINT32) {</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_INTERACT, (&quot;\tINT VAL: %d\n&quot;, *((SFInt32*)r-&gt;FromField.far_ptr)));</span>
+<span class="lineNum">     313 </span>            :                 } else {
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_INTERACT, (&quot;\n&quot;));</span>
+<span class="lineNum">     315 </span>            :                 }
+<span class="lineNum">     316 </span>            :         }
+<span class="lineNum">     317 </span>            : #endif
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            :         ret = 1;
+<span class="lineNum">     320 </span><span class="lineCov">      70318 :         switch (r-&gt;FromField.fieldType) {</span>
+<span class="lineNum">     321 </span><span class="lineCov">         78 :         case GF_SG_VRML_SFNODE:</span>
+<span class="lineNum">     322 </span><span class="lineCov">         78 :                 if (* (GF_Node **) r-&gt;ToField.far_ptr != * (GF_Node **) r-&gt;FromField.far_ptr) {</span>
+<span class="lineNum">     323 </span>            :                         GF_Node *n = * (GF_Node **) r-&gt;ToField.far_ptr;
+<span class="lineNum">     324 </span>            :                         /*delete instance*/
+<span class="lineNum">     325 </span><span class="lineCov">         24 :                         if (n) gf_node_unregister(n, r-&gt;ToNode);</span>
+<span class="lineNum">     326 </span>            :                         /*and use the node*/
+<span class="lineNum">     327 </span><span class="lineCov">         24 :                         * (GF_Node **) r-&gt;ToField.far_ptr = * (GF_Node **) r-&gt;FromField.far_ptr;</span>
+<span class="lineNum">     328 </span><span class="lineCov">         24 :                         n = * (GF_Node **) r-&gt;FromField.far_ptr;</span>
+<span class="lineNum">     329 </span><span class="lineCov">         24 :                         gf_node_register(n, r-&gt;ToNode);</span>
+<span class="lineNum">     330 </span>            :                 }
+<span class="lineNum">     331 </span>            :                 break;
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :         /*move all pointers to dest*/
+<span class="lineNum">     334 </span><span class="lineCov">         18 :         case GF_SG_VRML_MFNODE:</span>
+<span class="lineNum">     335 </span>            :         {
+<span class="lineNum">     336 </span><span class="lineCov">         18 :                 GF_ChildNodeItem *last = NULL;</span>
+<span class="lineNum">     337 </span><span class="lineCov">         18 :                 GF_ChildNodeItem *orig = *(GF_ChildNodeItem **)r-&gt;FromField.far_ptr;</span>
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :                 /*empty list*/
+<span class="lineNum">     340 </span><span class="lineCov">         18 :                 gf_node_unregister_children(r-&gt;ToNode, *(GF_ChildNodeItem **)r-&gt;ToField.far_ptr );</span>
+<span class="lineNum">     341 </span><span class="lineCov">         18 :                 *(GF_ChildNodeItem **)r-&gt;ToField.far_ptr = NULL;</span>
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span><span class="lineCov">         42 :                 while (orig) {</span>
+<span class="lineNum">     344 </span><span class="lineCov">          6 :                         gf_node_list_add_child_last( (GF_ChildNodeItem **)r-&gt;ToField.far_ptr, orig-&gt;node, &amp;last);</span>
+<span class="lineNum">     345 </span><span class="lineCov">          6 :                         gf_node_register(orig-&gt;node, r-&gt;ToNode);</span>
+<span class="lineNum">     346 </span><span class="lineCov">          6 :                         orig = orig-&gt;next;</span>
+<span class="lineNum">     347 </span>            :                 }
+<span class="lineNum">     348 </span>            :         }
+<span class="lineNum">     349 </span><span class="lineCov">         18 :         break;</span>
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span><span class="lineCov">      70222 :         default:</span>
+<span class="lineNum">     352 </span><span class="lineCov">      70222 :                 if (r-&gt;ToField.fieldType==r-&gt;FromField.fieldType) {</span>
+<span class="lineNum">     353 </span>            :                         /*if unchanged don't invalidate dst node*/
+<span class="lineNum">     354 </span><span class="lineCov">      69950 :                         if (gf_sg_vrml_field_equal(r-&gt;ToField.far_ptr, r-&gt;FromField.far_ptr, r-&gt;FromField.fieldType)) {</span>
+<span class="lineNum">     355 </span>            :                                 ret = 0;
+<span class="lineNum">     356 </span>            :                         } else {
+<span class="lineNum">     357 </span><span class="lineCov">      51155 :                                 gf_sg_vrml_field_copy(r-&gt;ToField.far_ptr, r-&gt;FromField.far_ptr, r-&gt;FromField.fieldType);</span>
+<span class="lineNum">     358 </span>            :                         }
+<span class="lineNum">     359 </span>            :                 }
+<span class="lineNum">     360 </span>            :                 /*typecast URL &lt;-&gt; string if needed*/
+<span class="lineNum">     361 </span>            :                 else {
+<span class="lineNum">     362 </span><span class="lineCov">        272 :                         VRML_FieldCopyCast(r-&gt;ToField.far_ptr, r-&gt;ToField.fieldType, r-&gt;FromField.far_ptr, r-&gt;FromField.fieldType);</span>
+<span class="lineNum">     363 </span>            :                 }
+<span class="lineNum">     364 </span>            :                 break;
+<span class="lineNum">     365 </span>            :         }
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            :         //don't notify dest change for generic function since the dest is not a node
+<span class="lineNum">     368 </span><span class="lineCov">      70318 :         if (r-&gt;ToField.fieldType==GF_SG_VRML_GENERIC_FUNCTION) {</span>
+<span class="lineNum">     369 </span>            :                 ret = 0;
+<span class="lineNum">     370 </span>            :         }
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     373 </span><span class="lineCov">      70318 :         if (gf_log_tool_level_on(GF_LOG_INTERACT, GF_LOG_DEBUG)) {</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_INTERACT, (&quot;[VRML Route] field copy/casted\n&quot;));</span>
+<span class="lineNum">     375 </span>            :         }
+<span class="lineNum">     376 </span>            : #endif
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span>            :         //if this is a supported eventIn call watcher
+<span class="lineNum">     379 </span><span class="lineCov">      70318 :         if (r-&gt;ToField.on_event_in) {</span>
+<span class="lineNum">     380 </span><span class="lineCov">      24264 :                 r-&gt;ToField.on_event_in(r-&gt;ToNode, r);</span>
+<span class="lineNum">     381 </span>            :         }
+<span class="lineNum">     382 </span>            :         //if this is a script eventIn call directly script
+<span class="lineNum">     383 </span><span class="lineCov">      92108 :         else if (((r-&gt;ToNode-&gt;sgprivate-&gt;tag==TAG_MPEG4_Script)</span>
+<span class="lineNum">     384 </span>            : #ifndef GPAC_DISABLE_X3D
+<span class="lineNum">     385 </span><span class="lineCov">      46054 :                   || (r-&gt;ToNode-&gt;sgprivate-&gt;tag==TAG_X3D_Script)</span>
+<span class="lineNum">     386 </span>            : #endif
+<span class="lineNum">     387 </span><span class="lineCov">       1759 :                  ) &amp;&amp; ((r-&gt;ToField.eventType==GF_SG_EVENT_IN) /*|| (r-&gt;ToField.eventType==GF_SG_EVENT_FIELD)*/) ) {</span>
+<span class="lineNum">     388 </span><span class="lineCov">       1759 :                 gf_sg_script_event_in(r-&gt;ToNode, &amp;r-&gt;ToField);</span>
+<span class="lineNum">     389 </span>            :         }
+<span class="lineNum">     390 </span>            :         //check if ISed or not - this will notify the node of any changes
+<span class="lineNum">     391 </span>            :         else {
+<span class="lineNum">     392 </span><span class="lineCov">      44295 :                 gf_sg_proto_propagate_event(r-&gt;ToNode, r-&gt;ToField.fieldIndex, r-&gt;FromNode);</span>
+<span class="lineNum">     393 </span>            :                 /*if not an ISed field, propagate (otherwise ROUTE is executed just below)*/
+<span class="lineNum">     394 </span><span class="lineCov">      44295 :                 if (r-&gt;ToField.eventType != GF_SG_EVENT_EXPOSED_FIELD)</span>
+<span class="lineNum">     395 </span><span class="lineCov">        120 :                         gf_sg_proto_propagate_event(r-&gt;ToNode, r-&gt;ToField.fieldIndex, r-&gt;FromNode);</span>
+<span class="lineNum">     396 </span>            :                 /*only happen on proto, an eventOut may route to an eventOut*/
+<span class="lineNum">     397 </span><span class="lineCov">      44295 :                 if (r-&gt;IS_route &amp;&amp; r-&gt;ToField.eventType==GF_SG_EVENT_OUT)</span>
+<span class="lineNum">     398 </span><span class="lineCov">         98 :                         gf_node_event_out(r-&gt;ToNode, r-&gt;ToField.fieldIndex);</span>
+<span class="lineNum">     399 </span>            :         }
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            :         /*and signal routes on exposed fields if field changed*/
+<span class="lineNum">     402 </span><span class="lineCov">      70318 :         if (r-&gt;ToField.eventType == GF_SG_EVENT_EXPOSED_FIELD) {</span>
+<span class="lineNum">     403 </span><span class="lineCov">      44175 :                 if (r-&gt;IS_route)</span>
+<span class="lineNum">     404 </span><span class="lineCov">      20564 :                         gf_node_event_out_proto(r-&gt;ToNode, r-&gt;ToField.fieldIndex);</span>
+<span class="lineNum">     405 </span>            :                 else
+<span class="lineNum">     406 </span><span class="lineCov">      23611 :                         gf_node_event_out(r-&gt;ToNode, r-&gt;ToField.fieldIndex);</span>
+<span class="lineNum">     407 </span>            :         }
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     410 </span><span class="lineCov">      70318 :         if (gf_log_tool_level_on(GF_LOG_INTERACT, GF_LOG_DEBUG)) {</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_INTERACT, (&quot;[VRML Route] done executing (res %d)\n&quot;, ret));</span>
+<span class="lineNum">     412 </span>            :         }
+<span class="lineNum">     413 </span>            : #endif
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span>            :         return ret;
+<span class="lineNum">     416 </span>            : }
+<span class="lineNum">     417 </span>            : 
+<a name="418"><span class="lineNum">     418 </span>            : </a>
+<span class="lineNum">     419 </span>            : GF_EXPORT
+<span class="lineNum">     420 </span><span class="lineCov">     125467 : void gf_node_event_out(GF_Node *node, u32 FieldIndex)</span>
+<span class="lineNum">     421 </span>            : {
+<span class="lineNum">     422 </span>            :         u32 i;
+<span class="lineNum">     423 </span>            :         GF_Route *r;
+<span class="lineNum">     424 </span><span class="lineCov">     183981 :         if (!node) return;</span>
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            :         /*node has no routes*/
+<span class="lineNum">     427 </span><span class="lineCov">     125467 :         if (!node-&gt;sgprivate-&gt;interact || !node-&gt;sgprivate-&gt;interact-&gt;routes) return;</span>
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span>            :         //search for routes to activate in the order they where declared
+<span class="lineNum">     430 </span><span class="lineCov">      66953 :         i=0;</span>
+<span class="lineNum">     431 </span><span class="lineCov">     226540 :         while ((r = (GF_Route*)gf_list_enum(node-&gt;sgprivate-&gt;interact-&gt;routes, &amp;i))) {</span>
+<span class="lineNum">     432 </span><span class="lineCov">      92634 :                 if (r-&gt;FromNode != node) continue;</span>
+<span class="lineNum">     433 </span><span class="lineCov">      92634 :                 if (r-&gt;FromField.fieldIndex != FieldIndex) continue;</span>
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span>            :                 /*no postpone for IS routes*/
+<span class="lineNum">     436 </span><span class="lineCov">      46671 :                 if (r-&gt;IS_route) {</span>
+<span class="lineNum">     437 </span><span class="lineCov">        278 :                         if (gf_sg_route_activate(r))</span>
+<span class="lineNum">     438 </span><span class="lineCov">        277 :                                 gf_node_changed(r-&gt;ToNode, &amp;r-&gt;ToField);</span>
+<span class="lineNum">     439 </span>            :                 }
+<span class="lineNum">     440 </span>            :                 //queue
+<span class="lineNum">     441 </span>            :                 else {
+<span class="lineNum">     442 </span><span class="lineCov">      46393 :                         gf_sg_route_queue(node-&gt;sgprivate-&gt;scenegraph, r);</span>
+<span class="lineNum">     443 </span>            :                 }
+<span class="lineNum">     444 </span>            :         }
+<span class="lineNum">     445 </span>            : }
+<a name="446"><span class="lineNum">     446 </span>            : </a>
+<span class="lineNum">     447 </span>            : GF_EXPORT
+<span class="lineNum">     448 </span><span class="lineCov">       1746 : void gf_node_event_out_str(GF_Node *node, const char *eventName)</span>
+<span class="lineNum">     449 </span>            : {
+<span class="lineNum">     450 </span>            :         u32 i;
+<span class="lineNum">     451 </span>            :         GF_Route *r;
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span>            :         /*node has no routes*/
+<span class="lineNum">     454 </span><span class="lineCov">       3492 :         if (!node-&gt;sgprivate-&gt;interact || !node-&gt;sgprivate-&gt;interact-&gt;routes) return;</span>
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :         //search for routes to activate in the order they where declared
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :         i=0;</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :         while ((r = (GF_Route*)gf_list_enum(node-&gt;sgprivate-&gt;interact-&gt;routes, &amp;i))) {</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :                 if (!r-&gt;is_setup) gf_sg_route_setup(r);</span>
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :                 if (stricmp(r-&gt;FromField.name, eventName)) continue;</span>
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            :                 //no postpone
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :                 if (r-&gt;IS_route) {</span>
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :                         gf_sg_route_activate(r);</span>
+<span class="lineNum">     465 </span>            :                 }
+<span class="lineNum">     466 </span>            :                 //queue
+<span class="lineNum">     467 </span>            :                 else {
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :                         gf_sg_route_queue(node-&gt;sgprivate-&gt;scenegraph, r);</span>
+<span class="lineNum">     469 </span>            :                 }
+<span class="lineNum">     470 </span>            :         }
+<span class="lineNum">     471 </span>            : }
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span>            : typedef struct
+<span class="lineNum">     474 </span>            : {
+<span class="lineNum">     475 </span>            :         GF_Route r;
+<span class="lineNum">     476 </span>            :         void ( *route_callback) (void *param, GF_FieldInfo *from_field);
+<a name="477"><span class="lineNum">     477 </span>            : } GF_RouteToFunction;</a>
+<span class="lineNum">     478 </span>            : 
+<span class="lineNum">     479 </span><span class="lineCov">          1 : static void on_route_to_function(GF_Node *node, GF_Route *r)</span>
+<span class="lineNum">     480 </span>            : {
+<span class="lineNum">     481 </span>            :         GF_RouteToFunction *rf = (GF_RouteToFunction *)r;
+<span class="lineNum">     482 </span><span class="lineCov">          1 :         rf-&gt;route_callback(r-&gt;ToNode, &amp;r-&gt;FromField);</span>
+<span class="lineNum">     483 </span><span class="lineCov">          1 : }</span>
+<a name="484"><span class="lineNum">     484 </span>            : </a>
+<span class="lineNum">     485 </span>            : GF_EXPORT
+<span class="lineNum">     486 </span><span class="lineCov">        209 : void gf_sg_route_new_to_callback(GF_SceneGraph *sg, GF_Node *fromNode, u32 fromField, void *cbk, void ( *route_callback) (void *param, GF_FieldInfo *from_field) )</span>
+<span class="lineNum">     487 </span>            : {
+<span class="lineNum">     488 </span>            :         GF_Route *r;
+<span class="lineNum">     489 </span>            :         GF_RouteToFunction *rf;
+<span class="lineNum">     490 </span><span class="lineCov">        209 :         GF_SAFEALLOC(rf, GF_RouteToFunction);</span>
+<span class="lineNum">     491 </span><span class="lineCov">        209 :         if (!rf) return;</span>
+<span class="lineNum">     492 </span><span class="lineCov">        209 :         rf-&gt;route_callback = route_callback;</span>
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span>            :         r = (GF_Route *)rf;
+<span class="lineNum">     495 </span><span class="lineCov">        209 :         r-&gt;FromNode = fromNode;</span>
+<span class="lineNum">     496 </span><span class="lineCov">        209 :         r-&gt;FromField.fieldIndex = fromField;</span>
+<span class="lineNum">     497 </span><span class="lineCov">        209 :         gf_node_get_field(r-&gt;FromNode, fromField, &amp;r-&gt;FromField);</span>
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span><span class="lineCov">        209 :         r-&gt;ToNode = (GF_Node *) cbk;</span>
+<span class="lineNum">     500 </span><span class="lineCov">        209 :         r-&gt;ToField.fieldType = GF_SG_VRML_GENERIC_FUNCTION;</span>
+<span class="lineNum">     501 </span><span class="lineCov">        209 :         r-&gt;ToField.on_event_in = on_route_to_function;</span>
+<span class="lineNum">     502 </span><span class="lineCov">        209 :         r-&gt;ToField.eventType = GF_SG_EVENT_IN;</span>
+<span class="lineNum">     503 </span><span class="lineCov">        209 :         r-&gt;ToField.far_ptr = NULL;</span>
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span><span class="lineCov">        209 :         r-&gt;is_setup = 1;</span>
+<span class="lineNum">     506 </span><span class="lineCov">        209 :         r-&gt;graph = sg;</span>
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span><span class="lineCov">        209 :         if (!fromNode-&gt;sgprivate-&gt;interact) {</span>
+<span class="lineNum">     509 </span><span class="lineCov">        209 :                 GF_SAFEALLOC(fromNode-&gt;sgprivate-&gt;interact, struct _node_interactive_ext);</span>
+<span class="lineNum">     510 </span><span class="lineCov">        209 :                 if (!fromNode-&gt;sgprivate-&gt;interact) {</span>
+<span class="lineNum">     511 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_SCENE, (&quot;[VRML] Failed to create interact storage\n&quot;));</span>
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :                         gf_free(r);</span>
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :                         return;</span>
+<span class="lineNum">     514 </span>            :                 }
+<span class="lineNum">     515 </span>            :         }
+<span class="lineNum">     516 </span><span class="lineCov">        209 :         if (!fromNode-&gt;sgprivate-&gt;interact-&gt;routes) fromNode-&gt;sgprivate-&gt;interact-&gt;routes = gf_list_new();</span>
+<span class="lineNum">     517 </span><span class="lineCov">        209 :         gf_list_add(fromNode-&gt;sgprivate-&gt;interact-&gt;routes, r);</span>
+<span class="lineNum">     518 </span><span class="lineCov">        209 :         gf_list_add(fromNode-&gt;sgprivate-&gt;scenegraph-&gt;Routes, r);</span>
+<span class="lineNum">     519 </span>            : }
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            : 
+<span class="lineNum">     522 </span>            : #endif  /*GPAC_DISABLE_VRML*/
+<span class="lineNum">     523 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

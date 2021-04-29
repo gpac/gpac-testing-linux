@@ -1,0 +1,55 @@
+*** mp4box-io-bad_jfif.jpg logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:47 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/bad_jfif.jpg" ***
+Import probing results for ./external_media/import/bad_jfif.jpg:
+File has 1 tracks
+- Track 1 type: Video - Codec JPEG Image
+	Size 4320x3240
+
+For more details, use `gpac -i bad_jfif.jpg inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/bad_jfif.jpg.mp4  (add) hash: 
+File hash (SHA-1): 711BCE5E3E875E209B5EEEF719A9AA1996754660
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/bad_jfif.jpg -new ./results/temp/bad_jfif.jpg.mp4" ***
+Track Importing JPEG - Width 4320 Height 3240 FPS 25/1
+
+Computing ./results/temp/bad_jfif.jpg.1.tmp  (diso) hash: 
+File hash (SHA-1): 30A03B6D72568E79EFDAE167BFFEA300FFE8BE87
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/bad_jfif.jpg.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:01.000
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 1000
+Media Duration 00:00:01.000 
+Media Info: Language "Undetermined (und)" - Type "vide:jpeg" - 1 samples
+Visual Sample Entry Info: width=4320 height=3240 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=4320 height=3240
+JPEG Image - Resolution 4320 x 3240
+	RFC6381 Codec Parameters: mp4v.6C
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1000 / 1000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/bad_jfif.jpg.mp4 -out ./results/temp/bad_jfif.jpg.1.tmp" ***
+
+Computing ./results/temp/bad_jfif.jpg.2.tmp  (dts) hash: 
+File hash (SHA-1): 6E1A79C1B9EC53389D2EBF1EA4824F4100CF96F5
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/bad_jfif.jpg.mp4 -out ./results/temp/bad_jfif.jpg.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/bad_jfif.jpg.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 5BCBBEAA46A7D5286C0F93F3971CC0ACF91DDEDE

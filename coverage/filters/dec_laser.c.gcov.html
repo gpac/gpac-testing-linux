@@ -1,0 +1,350 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dec_laser.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dec_laser.c<span style="font-size: 80%;"> (source / <a href="dec_laser.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">83</td>
+            <td class="headerCovTableEntry">100</td>
+            <td class="headerCovTableEntryMed">83.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2005-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / LASeR decoder filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #ifndef GPAC_DISABLE_LASER
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &lt;gpac/internal/compositor_dev.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;gpac/laser.h&gt;
+<span class="lineNum">      32 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : typedef struct
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span>            :         GF_Scene *scene;
+<span class="lineNum">      37 </span>            :         GF_ObjectManager *odm;
+<span class="lineNum">      38 </span>            : //      GF_Terminal *app;
+<span class="lineNum">      39 </span>            :         GF_LASeRCodec *codec;
+<span class="lineNum">      40 </span>            :         u32 PL, nb_streams;
+<span class="lineNum">      41 </span>            :         Bool is_playing;
+<span class="lineNum">      42 </span>            :         GF_FilterPid *out_pid;
+<a name="43"><span class="lineNum">      43 </span>            : } GF_LSRDecCtx;</a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">          2 : static GF_Err lsrdec_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span>            :         GF_FilterPid *out_pid;
+<span class="lineNum">      48 </span>            :         u32 ESID=0;
+<span class="lineNum">      49 </span><span class="lineCov">          2 :         GF_LSRDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">      50 </span>            :         const GF_PropertyValue *prop;
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :         //we must have streamtype SCENE
+<span class="lineNum">      53 </span><span class="lineCov">          2 :         prop = gf_filter_pid_get_property(pid, GF_PROP_PID_STREAM_TYPE);</span>
+<span class="lineNum">      54 </span><span class="lineCov">          2 :         if (!prop || (prop-&gt;value.uint != GF_STREAM_SCENE)) {</span>
+<span class="lineNum">      55 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      56 </span>            :         }
+<span class="lineNum">      57 </span><span class="lineCov">          2 :         prop = gf_filter_pid_get_property(pid, GF_PROP_PID_CODECID);</span>
+<span class="lineNum">      58 </span><span class="lineCov">          2 :         if (!prop || (prop-&gt;value.uint != GF_CODECID_LASER) ) {</span>
+<span class="lineNum">      59 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      60 </span>            :         }
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineCov">          2 :         prop = gf_filter_pid_get_property(pid, GF_PROP_PID_ESID);</span>
+<span class="lineNum">      63 </span><span class="lineCov">          2 :         if (prop) ESID = prop-&gt;value.uint;</span>
+<span class="lineNum">      64 </span>            :         else {
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :                 prop = gf_filter_pid_get_property(pid, GF_PROP_PID_ID);</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :                 if (prop) ESID = prop-&gt;value.uint;</span>
+<span class="lineNum">      67 </span>            :         }
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :         //we must have a dsi
+<span class="lineNum">      70 </span><span class="lineCov">          2 :         prop = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">      71 </span><span class="lineCov">          2 :         if (!prop || !prop-&gt;value.data.ptr || !prop-&gt;value.data.size) {</span>
+<span class="lineNum">      72 </span>            :                 return GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">      73 </span>            :         }
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">          2 :         if (is_remove) {</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :                 out_pid = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;out_pid==out_pid)</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :                         ctx-&gt;out_pid = NULL;</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :                 if (out_pid)</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(out_pid);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :                 ctx-&gt;nb_streams--;</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;codec &amp;&amp; ESID) {</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                         return gf_laser_decoder_remove_stream(ctx-&gt;codec, ESID);</span>
+<span class="lineNum">      84 </span>            :                 }
+<span class="lineNum">      85 </span>            :                 return GF_OK;
+<span class="lineNum">      86 </span>            :         }
+<span class="lineNum">      87 </span>            :         //this is a reconfigure
+<span class="lineNum">      88 </span><span class="lineCov">          2 :         if (gf_filter_pid_get_udta(pid)) {</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :                 gf_laser_decoder_remove_stream(ctx-&gt;codec, ESID);</span>
+<span class="lineNum">      90 </span><span class="lineCov">          1 :                 return gf_laser_decoder_configure_stream(ctx-&gt;codec, ESID, prop-&gt;value.data.ptr, prop-&gt;value.data.size);</span>
+<span class="lineNum">      91 </span>            :         }
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :         //check our namespace
+<span class="lineNum">      94 </span><span class="lineCov">          1 :         if (ctx-&gt;scene &amp;&amp; ! gf_filter_pid_is_filter_in_parents(pid, ctx-&gt;scene-&gt;root_od-&gt;scene_ns-&gt;source_filter)) {</span>
+<span class="lineNum">      95 </span>            :                 return GF_REQUIRES_NEW_INSTANCE;
+<span class="lineNum">      96 </span>            :         }
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :         //declare a new output PID of type scene, codecid RAW
+<span class="lineNum">      99 </span><span class="lineCov">          1 :         out_pid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     100 </span><span class="lineCov">          1 :         ctx-&gt;nb_streams++;</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :         //copy properties at init or reconfig
+<span class="lineNum">     103 </span><span class="lineCov">          1 :         gf_filter_pid_copy_properties(out_pid, pid);</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :         gf_filter_pid_set_property(out_pid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_RAW) );</span>
+<span class="lineNum">     105 </span><span class="lineCov">          1 :         gf_filter_pid_set_udta(pid, out_pid);</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">          1 :         if (!ctx-&gt;out_pid)</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :                 ctx-&gt;out_pid = out_pid;</span>
+<span class="lineNum">     109 </span>            :         return GF_OK;
+<a name="110"><span class="lineNum">     110 </span>            : }</a>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineCov">          6 : static Bool lsrdec_process_event(GF_Filter *filter, const GF_FilterEvent *com)</span>
+<span class="lineNum">     113 </span>            : {
+<span class="lineNum">     114 </span>            :         u32 count, i;
+<span class="lineNum">     115 </span><span class="lineCov">          6 :         GF_LSRDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     116 </span>            :         //check for scene attach
+<span class="lineNum">     117 </span><span class="lineCov">          6 :         switch (com-&gt;base.type) {</span>
+<span class="lineNum">     118 </span>            :         case GF_FEVT_ATTACH_SCENE:
+<span class="lineNum">     119 </span>            :                 break;
+<span class="lineNum">     120 </span><span class="lineCov">          1 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :                 ctx-&gt;is_playing = GF_TRUE;</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :                 return GF_FALSE;</span>
+<span class="lineNum">     123 </span>            :         default:
+<span class="lineNum">     124 </span>            :                 return GF_FALSE;
+<span class="lineNum">     125 </span>            :         }
+<span class="lineNum">     126 </span><span class="lineCov">          1 :         if (!com-&gt;attach_scene.on_pid) return GF_TRUE;</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          1 :         count = gf_filter_get_ipid_count(filter);</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :                 GF_FilterPid *ipid = gf_filter_get_ipid(filter, i);</span>
+<span class="lineNum">     131 </span><span class="lineCov">          1 :                 GF_FilterPid *opid = gf_filter_pid_get_udta(ipid);</span>
+<span class="lineNum">     132 </span>            :                 //we found our pid, set it up
+<span class="lineNum">     133 </span><span class="lineCov">          1 :                 if (opid == com-&gt;attach_scene.on_pid) {</span>
+<span class="lineNum">     134 </span><span class="lineCov">          1 :                         if (!ctx-&gt;odm) {</span>
+<span class="lineNum">     135 </span><span class="lineCov">          1 :                                 ctx-&gt;odm = com-&gt;attach_scene.object_manager;</span>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :                                 ctx-&gt;scene = ctx-&gt;odm-&gt;subscene ? ctx-&gt;odm-&gt;subscene : ctx-&gt;odm-&gt;parentscene;</span>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">          1 :                                 ctx-&gt;codec = gf_laser_decoder_new(ctx-&gt;scene-&gt;graph);</span>
+<span class="lineNum">     139 </span>            :                                 /*attach the clock*/
+<span class="lineNum">     140 </span><span class="lineCov">          1 :                                 gf_laser_decoder_set_clock(ctx-&gt;codec, gf_scene_get_time, ctx-&gt;scene);</span>
+<span class="lineNum">     141 </span><span class="lineCov">          1 :                                 gf_filter_pid_set_udta(opid, com-&gt;attach_scene.object_manager);</span>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :                                 lsrdec_configure_pid(filter, ipid, GF_FALSE);</span>
+<span class="lineNum">     143 </span>            :                         }
+<span class="lineNum">     144 </span>            :                         return GF_TRUE;
+<span class="lineNum">     145 </span>            :                 }
+<span class="lineNum">     146 </span>            :         }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :         return GF_TRUE;
+<a name="149"><span class="lineNum">     149 </span>            : }</a>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineCov">          4 : static GF_Err lsrdec_process(GF_Filter *filter)</span>
+<span class="lineNum">     152 </span>            : {
+<span class="lineNum">     153 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">     154 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     155 </span>            :         const char *data;
+<span class="lineNum">     156 </span>            :         u32 size, ESID=0;
+<span class="lineNum">     157 </span>            :         Double ts_offset;
+<span class="lineNum">     158 </span>            :         u64 now, cts;
+<span class="lineNum">     159 </span>            :         u32 obj_time;
+<span class="lineNum">     160 </span>            :         u32 i, count;
+<span class="lineNum">     161 </span>            :         const GF_PropertyValue *prop;
+<span class="lineNum">     162 </span><span class="lineCov">          4 :         GF_LSRDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     163 </span><span class="lineCov">          4 :         GF_Scene *scene = ctx-&gt;scene;</span>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineCov">          4 :         if (!scene) {</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;is_playing) {</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;out_pid &amp;&amp; gf_laser_decode_has_conditionnals(ctx-&gt;codec)) {</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_set_info(ctx-&gt;out_pid, GF_PROP_PID_KEEP_AFTER_EOS, &amp;PROP_BOOL(GF_TRUE));</span>
+<span class="lineNum">     169 </span>            :                         }
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_eos(ctx-&gt;out_pid);</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :                         return GF_EOS;</span>
+<span class="lineNum">     172 </span>            :                 }
+<span class="lineNum">     173 </span>            :                 return GF_OK;
+<span class="lineNum">     174 </span>            :         }
+<span class="lineNum">     175 </span><span class="lineCov">          4 :         if (!ctx-&gt;codec) return GF_OK;</span>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span><span class="lineCov">          4 :         count = gf_filter_get_ipid_count(filter);</span>
+<span class="lineNum">     179 </span><span class="lineCov">          8 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     180 </span><span class="lineCov">          4 :                 GF_FilterPid *pid = gf_filter_get_ipid(filter, i);</span>
+<span class="lineNum">     181 </span><span class="lineCov">          4 :                 GF_FilterPid *opid = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">          4 :                 GF_ObjectManager *odm = gf_filter_pid_get_udta(opid);</span>
+<span class="lineNum">     184 </span><span class="lineCov">          4 :                 if (!odm) continue;</span>
+<span class="lineNum">     185 </span>            :                 //object clock shall be valid
+<span class="lineNum">     186 </span>            :                 assert(odm-&gt;ck);
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineCov">          4 :                 pck = gf_filter_pid_get_packet(pid);</span>
+<span class="lineNum">     189 </span><span class="lineCov">          4 :                 if (!pck) {</span>
+<span class="lineNum">     190 </span><span class="lineCov">          1 :                         Bool is_eos = gf_filter_pid_is_eos(pid);</span>
+<span class="lineNum">     191 </span><span class="lineCov">          1 :                         if (is_eos) {</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :                                 if (ctx-&gt;out_pid &amp;&amp; gf_laser_decode_has_conditionnals(ctx-&gt;codec)) {</span>
+<span class="lineNum">     193 </span><span class="lineCov">          1 :                                         gf_filter_pid_set_info(ctx-&gt;out_pid, GF_PROP_PID_KEEP_AFTER_EOS, &amp;PROP_BOOL(GF_TRUE));</span>
+<span class="lineNum">     194 </span>            :                                 }
+<span class="lineNum">     195 </span><span class="lineCov">          1 :                                 gf_filter_pid_set_eos(opid);</span>
+<span class="lineNum">     196 </span>            :                         }
+<span class="lineNum">     197 </span><span class="lineCov">          1 :                         continue;</span>
+<span class="lineNum">     198 </span>            :                 }
+<span class="lineNum">     199 </span><span class="lineCov">          3 :                 data = gf_filter_pck_get_data(pck, &amp;size);</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">          3 :                 prop = gf_filter_pid_get_property(pid, GF_PROP_PID_ID);</span>
+<span class="lineNum">     202 </span><span class="lineCov">          3 :                 if (prop) ESID = prop-&gt;value.uint;</span>
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span><span class="lineCov">          3 :                 cts = gf_filter_pck_get_cts( pck );</span>
+<span class="lineNum">     205 </span><span class="lineCov">          3 :                 ts_offset = (Double) cts;</span>
+<span class="lineNum">     206 </span><span class="lineCov">          3 :                 ts_offset /= gf_filter_pck_get_timescale(pck);</span>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineCov">          3 :                 gf_odm_check_buffering(odm, pid);</span>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :                 //we still process any frame before our clock time even when buffering
+<span class="lineNum">     212 </span><span class="lineCov">          3 :                 obj_time = gf_clock_time(odm-&gt;ck);</span>
+<span class="lineNum">     213 </span><span class="lineCov">          3 :                 if (ts_offset * 1000 &gt; obj_time) {</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                         gf_sc_sys_frame_pending(ctx-&gt;scene-&gt;compositor, ts_offset, obj_time, filter);</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     216 </span>            :                 }
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineCov">          3 :                 now = gf_sys_clock_high_res();</span>
+<span class="lineNum">     219 </span><span class="lineCov">          3 :                 e = gf_laser_decode_au(ctx-&gt;codec, ESID, data, size);</span>
+<span class="lineNum">     220 </span><span class="lineCov">          3 :                 now = gf_sys_clock_high_res() - now;</span>
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">          3 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_CODEC, (&quot;[BIFS] ODM%d #CH%d at %d decoded AU TS %u in &quot;LLU&quot; us\n&quot;, odm-&gt;ID, ESID, obj_time, cts, now));</span>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span><span class="lineCov">          3 :                 gf_filter_pid_drop_packet(pid);</span>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineCov">          3 :                 if (e) return e;</span>
+<span class="lineNum">     227 </span><span class="lineCov">          3 :                 if (odm == ctx-&gt;odm)</span>
+<span class="lineNum">     228 </span><span class="lineCov">          3 :                         gf_scene_attach_to_compositor(scene);</span>
+<span class="lineNum">     229 </span>            :         }
+<span class="lineNum">     230 </span>            :         return GF_OK;
+<a name="231"><span class="lineNum">     231 </span>            : }</a>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineCov">          1 : static void lsrdec_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     234 </span>            : {
+<span class="lineNum">     235 </span><span class="lineCov">          1 :         GF_LSRDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     236 </span><span class="lineCov">          1 :         if (ctx-&gt;codec) gf_laser_decoder_del(ctx-&gt;codec);</span>
+<span class="lineNum">     237 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : static const GF_FilterCapability LSRDecCaps[] =
+<span class="lineNum">     241 </span>            : {
+<span class="lineNum">     242 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_SCENE),
+<span class="lineNum">     243 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_CODECID, GF_CODECID_LASER),
+<span class="lineNum">     244 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     245 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_SCENE),
+<span class="lineNum">     246 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_RAW),
+<span class="lineNum">     247 </span>            : };
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span>            : GF_FilterRegister LSRDecRegister = {
+<span class="lineNum">     251 </span>            :         .name = &quot;lsrdec&quot;,
+<span class="lineNum">     252 </span>            :         GF_FS_SET_DESCRIPTION(&quot;MPEG-4 LASeR decoder&quot;)
+<span class="lineNum">     253 </span>            :         GF_FS_SET_HELP(&quot;This filter decodes MPEG-4 LASeR frames directly into the scene graph of the compositor. It cannot be used to dump LASeR content.&quot;)
+<span class="lineNum">     254 </span>            :         .private_size = sizeof(GF_LSRDecCtx),
+<span class="lineNum">     255 </span>            :         .flags = GF_FS_REG_MAIN_THREAD,
+<span class="lineNum">     256 </span>            :         .priority = 1,
+<span class="lineNum">     257 </span>            :         SETCAPS(LSRDecCaps),
+<span class="lineNum">     258 </span>            :         .finalize = lsrdec_finalize,
+<span class="lineNum">     259 </span>            :         .process = lsrdec_process,
+<span class="lineNum">     260 </span>            :         .configure_pid = lsrdec_configure_pid,
+<span class="lineNum">     261 </span>            :         .process_event = lsrdec_process_event,
+<span class="lineNum">     262 </span>            : };
+<span class="lineNum">     263 </span>            : 
+<a name="264"><span class="lineNum">     264 </span>            : #endif /*GPAC_DISABLE_LASER*/</a>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">       2877 : const GF_FilterRegister *lsrdec_register(GF_FilterSession *session)</span>
+<span class="lineNum">     267 </span>            : {
+<span class="lineNum">     268 </span>            : #ifdef GPAC_DISABLE_LASER
+<span class="lineNum">     269 </span>            :         return NULL;
+<span class="lineNum">     270 </span>            : #else
+<span class="lineNum">     271 </span><span class="lineCov">       2877 :         return &amp;LSRDecRegister;</span>
+<span class="lineNum">     272 </span>            : #endif /*GPAC_DISABLE_LASER*/
+<span class="lineNum">     273 </span>            : }
+<span class="lineNum">     274 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

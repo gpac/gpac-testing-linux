@@ -1,0 +1,51 @@
+*** mux-avi-compressed logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:42:06 ***
+
+
+*** Subtest "mux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/count_video.cmp -i ./media/auxiliary_files/count_english.mp3  -o ./results/temp/test.avi" ***
+
+
+*** Subtest "aviraw-video": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -aviraw video ./results/temp/test.avi" ***
+[31m`-aviraw` option deprecated, use `-raw`
+[0m
+Computing ./results/temp/test_video.cmp  (aviraw-video) hash: 
+
+	Error: Requested URL is not valid or cannot be found
+
+*** Subtest "aviraw-audio": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -aviraw audio ./results/temp/test.avi" ***
+[31m`-aviraw` option deprecated, use `-raw`
+[0m
+Computing ./results/temp/test_audio.mp3  (aviraw-audio) hash: 
+
+	Error: Requested URL is not valid or cannot be found
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.avi inspect:allp:fmt=%cts%-%size%%lf%:interleave=false:log=./results/temp/inspect.txt -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1497112448
+
+Filter stats - 3 filters
+	Filter fin (src=./results/temp/test.avi) : 0 input pids 1 output pids 49 tasks 861 us process time
+		45 packets sent 224694 bytes sent (52264.8 pck/sec 2087.75 mbps)
+		* output PID test.avi: 45 packets sent
+	Filter inspect (allp:fmt=%cts%-%size%%lf%:interleave=false:log=./results/temp/inspect.txt) : 2 input pids 0 output pids 639 tasks 1023 us process time
+		635 packets processed 207261 bytes processed (620723 pck/sec 1620.81 mbps)
+		* input PID test.avi: 250 packets received
+		* input PID test.avi: 385 packets received
+	Filter avidmx : 1 input pids 2 output pids 438 tasks 1134 us process time
+		45 packets processed 224694 bytes processed (39682.5 pck/sec 1585.14 mbps)
+		635 packets sent 207261 bytes sent (559965 pck/sec 1462.16 mbps)
+		* input PID test.avi: 45 packets received
+		* output PID test.avi: 250 packets sent
+		* output PID test.avi: 385 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3370 us active_time 3305 us nb_tasks 1129
+
+Total: run_time 3370 us active_time 3305 us nb_tasks 1129
+
+Filters connected:
+fin (src=./results/temp/test.avi) (ptr=0x55b97d792840)
+-(PID test.avi) avidmx (ptr=0x55b97d7983c0)
+--(PID test.avi) inspect (allp:fmt=%cts%-%size%%lf%:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55b97d7950f0)
+--(PID test.avi) inspect (allp:fmt=%cts%-%size%%lf%:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55b97d7950f0)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 439326D70A514D8E70660D11D6068FE627ADF4EE
+Hash OK for ./results/temp/inspect.txt

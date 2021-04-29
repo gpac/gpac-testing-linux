@@ -1,0 +1,59 @@
+*** mp4box-io-sky.jpg logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:32 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/sky.jpg" ***
+Import probing results for ./media/auxiliary_files/sky.jpg:
+File has 1 tracks
+- Track 1 type: Video - Codec JPEG Image
+	Size 400x200
+
+For more details, use `gpac -i sky.jpg inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/sky.jpg.mp4  (add) hash: 
+File hash (SHA-1): 3EB388E11DD5DC7E8A4D069A165A5B2770AB65D9
+Hash OK for ./results/temp/sky.jpg.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/sky.jpg -new ./results/temp/sky.jpg.mp4" ***
+Track Importing JPEG - Width 400 Height 200 FPS 25/1
+
+Computing ./results/temp/sky.jpg.1.tmp  (diso) hash: 
+File hash (SHA-1): 99F93D844E000098068B3731ABC8073200F07C87
+Hash OK for ./results/temp/sky.jpg.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/sky.jpg.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:01.000
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 1000
+Media Duration 00:00:01.000 
+Media Info: Language "Undetermined (und)" - Type "vide:jpeg" - 1 samples
+Visual Sample Entry Info: width=400 height=200 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=400 height=200
+JPEG Image - Resolution 400 x 200
+	RFC6381 Codec Parameters: mp4v.6C
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1000 / 1000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/sky.jpg.mp4 -out ./results/temp/sky.jpg.1.tmp" ***
+
+Computing ./results/temp/sky.jpg.2.tmp  (dts) hash: 
+File hash (SHA-1): 45635F675138261B54B379B72871A32751AD8EF1
+Hash OK for ./results/temp/sky.jpg.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/sky.jpg.mp4 -out ./results/temp/sky.jpg.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/sky.jpg.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): C3FC75EA7C512F7A535FB8FFBB3A399FDA1715B3
+Hash OK for ./results/temp/inspect.txt

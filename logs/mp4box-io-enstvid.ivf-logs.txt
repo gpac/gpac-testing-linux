@@ -1,0 +1,66 @@
+*** mp4box-io-enstvid.ivf logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:30 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/enstvid.ivf" ***
+Import probing results for ./media/auxiliary_files/enstvid.ivf:
+File has 1 tracks
+- Track 1 type: Video - Codec VP9 Video
+	Size 128x128 @ 25 FPS
+
+For more details, use `gpac -i enstvid.ivf inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/enstvid.ivf.mp4  (add) hash: 
+File hash (SHA-1): 96E30482B08AAED0C34D963110FBB1845639BAF5
+Hash OK for ./results/temp/enstvid.ivf.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enstvid.ivf -new ./results/temp/enstvid.ivf.mp4" ***
+Track Importing VP9 Video - Width 128 Height 128 FPS 25/1
+
+
+*** Subtest "NALDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 1 ./results/temp/enstvid.ivf.mp4 -out ./results/temp/nal.xml" ***
+Error: Track #1 is not NALU or OBU based!
+
+Computing ./results/temp/nal.xml  (NALDump) hash: 
+File hash (SHA-1): 4917AB658AD64D1DE6DF0A55ABE3570806C5EFE8
+Hash OK for ./results/temp/nal.xml
+Computing ./results/temp/enstvid.ivf.1.tmp  (diso) hash: 
+File hash (SHA-1): 9A2B5717A3355D3FC6E7017461965597E38E0D66
+Hash OK for ./results/temp/enstvid.ivf.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/enstvid.ivf.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:06.960
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 25
+Media Duration 00:00:06.960 
+Media Info: Language "Undetermined (und)" - Type "vide:vp09" - 174 samples
+Visual Sample Entry Info: width=128 height=128 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=128
+Unknown track type
+	RFC6381 Codec Parameters: vp09.00.00.08.00.255.255.255.00
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 174 samples
+	Max sample duration: 1 / 25
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/enstvid.ivf.mp4 -out ./results/temp/enstvid.ivf.1.tmp" ***
+
+Computing ./results/temp/enstvid.ivf.2.tmp  (dts) hash: 
+File hash (SHA-1): 9DE1B53C632E315B5BDD417A96F2F15768FA48BC
+Hash OK for ./results/temp/enstvid.ivf.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/enstvid.ivf.mp4 -out ./results/temp/enstvid.ivf.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/enstvid.ivf.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 507569A853512F17B99AC49900201D60200935E4
+Hash OK for ./results/temp/inspect.txt

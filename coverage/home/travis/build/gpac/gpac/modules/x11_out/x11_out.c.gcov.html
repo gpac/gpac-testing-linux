@@ -1,0 +1,1718 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - /home/travis/build/gpac/gpac/modules/x11_out/x11_out.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../../../index.html">top level</a> - <a href="index.html">home/travis/build/gpac/gpac/modules/x11_out</a> - x11_out.c<span style="font-size: 80%;"> (source / <a href="x11_out.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">422</td>
+            <td class="headerCovTableEntry">718</td>
+            <td class="headerCovTableEntryLo">58.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntryHi">92.3 %</td>
+          </tr>
+          <tr><td><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                                      GPAC Multimedia Framework
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2005-2020
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC /  X11 video output module
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &quot;x11_out.h&quot;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/utf.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/user.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;sys/time.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;X11/XKBlib.h&gt;
+<span class="lineNum">      32 </span>            : #include &lt;X11/Xatom.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : enum
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span>            :         GF_PIXEL_IYUV = GF_4CC('I', 'Y', 'U', 'V'),
+<span class="lineNum">      38 </span>            :         GF_PIXEL_I420 = GF_4CC('I', '4', '2', '0'),
+<span class="lineNum">      39 </span>            :         /*!YUV packed format*/
+<span class="lineNum">      40 </span>            :         GF_PIXEL_UYNV = GF_4CC('U', 'Y', 'N', 'V'),
+<span class="lineNum">      41 </span>            :         /*!YUV packed format*/
+<span class="lineNum">      42 </span>            :         GF_PIXEL_YUNV = GF_4CC('Y', 'U', 'N', 'V'),
+<span class="lineNum">      43 </span>            :         /*!YUV packed format*/
+<span class="lineNum">      44 </span>            :         GF_PIXEL_V422 = GF_4CC('V', '4', '2', '2'),
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :         GF_PIXEL_YV12 = GF_4CC('Y', 'V', '1', '2'),
+<span class="lineNum">      47 </span>            :         GF_PIXEL_Y422 = GF_4CC('Y', '4', '2', '2'),
+<span class="lineNum">      48 </span>            :         GF_PIXEL_YUY2 = GF_4CC('Y', 'U', 'Y', '2'),
+<span class="lineNum">      49 </span>            : };
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : void X11_SetupWindow (GF_VideoOutput * vout);
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">      55 </span>            : PFNGLXSWAPINTERVALEXTPROC my_glXSwapIntervalEXT;
+<span class="lineNum">      56 </span>            : PFNGLXSWAPINTERVALMESAPROC my_glXSwapIntervalMESA;
+<span class="lineNum">      57 </span>            : PFNGLXSWAPINTERVALSGIPROC my_glXSwapIntervalSGI;
+<span class="lineNum">      58 </span>            : #endif
+<a name="59"><span class="lineNum">      59 </span>            : </a>
+<span class="lineNum">      60 </span>            : #ifdef GPAC_HAS_X11_XV
+<span class="lineNum">      61 </span><span class="lineCov">        155 : static void X11_DestroyOverlay(XWindow *xwin)</span>
+<span class="lineNum">      62 </span>            : {
+<span class="lineNum">      63 </span><span class="lineCov">        155 :         if (xwin-&gt;overlay) XFree(xwin-&gt;overlay);</span>
+<span class="lineNum">      64 </span><span class="lineCov">        155 :         xwin-&gt;overlay = NULL;</span>
+<span class="lineNum">      65 </span><span class="lineCov">        155 :         xwin-&gt;xv_pf_format = 0;</span>
+<span class="lineNum">      66 </span><span class="lineCov">        155 :         if (xwin-&gt;display &amp;&amp; (xwin-&gt;xvport&gt;=0)) {</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :                 XvUngrabPort(xwin-&gt;display, xwin-&gt;xvport, CurrentTime );</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :                 xwin-&gt;xvport = -1;</span>
+<span class="lineNum">      69 </span>            :         }
+<span class="lineNum">      70 </span><span class="lineCov">        155 : }</span>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            : static Bool is_same_yuv(u32 pf, u32 a_pf)
+<span class="lineNum">      73 </span>            : {
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :         if (pf==a_pf) return 1;</span>
+<span class="lineNum">      75 </span>            : #if 0
+<span class="lineNum">      76 </span>            :         switch (pf) {
+<span class="lineNum">      77 </span>            :         case GF_PIXEL_YV12:
+<span class="lineNum">      78 </span>            :         case GF_PIXEL_I420:
+<span class="lineNum">      79 </span>            :         case GF_PIXEL_IYUV:
+<span class="lineNum">      80 </span>            :                 switch (a_pf) {
+<span class="lineNum">      81 </span>            :                 case GF_PIXEL_YV12:
+<span class="lineNum">      82 </span>            :                 case GF_PIXEL_I420:
+<span class="lineNum">      83 </span>            :                 case GF_PIXEL_IYUV:
+<span class="lineNum">      84 </span>            :                         return 1;
+<span class="lineNum">      85 </span>            :                 default:
+<span class="lineNum">      86 </span>            :                         return 0;
+<span class="lineNum">      87 </span>            :                 }
+<span class="lineNum">      88 </span>            :         case GF_PIXEL_UYVY:
+<span class="lineNum">      89 </span>            :         case GF_PIXEL_UYNV:
+<span class="lineNum">      90 </span>            :         case GF_PIXEL_Y422:
+<span class="lineNum">      91 </span>            :                 switch (a_pf) {
+<span class="lineNum">      92 </span>            :                 case GF_PIXEL_UYVY:
+<span class="lineNum">      93 </span>            :                 case GF_PIXEL_UYNV:
+<span class="lineNum">      94 </span>            :                 case GF_PIXEL_Y422:
+<span class="lineNum">      95 </span>            :                         return 1;
+<span class="lineNum">      96 </span>            :                 default:
+<span class="lineNum">      97 </span>            :                         return 0;
+<span class="lineNum">      98 </span>            :                 }
+<span class="lineNum">      99 </span>            :         case GF_PIXEL_YUY2:
+<span class="lineNum">     100 </span>            :         case GF_PIXEL_YUNV:
+<span class="lineNum">     101 </span>            :                 switch (a_pf) {
+<span class="lineNum">     102 </span>            :                 case GF_PIXEL_YUY2:
+<span class="lineNum">     103 </span>            :                 case GF_PIXEL_YUNV:
+<span class="lineNum">     104 </span>            :                         return 1;
+<span class="lineNum">     105 </span>            :                 default:
+<span class="lineNum">     106 </span>            :                         return 0;
+<span class="lineNum">     107 </span>            :                 }
+<span class="lineNum">     108 </span>            :         }
+<span class="lineNum">     109 </span>            : #endif
+<span class="lineNum">     110 </span>            :         return 0;
+<span class="lineNum">     111 </span>            : }
+<span class="lineNum">     112 </span>            : static u32 X11_GetPixelFormat(u32 pf)
+<span class="lineNum">     113 </span>            : {
+<a name="114"><span class="lineNum">     114 </span><span class="lineNoCov">          0 :         return GF_4CC((pf)&amp;0xff, (pf&gt;&gt;8)&amp;0xff, (pf&gt;&gt;16)&amp;0xff, (pf&gt;&gt;24)&amp;0xff);</span></a>
+<span class="lineNum">     115 </span>            : }
+<span class="lineNum">     116 </span><span class="lineCov">        308 : static int X11_GetXVideoPort(GF_VideoOutput *vout, u32 pixel_format, Bool check_color)</span>
+<span class="lineNum">     117 </span>            : {
+<span class="lineNum">     118 </span><span class="lineCov">        308 :         XWindow *xwin = (XWindow *)vout-&gt;opaque;</span>
+<span class="lineNum">     119 </span>            :         Bool has_color_key = 0;
+<span class="lineNum">     120 </span>            :         XvAdaptorInfo *adaptors;
+<span class="lineNum">     121 </span>            :         unsigned int i;
+<span class="lineNum">     122 </span>            :         unsigned int nb_adaptors;
+<span class="lineNum">     123 </span>            :         int selected_port;
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span><span class="lineCov">        308 :         if (XvQueryExtension(xwin-&gt;display, &amp;i, &amp;i, &amp;i, &amp;i, &amp;i ) != Success) return -1;</span>
+<span class="lineNum">     126 </span><span class="lineCov">        308 :         if (XvQueryAdaptors(xwin-&gt;display, DefaultRootWindow(xwin-&gt;display), &amp;nb_adaptors, &amp;adaptors) != Success) return -1;</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            :         selected_port = -1;
+<span class="lineNum">     129 </span><span class="lineCov">        308 :         for (i=0; i &lt; nb_adaptors; i++) {</span>
+<span class="lineNum">     130 </span>            :                 XvImageFormatValues *formats;
+<span class="lineNum">     131 </span>            :                 int j, num_formats, port;
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :                 if( !( adaptors[i].type &amp; XvInputMask ) || !(adaptors[i].type &amp; XvImageMask ) )</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            :                 /* Check for our format... */
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :                 formats = XvListImageFormats(xwin-&gt;display, adaptors[i].base_id, &amp;num_formats);</span>
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :                 for (j=0; j&lt;num_formats &amp;&amp; (selected_port == -1 ); j++) {</span>
+<span class="lineNum">     140 </span>            :                         XvAttribute *attr=NULL;
+<span class="lineNum">     141 </span>            :                         int k, nb_attributes;
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :                         u32 pformat = X11_GetPixelFormat(formats[j].id);</span>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                         if( !is_same_yuv(pformat, pixel_format) ) continue;</span>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :                         /* Grab first port  supporting this format */
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                         for (port=adaptors[i].base_id; (port &lt; (int)(adaptors[i].base_id + adaptors[i].num_ports) ) &amp;&amp; (selected_port == -1); port++) {</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :                                 if (port==xwin-&gt;xvport) continue;</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                                 attr = XvQueryPortAttributes(xwin-&gt;display, port, &amp;nb_attributes);</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                                 for (k=0; k&lt;nb_attributes; k++ ) {</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :                                         if (!strcmp(attr[k].name, &quot;XV_COLORKEY&quot;)) {</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                                                 const Atom ckey = XInternAtom(xwin-&gt;display, &quot;XV_COLORKEY&quot;, False);</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                                                 XvGetPortAttribute(xwin-&gt;display, port, ckey, &amp;vout-&gt;overlay_color_key);</span>
+<span class="lineNum">     155 </span>            :                                                 has_color_key = 1;
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :                                                 vout-&gt;overlay_color_key |= 0xFF000000;</span>
+<span class="lineNum">     157 </span>            :                                         }
+<span class="lineNum">     158 </span>            :                                         /*                              else if (!strcmp(attr[k].name, &quot;XV_AUTOPAINT_COLORKEY&quot;)) {
+<span class="lineNum">     159 </span>            :                                                                             const Atom paint = XInternAtom(xwin-&gt;display, &quot;XV_AUTOPAINT_COLORKEY&quot;, False);
+<span class="lineNum">     160 </span>            :                                                                             XvSetPortAttribute(xwin-&gt;display, port, paint, 1);
+<span class="lineNum">     161 </span>            :                                                                         }
+<span class="lineNum">     162 </span>            :                                         */
+<span class="lineNum">     163 </span>            :                                 }
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                                 if (attr) {</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                                         free(attr);</span>
+<span class="lineNum">     166 </span>            :                                         attr=NULL;
+<span class="lineNum">     167 </span>            :                                 }
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                                 if (check_color &amp;&amp; !has_color_key) continue;</span>
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :                                 if (XvGrabPort(xwin-&gt;display, port, CurrentTime) == Success) {</span>
+<span class="lineNum">     172 </span>            :                                         selected_port = port;
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :                                         xwin-&gt;xv_pf_format = formats[j].id;</span>
+<span class="lineNum">     174 </span>            :                                 }
+<span class="lineNum">     175 </span>            :                         }
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :                         if (selected_port == -1 )</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                                 continue;</span>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :                 }
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                 if (formats != NULL) XFree(formats);</span>
+<span class="lineNum">     181 </span>            :         }
+<span class="lineNum">     182 </span><span class="lineCov">        308 :         if (nb_adaptors &gt; 0)</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                 XvFreeAdaptorInfo(adaptors);</span>
+<span class="lineNum">     184 </span>            : 
+<a name="185"><span class="lineNum">     185 </span>            :         return selected_port;</a>
+<span class="lineNum">     186 </span>            : }
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 : static GF_Err X11_InitOverlay(GF_VideoOutput *vout, u32 VideoWidth, u32 VideoHeight)</span>
+<span class="lineNum">     188 </span>            : {
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :         XWindow *xwin = (XWindow *)vout-&gt;opaque;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :         if (xwin-&gt;overlay &amp;&amp; (VideoWidth&lt;=xwin-&gt;overlay-&gt;width) &amp;&amp; (VideoHeight&lt;=xwin-&gt;overlay-&gt;height)) {</span>
+<span class="lineNum">     191 </span>            :                 return GF_OK;
+<span class="lineNum">     192 </span>            :         }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :         X11_DestroyOverlay(xwin);</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :         xwin-&gt;xvport = X11_GetXVideoPort(vout, GF_PIXEL_YV12, 0);</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :         if (xwin-&gt;xvport&lt;0)</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :                 xwin-&gt;xvport = X11_GetXVideoPort(vout, GF_PIXEL_YUY2, 0);</span>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :         if (xwin-&gt;xvport&lt;0) {</span>
+<span class="lineNum">     201 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     202 </span>            :         }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :         /* Create overlay image */
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :         xwin-&gt;overlay = XvCreateImage(xwin-&gt;display, xwin-&gt;xvport, xwin-&gt;xv_pf_format, NULL, VideoWidth, VideoHeight);</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :         if (!xwin-&gt;overlay) {</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Xv Overlay Creation Failure\n&quot;));</span>
+<span class="lineNum">     208 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     209 </span>            :         }
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[X11] Overlay init %d x %d - pixel format %s - XV port %d\n&quot;,</span>
+<span class="lineNum">     212 </span>            :                                           VideoWidth, VideoHeight,
+<span class="lineNum">     213 </span>            :                                           gf_4cc_to_str(vout-&gt;yuv_pixel_format), xwin-&gt;xvport ));
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :         return GF_OK;
+<a name="216"><span class="lineNum">     216 </span>            : }</a>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 : GF_Err X11_Blit(struct _video_out *vout, GF_VideoSurface *video_src, GF_Window *src, GF_Window *dest, u32 overlay_type)</span>
+<span class="lineNum">     219 </span>            : {
+<span class="lineNum">     220 </span>            :         XvImage *overlay;
+<span class="lineNum">     221 </span>            :         int xvport;
+<span class="lineNum">     222 </span>            :         Drawable dst_dr;
+<span class="lineNum">     223 </span>            :         GF_Err e;
+<span class="lineNum">     224 </span>            :         Window cur_wnd;
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :         XWindow *xwin = (XWindow *)vout-&gt;opaque;</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :         if (!video_src) {</span>
+<span class="lineNum">     228 </span>            :                 if (overlay_type &amp;&amp; xwin-&gt;xvport) {
+<span class="lineNum">     229 </span>            :                 }
+<span class="lineNum">     230 </span>            :                 return GF_OK;
+<span class="lineNum">     231 </span>            :         }
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         if (video_src-&gt;pixel_format != GF_PIXEL_YV12) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :         cur_wnd = xwin-&gt;fullscreen ? xwin-&gt;full_wnd : xwin-&gt;wnd;</span>
+<span class="lineNum">     235 </span>            :         /*init if needed*/
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :         if ((xwin-&gt;xvport&lt;0) || !xwin-&gt;overlay) {</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :                 e = X11_InitOverlay(vout, video_src-&gt;width, video_src-&gt;height);</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :                 if (e) return e;</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :                 if (!xwin-&gt;overlay) return GF_IO_ERR;</span>
+<span class="lineNum">     240 </span>            :         }
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            :         /*different size, recreate an image*/
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :         if (xwin-&gt;overlay &amp;&amp; ((xwin-&gt;overlay-&gt;width != video_src-&gt;width) || (xwin-&gt;overlay-&gt;height != video_src-&gt;height))) {</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :                 XFree(xwin-&gt;overlay);</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :                 xwin-&gt;overlay = XvCreateImage(xwin-&gt;display, xwin-&gt;xvport, xwin-&gt;xv_pf_format, NULL, video_src-&gt;width, video_src-&gt;height);</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :                 if (!xwin-&gt;overlay) return GF_IO_ERR;</span>
+<span class="lineNum">     247 </span>            :         }
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_MMIO, (&quot;[X11] Blit surface to dest %d x %d - overlay type %s\n&quot;, dest-&gt;w, dest-&gt;h,</span>
+<span class="lineNum">     249 </span>            :                                            (overlay_type==0)? &quot;none&quot; : ((overlay_type==1) ? &quot;Top-Level&quot; : &quot;ColorKey&quot;)
+<span class="lineNum">     250 </span>            :                                           ));
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :         overlay = xwin-&gt;overlay;</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :         xvport = xwin-&gt;xvport;</span>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :         overlay-&gt;data = video_src-&gt;video_buffer;</span>
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :         overlay-&gt;num_planes = 3;</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :         overlay-&gt;pitches[0] = video_src-&gt;width;</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :         overlay-&gt;pitches[1] = xwin-&gt;overlay-&gt;pitches[2] = video_src-&gt;width/2;</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :         overlay-&gt;offsets[0] = 0;</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :         overlay-&gt;offsets[1] = video_src-&gt;width*video_src-&gt;height;</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :         overlay-&gt;offsets[2] = 5*video_src-&gt;width*video_src-&gt;height/4;</span>
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            :         dst_dr = cur_wnd;
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :         if (!overlay_type) {</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :                 if (!xwin-&gt;pixmap) {</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Back buffer not configured for Blt\n&quot;));</span>
+<span class="lineNum">     268 </span>            :                         return GF_BAD_PARAM;
+<span class="lineNum">     269 </span>            :                 }
+<span class="lineNum">     270 </span>            :                 dst_dr = xwin-&gt;pixmap;
+<span class="lineNum">     271 </span>            :         }
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :         XvPutImage(xwin-&gt;display, xvport, dst_dr, xwin-&gt;the_gc, overlay,</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :                    src-&gt;x, src-&gt;y, src-&gt;w, src-&gt;h,</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :                    dest-&gt;x, dest-&gt;y, dest-&gt;w, dest-&gt;h);</span>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<span class="lineNum">     277 </span>            : }
+<span class="lineNum">     278 </span>            : #endif
+<span class="lineNum">     279 </span>            : 
+<a name="280"><span class="lineNum">     280 </span>            : </a>
+<span class="lineNum">     281 </span>            : /*Flush video */
+<span class="lineNum">     282 </span><span class="lineCov">        365 : GF_Err X11_Flush(struct _video_out *vout, GF_Window * dest)</span>
+<span class="lineNum">     283 </span>            : {
+<span class="lineNum">     284 </span>            :         Window cur_wnd;
+<span class="lineNum">     285 </span>            :         /*
+<span class="lineNum">     286 </span>            :          * write backbuffer to screen
+<span class="lineNum">     287 </span>            :          */
+<span class="lineNum">     288 </span><span class="lineCov">        365 :         X11VID ();</span>
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span><span class="lineCov">        365 :         if (!xWindow-&gt;is_init) return GF_OK;</span>
+<span class="lineNum">     291 </span><span class="lineCov">        365 :         cur_wnd = xWindow-&gt;fullscreen ? xWindow-&gt;full_wnd : xWindow-&gt;wnd;</span>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineCov">        365 :         if (xWindow-&gt;output_3d) {</span>
+<span class="lineNum">     294 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">     295 </span><span class="lineCov">        341 :                 XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">     296 </span><span class="lineCov">        341 :                 glFlush();</span>
+<span class="lineNum">     297 </span><span class="lineCov">        341 :                 glXSwapBuffers(xWindow-&gt;display, cur_wnd);</span>
+<span class="lineNum">     298 </span>            : #endif
+<span class="lineNum">     299 </span><span class="lineCov">        341 :                 return GF_OK;</span>
+<span class="lineNum">     300 </span>            :         }
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            : #ifdef GPAC_HAS_X11_SHM
+<span class="lineNum">     303 </span><span class="lineCov">         24 :         if (xWindow-&gt;pixmap) {</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :                 XClearWindow(xWindow-&gt;display, cur_wnd);</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :                 XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">     306 </span><span class="lineCov">         24 :         } else if (xWindow-&gt;use_shared_memory) {</span>
+<span class="lineNum">     307 </span><span class="lineCov">         24 :                 XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">     308 </span><span class="lineCov">         72 :                 XShmPutImage (xWindow-&gt;display, cur_wnd, xWindow-&gt;the_gc, xWindow-&gt;surface,</span>
+<span class="lineNum">     309 </span><span class="lineCov">         48 :                               0, 0, dest-&gt;x, dest-&gt;y, dest-&gt;w, dest-&gt;h, True);</span>
+<span class="lineNum">     310 </span>            :         } else
+<span class="lineNum">     311 </span>            : #endif
+<span class="lineNum">     312 </span>            :         {
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :                 XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">     314 </span>            :                 //XRaiseWindow(xWindow-&gt;display, xWindow-&gt;wnd);
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                 XPutImage (xWindow-&gt;display, cur_wnd, xWindow-&gt;the_gc, xWindow-&gt;surface,</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :                            0, 0, dest-&gt;x, dest-&gt;y, dest-&gt;w, dest-&gt;h);</span>
+<span class="lineNum">     317 </span>            :         }
+<span class="lineNum">     318 </span>            :         return GF_OK;
+<span class="lineNum">     319 </span>            : }
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            : typedef struct
+<span class="lineNum">     322 </span>            : {
+<span class="lineNum">     323 </span>            :         u32 x11_key;
+<span class="lineNum">     324 </span>            :         u32 gf_key;
+<span class="lineNum">     325 </span>            :         u32 gf_flags;
+<span class="lineNum">     326 </span>            : } X11KeyToGPAC;
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            : static X11KeyToGPAC X11Keys[] =
+<span class="lineNum">     329 </span>            : {
+<span class="lineNum">     330 </span>            :         {XK_BackSpace, GF_KEY_BACKSPACE, 0},
+<span class="lineNum">     331 </span>            :         {XK_Tab, GF_KEY_TAB, 0},
+<span class="lineNum">     332 </span>            : //      {XK_Linefeed, GF_KEY_LINEFEED, 0},
+<span class="lineNum">     333 </span>            :         {XK_Clear, GF_KEY_CLEAR, 0},
+<span class="lineNum">     334 </span>            :         {XK_KP_Enter, GF_KEY_ENTER, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     335 </span>            :         {XK_Return, GF_KEY_ENTER, 0},
+<span class="lineNum">     336 </span>            :         {XK_Pause, GF_KEY_PAUSE, 0},
+<span class="lineNum">     337 </span>            :         {XK_Caps_Lock, GF_KEY_CAPSLOCK, 0},
+<span class="lineNum">     338 </span>            :         {XK_Scroll_Lock, GF_KEY_SCROLL, 0},
+<span class="lineNum">     339 </span>            :         {XK_Escape, GF_KEY_ESCAPE, 0},
+<span class="lineNum">     340 </span>            :         {XK_Delete, GF_KEY_DEL, 0},
+<span class="lineNum">     341 </span>            :         {XK_Kanji, GF_KEY_KANJIMODE, 0},
+<span class="lineNum">     342 </span>            :         {XK_Katakana, GF_KEY_JAPANESEKATAKANA, 0},
+<span class="lineNum">     343 </span>            :         {XK_Romaji, GF_KEY_JAPANESEROMAJI, 0},
+<span class="lineNum">     344 </span>            :         {XK_Hiragana, GF_KEY_JAPANESEHIRAGANA, 0},
+<span class="lineNum">     345 </span>            :         {XK_Kana_Lock, GF_KEY_KANAMODE, 0},
+<span class="lineNum">     346 </span>            :         {XK_Home, GF_KEY_HOME, 0},
+<span class="lineNum">     347 </span>            :         {XK_Left, GF_KEY_LEFT, 0},
+<span class="lineNum">     348 </span>            :         {XK_Up, GF_KEY_UP, 0},
+<span class="lineNum">     349 </span>            :         {XK_Right, GF_KEY_RIGHT, 0},
+<span class="lineNum">     350 </span>            :         {XK_Down, GF_KEY_DOWN, 0},
+<span class="lineNum">     351 </span>            :         {XK_Page_Up, GF_KEY_PAGEUP, 0},
+<span class="lineNum">     352 </span>            :         {XK_Page_Down, GF_KEY_PAGEDOWN, 0},
+<span class="lineNum">     353 </span>            :         {XK_End, GF_KEY_END, 0},
+<span class="lineNum">     354 </span>            :         //{XK_Begin, GF_KEY_BEGIN, 0},
+<span class="lineNum">     355 </span>            :         {XK_Select, GF_KEY_SELECT, 0},
+<span class="lineNum">     356 </span>            :         {XK_Print, GF_KEY_PRINTSCREEN, 0},
+<span class="lineNum">     357 </span>            :         {XK_Execute, GF_KEY_EXECUTE, 0},
+<span class="lineNum">     358 </span>            :         {XK_Insert, GF_KEY_INSERT, 0},
+<span class="lineNum">     359 </span>            :         {XK_Undo, GF_KEY_UNDO, 0},
+<span class="lineNum">     360 </span>            :         //{XK_Redo, GF_KEY_BEGIN, 0},
+<span class="lineNum">     361 </span>            :         //{XK_Menu, GF_KEY_BEGIN, 0},
+<span class="lineNum">     362 </span>            :         {XK_Find, GF_KEY_FIND, 0},
+<span class="lineNum">     363 </span>            :         {XK_Cancel, GF_KEY_CANCEL, 0},
+<span class="lineNum">     364 </span>            :         {XK_Help, GF_KEY_HELP, 0},
+<span class="lineNum">     365 </span>            :         //{XK_Break, GF_KEY_BREAK, 0},
+<span class="lineNum">     366 </span>            :         //{XK_Mode_switch, GF_KEY_BEGIN, 0},
+<span class="lineNum">     367 </span>            :         {XK_Num_Lock, GF_KEY_NUMLOCK, 0},
+<span class="lineNum">     368 </span>            :         {XK_F1, GF_KEY_F1, 0},
+<span class="lineNum">     369 </span>            :         {XK_F2, GF_KEY_F2, 0},
+<span class="lineNum">     370 </span>            :         {XK_F3, GF_KEY_F3, 0},
+<span class="lineNum">     371 </span>            :         {XK_F4, GF_KEY_F4, 0},
+<span class="lineNum">     372 </span>            :         {XK_F5, GF_KEY_F5, 0},
+<span class="lineNum">     373 </span>            :         {XK_F6, GF_KEY_F6, 0},
+<span class="lineNum">     374 </span>            :         {XK_F7, GF_KEY_F7, 0},
+<span class="lineNum">     375 </span>            :         {XK_F8, GF_KEY_F8, 0},
+<span class="lineNum">     376 </span>            :         {XK_F9, GF_KEY_F9, 0},
+<span class="lineNum">     377 </span>            :         {XK_F10, GF_KEY_F10, 0},
+<span class="lineNum">     378 </span>            :         {XK_F11, GF_KEY_F11, 0},
+<span class="lineNum">     379 </span>            :         {XK_F12, GF_KEY_F12, 0},
+<span class="lineNum">     380 </span>            :         {XK_F13, GF_KEY_F13, 0},
+<span class="lineNum">     381 </span>            :         {XK_F14, GF_KEY_F14, 0},
+<span class="lineNum">     382 </span>            :         {XK_F15, GF_KEY_F15, 0},
+<span class="lineNum">     383 </span>            :         {XK_F16, GF_KEY_F16, 0},
+<span class="lineNum">     384 </span>            :         {XK_F17, GF_KEY_F17, 0},
+<span class="lineNum">     385 </span>            :         {XK_F18, GF_KEY_F18, 0},
+<span class="lineNum">     386 </span>            :         {XK_F19, GF_KEY_F19, 0},
+<span class="lineNum">     387 </span>            :         {XK_F20, GF_KEY_F20, 0},
+<span class="lineNum">     388 </span>            :         {XK_F21, GF_KEY_F21, 0},
+<span class="lineNum">     389 </span>            :         {XK_F22, GF_KEY_F22, 0},
+<span class="lineNum">     390 </span>            :         {XK_F23, GF_KEY_F23, 0},
+<span class="lineNum">     391 </span>            :         {XK_F24, GF_KEY_F24, 0},
+<span class="lineNum">     392 </span>            :         {XK_KP_Delete, GF_KEY_COMMA, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     393 </span>            :         {XK_KP_Decimal, GF_KEY_COMMA, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     394 </span>            :         {XK_KP_Insert, GF_KEY_0, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     395 </span>            :         {XK_KP_0, GF_KEY_0, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     396 </span>            :         {XK_KP_End, GF_KEY_1, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     397 </span>            :         {XK_KP_1, GF_KEY_1, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     398 </span>            :         {XK_KP_Down, GF_KEY_2, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     399 </span>            :         {XK_KP_2, GF_KEY_2, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     400 </span>            :         {XK_KP_Page_Down, GF_KEY_3, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     401 </span>            :         {XK_KP_3, GF_KEY_3, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     402 </span>            :         {XK_KP_Left, GF_KEY_4, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     403 </span>            :         {XK_KP_4, GF_KEY_4, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     404 </span>            :         {XK_KP_Begin, GF_KEY_5, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     405 </span>            :         {XK_KP_5, GF_KEY_5, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     406 </span>            :         {XK_KP_Right, GF_KEY_6, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     407 </span>            :         {XK_KP_6, GF_KEY_6, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     408 </span>            :         {XK_KP_Home, GF_KEY_7, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     409 </span>            :         {XK_KP_7, GF_KEY_7, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     410 </span>            :         {XK_KP_Up, GF_KEY_8, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     411 </span>            :         {XK_KP_8, GF_KEY_8, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     412 </span>            :         {XK_KP_Page_Up, GF_KEY_9, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     413 </span>            :         {XK_KP_9, GF_KEY_9, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     414 </span>            :         {XK_KP_Add, GF_KEY_PLUS, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     415 </span>            :         {XK_KP_Subtract, GF_KEY_HYPHEN, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     416 </span>            :         {XK_KP_Multiply, GF_KEY_STAR, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     417 </span>            :         {XK_KP_Divide, GF_KEY_SLASH, GF_KEY_EXT_NUMPAD},
+<span class="lineNum">     418 </span>            :         {XK_Shift_R, GF_KEY_EXT_RIGHT, 0},
+<span class="lineNum">     419 </span>            :         {XK_Shift_L, GF_KEY_SHIFT, 0},
+<span class="lineNum">     420 </span>            :         {XK_Control_R, GF_KEY_EXT_RIGHT, 0},
+<span class="lineNum">     421 </span>            :         {XK_Control_L, GF_KEY_CONTROL, 0},
+<span class="lineNum">     422 </span>            :         {XK_Alt_R, GF_KEY_EXT_RIGHT, 0},
+<span class="lineNum">     423 </span>            :         {XK_Alt_L, GF_KEY_ALT, 0},
+<span class="lineNum">     424 </span>            :         {XK_Super_R, GF_KEY_EXT_RIGHT, 0},
+<span class="lineNum">     425 </span>            :         {XK_Super_L, GF_KEY_WIN, 0},
+<span class="lineNum">     426 </span>            :         {XK_Menu, GF_KEY_META, 0},
+<span class="lineNum">     427 </span>            : #ifdef XK_XKB_KEYS
+<span class="lineNum">     428 </span>            :         {XK_ISO_Level3_Shift, GF_KEY_ALTGRAPH, 0},
+<span class="lineNum">     429 </span>            : #endif
+<span class="lineNum">     430 </span>            :         {'!', GF_KEY_EXCLAMATION, 0},
+<span class="lineNum">     431 </span>            :         {'&quot;', GF_KEY_QUOTATION, 0},
+<span class="lineNum">     432 </span>            :         {'#', GF_KEY_NUMBER, 0},
+<span class="lineNum">     433 </span>            :         {'$', GF_KEY_DOLLAR, 0},
+<span class="lineNum">     434 </span>            :         {'&amp;', GF_KEY_AMPERSAND, 0},
+<span class="lineNum">     435 </span>            :         {'\'', GF_KEY_APOSTROPHE, 0},
+<span class="lineNum">     436 </span>            :         {'(', GF_KEY_LEFTPARENTHESIS, 0},
+<span class="lineNum">     437 </span>            :         {')', GF_KEY_RIGHTPARENTHESIS, 0},
+<span class="lineNum">     438 </span>            :         {',', GF_KEY_COMMA, 0},
+<span class="lineNum">     439 </span>            :         {':', GF_KEY_COLON, 0},
+<span class="lineNum">     440 </span>            :         {';', GF_KEY_SEMICOLON, 0},
+<span class="lineNum">     441 </span>            :         {'&lt;', GF_KEY_LESSTHAN, 0},
+<span class="lineNum">     442 </span>            :         {'&gt;', GF_KEY_GREATERTHAN, 0},
+<span class="lineNum">     443 </span>            :         {'?', GF_KEY_QUESTION, 0},
+<span class="lineNum">     444 </span>            :         {'@', GF_KEY_AT, 0},
+<span class="lineNum">     445 </span>            :         {'[', GF_KEY_LEFTSQUAREBRACKET, 0},
+<span class="lineNum">     446 </span>            :         {']', GF_KEY_RIGHTSQUAREBRACKET, 0},
+<span class="lineNum">     447 </span>            :         {'\\', GF_KEY_BACKSLASH, 0},
+<span class="lineNum">     448 </span>            :         {'_', GF_KEY_UNDERSCORE, 0},
+<span class="lineNum">     449 </span>            :         {'`', GF_KEY_GRAVEACCENT, 0},
+<span class="lineNum">     450 </span>            :         {' ', GF_KEY_SPACE, 0},
+<span class="lineNum">     451 </span>            :         {'/', GF_KEY_SLASH, 0},
+<span class="lineNum">     452 </span>            :         {'*', GF_KEY_STAR, 0},
+<span class="lineNum">     453 </span>            :         {'-', GF_KEY_HYPHEN, 0},
+<span class="lineNum">     454 </span>            :         {'+', GF_KEY_PLUS, 0},
+<span class="lineNum">     455 </span>            :         {'=', GF_KEY_EQUALS, 0},
+<span class="lineNum">     456 </span>            :         {'^', GF_KEY_CIRCUM, 0},
+<span class="lineNum">     457 </span>            :         {'{', GF_KEY_LEFTCURLYBRACKET, 0},
+<span class="lineNum">     458 </span>            :         {'}', GF_KEY_RIGHTCURLYBRACKET, 0},
+<span class="lineNum">     459 </span>            :         {'|', GF_KEY_PIPE, 0},
+<span class="lineNum">     460 </span>            : };
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            : static u32 num_x11_keys = sizeof(X11Keys) / sizeof(X11KeyToGPAC);
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span>            : /*
+<span class="lineNum">     465 </span>            :  * Translate X_Key to GF_Key
+<span class="lineNum">     466 </span>            :  */
+<a name="467"><span class="lineNum">     467 </span>            : //=====================================</a>
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span><span class="lineCov">        154 : static void x11_translate_key(u32 X11Key, GF_EventKey *evt)</span>
+<span class="lineNum">     470 </span>            : {
+<span class="lineNum">     471 </span>            :         u32 i;
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineCov">        154 :         evt-&gt;flags = 0;</span>
+<span class="lineNum">     474 </span><span class="lineCov">        154 :         evt-&gt;hw_code = X11Key &amp; 0xFF;</span>
+<span class="lineNum">     475 </span><span class="lineCov">        154 :         for (i=0; i&lt;num_x11_keys; i++) {</span>
+<span class="lineNum">     476 </span><span class="lineCov">        154 :                 if (X11Key == X11Keys[i].x11_key) {</span>
+<span class="lineNum">     477 </span><span class="lineCov">        154 :                         evt-&gt;key_code = X11Keys[i].gf_key;</span>
+<span class="lineNum">     478 </span><span class="lineCov">        154 :                         evt-&gt;flags = X11Keys[i].gf_flags;</span>
+<span class="lineNum">     479 </span><span class="lineCov">        154 :                         return;</span>
+<span class="lineNum">     480 </span>            :                 }
+<span class="lineNum">     481 </span>            :         }
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :         if ((X11Key&gt;='0') &amp;&amp; (X11Key&lt;='9'))</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :                 evt-&gt;key_code = GF_KEY_0 + X11Key - '0';</span>
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :         else if ((X11Key&gt;='A') &amp;&amp; (X11Key&lt;='Z'))</span>
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :                 evt-&gt;key_code = GF_KEY_A + X11Key - 'A';</span>
+<span class="lineNum">     487 </span>            :         /*DOM3: translate to A -&gt; Z, not a -&gt; z*/
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :         else if ((X11Key&gt;='a') &amp;&amp; (X11Key&lt;='z'))  {</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :                 evt-&gt;key_code = GF_KEY_A + X11Key - 'a';</span>
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :                 evt-&gt;hw_code = X11Key - 'a' + 'A';</span>
+<span class="lineNum">     491 </span>            :         } else {
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :                 evt-&gt;key_code = GF_KEY_UNIDENTIFIED;</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[X11] Unrecognized key %X\n&quot;, X11Key));</span>
+<span class="lineNum">     494 </span>            :         }
+<span class="lineNum">     495 </span>            : }
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span>            : 
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            : /* taken from SDL
+<a name="500"><span class="lineNum">     500 </span>            :  Ack!  XPending() actually performs a blocking read if no events available</a>
+<span class="lineNum">     501 </span>            : */
+<span class="lineNum">     502 </span><span class="lineCov">       1599 : static int X11_Pending(Display *display)</span>
+<span class="lineNum">     503 </span>            : {
+<span class="lineNum">     504 </span>            :         /* Flush the display connection and look to see if events are queued */
+<span class="lineNum">     505 </span><span class="lineCov">       1599 :         XFlush(display);</span>
+<span class="lineNum">     506 </span><span class="lineCov">       1599 :         if ( XEventsQueued(display, QueuedAlready) ) return(1);</span>
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            :         /* More drastic measures are required -- see if X is ready to talk */
+<span class="lineNum">     509 </span>            :         {
+<span class="lineNum">     510 </span>            :                 static struct timeval zero_time;        /* static == 0 */
+<span class="lineNum">     511 </span>            :                 int x11_fd;
+<span class="lineNum">     512 </span>            :                 fd_set fdset;
+<span class="lineNum">     513 </span><span class="lineCov">        963 :                 x11_fd = ConnectionNumber(display);</span>
+<span class="lineNum">     514 </span><span class="lineCov">        963 :                 FD_ZERO(&amp;fdset);</span>
+<span class="lineNum">     515 </span><span class="lineCov">        963 :                 FD_SET(x11_fd, &amp;fdset);</span>
+<span class="lineNum">     516 </span><span class="lineCov">        963 :                 if ( select(x11_fd+1, &amp;fdset, NULL, NULL, &amp;zero_time) == 1 ) {</span>
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :                         return(XPending(display));</span>
+<span class="lineNum">     518 </span>            :                 }
+<span class="lineNum">     519 </span>            :         }
+<span class="lineNum">     520 </span>            :         /* Oh well, nothing is ready .. */
+<span class="lineNum">     521 </span><span class="lineCov">        963 :         return(0);</span>
+<span class="lineNum">     522 </span>            : }
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            : /*
+<span class="lineNum">     525 </span>            :  * handle X11 events
+<a name="526"><span class="lineNum">     526 </span>            :  * here we handle key, mouse, repaint and window sizing events</a>
+<span class="lineNum">     527 </span>            :  */
+<span class="lineNum">     528 </span><span class="lineCov">        963 : static void X11_HandleEvents(GF_VideoOutput *vout)</span>
+<span class="lineNum">     529 </span>            : {
+<span class="lineNum">     530 </span>            :         GF_Event evt;
+<span class="lineNum">     531 </span>            :         Window the_window;
+<span class="lineNum">     532 </span>            :         XComposeStatus state;
+<span class="lineNum">     533 </span><span class="lineCov">        963 :         X11VID();</span>
+<span class="lineNum">     534 </span>            :         unsigned char keybuf[32];
+<span class="lineNum">     535 </span>            :         XEvent xevent;
+<span class="lineNum">     536 </span><span class="lineCov">        963 :         if (!xWindow-&gt;display) return;</span>
+<span class="lineNum">     537 </span><span class="lineCov">        963 :         the_window = xWindow-&gt;fullscreen ? xWindow-&gt;full_wnd : xWindow-&gt;wnd;</span>
+<span class="lineNum">     538 </span><span class="lineCov">        963 :         XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span><span class="lineCov">       2562 :         while (X11_Pending(xWindow-&gt;display)) {</span>
+<span class="lineNum">     541 </span><span class="lineCov">        636 :                 XNextEvent(xWindow-&gt;display, &amp;xevent);</span>
+<span class="lineNum">     542 </span><span class="lineCov">        636 :                 if (xevent.xany.window!=the_window) continue;</span>
+<span class="lineNum">     543 </span><span class="lineCov">        622 :                 switch (xevent.type) {</span>
+<span class="lineNum">     544 </span>            :                 /*
+<span class="lineNum">     545 </span>            :                  * X11 window resized event
+<span class="lineNum">     546 </span>            :                  * must inform GPAC
+<span class="lineNum">     547 </span>            :                  */
+<span class="lineNum">     548 </span><span class="lineCov">         32 :                 case ConfigureNotify:</span>
+<span class="lineNum">     549 </span><span class="lineCov">         32 :                         if ((unsigned int) xevent.xconfigure.width != xWindow-&gt;w_width</span>
+<span class="lineNum">     550 </span><span class="lineCov">         32 :                                 || (unsigned int) xevent.xconfigure.height != xWindow-&gt;w_height)</span>
+<span class="lineNum">     551 </span>            :                         {
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :                                 evt.type = GF_EVENT_SIZE;</span>
+<span class="lineNum">     553 </span><span class="lineNoCov">          0 :                                 xWindow-&gt;w_width = evt.size.width = xevent.xconfigure.width;</span>
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :                                 xWindow-&gt;w_height = evt.size.height = xevent.xconfigure.height;</span>
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :                                 vout-&gt;on_event(vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     556 </span>            :                         } else {
+<span class="lineNum">     557 </span><span class="lineCov">         32 :                                 evt.type = GF_EVENT_MOVE;</span>
+<span class="lineNum">     558 </span><span class="lineCov">         32 :                                 evt.move.x = xevent.xconfigure.x;</span>
+<span class="lineNum">     559 </span><span class="lineCov">         32 :                                 evt.move.y = xevent.xconfigure.y;</span>
+<span class="lineNum">     560 </span><span class="lineCov">         32 :                                 vout-&gt;on_event(vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     561 </span>            :                         }
+<span class="lineNum">     562 </span>            :                         break;
+<span class="lineNum">     563 </span>            :                 /*
+<span class="lineNum">     564 </span>            :                  * Windows need repaint
+<span class="lineNum">     565 </span>            :                  */
+<span class="lineNum">     566 </span><span class="lineCov">         26 :                 case Expose:</span>
+<span class="lineNum">     567 </span><span class="lineCov">         26 :                         if (xevent.xexpose.count &gt; 0)        break;</span>
+<span class="lineNum">     568 </span><span class="lineCov">         26 :                         evt.type = GF_EVENT_REFRESH;</span>
+<span class="lineNum">     569 </span><span class="lineCov">         26 :                         vout-&gt;on_event (vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     570 </span><span class="lineCov">         26 :                         break;</span>
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span>            :                 /* Have we been requested to quit (or another client message?) */
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :                 case ClientMessage:</span>
+<span class="lineNum">     574 </span><span class="lineNoCov">          0 :                         if ( (xevent.xclient.format == 32) &amp;&amp; (xevent.xclient.data.l[0] == xWindow-&gt;WM_DELETE_WINDOW) ) {</span>
+<span class="lineNum">     575 </span>            :                                 memset(&amp;evt, 0, sizeof(GF_Event));
+<span class="lineNum">     576 </span><span class="lineNoCov">          0 :                                 evt.type = GF_EVENT_QUIT;</span>
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :                                 vout-&gt;on_event(vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     578 </span>            :                         }
+<span class="lineNum">     579 </span>            :                         break;
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :                 case KeyPress:</span>
+<span class="lineNum">     582 </span>            :                 case KeyRelease:
+<span class="lineNum">     583 </span><span class="lineNoCov">          0 :                         x11_translate_key(XKeycodeToKeysym (xWindow-&gt;display, xevent.xkey.keycode, 0), &amp;evt.key);</span>
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 :                         evt.type = (xevent.type ==KeyPress) ? GF_EVENT_KEYDOWN : GF_EVENT_KEYUP;</span>
+<span class="lineNum">     585 </span><span class="lineNoCov">          0 :                         vout-&gt;on_event (vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :                         if (xevent.type ==KeyPress) {</span>
+<span class="lineNum">     588 </span>            :                                 s32 len;
+<span class="lineNum">     589 </span><span class="lineNoCov">          0 :                                 len = XLookupString (&amp;xevent.xkey, (char *) keybuf, sizeof(keybuf), NULL, &amp;state);</span>
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :                                 if ((len&gt;0) &amp;&amp; (len&lt;5)) {</span>
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :                                         utf8_to_ucs4 (&amp; evt.character.unicode_char, len, keybuf);</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                                         evt.type = GF_EVENT_TEXTINPUT;</span>
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :                                         vout-&gt;on_event (vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     594 </span>            :                                 }
+<span class="lineNum">     595 </span>            :                         }
+<span class="lineNum">     596 </span>            : 
+<span class="lineNum">     597 </span><span class="lineNoCov">          0 :                         if (evt.key.key_code==GF_KEY_CONTROL) xWindow-&gt;ctrl_down = (xevent.type==KeyPress) ? 1 : 0;</span>
+<span class="lineNum">     598 </span><span class="lineNoCov">          0 :                         else if (evt.key.key_code==GF_KEY_ALT) xWindow-&gt;alt_down = (xevent.type==KeyPress) ? 1 : 0;</span>
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :                         else if (evt.key.key_code==GF_KEY_META) xWindow-&gt;meta_down = (xevent.type==KeyPress) ? 1 : 0;</span>
+<span class="lineNum">     600 </span>            : 
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :                         if ((evt.type==GF_EVENT_KEYUP) &amp;&amp; (evt.key.key_code==GF_KEY_V) &amp;&amp; xWindow-&gt;ctrl_down) {</span>
+<span class="lineNum">     602 </span>            :                                 int sformat;
+<span class="lineNum">     603 </span>            :                                 unsigned long nb_bytes, overflow;
+<span class="lineNum">     604 </span>            :                                 unsigned char *data;
+<span class="lineNum">     605 </span>            :                                 Window owner;
+<span class="lineNum">     606 </span>            :                                 Atom selection, stype;
+<span class="lineNum">     607 </span><span class="lineNoCov">          0 :                                 Atom clipb_atom = XInternAtom(xWindow-&gt;display, &quot;CLIPBOARD&quot;, 0);</span>
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 :                                 if (clipb_atom == None) break;</span>
+<span class="lineNum">     609 </span><span class="lineNoCov">          0 :                                 owner = XGetSelectionOwner(xWindow-&gt;display, clipb_atom);</span>
+<span class="lineNum">     610 </span><span class="lineNoCov">          0 :                                 if ((owner == None) || (owner == the_window)) {</span>
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :                                         owner = DefaultRootWindow(xWindow-&gt;display);</span>
+<span class="lineNum">     612 </span>            :                                         selection = XA_CUT_BUFFER0;
+<span class="lineNum">     613 </span>            :                                 } else {
+<span class="lineNum">     614 </span>            :                                         owner = the_window;
+<span class="lineNum">     615 </span><span class="lineNoCov">          0 :                                         selection = XInternAtom(xWindow-&gt;display, &quot;GPAC_TEXT_SEL&quot;, False);</span>
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :                                         XConvertSelection(xWindow-&gt;display, clipb_atom, XA_STRING, selection, owner, CurrentTime);</span>
+<span class="lineNum">     617 </span>            :                                 }
+<span class="lineNum">     618 </span>            : 
+<span class="lineNum">     619 </span>            : 
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 :                                 if (XGetWindowProperty(xWindow-&gt;display, owner, selection, 0, INT_MAX/4, False, AnyPropertyType, &amp;stype, &amp;sformat, &amp;nb_bytes, &amp;overflow, &amp;data) == Success) {</span>
+<span class="lineNum">     621 </span><span class="lineNoCov">          0 :                                         if (stype == XA_STRING) {</span>
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :                                                 char *text = gf_malloc(sizeof(char)*(nb_bytes+1));</span>
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :                                                 if (text) {</span>
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :                                                         memcpy(text, data, nb_bytes);</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :                                                         text[nb_bytes] = 0;</span>
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 :                                                         evt.type = GF_EVENT_PASTE_TEXT;</span>
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :                                                         evt.clipboard.text = text;</span>
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :                                                         vout-&gt;on_event(vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 :                                                         gf_free(text);</span>
+<span class="lineNum">     630 </span>            :                                                 }
+<span class="lineNum">     631 </span>            :                                         }
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :                                         XFree(data);</span>
+<span class="lineNum">     633 </span>            :                                 }
+<span class="lineNum">     634 </span>            :                         }
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :                         else if ((evt.type==GF_EVENT_KEYUP) &amp;&amp; (evt.key.key_code==GF_KEY_C) &amp;&amp; xWindow-&gt;ctrl_down) {</span>
+<span class="lineNum">     636 </span><span class="lineNoCov">          0 :                                 Atom clipb_atom = XInternAtom(xWindow-&gt;display, &quot;CLIPBOARD&quot;, 0);</span>
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :                                 evt.type = GF_EVENT_COPY_TEXT;</span>
+<span class="lineNum">     638 </span><span class="lineNoCov">          0 :                                 if (vout-&gt;on_event(vout-&gt;evt_cbk_hdl, &amp;evt)==GF_TRUE) {</span>
+<span class="lineNum">     639 </span><span class="lineNoCov">          0 :                                         if (evt.clipboard.text) {</span>
+<span class="lineNum">     640 </span><span class="lineNoCov">          0 :                                                 XChangeProperty(xWindow-&gt;display, DefaultRootWindow(xWindow-&gt;display), XA_CUT_BUFFER0, XA_STRING, 8, PropModeReplace, (const unsigned char *)evt.clipboard.text, strlen(evt.clipboard.text));</span>
+<span class="lineNum">     641 </span><span class="lineNoCov">          0 :                                                 gf_free(evt.clipboard.text);</span>
+<span class="lineNum">     642 </span>            :                                         }
+<span class="lineNum">     643 </span>            : 
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :                                         if ((clipb_atom != None) &amp;&amp; XGetSelectionOwner(xWindow-&gt;display, clipb_atom) != the_window) {</span>
+<span class="lineNum">     645 </span><span class="lineNoCov">          0 :                                                 XSetSelectionOwner(xWindow-&gt;display, clipb_atom, the_window, CurrentTime);</span>
+<span class="lineNum">     646 </span>            :                                         }
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 :                                         if (XGetSelectionOwner(xWindow-&gt;display, XA_PRIMARY) != the_window) {</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :                                                 XSetSelectionOwner(xWindow-&gt;display, XA_PRIMARY, the_window, CurrentTime);</span>
+<span class="lineNum">     649 </span>            :                                         }
+<span class="lineNum">     650 </span>            :                                 }
+<span class="lineNum">     651 </span>            :                         }
+<span class="lineNum">     652 </span>            :                         break;
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span><span class="lineNoCov">          0 :                 case ButtonPress:</span>
+<span class="lineNum">     655 </span><span class="lineNoCov">          0 :                         if (!xWindow-&gt;fullscreen &amp;&amp; !xWindow-&gt;has_focus) {</span>
+<span class="lineNum">     656 </span><span class="lineNoCov">          0 :                                 xWindow-&gt;has_focus = 1;</span>
+<span class="lineNum">     657 </span><span class="lineNoCov">          0 :                                 XSetInputFocus(xWindow-&gt;display, xWindow-&gt;wnd, RevertToParent, CurrentTime);</span>
+<span class="lineNum">     658 </span>            :                         }
+<span class="lineNum">     659 </span>            :                 case ButtonRelease:
+<span class="lineNum">     660 </span>            :                         //                              last_mouse_move = xevent.xbutton.time;
+<span class="lineNum">     661 </span><span class="lineNoCov">          0 :                         evt.mouse.x = xevent.xbutton.x;</span>
+<span class="lineNum">     662 </span><span class="lineNoCov">          0 :                         evt.mouse.y = xevent.xbutton.y;</span>
+<span class="lineNum">     663 </span><span class="lineNoCov">          0 :                         evt.type = (xevent.type == ButtonRelease) ? GF_EVENT_MOUSEUP : GF_EVENT_MOUSEDOWN;</span>
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span><span class="lineNoCov">          0 :                         switch (xevent.xbutton.button) {</span>
+<span class="lineNum">     666 </span><span class="lineNoCov">          0 :                         case Button1:</span>
+<span class="lineNum">     667 </span><span class="lineNoCov">          0 :                                 evt.mouse.button = GF_MOUSE_LEFT;</span>
+<span class="lineNum">     668 </span><span class="lineNoCov">          0 :                                 vout-&gt;on_event (vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     669 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     670 </span><span class="lineNoCov">          0 :                         case Button2:</span>
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 :                                 evt.mouse.button = GF_MOUSE_MIDDLE;</span>
+<span class="lineNum">     672 </span><span class="lineNoCov">          0 :                                 vout-&gt;on_event (vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     673 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 :                         case Button3:</span>
+<span class="lineNum">     675 </span><span class="lineNoCov">          0 :                                 evt.mouse.button = GF_MOUSE_RIGHT;</span>
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 :                                 vout-&gt;on_event (vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     677 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     678 </span><span class="lineNoCov">          0 :                         case Button4:</span>
+<span class="lineNum">     679 </span><span class="lineNoCov">          0 :                                 evt.type = GF_EVENT_MOUSEWHEEL;</span>
+<span class="lineNum">     680 </span><span class="lineNoCov">          0 :                                 evt.mouse.wheel_pos = FIX_ONE;</span>
+<span class="lineNum">     681 </span><span class="lineNoCov">          0 :                                 vout-&gt;on_event(vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     682 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     683 </span><span class="lineNoCov">          0 :                         case Button5:</span>
+<span class="lineNum">     684 </span><span class="lineNoCov">          0 :                                 evt.type = GF_EVENT_MOUSEWHEEL;</span>
+<span class="lineNum">     685 </span><span class="lineNoCov">          0 :                                 evt.mouse.wheel_pos = -FIX_ONE;</span>
+<span class="lineNum">     686 </span><span class="lineNoCov">          0 :                                 vout-&gt;on_event(vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     687 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     688 </span>            :                         }
+<span class="lineNum">     689 </span><span class="lineNoCov">          0 :                         if (!xWindow-&gt;fullscreen &amp;&amp; (xevent.type==ButtonPress) )</span>
+<span class="lineNum">     690 </span><span class="lineNoCov">          0 :                                 XSetInputFocus(xWindow-&gt;display, xWindow-&gt;wnd, RevertToNone, CurrentTime);</span>
+<span class="lineNum">     691 </span>            :                         break;
+<span class="lineNum">     692 </span>            : 
+<span class="lineNum">     693 </span><span class="lineNoCov">          0 :                 case MotionNotify:</span>
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 :                         evt.type = GF_EVENT_MOUSEMOVE;</span>
+<span class="lineNum">     695 </span><span class="lineNoCov">          0 :                         evt.mouse.x = xevent.xmotion.x;</span>
+<span class="lineNum">     696 </span><span class="lineNoCov">          0 :                         evt.mouse.y = xevent.xmotion.y;</span>
+<span class="lineNum">     697 </span><span class="lineNoCov">          0 :                         vout-&gt;on_event (vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     698 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     699 </span>            :                 case PropertyNotify:
+<span class="lineNum">     700 </span>            :                         break;
+<span class="lineNum">     701 </span>            :                 case MapNotify:
+<span class="lineNum">     702 </span>            :                         break;
+<span class="lineNum">     703 </span>            :                 case CirculateNotify:
+<span class="lineNum">     704 </span>            :                         break;
+<span class="lineNum">     705 </span>            :                 case UnmapNotify:
+<span class="lineNum">     706 </span>            :                         break;
+<span class="lineNum">     707 </span>            :                 case ReparentNotify:
+<span class="lineNum">     708 </span>            :                         break;
+<span class="lineNum">     709 </span><span class="lineCov">          1 :                 case FocusOut:</span>
+<span class="lineNum">     710 </span><span class="lineCov">          1 :                         if (!xWindow-&gt;fullscreen) xWindow-&gt;has_focus = 0;</span>
+<span class="lineNum">     711 </span>            :                         break;
+<span class="lineNum">     712 </span><span class="lineCov">          2 :                 case FocusIn:</span>
+<span class="lineNum">     713 </span><span class="lineCov">          2 :                         if (!xWindow-&gt;fullscreen) xWindow-&gt;has_focus = 1;</span>
+<span class="lineNum">     714 </span>            :                         break;
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span>            :                 case DestroyNotify:
+<span class="lineNum">     717 </span>            :                         memset(&amp;evt, 0, sizeof(GF_Event));
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :                         evt.type = GF_EVENT_QUIT;</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :                         vout-&gt;on_event(vout-&gt;evt_cbk_hdl, &amp;evt);</span>
+<span class="lineNum">     720 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     721 </span>            : 
+<span class="lineNum">     722 </span>            :                 default:
+<span class="lineNum">     723 </span>            :                         break;
+<span class="lineNum">     724 </span>            :                 }
+<span class="lineNum">     725 </span><span class="lineNoCov">          0 :         }</span>
+<span class="lineNum">     726 </span>            : 
+<span class="lineNum">     727 </span>            : }
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span>            : 
+<a name="730"><span class="lineNum">     730 </span>            : </a>
+<span class="lineNum">     731 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">     732 </span><span class="lineCov">        188 : static GF_Err X11_SetupGL(GF_VideoOutput *vout)</span>
+<span class="lineNum">     733 </span>            : {
+<span class="lineNum">     734 </span>            :         GF_Event evt;
+<span class="lineNum">     735 </span><span class="lineCov">        188 :         XWindow *xWin = (XWindow *)vout-&gt;opaque;</span>
+<span class="lineNum">     736 </span>            : 
+<span class="lineNum">     737 </span><span class="lineCov">        188 :         if (!xWin-&gt;glx_visualinfo) return GF_IO_ERR;</span>
+<span class="lineNum">     738 </span>            :         memset(&amp;evt, 0, sizeof(GF_Event));
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span><span class="lineCov">        188 :         if (!xWin-&gt;glx_context) {</span>
+<span class="lineNum">     741 </span><span class="lineCov">        152 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MMIO, (&quot;[X11] Setting up GL for display %d\n&quot;, xWin-&gt;display));</span>
+<span class="lineNum">     742 </span><span class="lineCov">        152 :                 XSync(xWin-&gt;display, False);</span>
+<span class="lineNum">     743 </span><span class="lineCov">        152 :                 xWin-&gt;glx_context = glXCreateContext(xWin-&gt;display,xWin-&gt;glx_visualinfo, NULL, True);</span>
+<span class="lineNum">     744 </span><span class="lineCov">        152 :                 XSync(xWin-&gt;display, False);</span>
+<span class="lineNum">     745 </span><span class="lineCov">        152 :                 if (!xWin-&gt;glx_context) return GF_IO_ERR;</span>
+<span class="lineNum">     746 </span>            : 
+<span class="lineNum">     747 </span><span class="lineCov">        152 :                 evt.setup.hw_reset = 1;</span>
+<span class="lineNum">     748 </span>            :         }
+<span class="lineNum">     749 </span><span class="lineCov">        188 :         if ( ! glXMakeCurrent(xWin-&gt;display, xWin-&gt;fullscreen ? xWin-&gt;full_wnd : xWin-&gt;wnd, xWin-&gt;glx_context) ) return GF_IO_ERR;</span>
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">     752 </span><span class="lineCov">        188 :         if (gf_opts_get_bool(&quot;core&quot;, &quot;disable-vsync&quot;)) {</span>
+<span class="lineNum">     753 </span><span class="lineNoCov">          0 :                 my_glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)glXGetProcAddress( (const GLubyte*)&quot;glXSwapIntervalEXT&quot;);</span>
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :                 if (my_glXSwapIntervalEXT != NULL) {</span>
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :                         my_glXSwapIntervalEXT(xWin-&gt;display, xWin-&gt;wnd, 0);</span>
+<span class="lineNum">     756 </span>            :                 } else {
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :                         my_glXSwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC)glXGetProcAddress( (const GLubyte*)&quot;glXSwapIntervalMESA&quot;);</span>
+<span class="lineNum">     758 </span><span class="lineNoCov">          0 :                         if (my_glXSwapIntervalMESA != NULL ) {</span>
+<span class="lineNum">     759 </span><span class="lineNoCov">          0 :                                 my_glXSwapIntervalMESA(0);</span>
+<span class="lineNum">     760 </span>            :                         } else {
+<span class="lineNum">     761 </span><span class="lineNoCov">          0 :                                 my_glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress( (const GLubyte*)&quot;glXSwapIntervalSGI&quot;);</span>
+<span class="lineNum">     762 </span><span class="lineNoCov">          0 :                                 if (my_glXSwapIntervalSGI != NULL ) {</span>
+<span class="lineNum">     763 </span><span class="lineNoCov">          0 :                                         my_glXSwapIntervalSGI(0);</span>
+<span class="lineNum">     764 </span>            :                                 }
+<span class="lineNum">     765 </span>            :                         }
+<span class="lineNum">     766 </span>            :                 }
+<span class="lineNum">     767 </span>            :         }
+<span class="lineNum">     768 </span>            : #endif
+<span class="lineNum">     769 </span><span class="lineCov">        188 :         XSync(xWin-&gt;display, False);</span>
+<span class="lineNum">     770 </span>            : 
+<span class="lineNum">     771 </span><span class="lineCov">        188 :         evt.type = GF_EVENT_VIDEO_SETUP;</span>
+<span class="lineNum">     772 </span><span class="lineCov">        188 :         vout-&gt;on_event (vout-&gt;evt_cbk_hdl,&amp;evt);</span>
+<span class="lineNum">     773 </span><span class="lineCov">        188 :         xWin-&gt;is_init = 1;</span>
+<span class="lineNum">     774 </span><span class="lineCov">        188 :         return GF_OK;</span>
+<a name="775"><span class="lineNum">     775 </span>            : }</a>
+<span class="lineNum">     776 </span>            : 
+<span class="lineNum">     777 </span><span class="lineCov">        153 : static void X11_ReleaseGL(XWindow *xWin)</span>
+<span class="lineNum">     778 </span>            : {
+<span class="lineNum">     779 </span><span class="lineCov">        153 :         XSync(xWin-&gt;display, False);</span>
+<span class="lineNum">     780 </span><span class="lineCov">        153 :         if (xWin-&gt;glx_context) {</span>
+<span class="lineNum">     781 </span><span class="lineCov">        151 :                 glXMakeCurrent(xWin-&gt;display, None, NULL);</span>
+<span class="lineNum">     782 </span><span class="lineCov">        151 :                 glXDestroyContext(xWin-&gt;display, xWin-&gt;glx_context);</span>
+<span class="lineNum">     783 </span><span class="lineCov">        151 :                 xWin-&gt;glx_context = NULL;</span>
+<span class="lineNum">     784 </span>            :         }
+<span class="lineNum">     785 </span><span class="lineCov">        153 :         xWin-&gt;is_init = 0;</span>
+<span class="lineNum">     786 </span><span class="lineCov">        153 :         XSync(xWin-&gt;display, False);</span>
+<span class="lineNum">     787 </span><span class="lineCov">        153 : }</span>
+<span class="lineNum">     788 </span>            : 
+<span class="lineNum">     789 </span>            : #endif
+<a name="790"><span class="lineNum">     790 </span>            : </a>
+<span class="lineNum">     791 </span>            : 
+<span class="lineNum">     792 </span><span class="lineCov">        155 : static void X11_ReleaseBackBuffer (GF_VideoOutput * vout)</span>
+<span class="lineNum">     793 </span>            : {
+<span class="lineNum">     794 </span><span class="lineCov">        155 :         X11VID ();</span>
+<span class="lineNum">     795 </span><span class="lineCov">        155 :         if (xWindow-&gt;x_data) {</span>
+<span class="lineNum">     796 </span><span class="lineNoCov">          0 :                 gf_free(xWindow-&gt;x_data);</span>
+<span class="lineNum">     797 </span><span class="lineNoCov">          0 :                 xWindow-&gt;x_data = NULL;</span>
+<span class="lineNum">     798 </span><span class="lineNoCov">          0 :                 if (xWindow-&gt;surface) xWindow-&gt;surface-&gt;data = NULL;</span>
+<span class="lineNum">     799 </span>            :         }
+<span class="lineNum">     800 </span>            : #ifdef GPAC_HAS_X11_SHM
+<span class="lineNum">     801 </span><span class="lineCov">        155 :         if (xWindow-&gt;shmseginfo) XShmDetach (xWindow-&gt;display, xWindow-&gt;shmseginfo);</span>
+<span class="lineNum">     802 </span><span class="lineCov">        155 :         if (xWindow-&gt;pixmap) {</span>
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :                 XFreePixmap(xWindow-&gt;display, xWindow-&gt;pixmap);</span>
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :                 xWindow-&gt;pixmap = 0L;</span>
+<span class="lineNum">     805 </span><span class="lineNoCov">          0 :                 xWindow-&gt;pwidth = xWindow-&gt;pheight = 0;</span>
+<span class="lineNum">     806 </span>            :         } else {
+<span class="lineNum">     807 </span><span class="lineCov">        155 :                 if (xWindow-&gt;surface) XDestroyImage(xWindow-&gt;surface);</span>
+<span class="lineNum">     808 </span><span class="lineCov">        155 :                 xWindow-&gt;surface = NULL;</span>
+<span class="lineNum">     809 </span>            :         }
+<span class="lineNum">     810 </span><span class="lineCov">        155 :         if (xWindow-&gt;shmseginfo) {</span>
+<span class="lineNum">     811 </span><span class="lineCov">          2 :                 if (xWindow-&gt;shmseginfo-&gt;shmaddr) shmdt(xWindow-&gt;shmseginfo-&gt;shmaddr);</span>
+<span class="lineNum">     812 </span><span class="lineCov">          2 :                 if (xWindow-&gt;shmseginfo-&gt;shmid &gt;= 0)</span>
+<span class="lineNum">     813 </span><span class="lineCov">          2 :                         shmctl (xWindow-&gt;shmseginfo-&gt;shmid, IPC_RMID, NULL);</span>
+<span class="lineNum">     814 </span><span class="lineCov">          2 :                 gf_free(xWindow-&gt;shmseginfo);</span>
+<span class="lineNum">     815 </span><span class="lineCov">          2 :                 xWindow-&gt;shmseginfo = NULL;</span>
+<span class="lineNum">     816 </span>            :         }
+<span class="lineNum">     817 </span>            : #endif
+<span class="lineNum">     818 </span><span class="lineCov">        155 :         if (xWindow-&gt;surface) {</span>
+<span class="lineNum">     819 </span><span class="lineNoCov">          0 :                 XFree(xWindow-&gt;surface);</span>
+<span class="lineNum">     820 </span><span class="lineNoCov">          0 :                 xWindow-&gt;surface = NULL;</span>
+<span class="lineNum">     821 </span>            :         }
+<span class="lineNum">     822 </span><span class="lineCov">        155 :         xWindow-&gt;is_init = 0;</span>
+<span class="lineNum">     823 </span>            : #ifdef GPAC_HAS_X11_XV
+<span class="lineNum">     824 </span><span class="lineCov">        155 :         X11_DestroyOverlay(xWindow);</span>
+<span class="lineNum">     825 </span>            : #endif
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span><span class="lineCov">        155 : }</span>
+<span class="lineNum">     828 </span>            : 
+<span class="lineNum">     829 </span>            : /*
+<a name="830"><span class="lineNum">     830 </span>            :  * init backbuffer</a>
+<span class="lineNum">     831 </span>            :  */
+<span class="lineNum">     832 </span><span class="lineCov">          2 : GF_Err X11_InitBackBuffer (GF_VideoOutput * vout, u32 VideoWidth, u32 VideoHeight)</span>
+<span class="lineNum">     833 </span>            : {
+<span class="lineNum">     834 </span>            : #ifdef GPAC_HAS_X11_SHM
+<span class="lineNum">     835 </span>            :         Window cur_wnd;
+<span class="lineNum">     836 </span>            : #endif
+<span class="lineNum">     837 </span>            :         u32 size;
+<span class="lineNum">     838 </span><span class="lineCov">          2 :         VideoWidth = VideoWidth &gt; 32 ? VideoWidth : 32;</span>
+<span class="lineNum">     839 </span><span class="lineCov">          2 :         VideoWidth = VideoWidth &lt; 4096 ? VideoWidth : 4096;</span>
+<span class="lineNum">     840 </span><span class="lineCov">          2 :         VideoHeight = VideoHeight &gt; 32 ? VideoHeight : 32;</span>
+<span class="lineNum">     841 </span><span class="lineCov">          2 :         VideoHeight = VideoHeight &gt; 4096 ? 4096 : VideoHeight;</span>
+<span class="lineNum">     842 </span>            : 
+<span class="lineNum">     843 </span><span class="lineCov">          2 :         X11VID ();</span>
+<span class="lineNum">     844 </span><span class="lineCov">          2 :         if (!xWindow || !VideoWidth || !VideoHeight)</span>
+<span class="lineNum">     845 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     846 </span>            : 
+<span class="lineNum">     847 </span><span class="lineCov">          2 :         X11_ReleaseBackBuffer(vout);</span>
+<span class="lineNum">     848 </span>            :         /*WATCHOUT seems we need even width when using shared memory extensions*/
+<span class="lineNum">     849 </span><span class="lineCov">          2 :         if (xWindow-&gt;use_shared_memory &amp;&amp; (VideoWidth%2))</span>
+<span class="lineNum">     850 </span><span class="lineNoCov">          0 :                 VideoWidth++;</span>
+<span class="lineNum">     851 </span>            : 
+<span class="lineNum">     852 </span><span class="lineCov">          2 :         size = VideoWidth * VideoHeight * xWindow-&gt;bpp;</span>
+<span class="lineNum">     853 </span>            : 
+<span class="lineNum">     854 </span>            : #ifdef GPAC_HAS_X11_SHM
+<span class="lineNum">     855 </span><span class="lineCov">          2 :         cur_wnd = xWindow-&gt;fullscreen ? xWindow-&gt;full_wnd : xWindow-&gt;wnd;</span>
+<span class="lineNum">     856 </span>            :         /*if we're using YUV blit to offscreen, we must use a pixmap*/
+<span class="lineNum">     857 </span><span class="lineCov">          2 :         if (vout-&gt;hw_caps &amp; GF_VIDEO_HW_HAS_YUV) {</span>
+<span class="lineNum">     858 </span><span class="lineNoCov">          0 :                 GF_SAFEALLOC(xWindow-&gt;shmseginfo, XShmSegmentInfo);</span>
+<span class="lineNum">     859 </span><span class="lineNoCov">          0 :                 xWindow-&gt;shmseginfo-&gt;shmid = shmget(IPC_PRIVATE, size, IPC_CREAT | 0776);</span>
+<span class="lineNum">     860 </span><span class="lineNoCov">          0 :                 xWindow-&gt;shmseginfo-&gt;shmaddr = shmat(xWindow-&gt;shmseginfo-&gt;shmid, 0, 0);</span>
+<span class="lineNum">     861 </span><span class="lineNoCov">          0 :                 xWindow-&gt;shmseginfo-&gt;readOnly = False;</span>
+<span class="lineNum">     862 </span><span class="lineNoCov">          0 :                 if (!XShmAttach (xWindow-&gt;display, xWindow-&gt;shmseginfo)) {</span>
+<span class="lineNum">     863 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Failed to attach shared memory!\n&quot;));</span>
+<span class="lineNum">     864 </span>            :                 }
+<span class="lineNum">     865 </span><span class="lineNoCov">          0 :                 xWindow-&gt;pixmap = XShmCreatePixmap(xWindow-&gt;display, cur_wnd,</span>
+<span class="lineNum">     866 </span>            :                                                    (unsigned char *) xWindow-&gt;shmseginfo-&gt;shmaddr, xWindow-&gt;shmseginfo,
+<span class="lineNum">     867 </span>            :                                                    VideoWidth, VideoHeight, xWindow-&gt;depth);
+<span class="lineNum">     868 </span><span class="lineNoCov">          0 :                 memset((unsigned char *) xWindow-&gt;shmseginfo-&gt;shmaddr, 0, sizeof(char)*size);</span>
+<span class="lineNum">     869 </span><span class="lineNoCov">          0 :                 XSetWindowBackgroundPixmap (xWindow-&gt;display, cur_wnd, xWindow-&gt;pixmap);</span>
+<span class="lineNum">     870 </span><span class="lineNoCov">          0 :                 xWindow-&gt;pwidth = VideoWidth;</span>
+<span class="lineNum">     871 </span><span class="lineNoCov">          0 :                 xWindow-&gt;pheight = VideoHeight;</span>
+<span class="lineNum">     872 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MMIO, (&quot;[X11] Using X11 Pixmap %08x\n&quot;, (u32)xWindow-&gt;pixmap));</span>
+<span class="lineNum">     873 </span><span class="lineCov">          2 :         } else if (xWindow-&gt;use_shared_memory) {</span>
+<span class="lineNum">     874 </span><span class="lineCov">          2 :                 GF_SAFEALLOC(xWindow-&gt;shmseginfo, XShmSegmentInfo);</span>
+<span class="lineNum">     875 </span><span class="lineCov">          2 :                 xWindow-&gt;surface = XShmCreateImage (xWindow-&gt;display, xWindow-&gt;visual,</span>
+<span class="lineNum">     876 </span>            :                                                     xWindow-&gt;depth, ZPixmap, NULL, xWindow-&gt;shmseginfo,
+<span class="lineNum">     877 </span>            :                                                     VideoWidth, VideoHeight);
+<span class="lineNum">     878 </span><span class="lineCov">          2 :                 xWindow-&gt;shmseginfo-&gt;shmid = shmget(IPC_PRIVATE, xWindow-&gt;surface-&gt;bytes_per_line * xWindow-&gt;surface-&gt;height,</span>
+<span class="lineNum">     879 </span>            :                                                     IPC_CREAT | 0777);
+<span class="lineNum">     880 </span>            : 
+<span class="lineNum">     881 </span><span class="lineCov">          2 :                 xWindow-&gt;surface-&gt;data = xWindow-&gt;shmseginfo-&gt;shmaddr = shmat(xWindow-&gt;shmseginfo-&gt;shmid, NULL, 0);</span>
+<span class="lineNum">     882 </span><span class="lineCov">          2 :                 xWindow-&gt;shmseginfo-&gt;readOnly = False;</span>
+<span class="lineNum">     883 </span><span class="lineCov">          2 :                 XShmAttach (xWindow-&gt;display, xWindow-&gt;shmseginfo);</span>
+<span class="lineNum">     884 </span>            :         } else
+<span class="lineNum">     885 </span>            : #endif
+<span class="lineNum">     886 </span>            :         {
+<span class="lineNum">     887 </span><span class="lineNoCov">          0 :                 xWindow-&gt;x_data = (char *) gf_malloc(sizeof(char)*size);</span>
+<span class="lineNum">     888 </span><span class="lineNoCov">          0 :                 xWindow-&gt;surface = XCreateImage (xWindow-&gt;display, xWindow-&gt;visual,</span>
+<span class="lineNum">     889 </span>            :                                                  xWindow-&gt;depth, ZPixmap,
+<span class="lineNum">     890 </span>            :                                                  0,
+<span class="lineNum">     891 </span>            :                                                  xWindow-&gt;x_data,
+<span class="lineNum">     892 </span>            :                                                  VideoWidth, VideoHeight,
+<span class="lineNum">     893 </span><span class="lineNoCov">          0 :                                                  xWindow-&gt;bpp*8, xWindow-&gt;bpp*VideoWidth);</span>
+<span class="lineNum">     894 </span><span class="lineNoCov">          0 :                 if (!xWindow-&gt;surface) {</span>
+<span class="lineNum">     895 </span>            :                         return GF_IO_ERR;
+<span class="lineNum">     896 </span>            :                 }
+<span class="lineNum">     897 </span>            : 
+<span class="lineNum">     898 </span>            :         }
+<span class="lineNum">     899 </span><span class="lineCov">          2 :         xWindow-&gt;is_init = 1;</span>
+<span class="lineNum">     900 </span><span class="lineCov">          2 :         return GF_OK;</span>
+<span class="lineNum">     901 </span>            : }
+<span class="lineNum">     902 </span>            : 
+<span class="lineNum">     903 </span>            : /*
+<a name="904"><span class="lineNum">     904 </span>            :  * resize buffer: note we don't resize window here</a>
+<span class="lineNum">     905 </span>            :  */
+<span class="lineNum">     906 </span><span class="lineCov">          4 : GF_Err X11_ResizeBackBuffer (struct _video_out *vout, u32 newWidth, u32 newHeight)</span>
+<span class="lineNum">     907 </span>            : {
+<span class="lineNum">     908 </span><span class="lineCov">          4 :         X11VID ();</span>
+<span class="lineNum">     909 </span><span class="lineCov">          4 :         u32 w = xWindow-&gt;surface ? xWindow-&gt;surface-&gt;width : xWindow-&gt;pwidth;</span>
+<span class="lineNum">     910 </span><span class="lineCov">          4 :         u32 h = xWindow-&gt;surface ? xWindow-&gt;surface-&gt;height : xWindow-&gt;pheight;</span>
+<span class="lineNum">     911 </span><span class="lineCov">          4 :         if (!xWindow-&gt;is_init || (newWidth != w) || (newHeight != h)) {</span>
+<span class="lineNum">     912 </span><span class="lineCov">          2 :                 if ((newWidth &gt;= 32) &amp;&amp; (newHeight &gt;= 32))</span>
+<span class="lineNum">     913 </span><span class="lineCov">          2 :                         return X11_InitBackBuffer (vout, newWidth, newHeight);</span>
+<span class="lineNum">     914 </span>            :         }
+<span class="lineNum">     915 </span>            :         return GF_OK;
+<a name="916"><span class="lineNum">     916 </span>            : }</a>
+<span class="lineNum">     917 </span>            : 
+<span class="lineNum">     918 </span><span class="lineCov">       2399 : GF_Err X11_ProcessEvent (struct _video_out * vout, GF_Event * evt)</span>
+<span class="lineNum">     919 </span>            : {
+<span class="lineNum">     920 </span><span class="lineCov">       2399 :         X11VID ();</span>
+<span class="lineNum">     921 </span>            : 
+<span class="lineNum">     922 </span><span class="lineCov">       2399 :         X11_SetupWindow(vout);</span>
+<span class="lineNum">     923 </span><span class="lineCov">       2399 :         if (!xWindow-&gt;display) return GF_IO_ERR;</span>
+<span class="lineNum">     924 </span>            : 
+<span class="lineNum">     925 </span><span class="lineCov">       2399 :         if (evt) {</span>
+<span class="lineNum">     926 </span><span class="lineCov">       1436 :                 switch (evt-&gt;type) {</span>
+<span class="lineNum">     927 </span>            :                 case GF_EVENT_SET_CURSOR:
+<span class="lineNum">     928 </span>            :                         break;
+<span class="lineNum">     929 </span><span class="lineCov">        429 :                 case GF_EVENT_SET_CAPTION:</span>
+<span class="lineNum">     930 </span><span class="lineCov">        429 :                         if (!xWindow-&gt;par_wnd &amp;&amp; xWindow-&gt;wnd &amp;&amp; evt-&gt;caption.caption) {</span>
+<span class="lineNum">     931 </span><span class="lineCov">        429 :                                 XStoreName(xWindow-&gt;display, xWindow-&gt;wnd, &quot;&quot;);</span>
+<span class="lineNum">     932 </span>            :                         }
+<span class="lineNum">     933 </span>            :                         break;
+<span class="lineNum">     934 </span>            :                 case GF_EVENT_SHOWHIDE:
+<span class="lineNum">     935 </span>            :                         break;
+<span class="lineNum">     936 </span><span class="lineCov">          1 :                 case GF_EVENT_MOVE:</span>
+<span class="lineNum">     937 </span><span class="lineCov">          1 :                         if (xWindow-&gt;fullscreen) return GF_OK;</span>
+<span class="lineNum">     938 </span>            : 
+<span class="lineNum">     939 </span><span class="lineCov">          1 :                         if (evt-&gt;move.relative == 2) {</span>
+<span class="lineNum">     940 </span>            :                         }
+<span class="lineNum">     941 </span><span class="lineCov">          1 :                         else if (evt-&gt;move.relative) {</span>
+<span class="lineNum">     942 </span>            :                                 s32 x, y;
+<span class="lineNum">     943 </span>            :                                 Window child;
+<span class="lineNum">     944 </span><span class="lineCov">          1 :                                 x = y = 0;</span>
+<span class="lineNum">     945 </span><span class="lineCov">          1 :                                 XTranslateCoordinates(xWindow-&gt;display, xWindow-&gt;wnd, RootWindowOfScreen (xWindow-&gt;screenptr), 0, 0, &amp;x, &amp;y, &amp;child );</span>
+<span class="lineNum">     946 </span><span class="lineCov">          1 :                                 XMoveWindow(xWindow-&gt;display, xWindow-&gt;wnd, x + evt-&gt;move.x, y + evt-&gt;move.y);</span>
+<span class="lineNum">     947 </span>            :                         } else {
+<span class="lineNum">     948 </span><span class="lineNoCov">          0 :                                 XMoveWindow(xWindow-&gt;display, xWindow-&gt;wnd, evt-&gt;move.x, evt-&gt;move.y);</span>
+<span class="lineNum">     949 </span>            :                         }
+<span class="lineNum">     950 </span>            :                         break;
+<span class="lineNum">     951 </span><span class="lineCov">         41 :                 case GF_EVENT_SIZE:</span>
+<span class="lineNum">     952 </span>            :                         /*if owning the window and not in fullscreen, resize it (initial scene size)*/
+<span class="lineNum">     953 </span><span class="lineCov">         41 :                         xWindow-&gt;w_width = evt-&gt;size.width;</span>
+<span class="lineNum">     954 </span><span class="lineCov">         41 :                         xWindow-&gt;w_height = evt-&gt;size.height;</span>
+<span class="lineNum">     955 </span>            : 
+<span class="lineNum">     956 </span><span class="lineCov">         41 :                         if (!xWindow-&gt;fullscreen) {</span>
+<span class="lineNum">     957 </span><span class="lineCov">         41 :                                 if (xWindow-&gt;par_wnd) {</span>
+<span class="lineNum">     958 </span>            :                                         XWindowAttributes pwa;
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :                                         XGetWindowAttributes(xWindow-&gt;display, xWindow-&gt;par_wnd, &amp;pwa);</span>
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 :                                         XMoveResizeWindow(xWindow-&gt;display, xWindow-&gt;wnd, pwa.x, pwa.y, evt-&gt;size.width, evt-&gt;size.height);</span>
+<span class="lineNum">     961 </span><span class="lineNoCov">          0 :                                         if (!xWindow-&gt;no_select_input) XSetInputFocus(xWindow-&gt;display, xWindow-&gt;wnd, RevertToNone, CurrentTime);</span>
+<span class="lineNum">     962 </span>            :                                 } else {
+<span class="lineNum">     963 </span><span class="lineCov">         41 :                                         XResizeWindow (xWindow-&gt;display, xWindow-&gt;wnd, evt-&gt;size.width, evt-&gt;size.height);</span>
+<span class="lineNum">     964 </span>            :                                 }
+<span class="lineNum">     965 </span>            :                         }
+<span class="lineNum">     966 </span>            :                         break;
+<span class="lineNum">     967 </span><span class="lineCov">        190 :                 case GF_EVENT_VIDEO_SETUP:</span>
+<span class="lineNum">     968 </span><span class="lineCov">        190 :                         if (evt-&gt;setup.use_opengl) {</span>
+<span class="lineNum">     969 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">     970 </span><span class="lineCov">        186 :                                 xWindow-&gt;output_3d = GF_TRUE;</span>
+<span class="lineNum">     971 </span><span class="lineCov">        186 :                                 return X11_SetupGL(vout);</span>
+<span class="lineNum">     972 </span>            : #else
+<span class="lineNum">     973 </span>            :                                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     974 </span>            : #endif
+<span class="lineNum">     975 </span>            :                         } else {
+<span class="lineNum">     976 </span><span class="lineCov">          4 :                                 xWindow-&gt;output_3d = GF_FALSE;</span>
+<span class="lineNum">     977 </span><span class="lineCov">          4 :                                 return X11_ResizeBackBuffer(vout, evt-&gt;setup.width, evt-&gt;setup.height);</span>
+<span class="lineNum">     978 </span>            :                         }
+<span class="lineNum">     979 </span>            :                         break;
+<span class="lineNum">     980 </span><span class="lineCov">        759 :                 case GF_EVENT_SET_GL:</span>
+<span class="lineNum">     981 </span><span class="lineCov">        759 :                         if (!xWindow-&gt;output_3d) return GF_OK;</span>
+<span class="lineNum">     982 </span>            : 
+<span class="lineNum">     983 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">     984 </span><span class="lineCov">        757 :                         if ( ! glXMakeCurrent(xWindow-&gt;display, xWindow-&gt;fullscreen ? xWindow-&gt;full_wnd : xWindow-&gt;wnd, xWindow-&gt;glx_context) ) {</span>
+<span class="lineNum">     985 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Cannot make context current\n&quot;));</span>
+<span class="lineNum">     986 </span>            :                                 return GF_IO_ERR;
+<span class="lineNum">     987 </span>            :                         }
+<span class="lineNum">     988 </span>            : #else
+<span class="lineNum">     989 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">     990 </span>            : #endif
+<span class="lineNum">     991 </span>            :                         break;
+<span class="lineNum">     992 </span>            :                 }
+<span class="lineNum">     993 </span>            :         } else {
+<span class="lineNum">     994 </span><span class="lineCov">        963 :                 X11_HandleEvents(vout);</span>
+<span class="lineNum">     995 </span>            :         }
+<span class="lineNum">     996 </span>            :         return GF_OK;
+<span class="lineNum">     997 </span>            : 
+<span class="lineNum">     998 </span>            : }
+<a name="999"><span class="lineNum">     999 </span>            : </a>
+<span class="lineNum">    1000 </span>            : /* switch from/to full screen mode */
+<span class="lineNum">    1001 </span><span class="lineCov">          2 : GF_Err X11_SetFullScreen (struct _video_out * vout, u32 bFullScreenOn, u32 * screen_width, u32 * screen_height)</span>
+<span class="lineNum">    1002 </span>            : {
+<span class="lineNum">    1003 </span><span class="lineCov">          2 :         X11VID ();</span>
+<span class="lineNum">    1004 </span><span class="lineCov">          2 :         xWindow-&gt;fullscreen = bFullScreenOn;</span>
+<span class="lineNum">    1005 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">    1006 </span>            : //      if (xWindow-&gt;output_3d) X11_ReleaseGL(xWindow);
+<span class="lineNum">    1007 </span>            : #endif
+<span class="lineNum">    1008 </span>            : 
+<span class="lineNum">    1009 </span><span class="lineCov">          2 :         if (bFullScreenOn) {</span>
+<span class="lineNum">    1010 </span><span class="lineCov">          2 :                 xWindow-&gt;store_width = *screen_width;</span>
+<span class="lineNum">    1011 </span><span class="lineCov">          2 :                 xWindow-&gt;store_height = *screen_height;</span>
+<span class="lineNum">    1012 </span>            : 
+<span class="lineNum">    1013 </span><span class="lineCov">          2 :                 xWindow-&gt;w_width = vout-&gt;max_screen_width;</span>
+<span class="lineNum">    1014 </span><span class="lineCov">          2 :                 xWindow-&gt;w_height = vout-&gt;max_screen_height;</span>
+<span class="lineNum">    1015 </span>            : 
+<span class="lineNum">    1016 </span><span class="lineCov">          2 :                 XFreeGC (xWindow-&gt;display, xWindow-&gt;the_gc);</span>
+<span class="lineNum">    1017 </span><span class="lineCov">          2 :                 xWindow-&gt;the_gc = XCreateGC (xWindow-&gt;display, xWindow-&gt;full_wnd, 0, NULL);</span>
+<span class="lineNum">    1018 </span>            : 
+<span class="lineNum">    1019 </span><span class="lineCov">          4 :                 XMoveResizeWindow (xWindow-&gt;display,</span>
+<span class="lineNum">    1020 </span><span class="lineCov">          2 :                                    (Window) xWindow-&gt;full_wnd, 0, 0,</span>
+<span class="lineNum">    1021 </span>            :                                    vout-&gt;max_screen_width,
+<span class="lineNum">    1022 </span>            :                                    vout-&gt;max_screen_height);
+<span class="lineNum">    1023 </span><span class="lineCov">          2 :                 *screen_width = xWindow-&gt;w_width;</span>
+<span class="lineNum">    1024 </span><span class="lineCov">          2 :                 *screen_height = xWindow-&gt;w_height;</span>
+<span class="lineNum">    1025 </span><span class="lineCov">          2 :                 XUnmapWindow (xWindow-&gt;display, xWindow-&gt;wnd);</span>
+<span class="lineNum">    1026 </span><span class="lineCov">          2 :                 XMapWindow (xWindow-&gt;display, xWindow-&gt;full_wnd);</span>
+<span class="lineNum">    1027 </span><span class="lineCov">          2 :                 XSetInputFocus(xWindow-&gt;display, xWindow-&gt;full_wnd, RevertToNone, CurrentTime);</span>
+<span class="lineNum">    1028 </span><span class="lineCov">          2 :                 XRaiseWindow(xWindow-&gt;display, xWindow-&gt;full_wnd);</span>
+<span class="lineNum">    1029 </span><span class="lineCov">          2 :                 XGrabKeyboard(xWindow-&gt;display, xWindow-&gt;full_wnd, True, GrabModeAsync, GrabModeAsync, CurrentTime);</span>
+<span class="lineNum">    1030 </span>            :         } else {
+<span class="lineNum">    1031 </span><span class="lineNoCov">          0 :                 *screen_width = xWindow-&gt;store_width;</span>
+<span class="lineNum">    1032 </span><span class="lineNoCov">          0 :                 *screen_height = xWindow-&gt;store_height;</span>
+<span class="lineNum">    1033 </span><span class="lineNoCov">          0 :                 XFreeGC (xWindow-&gt;display, xWindow-&gt;the_gc);</span>
+<span class="lineNum">    1034 </span><span class="lineNoCov">          0 :                 xWindow-&gt;the_gc = XCreateGC (xWindow-&gt;display, xWindow-&gt;wnd, 0, NULL);</span>
+<span class="lineNum">    1035 </span><span class="lineNoCov">          0 :                 XUnmapWindow (xWindow-&gt;display, xWindow-&gt;full_wnd);</span>
+<span class="lineNum">    1036 </span><span class="lineNoCov">          0 :                 XMapWindow (xWindow-&gt;display, xWindow-&gt;wnd);</span>
+<span class="lineNum">    1037 </span><span class="lineNoCov">          0 :                 XUngrabKeyboard(xWindow-&gt;display, CurrentTime);</span>
+<span class="lineNum">    1038 </span>            :                 /*looks like this makes osmozilla crash*/
+<span class="lineNum">    1039 </span>            :                 //if (xWindow-&gt;par_wnd) XSetInputFocus(xWindow-&gt;display, xWindow-&gt;wnd, RevertToNone, CurrentTime);
+<span class="lineNum">    1040 </span>            : 
+<span class="lineNum">    1041 </span>            :                 /*backbuffer resize will be done right after this is called */
+<span class="lineNum">    1042 </span>            :         }
+<span class="lineNum">    1043 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">    1044 </span><span class="lineCov">          2 :         if (xWindow-&gt;output_3d) X11_SetupGL(vout);</span>
+<span class="lineNum">    1045 </span>            : #endif
+<span class="lineNum">    1046 </span><span class="lineCov">          2 :         return GF_OK;</span>
+<span class="lineNum">    1047 </span>            : }
+<span class="lineNum">    1048 </span>            : 
+<span class="lineNum">    1049 </span>            : /*
+<a name="1050"><span class="lineNum">    1050 </span>            :  * lock video mem</a>
+<span class="lineNum">    1051 </span>            :  */
+<span class="lineNum">    1052 </span><span class="lineCov">         48 : GF_Err X11_LockBackBuffer(struct _video_out * vout, GF_VideoSurface * vi, u32 do_lock)</span>
+<span class="lineNum">    1053 </span>            : {
+<span class="lineNum">    1054 </span><span class="lineCov">         48 :         X11VID ();</span>
+<span class="lineNum">    1055 </span>            : 
+<span class="lineNum">    1056 </span><span class="lineCov">         48 :         if (do_lock) {</span>
+<span class="lineNum">    1057 </span><span class="lineCov">         24 :                 if (!vi) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1058 </span>            :                 memset(vi, 0, sizeof(GF_VideoSurface));
+<span class="lineNum">    1059 </span><span class="lineCov">         24 :                 if (xWindow-&gt;surface) {</span>
+<span class="lineNum">    1060 </span><span class="lineCov">         24 :                         vi-&gt;width = xWindow-&gt;surface-&gt;width;</span>
+<span class="lineNum">    1061 </span><span class="lineCov">         24 :                         vi-&gt;height = xWindow-&gt;surface-&gt;height;</span>
+<span class="lineNum">    1062 </span><span class="lineCov">         24 :                         vi-&gt;pitch_x = xWindow-&gt;bpp;</span>
+<span class="lineNum">    1063 </span><span class="lineCov">         24 :                         vi-&gt;pitch_y = xWindow-&gt;surface-&gt;width*xWindow-&gt;bpp;</span>
+<span class="lineNum">    1064 </span><span class="lineCov">         24 :                         vi-&gt;pixel_format = xWindow-&gt;pixel_format;</span>
+<span class="lineNum">    1065 </span><span class="lineCov">         24 :                         vi-&gt;video_buffer = xWindow-&gt;surface-&gt;data;</span>
+<span class="lineNum">    1066 </span>            :                 } else {
+<span class="lineNum">    1067 </span>            : #ifdef GPAC_HAS_X11_SHM
+<span class="lineNum">    1068 </span><span class="lineNoCov">          0 :                         vi-&gt;width = xWindow-&gt;pwidth;</span>
+<span class="lineNum">    1069 </span><span class="lineNoCov">          0 :                         vi-&gt;height = xWindow-&gt;pheight;</span>
+<span class="lineNum">    1070 </span><span class="lineNoCov">          0 :                         vi-&gt;pitch_x = xWindow-&gt;bpp;</span>
+<span class="lineNum">    1071 </span><span class="lineNoCov">          0 :                         vi-&gt;pitch_y = xWindow-&gt;pwidth*xWindow-&gt;bpp;</span>
+<span class="lineNum">    1072 </span><span class="lineNoCov">          0 :                         vi-&gt;pixel_format = xWindow-&gt;pixel_format;</span>
+<span class="lineNum">    1073 </span><span class="lineNoCov">          0 :                         vi-&gt;video_buffer = (unsigned char *) xWindow-&gt;shmseginfo-&gt;shmaddr;</span>
+<span class="lineNum">    1074 </span>            : #endif
+<span class="lineNum">    1075 </span>            :                 }
+<span class="lineNum">    1076 </span><span class="lineCov">         24 :                 vi-&gt;is_hardware_memory = (xWindow-&gt;use_shared_memory) ? 1 : 0;</span>
+<span class="lineNum">    1077 </span><span class="lineCov">         24 :                 return GF_OK;</span>
+<span class="lineNum">    1078 </span>            :         } else {
+<span class="lineNum">    1079 </span>            :                 return GF_OK;
+<span class="lineNum">    1080 </span>            :         }
+<span class="lineNum">    1081 </span>            : }
+<span class="lineNum">    1082 </span>            : 
+<span class="lineNum">    1083 </span>            : 
+<a name="1084"><span class="lineNum">    1084 </span>            : static XErrorHandler old_handler = NULL;</a>
+<span class="lineNum">    1085 </span>            : static int selectinput_err = 0;
+<span class="lineNum">    1086 </span><span class="lineCov">        154 : static int X11_BadAccess_ByPass(Display * display,</span>
+<span class="lineNum">    1087 </span>            :                                 XErrorEvent * event)
+<span class="lineNum">    1088 </span>            : {
+<span class="lineNum">    1089 </span>            :         char msg[60];
+<span class="lineNum">    1090 </span><span class="lineCov">        154 :         if (!display || !event) return 0;</span>
+<span class="lineNum">    1091 </span>            : 
+<span class="lineNum">    1092 </span><span class="lineNoCov">          0 :         if (event-&gt;error_code == BadAccess)</span>
+<span class="lineNum">    1093 </span>            :         {
+<span class="lineNum">    1094 </span><span class="lineNoCov">          0 :                 selectinput_err = 1;</span>
+<span class="lineNum">    1095 </span><span class="lineNoCov">          0 :                 return 0;</span>
+<span class="lineNum">    1096 </span>            :         }
+<span class="lineNum">    1097 </span><span class="lineNoCov">          0 :         if (old_handler != NULL)</span>
+<span class="lineNum">    1098 </span><span class="lineNoCov">          0 :                 old_handler(display, event);</span>
+<span class="lineNum">    1099 </span>            :         else
+<span class="lineNum">    1100 </span>            :         {
+<span class="lineNum">    1101 </span><span class="lineNoCov">          0 :                 XGetErrorText(display, event-&gt;error_code, (char *) &amp;msg, 60);</span>
+<span class="lineNum">    1102 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Error %s\n&quot;,msg));</span>
+<span class="lineNum">    1103 </span>            :         }
+<span class="lineNum">    1104 </span>            :         return 0;
+<span class="lineNum">    1105 </span>            : }
+<a name="1106"><span class="lineNum">    1106 </span>            : </a>
+<span class="lineNum">    1107 </span>            : 
+<span class="lineNum">    1108 </span><span class="lineCov">        307 : static void X11_XScreenSaverState(XWindow *xwin, Bool turn_on)</span>
+<span class="lineNum">    1109 </span>            : {
+<span class="lineNum">    1110 </span><span class="lineCov">        307 :         if (turn_on) {</span>
+<span class="lineNum">    1111 </span><span class="lineCov">        153 :                 if (!xwin-&gt;ss_t) return;</span>
+<span class="lineNum">    1112 </span><span class="lineCov">        153 :                 XSetScreenSaver(xwin-&gt;display, xwin-&gt;ss_t, xwin-&gt;ss_i, xwin-&gt;ss_b, xwin-&gt;ss_e);</span>
+<span class="lineNum">    1113 </span>            :         } else {
+<span class="lineNum">    1114 </span>            :                 /* Save state information */
+<span class="lineNum">    1115 </span><span class="lineCov">        154 :                 XGetScreenSaver(xwin-&gt;display, &amp;xwin-&gt;ss_t, &amp;xwin-&gt;ss_i, &amp;xwin-&gt;ss_b, &amp;xwin-&gt;ss_e);</span>
+<span class="lineNum">    1116 </span><span class="lineCov">        154 :                 if (xwin-&gt;ss_t)</span>
+<span class="lineNum">    1117 </span><span class="lineCov">        154 :                         XSetScreenSaver(xwin-&gt;display, 0, xwin-&gt;ss_i, xwin-&gt;ss_b, xwin-&gt;ss_e);</span>
+<span class="lineNum">    1118 </span>            :         }
+<span class="lineNum">    1119 </span>            : }
+<span class="lineNum">    1120 </span>            : 
+<span class="lineNum">    1121 </span>            : /*
+<span class="lineNum">    1122 </span>            :  * Setup X11 wnd System
+<a name="1123"><span class="lineNum">    1123 </span>            :  */</a>
+<span class="lineNum">    1124 </span>            : void
+<span class="lineNum">    1125 </span><span class="lineCov">       2399 : X11_SetupWindow (GF_VideoOutput * vout)</span>
+<span class="lineNum">    1126 </span>            : {
+<span class="lineNum">    1127 </span><span class="lineCov">       2399 :         X11VID ();</span>
+<span class="lineNum">    1128 </span>            : #if defined(GPAC_HAS_X11_SHM) || defined(GPAC_HAS_X11_XV) || defined(GPAC_HAS_OPENGL)
+<span class="lineNum">    1129 </span>            :         const char *sOpt;
+<span class="lineNum">    1130 </span>            : #endif
+<span class="lineNum">    1131 </span>            : 
+<span class="lineNum">    1132 </span>            :         Bool autorepeat, supported;
+<span class="lineNum">    1133 </span>            : 
+<span class="lineNum">    1134 </span><span class="lineCov">       4644 :         if (xWindow-&gt;setup_done) return;</span>
+<span class="lineNum">    1135 </span><span class="lineCov">        154 :         xWindow-&gt;setup_done = 1;</span>
+<span class="lineNum">    1136 </span>            : 
+<span class="lineNum">    1137 </span><span class="lineCov">        154 :         XInitThreads();</span>
+<span class="lineNum">    1138 </span>            : 
+<span class="lineNum">    1139 </span><span class="lineCov">        154 :         xWindow-&gt;display = XOpenDisplay (NULL);</span>
+<span class="lineNum">    1140 </span><span class="lineCov">        154 :         if (!xWindow-&gt;display) {</span>
+<span class="lineNum">    1141 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Failed to open X11 display %d\n&quot;, errno));</span>
+<span class="lineNum">    1142 </span>            :                 return;
+<span class="lineNum">    1143 </span>            :         }
+<span class="lineNum">    1144 </span><span class="lineCov">        154 :         xWindow-&gt;screennum = DefaultScreen (xWindow-&gt;display);</span>
+<span class="lineNum">    1145 </span><span class="lineCov">        154 :         xWindow-&gt;screenptr = DefaultScreenOfDisplay (xWindow-&gt;display);</span>
+<span class="lineNum">    1146 </span><span class="lineCov">        154 :         xWindow-&gt;visual = DefaultVisualOfScreen (xWindow-&gt;screenptr);</span>
+<span class="lineNum">    1147 </span><span class="lineCov">        154 :         xWindow-&gt;depth = DefaultDepth (xWindow-&gt;display, xWindow-&gt;screennum);</span>
+<span class="lineNum">    1148 </span>            : 
+<span class="lineNum">    1149 </span>            :         {
+<span class="lineNum">    1150 </span><span class="lineCov">        154 :                 Float screenWidth = (Float)XWidthOfScreen(xWindow-&gt;screenptr);</span>
+<span class="lineNum">    1151 </span><span class="lineCov">        154 :                 Float screenWidthIn = (Float)XWidthMMOfScreen(xWindow-&gt;screenptr) / 25.4f;</span>
+<span class="lineNum">    1152 </span><span class="lineCov">        154 :                 Float screenHeight = (Float)XHeightOfScreen(xWindow-&gt;screenptr);</span>
+<span class="lineNum">    1153 </span><span class="lineCov">        154 :                 Float screenHeightIn = (Float)XHeightMMOfScreen(xWindow-&gt;screenptr) / 25.4f;</span>
+<span class="lineNum">    1154 </span><span class="lineCov">        154 :                 vout-&gt;dpi_x = (u32)(screenWidth / screenWidthIn);</span>
+<span class="lineNum">    1155 </span><span class="lineCov">        154 :                 vout-&gt;dpi_y = (u32)(screenHeight / screenHeightIn);</span>
+<span class="lineNum">    1156 </span>            :         }
+<span class="lineNum">    1157 </span>            : 
+<span class="lineNum">    1158 </span><span class="lineCov">        154 :         switch (xWindow-&gt;depth) {</span>
+<span class="lineNum">    1159 </span><span class="lineNoCov">          0 :         case 8:</span>
+<span class="lineNum">    1160 </span><span class="lineNoCov">          0 :                 xWindow-&gt;pixel_format = GF_PIXEL_GREYSCALE;</span>
+<span class="lineNum">    1161 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">    1162 </span><span class="lineNoCov">          0 :         case 16:</span>
+<span class="lineNum">    1163 </span><span class="lineNoCov">          0 :                 xWindow-&gt;pixel_format = GF_PIXEL_RGB_565;</span>
+<span class="lineNum">    1164 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">    1165 </span><span class="lineCov">        154 :         case 24:</span>
+<span class="lineNum">    1166 </span>            : #ifdef GPAC_BIG_ENDIAN
+<span class="lineNum">    1167 </span>            :                 if (xWindow-&gt;visual-&gt;red_mask==0x00FF0000)
+<span class="lineNum">    1168 </span>            :                         xWindow-&gt;pixel_format = GF_PIXEL_RGB;
+<span class="lineNum">    1169 </span>            :                 else
+<span class="lineNum">    1170 </span>            :                         xWindow-&gt;pixel_format = GF_PIXEL_BGR;
+<span class="lineNum">    1171 </span>            : #else
+<span class="lineNum">    1172 </span><span class="lineCov">        154 :                 if (xWindow-&gt;visual-&gt;red_mask==0x00FF0000)</span>
+<span class="lineNum">    1173 </span><span class="lineCov">        154 :                         xWindow-&gt;pixel_format = GF_PIXEL_BGR;</span>
+<span class="lineNum">    1174 </span>            :                 else
+<span class="lineNum">    1175 </span><span class="lineNoCov">          0 :                         xWindow-&gt;pixel_format = GF_PIXEL_RGB;</span>
+<span class="lineNum">    1176 </span>            : #endif
+<span class="lineNum">    1177 </span>            :                 break;
+<span class="lineNum">    1178 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">    1179 </span><span class="lineNoCov">          0 :                 xWindow-&gt;pixel_format = GF_PIXEL_GREYSCALE;</span>
+<span class="lineNum">    1180 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">    1181 </span>            :         }
+<span class="lineNum">    1182 </span><span class="lineCov">        154 :         xWindow-&gt;bpp = xWindow-&gt;depth / 8;</span>
+<span class="lineNum">    1183 </span><span class="lineCov">        154 :         xWindow-&gt;bpp = xWindow-&gt;bpp == 3 ? 4 : xWindow-&gt;bpp;</span>
+<span class="lineNum">    1184 </span>            : 
+<span class="lineNum">    1185 </span><span class="lineCov">        154 :         xWindow-&gt;screennum=0;</span>
+<span class="lineNum">    1186 </span><span class="lineCov">        154 :         vout-&gt;max_screen_width = DisplayWidth(xWindow-&gt;display, xWindow-&gt;screennum);</span>
+<span class="lineNum">    1187 </span><span class="lineCov">        154 :         vout-&gt;max_screen_height = DisplayHeight(xWindow-&gt;display, xWindow-&gt;screennum);</span>
+<span class="lineNum">    1188 </span><span class="lineCov">        154 :         vout-&gt;max_screen_bpp = 8;</span>
+<span class="lineNum">    1189 </span>            : 
+<span class="lineNum">    1190 </span>            :         /*
+<span class="lineNum">    1191 </span>            :          * Full screen wnd
+<span class="lineNum">    1192 </span>            :          */
+<span class="lineNum">    1193 </span><span class="lineCov">        462 :         xWindow-&gt;full_wnd = XCreateWindow (xWindow-&gt;display,</span>
+<span class="lineNum">    1194 </span><span class="lineCov">        154 :                                            RootWindowOfScreen (xWindow-&gt;screenptr),</span>
+<span class="lineNum">    1195 </span>            :                                            0, 0,
+<span class="lineNum">    1196 </span>            :                                            vout-&gt;max_screen_width,
+<span class="lineNum">    1197 </span>            :                                            vout-&gt;max_screen_height, 0,
+<span class="lineNum">    1198 </span><span class="lineCov">        154 :                                            xWindow-&gt;depth, InputOutput,</span>
+<span class="lineNum">    1199 </span>            :                                            xWindow-&gt;visual, 0, NULL);
+<span class="lineNum">    1200 </span>            : 
+<span class="lineNum">    1201 </span><span class="lineCov">        154 :         XSelectInput(xWindow-&gt;display, xWindow-&gt;full_wnd,</span>
+<span class="lineNum">    1202 </span>            :                      FocusChangeMask | ExposureMask | PointerMotionMask | ButtonReleaseMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);
+<span class="lineNum">    1203 </span>            : 
+<span class="lineNum">    1204 </span><span class="lineCov">        154 :         if (!xWindow-&gt;par_wnd) {</span>
+<span class="lineNum">    1205 </span><span class="lineCov">        154 :                 xWindow-&gt;w_width = 320;</span>
+<span class="lineNum">    1206 </span><span class="lineCov">        154 :                 xWindow-&gt;w_height = 240;</span>
+<span class="lineNum">    1207 </span><span class="lineCov">        462 :                 xWindow-&gt;wnd = XCreateWindow (xWindow-&gt;display,</span>
+<span class="lineNum">    1208 </span><span class="lineCov">        154 :                                               RootWindowOfScreen(xWindow-&gt;screenptr), 0, 0,</span>
+<span class="lineNum">    1209 </span>            :                                               xWindow-&gt;w_width, xWindow-&gt;w_height, 0,
+<span class="lineNum">    1210 </span><span class="lineCov">        154 :                                               xWindow-&gt;depth, InputOutput,</span>
+<span class="lineNum">    1211 </span>            :                                               xWindow-&gt;visual, 0, NULL);
+<span class="lineNum">    1212 </span>            :         } else {
+<span class="lineNum">    1213 </span>            :                 XWindowAttributes pwa;
+<span class="lineNum">    1214 </span><span class="lineNoCov">          0 :                 XGetWindowAttributes(xWindow-&gt;display, xWindow-&gt;par_wnd, &amp;pwa);</span>
+<span class="lineNum">    1215 </span><span class="lineNoCov">          0 :                 xWindow-&gt;w_width = pwa.width;</span>
+<span class="lineNum">    1216 </span><span class="lineNoCov">          0 :                 xWindow-&gt;w_height = pwa.height;</span>
+<span class="lineNum">    1217 </span><span class="lineNoCov">          0 :                 xWindow-&gt;wnd = XCreateWindow (xWindow-&gt;display, xWindow-&gt;par_wnd, pwa.x, pwa.y,</span>
+<span class="lineNum">    1218 </span>            :                                               xWindow-&gt;w_width, xWindow-&gt;w_height, 0,
+<span class="lineNum">    1219 </span><span class="lineNoCov">          0 :                                               xWindow-&gt;depth, InputOutput,</span>
+<span class="lineNum">    1220 </span>            :                                               xWindow-&gt;visual, 0, NULL);
+<span class="lineNum">    1221 </span>            :         }
+<span class="lineNum">    1222 </span>            : 
+<span class="lineNum">    1223 </span><span class="lineCov">        154 :         if (!(xWindow-&gt;init_flags &amp; GF_TERM_INIT_HIDE)) {</span>
+<span class="lineNum">    1224 </span><span class="lineCov">         11 :                 XMapWindow (xWindow-&gt;display, (Window) xWindow-&gt;wnd);</span>
+<span class="lineNum">    1225 </span>            :         }
+<span class="lineNum">    1226 </span>            : 
+<span class="lineNum">    1227 </span><span class="lineCov">        154 :         XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">    1228 </span><span class="lineCov">        154 :         XUnmapWindow (xWindow-&gt;display, (Window) xWindow-&gt;wnd);</span>
+<span class="lineNum">    1229 </span><span class="lineCov">        154 :         XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">    1230 </span><span class="lineCov">        154 :         old_handler = XSetErrorHandler(X11_BadAccess_ByPass);</span>
+<span class="lineNum">    1231 </span><span class="lineCov">        154 :         selectinput_err = 0;</span>
+<span class="lineNum">    1232 </span><span class="lineCov">        154 :         XSelectInput(xWindow-&gt;display, xWindow-&gt;wnd,</span>
+<span class="lineNum">    1233 </span>            :                      FocusChangeMask | StructureNotifyMask | PropertyChangeMask | ExposureMask |
+<span class="lineNum">    1234 </span>            :                      PointerMotionMask | ButtonReleaseMask | ButtonPressMask |
+<span class="lineNum">    1235 </span>            :                      KeyPressMask | KeyReleaseMask);
+<span class="lineNum">    1236 </span><span class="lineCov">        154 :         XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">    1237 </span><span class="lineCov">        154 :         XSetErrorHandler(old_handler);</span>
+<span class="lineNum">    1238 </span><span class="lineCov">        154 :         if (selectinput_err) {</span>
+<span class="lineNum">    1239 </span><span class="lineNoCov">          0 :                 XSelectInput(xWindow-&gt;display, xWindow-&gt;wnd,</span>
+<span class="lineNum">    1240 </span>            :                              StructureNotifyMask | PropertyChangeMask | ExposureMask |
+<span class="lineNum">    1241 </span>            :                              KeyPressMask | KeyReleaseMask);
+<span class="lineNum">    1242 </span>            : 
+<span class="lineNum">    1243 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Cannot select input focus\n&quot;));</span>
+<span class="lineNum">    1244 </span>            :         }
+<span class="lineNum">    1245 </span><span class="lineCov">        154 :         XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">    1246 </span><span class="lineCov">        154 :         if (!(xWindow-&gt;init_flags &amp; GF_TERM_INIT_HIDE)) {</span>
+<span class="lineNum">    1247 </span><span class="lineCov">         11 :                 XMapWindow (xWindow-&gt;display, (Window) xWindow-&gt;wnd);</span>
+<span class="lineNum">    1248 </span>            :         }
+<span class="lineNum">    1249 </span><span class="lineCov">        154 :         XSizeHints *Hints = XAllocSizeHints ();</span>
+<span class="lineNum">    1250 </span><span class="lineCov">        154 :         Hints-&gt;flags = PSize | PMinSize;</span>
+<span class="lineNum">    1251 </span><span class="lineCov">        154 :         Hints-&gt;min_width = 64;</span>
+<span class="lineNum">    1252 </span><span class="lineCov">        154 :         Hints-&gt;min_height = 64;</span>
+<span class="lineNum">    1253 </span><span class="lineCov">        154 :         Hints-&gt;max_height = 4096;</span>
+<span class="lineNum">    1254 </span><span class="lineCov">        154 :         Hints-&gt;max_width = 4096;</span>
+<span class="lineNum">    1255 </span><span class="lineCov">        154 :         if (!xWindow-&gt;par_wnd) {</span>
+<span class="lineNum">    1256 </span><span class="lineCov">        154 :                 XSetWMNormalHints (xWindow-&gt;display, xWindow-&gt;wnd, Hints);</span>
+<span class="lineNum">    1257 </span><span class="lineCov">        154 :                 XStoreName (xWindow-&gt;display, xWindow-&gt;wnd, &quot;GPAC X11 Output&quot;);</span>
+<span class="lineNum">    1258 </span>            :         }
+<span class="lineNum">    1259 </span><span class="lineCov">        154 :         Hints-&gt;x = 0;</span>
+<span class="lineNum">    1260 </span><span class="lineCov">        154 :         Hints-&gt;y = 0;</span>
+<span class="lineNum">    1261 </span><span class="lineCov">        154 :         Hints-&gt;flags |= USPosition;</span>
+<span class="lineNum">    1262 </span><span class="lineCov">        154 :         XSetWMNormalHints (xWindow-&gt;display, xWindow-&gt;full_wnd, Hints);</span>
+<span class="lineNum">    1263 </span>            : 
+<span class="lineNum">    1264 </span>            :         {
+<span class="lineNum">    1265 </span>            :                 XClassHint hint;
+<span class="lineNum">    1266 </span><span class="lineCov">        154 :                 hint.res_name = &quot;gpac&quot;;</span>
+<span class="lineNum">    1267 </span><span class="lineCov">        154 :                 hint.res_class = &quot;gpac&quot;;</span>
+<span class="lineNum">    1268 </span><span class="lineCov">        154 :                 XSetClassHint(xWindow-&gt;display, xWindow-&gt;wnd, &amp;hint);</span>
+<span class="lineNum">    1269 </span>            :         }
+<span class="lineNum">    1270 </span>            : 
+<span class="lineNum">    1271 </span>            :         autorepeat = 1;
+<span class="lineNum">    1272 </span><span class="lineCov">        154 :         XkbSetDetectableAutoRepeat(xWindow-&gt;display, autorepeat, &amp;supported);</span>
+<span class="lineNum">    1273 </span>            : 
+<span class="lineNum">    1274 </span>            : 
+<span class="lineNum">    1275 </span><span class="lineCov">        154 :         if (xWindow-&gt;init_flags &amp; GF_TERM_WINDOW_NO_DECORATION) {</span>
+<span class="lineNum">    1276 </span>            : #define PROP_MOTIF_WM_HINTS_ELEMENTS 5
+<span class="lineNum">    1277 </span>            : #define MWM_HINTS_DECORATIONS (1L &lt;&lt; 1)
+<span class="lineNum">    1278 </span>            :                 struct {
+<span class="lineNum">    1279 </span>            :                         unsigned long flags;
+<span class="lineNum">    1280 </span>            :                         unsigned long functions;
+<span class="lineNum">    1281 </span>            :                         unsigned long decorations;
+<span class="lineNum">    1282 </span>            :                         long inputMode;
+<span class="lineNum">    1283 </span>            :                         unsigned long status;
+<span class="lineNum">    1284 </span><span class="lineNoCov">          0 :                 } hints = {2, 0, 0, 0, 0};</span>
+<span class="lineNum">    1285 </span>            : 
+<span class="lineNum">    1286 </span>            :                 hints.flags = MWM_HINTS_DECORATIONS;
+<span class="lineNum">    1287 </span>            :                 hints.decorations = 0;
+<span class="lineNum">    1288 </span>            : 
+<span class="lineNum">    1289 </span><span class="lineNoCov">          0 :                 XChangeProperty(xWindow-&gt;display, xWindow-&gt;wnd, XInternAtom(xWindow-&gt;display,&quot;_MOTIF_WM_HINTS&quot;, False), XInternAtom(xWindow-&gt;display, &quot;_MOTIF_WM_HINTS&quot;, False), 32, PropModeReplace, (unsigned char *)&amp;hints, PROP_MOTIF_WM_HINTS_ELEMENTS);</span>
+<span class="lineNum">    1290 </span>            : 
+<span class="lineNum">    1291 </span>            :         }
+<span class="lineNum">    1292 </span>            : 
+<span class="lineNum">    1293 </span><span class="lineCov">        154 :         xWindow-&gt;the_gc = XCreateGC (xWindow-&gt;display, xWindow-&gt;wnd, 0, NULL);</span>
+<span class="lineNum">    1294 </span><span class="lineCov">        154 :         xWindow-&gt;use_shared_memory = 0;</span>
+<span class="lineNum">    1295 </span>            : 
+<span class="lineNum">    1296 </span>            : #ifdef GPAC_HAS_X11_SHM
+<span class="lineNum">    1297 </span><span class="lineCov">        154 :         sOpt = gf_opts_get_key(&quot;core&quot;, &quot;hwvmem&quot;);</span>
+<span class="lineNum">    1298 </span><span class="lineCov">        154 :         if (!sOpt || strcmp(sOpt, &quot;no&quot;)) {</span>
+<span class="lineNum">    1299 </span>            :                 int XShmMajor, XShmMinor;
+<span class="lineNum">    1300 </span>            :                 Bool XShmPixmaps;
+<span class="lineNum">    1301 </span><span class="lineCov">        154 :                 if (XShmQueryVersion(xWindow-&gt;display, &amp;XShmMajor, &amp;XShmMinor, &amp;XShmPixmaps)) {</span>
+<span class="lineNum">    1302 </span><span class="lineCov">        154 :                         xWindow-&gt;use_shared_memory = 1;</span>
+<span class="lineNum">    1303 </span><span class="lineCov">        154 :                         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[X11] Using X11 Shared Memory\n&quot;));</span>
+<span class="lineNum">    1304 </span><span class="lineCov">        154 :                         if ((XShmPixmaps==True) &amp;&amp; (XShmPixmapFormat(xWindow-&gt;display)==ZPixmap)) {</span>
+<span class="lineNum">    1305 </span><span class="lineCov">        154 :                                 GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[X11] X11 Shared Memory Pixmaps available\n&quot;));</span>
+<span class="lineNum">    1306 </span>            :                         }
+<span class="lineNum">    1307 </span>            :                 }
+<span class="lineNum">    1308 </span>            :         }
+<span class="lineNum">    1309 </span>            : 
+<span class="lineNum">    1310 </span>            : #endif
+<span class="lineNum">    1311 </span>            : 
+<span class="lineNum">    1312 </span>            : #ifdef GPAC_HAS_X11_XV
+<span class="lineNum">    1313 </span><span class="lineCov">        154 :         sOpt = gf_opts_get_key(&quot;core&quot;, &quot;no-colorkey&quot;);</span>
+<span class="lineNum">    1314 </span><span class="lineCov">        154 :         if (sOpt &amp;&amp; !strcmp(sOpt, &quot;yes&quot;)) {</span>
+<span class="lineNum">    1315 </span><span class="lineNoCov">          0 :                 xWindow-&gt;xvport = X11_GetXVideoPort(vout, GF_PIXEL_YV12, 0);</span>
+<span class="lineNum">    1316 </span>            :         } else {
+<span class="lineNum">    1317 </span><span class="lineCov">        154 :                 xWindow-&gt;xvport = X11_GetXVideoPort(vout, GF_PIXEL_YV12, 1);</span>
+<span class="lineNum">    1318 </span><span class="lineCov">        154 :                 if (xWindow-&gt;xvport&lt;0) {</span>
+<span class="lineNum">    1319 </span><span class="lineCov">        154 :                         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[X11] Hardware has no color keying\n&quot;));</span>
+<span class="lineNum">    1320 </span><span class="lineCov">        154 :                         vout-&gt;overlay_color_key = 0;</span>
+<span class="lineNum">    1321 </span><span class="lineCov">        154 :                         xWindow-&gt;xvport = X11_GetXVideoPort(vout, GF_PIXEL_YV12, 0);</span>
+<span class="lineNum">    1322 </span>            :                 } else {
+<span class="lineNum">    1323 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[X11] Hardware uses color key %08x\n&quot;, vout-&gt;overlay_color_key));</span>
+<span class="lineNum">    1324 </span>            :                 }
+<span class="lineNum">    1325 </span>            :         }
+<span class="lineNum">    1326 </span><span class="lineCov">        154 :         if (xWindow-&gt;xvport&gt;=0) {</span>
+<span class="lineNum">    1327 </span><span class="lineNoCov">          0 :                 XvUngrabPort(xWindow-&gt;display, xWindow-&gt;xvport, CurrentTime );</span>
+<span class="lineNum">    1328 </span><span class="lineNoCov">          0 :                 xWindow-&gt;xvport = -1;</span>
+<span class="lineNum">    1329 </span><span class="lineNoCov">          0 :                 vout-&gt;yuv_pixel_format = X11_GetPixelFormat(xWindow-&gt;xv_pf_format);</span>
+<span class="lineNum">    1330 </span><span class="lineNoCov">          0 :                 vout-&gt;Blit = X11_Blit;</span>
+<span class="lineNum">    1331 </span><span class="lineNoCov">          0 :                 vout-&gt;hw_caps |= GF_VIDEO_HW_HAS_YUV_OVERLAY;</span>
+<span class="lineNum">    1332 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[X11] Using XV YUV Overlays\n&quot;));</span>
+<span class="lineNum">    1333 </span>            : 
+<span class="lineNum">    1334 </span>            : #ifdef GPAC_HAS_X11_SHM
+<span class="lineNum">    1335 </span>            :                 /*if user asked for YUV-&gt;RGB on offscreen, do it (it may crash the system)*/
+<span class="lineNum">    1336 </span><span class="lineNoCov">          0 :                 if (gf_opts_get_bool(&quot;core&quot;, &quot;offscreen-yuv&quot;)) {</span>
+<span class="lineNum">    1337 </span><span class="lineNoCov">          0 :                         vout-&gt;hw_caps |= GF_VIDEO_HW_HAS_YUV;</span>
+<span class="lineNum">    1338 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[X11] Using XV Offscreen YUV2RGB acceleration\n&quot;));</span>
+<span class="lineNum">    1339 </span>            :                 }
+<span class="lineNum">    1340 </span>            : #endif
+<span class="lineNum">    1341 </span>            :         }
+<span class="lineNum">    1342 </span>            : #endif
+<span class="lineNum">    1343 </span>            : 
+<span class="lineNum">    1344 </span>            :         XSetWindowAttributes xsw;
+<span class="lineNum">    1345 </span><span class="lineCov">        154 :         xsw.border_pixel = WhitePixel (xWindow-&gt;display, xWindow-&gt;screennum);</span>
+<span class="lineNum">    1346 </span><span class="lineCov">        154 :         xsw.background_pixel = BlackPixel (xWindow-&gt;display, xWindow-&gt;screennum);</span>
+<span class="lineNum">    1347 </span><span class="lineCov">        154 :         xsw.win_gravity = NorthWestGravity;</span>
+<span class="lineNum">    1348 </span><span class="lineCov">        154 :         XChangeWindowAttributes (xWindow-&gt;display, xWindow-&gt;wnd, CWBackPixel | CWWinGravity, &amp;xsw);</span>
+<span class="lineNum">    1349 </span>            : 
+<span class="lineNum">    1350 </span><span class="lineCov">        154 :         xsw.override_redirect = True;</span>
+<span class="lineNum">    1351 </span><span class="lineCov">        154 :         XChangeWindowAttributes(xWindow-&gt;display, xWindow-&gt;full_wnd,</span>
+<span class="lineNum">    1352 </span>            :                                 CWOverrideRedirect | CWBackPixel | CWBorderPixel | CWWinGravity, &amp;xsw);
+<span class="lineNum">    1353 </span>            : 
+<span class="lineNum">    1354 </span><span class="lineCov">        154 :         if (!xWindow-&gt;par_wnd) {</span>
+<span class="lineNum">    1355 </span><span class="lineCov">        154 :                 xWindow-&gt;WM_DELETE_WINDOW = XInternAtom (xWindow-&gt;display, &quot;WM_DELETE_WINDOW&quot;, False);</span>
+<span class="lineNum">    1356 </span><span class="lineCov">        154 :                 XSetWMProtocols(xWindow-&gt;display, xWindow-&gt;wnd, &amp;xWindow-&gt;WM_DELETE_WINDOW, 1);</span>
+<span class="lineNum">    1357 </span>            :         }
+<span class="lineNum">    1358 </span>            : 
+<span class="lineNum">    1359 </span>            : 
+<span class="lineNum">    1360 </span>            :         {
+<span class="lineNum">    1361 </span>            :                 XEvent ev;
+<span class="lineNum">    1362 </span>            :                 long mask;
+<span class="lineNum">    1363 </span>            : 
+<span class="lineNum">    1364 </span>            :                 memset (&amp;ev, 0, sizeof (ev));
+<span class="lineNum">    1365 </span><span class="lineCov">        154 :                 ev.xclient.type = ClientMessage;</span>
+<span class="lineNum">    1366 </span><span class="lineCov">        154 :                 ev.xclient.window = RootWindowOfScreen (xWindow-&gt;screenptr);</span>
+<span class="lineNum">    1367 </span><span class="lineCov">        154 :                 ev.xclient.message_type = XInternAtom (xWindow-&gt;display, &quot;KWM_KEEP_ON_TOP&quot;, False);</span>
+<span class="lineNum">    1368 </span><span class="lineCov">        154 :                 ev.xclient.format = 32;</span>
+<span class="lineNum">    1369 </span><span class="lineCov">        154 :                 ev.xclient.data.l[0] = xWindow-&gt;full_wnd;</span>
+<span class="lineNum">    1370 </span><span class="lineCov">        154 :                 ev.xclient.data.l[1] = CurrentTime;</span>
+<span class="lineNum">    1371 </span>            :                 mask = SubstructureRedirectMask;
+<span class="lineNum">    1372 </span><span class="lineCov">        154 :                 XSendEvent (xWindow-&gt;display,RootWindowOfScreen (xWindow-&gt;screenptr), False,</span>
+<span class="lineNum">    1373 </span>            :                             mask, &amp;ev);
+<span class="lineNum">    1374 </span>            :         }
+<span class="lineNum">    1375 </span>            : 
+<span class="lineNum">    1376 </span>            :         /*openGL setup*/
+<span class="lineNum">    1377 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">    1378 </span>            :         {
+<span class="lineNum">    1379 </span>            :                 int attribs[64];
+<span class="lineNum">    1380 </span>            :                 int i, nb_bits, nb_depth_bits;
+<span class="lineNum">    1381 </span>            : 
+<span class="lineNum">    1382 </span><span class="lineCov">        154 :                 sOpt = gf_opts_get_key(&quot;core&quot;, &quot;gl-bits-comp&quot;);</span>
+<span class="lineNum">    1383 </span>            :                 /* Most outputs are 24/32 bits these days, use 8 bits per channel instead of 5, works better on MacOS X */
+<span class="lineNum">    1384 </span><span class="lineCov">        154 :                 nb_bits = sOpt ? atoi(sOpt) : 8;</span>
+<span class="lineNum">    1385 </span><span class="lineCov">        154 :                 if (!sOpt) {</span>
+<span class="lineNum">    1386 </span><span class="lineCov">        154 :                         gf_opts_set_key(&quot;core&quot;, &quot;gl-bits-comp&quot;, &quot;8&quot;);</span>
+<span class="lineNum">    1387 </span>            :                 }
+<span class="lineNum">    1388 </span><span class="lineCov">        154 : retry_8bpp:</span>
+<span class="lineNum">    1389 </span>            :                 i=0;
+<span class="lineNum">    1390 </span><span class="lineCov">        154 :                 if (nb_bits&gt;8) {</span>
+<span class="lineNum">    1391 </span><span class="lineNoCov">          0 :                         attribs[i++] = GLX_DRAWABLE_TYPE;</span>
+<span class="lineNum">    1392 </span><span class="lineNoCov">          0 :                         attribs[i++] =  GLX_WINDOW_BIT;</span>
+<span class="lineNum">    1393 </span><span class="lineNoCov">          0 :                         attribs[i++] = GLX_RENDER_TYPE;</span>
+<span class="lineNum">    1394 </span><span class="lineNoCov">          0 :                         attribs[i++] = GLX_RGBA_BIT;</span>
+<span class="lineNum">    1395 </span>            :                 } else {
+<span class="lineNum">    1396 </span><span class="lineCov">        154 :                         attribs[i++] = GLX_RGBA;</span>
+<span class="lineNum">    1397 </span>            :                 }
+<span class="lineNum">    1398 </span><span class="lineCov">        154 :                 attribs[i++] = GLX_RED_SIZE;</span>
+<span class="lineNum">    1399 </span><span class="lineCov">        154 :                 attribs[i++] = nb_bits;</span>
+<span class="lineNum">    1400 </span><span class="lineCov">        154 :                 attribs[i++] = GLX_GREEN_SIZE;</span>
+<span class="lineNum">    1401 </span><span class="lineCov">        154 :                 attribs[i++] = nb_bits;</span>
+<span class="lineNum">    1402 </span><span class="lineCov">        154 :                 attribs[i++] = GLX_BLUE_SIZE;</span>
+<span class="lineNum">    1403 </span><span class="lineCov">        154 :                 attribs[i++] = nb_bits;</span>
+<span class="lineNum">    1404 </span><span class="lineCov">        154 :                 if (nb_bits==10) {</span>
+<span class="lineNum">    1405 </span><span class="lineNoCov">          0 :                         attribs[i++] = GLX_ALPHA_SIZE;</span>
+<span class="lineNum">    1406 </span><span class="lineNoCov">          0 :                         attribs[i++] = 2;</span>
+<span class="lineNum">    1407 </span>            :                 }
+<span class="lineNum">    1408 </span>            : 
+<span class="lineNum">    1409 </span><span class="lineCov">        154 :                 sOpt = gf_opts_get_key(&quot;core&quot;, &quot;gl-bits-depth&quot;);</span>
+<span class="lineNum">    1410 </span><span class="lineCov">        154 :                 nb_depth_bits = sOpt ? atoi(sOpt) : 16;</span>
+<span class="lineNum">    1411 </span><span class="lineCov">        154 :                 if (!sOpt) {</span>
+<span class="lineNum">    1412 </span><span class="lineCov">        154 :                         gf_opts_set_key(&quot;core&quot;, &quot;gl-bits-depth&quot;, &quot;16&quot;);</span>
+<span class="lineNum">    1413 </span>            :                 }
+<span class="lineNum">    1414 </span><span class="lineCov">        154 :                 if (nb_bits) {</span>
+<span class="lineNum">    1415 </span><span class="lineCov">        154 :                         attribs[i++] = GLX_DEPTH_SIZE;</span>
+<span class="lineNum">    1416 </span><span class="lineCov">        154 :                         attribs[i++] = nb_depth_bits;</span>
+<span class="lineNum">    1417 </span>            :                 }
+<span class="lineNum">    1418 </span><span class="lineCov">        154 :                 sOpt = gf_opts_get_key(&quot;core&quot;, &quot;gl-doublebuf&quot;);</span>
+<span class="lineNum">    1419 </span><span class="lineCov">        154 :                 if (!sOpt) {</span>
+<span class="lineNum">    1420 </span><span class="lineCov">        154 :                         gf_opts_set_key(&quot;core&quot;, &quot;gl-doublebuf&quot;, &quot;yes&quot;);</span>
+<span class="lineNum">    1421 </span>            :                 }
+<span class="lineNum">    1422 </span><span class="lineCov">        154 :                 if (!sOpt || !strcmp(sOpt, &quot;yes&quot;)) {</span>
+<span class="lineNum">    1423 </span><span class="lineCov">        154 :                         attribs[i++] = GLX_DOUBLEBUFFER;</span>
+<span class="lineNum">    1424 </span><span class="lineCov">        154 :                         attribs[i++] = True;</span>
+<span class="lineNum">    1425 </span>            :                 }
+<span class="lineNum">    1426 </span><span class="lineCov">        154 :                 attribs[i++] = None;</span>
+<span class="lineNum">    1427 </span>            : 
+<span class="lineNum">    1428 </span><span class="lineCov">        154 :                 if (nb_bits&gt;8) {</span>
+<span class="lineNum">    1429 </span><span class="lineNoCov">          0 :                         int fbcount=0;</span>
+<span class="lineNum">    1430 </span>            :                         GLXFBConfig *fb=NULL;
+<span class="lineNum">    1431 </span>            :                         typedef GLXFBConfig * (* FnGlXChooseFBConfigProc)( Display *, int, int const *,int * );
+<span class="lineNum">    1432 </span>            :                         typedef XVisualInfo * (* FnGlXGetVisualFromFBConfigProc)( Display *, GLXFBConfig );
+<span class="lineNum">    1433 </span>            :                         typedef int (* FnGlXGetFBConfigAttrib) (Display *  dpy,  GLXFBConfig  config,  int  attribute,  int *  value);
+<span class="lineNum">    1434 </span>            : 
+<span class="lineNum">    1435 </span>            : 
+<span class="lineNum">    1436 </span><span class="lineNoCov">          0 :                         FnGlXChooseFBConfigProc my_glXChooseFBConfig = (FnGlXChooseFBConfigProc) glXGetProcAddress((GLubyte*) &quot;glXChooseFBConfig&quot;);</span>
+<span class="lineNum">    1437 </span><span class="lineNoCov">          0 :                         FnGlXGetVisualFromFBConfigProc my_glXGetVisualFromFBConfig = (FnGlXGetVisualFromFBConfigProc)glXGetProcAddress((GLubyte*) &quot;glXGetVisualFromFBConfig&quot;);</span>
+<span class="lineNum">    1438 </span><span class="lineNoCov">          0 :                         FnGlXGetFBConfigAttrib my_glXGetFBConfigAttrib = (FnGlXGetFBConfigAttrib)glXGetProcAddress((GLubyte*) &quot;glXGetFBConfigAttrib&quot;);</span>
+<span class="lineNum">    1439 </span>            : 
+<span class="lineNum">    1440 </span><span class="lineNoCov">          0 :                         if (my_glXChooseFBConfig &amp;&amp; my_glXGetVisualFromFBConfig) {</span>
+<span class="lineNum">    1441 </span><span class="lineNoCov">          0 :                                 fb = my_glXChooseFBConfig(xWindow-&gt;display, xWindow-&gt;screennum, attribs, &amp;fbcount);</span>
+<span class="lineNum">    1442 </span>            :                         }
+<span class="lineNum">    1443 </span>            : 
+<span class="lineNum">    1444 </span><span class="lineNoCov">          0 :                         if (fbcount==0) {</span>
+<span class="lineNum">    1445 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Failed to choose GLX config for 10 bit depth - retrying with 8 bit depth\n&quot;));</span>
+<span class="lineNum">    1446 </span>            :                                 nb_bits = 8;
+<span class="lineNum">    1447 </span><span class="lineNoCov">          0 :                                 goto retry_8bpp;</span>
+<span class="lineNum">    1448 </span>            :                         }
+<span class="lineNum">    1449 </span><span class="lineNoCov">          0 :                         if (my_glXGetVisualFromFBConfig)</span>
+<span class="lineNum">    1450 </span><span class="lineNoCov">          0 :                                 xWindow-&gt;glx_visualinfo = my_glXGetVisualFromFBConfig(xWindow-&gt;display, fb[0]);</span>
+<span class="lineNum">    1451 </span>            : 
+<span class="lineNum">    1452 </span><span class="lineNoCov">          0 :                         if (my_glXGetFBConfigAttrib &amp;&amp; fb) {</span>
+<span class="lineNum">    1453 </span>            :                                 int r, g, b;
+<span class="lineNum">    1454 </span><span class="lineNoCov">          0 :                                 my_glXGetFBConfigAttrib(xWindow-&gt;display, fb[0], GLX_RED_SIZE, &amp;r);</span>
+<span class="lineNum">    1455 </span><span class="lineNoCov">          0 :                                 my_glXGetFBConfigAttrib(xWindow-&gt;display, fb[0], GLX_GREEN_SIZE, &amp;g);</span>
+<span class="lineNum">    1456 </span><span class="lineNoCov">          0 :                                 my_glXGetFBConfigAttrib(xWindow-&gt;display, fb[0], GLX_BLUE_SIZE, &amp;b);</span>
+<span class="lineNum">    1457 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[GLX] Configured display asked %d bits got r:%d g:%d b:%d bits\n&quot;, nb_bits, r, g, b));</span>
+<span class="lineNum">    1458 </span>            :                         }
+<span class="lineNum">    1459 </span>            :                 } else {
+<span class="lineNum">    1460 </span><span class="lineCov">        154 :                         xWindow-&gt;glx_visualinfo = glXChooseVisual(xWindow-&gt;display, xWindow-&gt;screennum, attribs);</span>
+<span class="lineNum">    1461 </span>            :                 }
+<span class="lineNum">    1462 </span><span class="lineCov">        154 :                 vout-&gt;max_screen_bpp = nb_bits;</span>
+<span class="lineNum">    1463 </span>            : 
+<span class="lineNum">    1464 </span><span class="lineCov">        154 :                 if (!xWindow-&gt;glx_visualinfo) {</span>
+<span class="lineNum">    1465 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[X11] Error selecting GL display\n&quot;));</span>
+<span class="lineNum">    1466 </span>            :                 }
+<span class="lineNum">    1467 </span>            :         }
+<span class="lineNum">    1468 </span>            : 
+<span class="lineNum">    1469 </span><span class="lineCov">        308 :         xWindow-&gt;gl_wnd = XCreateWindow (xWindow-&gt;display, RootWindowOfScreen (xWindow-&gt;screenptr),</span>
+<span class="lineNum">    1470 </span>            :                                          0,
+<span class="lineNum">    1471 </span>            :                                          0,
+<span class="lineNum">    1472 </span>            :                                          200,
+<span class="lineNum">    1473 </span>            :                                          200, 0,
+<span class="lineNum">    1474 </span><span class="lineCov">        154 :                                          xWindow-&gt;depth, InputOutput,</span>
+<span class="lineNum">    1475 </span>            :                                          xWindow-&gt;visual, 0, NULL);
+<span class="lineNum">    1476 </span>            : 
+<span class="lineNum">    1477 </span><span class="lineCov">        154 :         XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">    1478 </span><span class="lineCov">        154 :         XUnmapWindow(xWindow-&gt;display, (Window) xWindow-&gt;gl_wnd);</span>
+<span class="lineNum">    1479 </span><span class="lineCov">        154 :         XSync(xWindow-&gt;display, False);</span>
+<span class="lineNum">    1480 </span>            : 
+<span class="lineNum">    1481 </span><span class="lineCov">        154 :         sOpt = gf_opts_get_key(&quot;core&quot;, &quot;gl-offscreen&quot;);</span>
+<span class="lineNum">    1482 </span><span class="lineCov">        154 :         if (!sOpt)</span>
+<span class="lineNum">    1483 </span><span class="lineCov">        154 :                 gf_opts_set_key(&quot;core&quot;, &quot;gl-offscreen&quot;, &quot;Pixmap&quot;);</span>
+<span class="lineNum">    1484 </span><span class="lineCov">        154 :         if (sOpt &amp;&amp; !strcmp(sOpt, &quot;Window&quot;)) {</span>
+<span class="lineNum">    1485 </span><span class="lineNoCov">          0 :                 xWindow-&gt;offscreen_type = 1;</span>
+<span class="lineNum">    1486 </span><span class="lineCov">        154 :         } else if (sOpt &amp;&amp; !strcmp(sOpt, &quot;VisibleWindow&quot;)) {</span>
+<span class="lineNum">    1487 </span><span class="lineNoCov">          0 :                 xWindow-&gt;offscreen_type = 2;</span>
+<span class="lineNum">    1488 </span><span class="lineNoCov">          0 :                 XSetWMNormalHints (xWindow-&gt;display, xWindow-&gt;gl_wnd, Hints);</span>
+<span class="lineNum">    1489 </span><span class="lineCov">        154 :         } else if (sOpt &amp;&amp; !strcmp(sOpt, &quot;Pixmap&quot;)) {</span>
+<span class="lineNum">    1490 </span><span class="lineNoCov">          0 :                 xWindow-&gt;offscreen_type = 0;</span>
+<span class="lineNum">    1491 </span>            :         } else {
+<span class="lineNum">    1492 </span><span class="lineCov">        154 :                 xWindow-&gt;offscreen_type = 0;</span>
+<span class="lineNum">    1493 </span>            :         }
+<span class="lineNum">    1494 </span>            : #endif
+<span class="lineNum">    1495 </span>            : 
+<span class="lineNum">    1496 </span>            : 
+<span class="lineNum">    1497 </span>            :         /*turn off xscreensaver*/
+<span class="lineNum">    1498 </span><span class="lineCov">        154 :         X11_XScreenSaverState(xWindow, 0);</span>
+<span class="lineNum">    1499 </span>            : 
+<span class="lineNum">    1500 </span><span class="lineCov">        154 :         XFree (Hints);</span>
+<a name="1501"><span class="lineNum">    1501 </span>            : }</a>
+<span class="lineNum">    1502 </span>            : 
+<span class="lineNum">    1503 </span><span class="lineCov">        155 : GF_Err X11_Setup(struct _video_out *vout, void *os_handle, void *os_display, u32 flags)</span>
+<span class="lineNum">    1504 </span>            : {
+<span class="lineNum">    1505 </span><span class="lineCov">        155 :         X11VID ();</span>
+<span class="lineNum">    1506 </span>            :         /*assign window if any, NEVER display*/
+<span class="lineNum">    1507 </span><span class="lineCov">        155 :         xWindow-&gt;par_wnd = (Window) os_handle;</span>
+<span class="lineNum">    1508 </span><span class="lineCov">        155 :         xWindow-&gt;init_flags = flags;</span>
+<span class="lineNum">    1509 </span>            : 
+<span class="lineNum">    1510 </span>            :         //window already setup and this restup asks for visible, show window
+<span class="lineNum">    1511 </span><span class="lineCov">        155 :         if (xWindow-&gt;wnd) {</span>
+<span class="lineNum">    1512 </span><span class="lineCov">          1 :                 if (!(xWindow-&gt;init_flags &amp; GF_TERM_INIT_HIDE)) {</span>
+<span class="lineNum">    1513 </span><span class="lineCov">          1 :                         XMapWindow (xWindow-&gt;display, (Window) xWindow-&gt;wnd);</span>
+<span class="lineNum">    1514 </span>            :                 }
+<span class="lineNum">    1515 </span>            :         }
+<span class="lineNum">    1516 </span>            : 
+<span class="lineNum">    1517 </span>            :         /*OSMOZILLA HACK*/
+<span class="lineNum">    1518 </span><span class="lineCov">        155 :         if (os_display) xWindow-&gt;no_select_input = 1;</span>
+<span class="lineNum">    1519 </span>            : 
+<span class="lineNum">    1520 </span>            :         /*the rest is done THROUGH THE MAIN RENDERER TRHEAD!!*/
+<span class="lineNum">    1521 </span><span class="lineCov">        155 :         return GF_OK;</span>
+<span class="lineNum">    1522 </span>            : }
+<a name="1523"><span class="lineNum">    1523 </span>            : </a>
+<span class="lineNum">    1524 </span>            : /* Shutdown X11 */
+<span class="lineNum">    1525 </span><span class="lineCov">        153 : void X11_Shutdown (struct _video_out *vout)</span>
+<span class="lineNum">    1526 </span>            : {
+<span class="lineNum">    1527 </span><span class="lineCov">        153 :         X11VID ();</span>
+<span class="lineNum">    1528 </span><span class="lineCov">        153 :         if (! xWindow-&gt;display) return;</span>
+<span class="lineNum">    1529 </span>            : 
+<span class="lineNum">    1530 </span><span class="lineCov">        153 :         X11_ReleaseBackBuffer (vout);</span>
+<span class="lineNum">    1531 </span>            : 
+<span class="lineNum">    1532 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">    1533 </span><span class="lineCov">        153 :         X11_ReleaseGL(xWindow);</span>
+<span class="lineNum">    1534 </span><span class="lineCov">        153 :         if (xWindow-&gt;glx_visualinfo)</span>
+<span class="lineNum">    1535 </span><span class="lineCov">        153 :                 XFree(xWindow-&gt;glx_visualinfo);</span>
+<span class="lineNum">    1536 </span><span class="lineCov">        153 :         xWindow-&gt;glx_visualinfo = NULL;</span>
+<span class="lineNum">    1537 </span>            : #endif
+<span class="lineNum">    1538 </span><span class="lineCov">        153 :         XFreeGC (xWindow-&gt;display, xWindow-&gt;the_gc);</span>
+<span class="lineNum">    1539 </span><span class="lineCov">        153 :         XUnmapWindow (xWindow-&gt;display, (Window) xWindow-&gt;wnd);</span>
+<span class="lineNum">    1540 </span><span class="lineCov">        153 :         XDestroyWindow (xWindow-&gt;display, (Window) xWindow-&gt;wnd);</span>
+<span class="lineNum">    1541 </span><span class="lineCov">        153 :         XDestroyWindow (xWindow-&gt;display, (Window) xWindow-&gt;full_wnd);</span>
+<span class="lineNum">    1542 </span>            : #ifdef GPAC_HAS_OPENGL
+<span class="lineNum">    1543 </span><span class="lineCov">        153 :         if (xWindow-&gt;gl_offscreen) glXDestroyGLXPixmap(xWindow-&gt;display, xWindow-&gt;gl_offscreen);</span>
+<span class="lineNum">    1544 </span><span class="lineCov">        153 :         if (xWindow-&gt;gl_pixmap) XFreePixmap(xWindow-&gt;display, xWindow-&gt;gl_pixmap);</span>
+<span class="lineNum">    1545 </span><span class="lineCov">        153 :         XUnmapWindow (xWindow-&gt;display, (Window) xWindow-&gt;gl_wnd);</span>
+<span class="lineNum">    1546 </span><span class="lineCov">        153 :         XDestroyWindow (xWindow-&gt;display, (Window) xWindow-&gt;gl_wnd);</span>
+<span class="lineNum">    1547 </span>            : #endif
+<span class="lineNum">    1548 </span>            : 
+<span class="lineNum">    1549 </span>            :         /*restore xscreen saver*/
+<span class="lineNum">    1550 </span><span class="lineCov">        153 :         X11_XScreenSaverState(xWindow, 1);</span>
+<span class="lineNum">    1551 </span>            : 
+<span class="lineNum">    1552 </span><span class="lineCov">        153 :         XCloseDisplay (xWindow-&gt;display);</span>
+<span class="lineNum">    1553 </span><span class="lineCov">        153 :         gf_free(xWindow);</span>
+<span class="lineNum">    1554 </span><span class="lineCov">        153 :         vout-&gt;opaque = NULL;</span>
+<span class="lineNum">    1555 </span>            : }
+<span class="lineNum">    1556 </span>            : 
+<span class="lineNum">    1557 </span>            : 
+<a name="1558"><span class="lineNum">    1558 </span>            : </a>
+<span class="lineNum">    1559 </span>            : 
+<span class="lineNum">    1560 </span><span class="lineCov">        160 : void *NewX11VideoOutput ()</span>
+<span class="lineNum">    1561 </span>            : {
+<span class="lineNum">    1562 </span>            :         GF_VideoOutput *driv;
+<span class="lineNum">    1563 </span>            :         XWindow *xWindow;
+<span class="lineNum">    1564 </span><span class="lineCov">        160 :         GF_SAFEALLOC(driv, GF_VideoOutput);</span>
+<span class="lineNum">    1565 </span><span class="lineCov">        160 :         if (!driv) return NULL;</span>
+<span class="lineNum">    1566 </span><span class="lineCov">        160 :         GF_SAFEALLOC(xWindow, XWindow);</span>
+<span class="lineNum">    1567 </span><span class="lineCov">        160 :         if (!xWindow) {</span>
+<span class="lineNum">    1568 </span><span class="lineNoCov">          0 :                 gf_free(driv);</span>
+<span class="lineNum">    1569 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">    1570 </span>            :         }
+<span class="lineNum">    1571 </span><span class="lineCov">        160 :         GF_REGISTER_MODULE_INTERFACE(driv, GF_VIDEO_OUTPUT_INTERFACE, &quot;X11 Video Output&quot;, &quot;gpac distribution&quot;)</span>
+<span class="lineNum">    1572 </span>            : 
+<span class="lineNum">    1573 </span><span class="lineCov">        160 :         driv-&gt;opaque = xWindow;</span>
+<span class="lineNum">    1574 </span>            : 
+<span class="lineNum">    1575 </span><span class="lineCov">        160 :         driv-&gt;Flush = X11_Flush;</span>
+<span class="lineNum">    1576 </span><span class="lineCov">        160 :         driv-&gt;SetFullScreen = X11_SetFullScreen;</span>
+<span class="lineNum">    1577 </span><span class="lineCov">        160 :         driv-&gt;Setup = X11_Setup;</span>
+<span class="lineNum">    1578 </span><span class="lineCov">        160 :         driv-&gt;Shutdown = X11_Shutdown;</span>
+<span class="lineNum">    1579 </span><span class="lineCov">        160 :         driv-&gt;LockBackBuffer = X11_LockBackBuffer;</span>
+<span class="lineNum">    1580 </span><span class="lineCov">        160 :         driv-&gt;ProcessEvent = X11_ProcessEvent;</span>
+<span class="lineNum">    1581 </span>            :         driv-&gt;hw_caps = GF_VIDEO_HW_OPENGL;
+<span class="lineNum">    1582 </span>            :         /*fixme - needs a better detection scheme*/
+<span class="lineNum">    1583 </span><span class="lineCov">        160 :         driv-&gt;hw_caps |= GF_VIDEO_HW_OPENGL_OFFSCREEN | GF_VIDEO_HW_OPENGL_OFFSCREEN_ALPHA;</span>
+<span class="lineNum">    1584 </span>            : 
+<span class="lineNum">    1585 </span><span class="lineCov">        160 :         if (gf_sys_is_test_mode()) {</span>
+<span class="lineNum">    1586 </span>            :                 GF_Event evt;
+<span class="lineNum">    1587 </span><span class="lineCov">        154 :                 x11_translate_key(XK_BackSpace, &amp;evt.key);</span>
+<span class="lineNum">    1588 </span><span class="lineCov">        154 :                 X11_BadAccess_ByPass(NULL, NULL);</span>
+<span class="lineNum">    1589 </span>            :         }
+<span class="lineNum">    1590 </span>            :         return (void *) driv;
+<span class="lineNum">    1591 </span>            : 
+<span class="lineNum">    1592 </span>            : }
+<span class="lineNum">    1593 </span>            : 
+<a name="1594"><span class="lineNum">    1594 </span>            : </a>
+<span class="lineNum">    1595 </span>            : void
+<span class="lineNum">    1596 </span><span class="lineCov">        159 : DeleteX11VideoOutput (GF_VideoOutput * vout)</span>
+<span class="lineNum">    1597 </span>            : {
+<span class="lineNum">    1598 </span><span class="lineCov">        159 :         if (vout-&gt;opaque) gf_free(vout-&gt;opaque);</span>
+<span class="lineNum">    1599 </span><span class="lineCov">        159 :         gf_free(vout);</span>
+<span class="lineNum">    1600 </span><span class="lineCov">        159 : }</span>
+<span class="lineNum">    1601 </span>            : 
+<span class="lineNum">    1602 </span>            : /*
+<span class="lineNum">    1603 </span>            :  * interface query
+<a name="1604"><span class="lineNum">    1604 </span>            :  */</a>
+<span class="lineNum">    1605 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">    1606 </span><span class="lineCov">        805 : const u32 *QueryInterfaces()</span>
+<span class="lineNum">    1607 </span>            : {
+<span class="lineNum">    1608 </span>            :         static u32 si [] = {
+<span class="lineNum">    1609 </span>            :                 GF_VIDEO_OUTPUT_INTERFACE,
+<span class="lineNum">    1610 </span>            :                 0
+<span class="lineNum">    1611 </span>            :         };
+<span class="lineNum">    1612 </span><span class="lineCov">        805 :         return si;</span>
+<span class="lineNum">    1613 </span>            : }
+<span class="lineNum">    1614 </span>            : 
+<span class="lineNum">    1615 </span>            : 
+<span class="lineNum">    1616 </span>            : /*
+<span class="lineNum">    1617 </span>            :  * interface create
+<a name="1618"><span class="lineNum">    1618 </span>            :  */</a>
+<span class="lineNum">    1619 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">    1620 </span><span class="lineCov">        160 : GF_BaseInterface *LoadInterface (u32 InterfaceType)</span>
+<span class="lineNum">    1621 </span>            : {
+<span class="lineNum">    1622 </span><span class="lineCov">        160 :         if (InterfaceType == GF_VIDEO_OUTPUT_INTERFACE)</span>
+<span class="lineNum">    1623 </span><span class="lineCov">        160 :                 return (GF_BaseInterface *) NewX11VideoOutput ();</span>
+<span class="lineNum">    1624 </span>            :         return NULL;
+<span class="lineNum">    1625 </span>            : }
+<span class="lineNum">    1626 </span>            : 
+<span class="lineNum">    1627 </span>            : 
+<span class="lineNum">    1628 </span>            : /*
+<span class="lineNum">    1629 </span>            :  * interface destroy
+<a name="1630"><span class="lineNum">    1630 </span>            :  */</a>
+<span class="lineNum">    1631 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">    1632 </span><span class="lineCov">        159 : void ShutdownInterface (GF_BaseInterface *ifce)</span>
+<span class="lineNum">    1633 </span>            : {
+<span class="lineNum">    1634 </span><span class="lineCov">        159 :         switch (ifce-&gt;InterfaceType)</span>
+<span class="lineNum">    1635 </span>            :         {
+<span class="lineNum">    1636 </span><span class="lineCov">        159 :         case GF_VIDEO_OUTPUT_INTERFACE:</span>
+<span class="lineNum">    1637 </span><span class="lineCov">        159 :                 DeleteX11VideoOutput ((GF_VideoOutput *)ifce);</span>
+<span class="lineNum">    1638 </span><span class="lineCov">        159 :                 break;</span>
+<span class="lineNum">    1639 </span>            :         }
+<span class="lineNum">    1640 </span><span class="lineCov">        159 : }</span>
+<span class="lineNum">    1641 </span>            : 
+<span class="lineNum">    1642 </span>            : GPAC_MODULE_STATIC_DECLARATION( x11_out )
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

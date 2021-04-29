@@ -1,0 +1,2135 @@
+*** route_dash_ll_filemode logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:44:12 ***
+
+
+*** Subtest "receive": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i route://225.1.1.0:6000 inspect:allp:deep:interleave=false:test=noprop:fmt=%dts%-%cts%-%sap%%lf%:dur=1:log=./results/temp/inspect.txt -logs=dash:route@info" ***
+[ROUTE] Setting up service 1 destination IP 225.1.1.0 port 6000
+[ROUTE] Service 1 got TSI 0 config package:
+Content-Type: multipart/related; type="application/dash+xml"; boundary="_GPAC_BOUNDARY_ROUTE_.67706163_"
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/dash+xml
+Content-Location: out.mpd
+
+<?xml version="1.0" encoding="utf-8"?>
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:mpeg:dash:schema:mpd:2011"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
+	profiles="urn:mpeg:dash:profile:isoff-live:2011"
+	type="dynamic"
+	minimumUpdatePeriod="PT500S"
+	suggestedPresentationDelay="PT2S"
+	availabilityStartTime="2021-04-29T05:00:03Z"
+	publishTime="2021-04-29T23:44:11Z"
+	timeShiftBufferDepth="PT6.0S"
+	minBufferTime="PT2.0S">
+	<ProgramInformation>
+	</ProgramInformation>
+	<Period start="PT0.0S">
+		<AdaptationSet contentType="video" segmentAlignment="true" bitstreamSwitching="true" frameRate="30000/1001">
+			<Representation id="0" mimeType="video/mp4" codecs="avc1.64001f" bandwidth="2000000" width="1280" height="720" frameRate="30000/1001">
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.969" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+		<AdaptationSet contentType="audio" segmentAlignment="true" bitstreamSwitching="true">
+			<Representation id="1" mimeType="audio/mp4" codecs="mp4a.40.2" bandwidth="96000" audioSamplingRate="48000">
+				<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2" />
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.981" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+	</Period>
+</MPD>
+
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/route-s-tsid+xml
+Content-Location: stsid.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<S-TSID xmlns="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/S-TSID/1.0/" xmlns:afdt="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/ATSC-FDT/1.0/" xmlns:fdt="urn:ietf:params:xml:ns:fdt">
+ <RS dIpAddr="225.1.1.0" dPort="6000" sIpAddr="225.1.1.0">
+  <LS tsi="10" bw="105">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_1-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="5098">
+      <fdt:File Content-Location="1619672403/init-stream1.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="1" contentType="audio"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+ </RS>
+</S-TSID>
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_--
+
+[ROUTE] Service 1 received MPD file out.mpd
+[DASH] Detected ROUTE DASH service ID 1
+[DASH] Setting up period start 0 duration 0 xlink none ID none
+[DASH] AS#1 changed quality to bitrate 2000 kbps - Width 1280 Height 720 FPS 30000/1001 (playback speed 1)
+[DASH] AS#2 changed quality to bitrate 96 kbps - sample rate 48000 (playback speed 1)
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[ROUTE] Service 1 got TSI 0 config package:
+Content-Type: multipart/related; type="application/dash+xml"; boundary="_GPAC_BOUNDARY_ROUTE_.67706163_"
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/dash+xml
+Content-Location: out.mpd
+
+<?xml version="1.0" encoding="utf-8"?>
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:mpeg:dash:schema:mpd:2011"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
+	profiles="urn:mpeg:dash:profile:isoff-live:2011"
+	type="dynamic"
+	minimumUpdatePeriod="PT500S"
+	suggestedPresentationDelay="PT2S"
+	availabilityStartTime="2021-04-29T05:00:03Z"
+	publishTime="2021-04-29T23:44:11Z"
+	timeShiftBufferDepth="PT6.0S"
+	minBufferTime="PT2.0S">
+	<ProgramInformation>
+	</ProgramInformation>
+	<Period start="PT0.0S">
+		<AdaptationSet contentType="video" segmentAlignment="true" bitstreamSwitching="true" frameRate="30000/1001">
+			<Representation id="0" mimeType="video/mp4" codecs="avc1.64001f" bandwidth="2000000" width="1280" height="720" frameRate="30000/1001">
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.969" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+		<AdaptationSet contentType="audio" segmentAlignment="true" bitstreamSwitching="true">
+			<Representation id="1" mimeType="audio/mp4" codecs="mp4a.40.2" bandwidth="96000" audioSamplingRate="48000">
+				<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2" />
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.981" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+	</Period>
+</MPD>
+
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/route-s-tsid+xml
+Content-Location: stsid.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<S-TSID xmlns="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/S-TSID/1.0/" xmlns:afdt="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/ATSC-FDT/1.0/" xmlns:fdt="urn:ietf:params:xml:ns:fdt">
+ <RS dIpAddr="225.1.1.0" dPort="6000" sIpAddr="225.1.1.0">
+  <LS tsi="10" bw="105">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_1-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="5098">
+      <fdt:File Content-Location="1619672403/init-stream1.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="1" contentType="audio"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+  <LS tsi="20" bw="2200">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_0-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="4566">
+      <fdt:File Content-Location="1619672403/init-stream0.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="0" contentType="video"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+ </RS>
+</S-TSID>
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_--
+
+[ROUTE] Service 1 update of S-TSID not yet supported, skipping
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[ROUTE] Service 1 got file 1619672403/init-stream1.m4s (TSI 10 TOI 4294967295) size 770 in 0 ms
+[ROUTE] Pushing file 1619672403/init-stream1.m4s to cache
+[ROUTE] Service 1 object TSI 10 TOI 33692 started without total-length assigned !
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[DASH] Estimated UTC diff of ROUTE broadcast 3110 ms (UTC fetch 1619739855492 - server UTC 1619739852382 - MPD AST 1619672403000 - MPD PublishTime 1619739851000 - bootstraping on segment 1619672403/chunk-stream_t_1-33692.m4s
+[DASH] AST at init 1619672406110
+[DASH] At current time 67449382 ms: Initializing Timeline: startNumber=1 segmentNumber=33691 segmentDuration=2.002000 - 0.000 seconds in segment (start range 67449.4)
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Service 1 object TSI 10 TOI 33692 was started without total-length assigned, assigning to 37223
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[ROUTE] Service 1 got file 1619672403/chunk-stream_t_1-33692.m4s (TSI 10 TOI 33692) size 37223 in 1953 ms
+[ROUTE] Pushing file 1619672403/chunk-stream_t_1-33692.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Service 1 object TSI 10 TOI 33693 started without total-length assigned !
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Service 1 object TSI 10 TOI 33693 was started without total-length assigned, assigning to 37181
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[ROUTE] Service 1 got file 1619672403/chunk-stream_t_1-33693.m4s (TSI 10 TOI 33693) size 37181 in 871 ms
+[ROUTE] Pushing file 1619672403/chunk-stream_t_1-33693.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Service 1 object TSI 10 TOI 33694 started without total-length assigned !
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Service 1 object TSI 10 TOI 33694 was started without total-length assigned, assigning to 37338
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[ROUTE] Service 1 got file 1619672403/chunk-stream_t_1-33694.m4s (TSI 10 TOI 33694) size 37338 in 1663 ms
+[ROUTE] Pushing file 1619672403/chunk-stream_t_1-33694.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Service 1 object TSI 10 TOI 33695 started without total-length assigned !
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33695.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[ROUTE] No data for 5001 ms, aborting
+[ROUTE] No data for 5001 ms, aborting
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream0.m4s: Requested URL is not valid or cannot be found
+
+
+*** Subtest "send": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i https://akamaibroadcasteruseast.akamaized.net/cmaf/live/657078/akasource/out.mpd dashin:forward=file @ -o route://225.1.1.0:6000/:llmode:runfor=10000 -logs=route@debug" ***
+[ROUTE] Mux rate 0 kbps
+[ROUTE] Updated Manifest+S-TSID bundle to:
+Content-Type: multipart/related; type="application/dash+xml"; boundary="_GPAC_BOUNDARY_ROUTE_.67706163_"
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/dash+xml
+Content-Location: out.mpd
+
+<?xml version="1.0" encoding="utf-8"?>
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:mpeg:dash:schema:mpd:2011"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
+	profiles="urn:mpeg:dash:profile:isoff-live:2011"
+	type="dynamic"
+	minimumUpdatePeriod="PT500S"
+	suggestedPresentationDelay="PT2S"
+	availabilityStartTime="2021-04-29T05:00:03Z"
+	publishTime="2021-04-29T23:44:11Z"
+	timeShiftBufferDepth="PT6.0S"
+	minBufferTime="PT2.0S">
+	<ProgramInformation>
+	</ProgramInformation>
+	<Period start="PT0.0S">
+		<AdaptationSet contentType="video" segmentAlignment="true" bitstreamSwitching="true" frameRate="30000/1001">
+			<Representation id="0" mimeType="video/mp4" codecs="avc1.64001f" bandwidth="2000000" width="1280" height="720" frameRate="30000/1001">
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.969" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+		<AdaptationSet contentType="audio" segmentAlignment="true" bitstreamSwitching="true">
+			<Representation id="1" mimeType="audio/mp4" codecs="mp4a.40.2" bandwidth="96000" audioSamplingRate="48000">
+				<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2" />
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.981" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+	</Period>
+</MPD>
+
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/route-s-tsid+xml
+Content-Location: stsid.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<S-TSID xmlns="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/S-TSID/1.0/" xmlns:afdt="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/ATSC-FDT/1.0/" xmlns:fdt="urn:ietf:params:xml:ns:fdt">
+ <RS dIpAddr="225.1.1.0" dPort="6000" sIpAddr="225.1.1.0">
+  <LS tsi="10" bw="105">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_1-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="5098">
+      <fdt:File Content-Location="1619672403/init-stream1.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="1" contentType="audio"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+ </RS>
+</S-TSID>
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_--
+
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614721 size 1245 (frag 1245 total 1245) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1245 bytes)
+[ROUTE] Updated Manifest+S-TSID bundle to:
+Content-Type: multipart/related; type="application/dash+xml"; boundary="_GPAC_BOUNDARY_ROUTE_.67706163_"
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/dash+xml
+Content-Location: out.mpd
+
+<?xml version="1.0" encoding="utf-8"?>
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:mpeg:dash:schema:mpd:2011"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
+	profiles="urn:mpeg:dash:profile:isoff-live:2011"
+	type="dynamic"
+	minimumUpdatePeriod="PT500S"
+	suggestedPresentationDelay="PT2S"
+	availabilityStartTime="2021-04-29T05:00:03Z"
+	publishTime="2021-04-29T23:44:11Z"
+	timeShiftBufferDepth="PT6.0S"
+	minBufferTime="PT2.0S">
+	<ProgramInformation>
+	</ProgramInformation>
+	<Period start="PT0.0S">
+		<AdaptationSet contentType="video" segmentAlignment="true" bitstreamSwitching="true" frameRate="30000/1001">
+			<Representation id="0" mimeType="video/mp4" codecs="avc1.64001f" bandwidth="2000000" width="1280" height="720" frameRate="30000/1001">
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.969" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+		<AdaptationSet contentType="audio" segmentAlignment="true" bitstreamSwitching="true">
+			<Representation id="1" mimeType="audio/mp4" codecs="mp4a.40.2" bandwidth="96000" audioSamplingRate="48000">
+				<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2" />
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.981" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+	</Period>
+</MPD>
+
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/route-s-tsid+xml
+Content-Location: stsid.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<S-TSID xmlns="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/S-TSID/1.0/" xmlns:afdt="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/ATSC-FDT/1.0/" xmlns:fdt="urn:ietf:params:xml:ns:fdt">
+ <RS dIpAddr="225.1.1.0" dPort="6000" sIpAddr="225.1.1.0">
+  <LS tsi="10" bw="105">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_1-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="5098">
+      <fdt:File Content-Location="1619672403/init-stream1.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="1" contentType="audio"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+  <LS tsi="20" bw="2200">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_0-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="4566">
+      <fdt:File Content-Location="1619672403/init-stream0.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="0" contentType="video"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+ </RS>
+</S-TSID>
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_--
+
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] Mux rate 20 kbps
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] Missing timing for fragment 0 of segment 1619672403/chunk-stream_t_1-33692.m4s - timing estimated from bitrate: TS 67449382 (0 in segment) dur 1217
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] LCT SID 0 TSI 10 TOI 4294967295 size 770 (frag 770 total 770) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 0 (0 in obj)
+[ROUTE] Missing timing for fragment 0 of segment 1619672403/chunk-stream_t_0-33692.m4s - timing estimated from bitrate: TS 67449382 (0 in segment) dur 58
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+[ROUTE] LCT SID 0 TSI 20 TOI 4294967295 size 829 (frag 829 total 829) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 1452 (1452 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 2904 (2904 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 4356 (4356 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 5808 (5808 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 7260 (7260 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 1452 (1452 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 8712 (8712 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 10164 (10164 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 11616 (11616 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 13068 (13068 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16075 total 0) offset 14520 (14520 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 103 (frag 16075 total 0) offset 15972 (15972 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33692.m4s#1 (16075 bytes) in 57628 us - target push 58000 us
+[ROUTE] Missing timing for fragment 1 of segment 1619672403/chunk-stream_t_0-33692.m4s - timing estimated from bitrate: TS 67449440 (58 in segment) dur 61
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 0 (16075 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 1452 (17527 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 2904 (18979 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 4356 (20431 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 5808 (21883 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 7260 (23335 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 8712 (24787 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 10164 (26239 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 11616 (27691 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 13068 (29143 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 16976 total 0) offset 14520 (30595 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1004 (frag 16976 total 0) offset 15972 (32047 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33692.m4s#2 (16976 bytes) in 16857 us - target push 61000 us
+[ROUTE] Missing timing for fragment 2 of segment 1619672403/chunk-stream_t_0-33692.m4s - timing estimated from bitrate: TS 67449502 (120 in segment) dur 57
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 0 (33051 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 1452 (34503 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 2904 (35955 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 4356 (37407 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 2904 (2904 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 5808 (38859 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 7260 (40311 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 8712 (41763 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 10164 (43215 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 11616 (44667 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 15882 total 0) offset 13068 (46119 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1362 (frag 15882 total 0) offset 14520 (47571 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33692.m4s#3 (15882 bytes) in 44881 us - target push 57000 us
+[ROUTE] Missing timing for fragment 3 of segment 1619672403/chunk-stream_t_0-33692.m4s - timing estimated from bitrate: TS 67449559 (177 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 0 (48933 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 1452 (50385 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 2904 (51837 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 4356 (53289 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 5808 (54741 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 7260 (56193 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 8712 (57645 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 10164 (59097 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 11616 (60549 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 13068 (62001 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 14520 (63453 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 15972 (64905 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 17424 (66357 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 18876 (67809 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 4356 (4356 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 20328 (69261 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 21780 (70713 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 23232 (72165 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 24684 (73617 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 26136 (75069 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 27588 (76521 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 29040 (77973 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 30492 (79425 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 31944 (80877 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 33396 (82329 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 34848 (83781 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 36300 (85233 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 37752 (86685 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 39204 (88137 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 40656 (89589 in obj)
+[ROUTE] Mux rate 809 kbps
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 42108 (91041 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 43560 (92493 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 45012 (93945 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 46464 (95397 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 47916 (96849 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 49368 (98301 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 5808 (5808 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 50820 (99753 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 52272 (101205 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 53724 (102657 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 55176 (104109 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 56628 (105561 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 58080 (107013 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 59532 (108465 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 60984 (109917 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 62436 (111369 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 63888 (112821 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 65340 (114273 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 66792 (115725 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 68244 (117177 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 69696 (118629 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 71148 (120081 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 72600 (121533 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 74052 (122985 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 75504 (124437 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 76956 (125889 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 78408 (127341 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 79860 (128793 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 7260 (7260 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 81312 (130245 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 82764 (131697 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 84216 (133149 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 85668 (134601 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 87120 (136053 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 88572 (137505 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 90024 (138957 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 91476 (140409 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 92928 (141861 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 94380 (143313 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 95832 (144765 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 97284 (146217 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1264 (frag 100000 total 0) offset 98736 (147669 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33692.m4s#4 (100000 bytes) in 324730 us - target push 363000 us
+[ROUTE] Missing timing for fragment 4 of segment 1619672403/chunk-stream_t_0-33692.m4s - timing estimated from bitrate: TS 67449923 (541 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 0 (148933 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 1452 (150385 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 2904 (151837 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 4356 (153289 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 5808 (154741 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 7260 (156193 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 8712 (157645 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 10164 (159097 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 8712 (8712 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 11616 (160549 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 13068 (162001 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 14520 (163453 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 15972 (164905 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 17424 (166357 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 18876 (167809 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 20328 (169261 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 21780 (170713 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 23232 (172165 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 24684 (173617 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 26136 (175069 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 27588 (176521 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 29040 (177973 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 30492 (179425 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 31944 (180877 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 33396 (182329 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 34848 (183781 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 36300 (185233 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 37752 (186685 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 39204 (188137 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 40656 (189589 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 10164 (10164 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 42108 (191041 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 43560 (192493 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 45012 (193945 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 46464 (195397 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 47916 (196849 in obj)
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 49368 (198301 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 50820 (199753 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 52272 (201205 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 53724 (202657 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 55176 (204109 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 56628 (205561 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 58080 (207013 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 59532 (208465 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 60984 (209917 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 62436 (211369 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 63888 (212821 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 65340 (214273 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 66792 (215725 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 68244 (217177 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 69696 (218629 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 71148 (220081 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 11616 (11616 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 72600 (221533 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 74052 (222985 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 75504 (224437 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 76956 (225889 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 78408 (227341 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 79860 (228793 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 81312 (230245 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 82764 (231697 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 84216 (233149 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 85668 (234601 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 87120 (236053 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 88572 (237505 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 90024 (238957 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 91476 (240409 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 92928 (241861 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 94380 (243313 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 95832 (244765 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 97284 (246217 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1264 (frag 100000 total 0) offset 98736 (247669 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33692.m4s#5 (100000 bytes) in 342377 us - target push 363000 us
+[ROUTE] Missing timing for fragment 5 of segment 1619672403/chunk-stream_t_0-33692.m4s - timing estimated from bitrate: TS 67450287 (905 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 0 (248933 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 13068 (13068 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 1452 (250385 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 2904 (251837 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 4356 (253289 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 5808 (254741 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 7260 (256193 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 8712 (257645 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 10164 (259097 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 11616 (260549 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 13068 (262001 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 14520 (263453 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 15972 (264905 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 17424 (266357 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 18876 (267809 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 20328 (269261 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 21780 (270713 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 23232 (272165 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 24684 (273617 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 26136 (275069 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 27588 (276521 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 29040 (277973 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 30492 (279425 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1452 (frag 16066 total 0) offset 14520 (14520 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 31944 (280877 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 33396 (282329 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 34848 (283781 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 36300 (285233 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 37752 (286685 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 39204 (288137 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 40656 (289589 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 42108 (291041 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 43560 (292493 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 45012 (293945 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 46464 (295397 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 47916 (296849 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 49368 (298301 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 50820 (299753 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 52272 (301205 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 53724 (302657 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 55176 (304109 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 56628 (305561 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 58080 (307013 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 59532 (308465 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 60984 (309917 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 94 (frag 16066 total 0) offset 15972 (15972 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_1-33692.m4s#1 (16066 bytes) in 1209879 us - target push 1217000 us
+[ROUTE] Missing timing for fragment 1 of segment 1619672403/chunk-stream_t_1-33692.m4s - timing estimated from bitrate: TS 67450246 (864 in segment) dur 1137
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 0 (16066 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 1448 (17514 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 2896 (18962 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 4344 (20410 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 5792 (21858 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 62436 (311369 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 63888 (312821 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 65340 (314273 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 66792 (315725 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 68244 (317177 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 69696 (318629 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 71148 (320081 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 72600 (321533 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 7240 (23306 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 74052 (322985 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 75504 (324437 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 76956 (325889 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 78408 (327341 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 79860 (328793 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 81312 (330245 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 82764 (331697 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 84216 (333149 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 85668 (334601 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 87120 (336053 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 88572 (337505 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 90024 (338957 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 91476 (340409 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 92928 (341861 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 94380 (343313 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 8688 (24754 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 95832 (344765 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 97284 (346217 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1264 (frag 100000 total 0) offset 98736 (347669 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33692.m4s#6 (100000 bytes) in 359593 us - target push 363000 us
+[ROUTE] Missing timing for fragment 6 of segment 1619672403/chunk-stream_t_0-33692.m4s - timing estimated from bitrate: TS 67450650 (1268 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 0 (348933 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 1452 (350385 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 2904 (351837 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 4356 (353289 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 5808 (354741 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 7260 (356193 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 8712 (357645 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 10164 (359097 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 11616 (360549 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 13068 (362001 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 14520 (363453 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 15972 (364905 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 10136 (26202 in obj)
+[ROUTE] Mux rate 2420 kbps
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 17424 (366357 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 18876 (367809 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 20328 (369261 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 21780 (370713 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 23232 (372165 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 24684 (373617 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 26136 (375069 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 27588 (376521 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 29040 (377973 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 30492 (379425 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 31944 (380877 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 33396 (382329 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 34848 (383781 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 36300 (385233 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 37752 (386685 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 11584 (27650 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 39204 (388137 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 40656 (389589 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 42108 (391041 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 43560 (392493 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 45012 (393945 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 46464 (395397 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 47916 (396849 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 49368 (398301 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 50820 (399753 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 52272 (401205 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 53724 (402657 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 55176 (404109 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 56628 (405561 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 58080 (407013 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 59532 (408465 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 13032 (29098 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 60984 (409917 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 62436 (411369 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 63888 (412821 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 65340 (414273 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 66792 (415725 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 68244 (417177 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 69696 (418629 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 71148 (420081 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 72600 (421533 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 74052 (422985 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 75504 (424437 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 76956 (425889 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 78408 (427341 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 79860 (428793 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 14480 (30546 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 81312 (430245 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 82764 (431697 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 84216 (433149 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 85668 (434601 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 87120 (436053 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 88572 (437505 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 90024 (438957 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 91476 (440409 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 92928 (441861 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 94380 (443313 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 95832 (444765 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1452 (frag 100000 total 0) offset 97284 (446217 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1264 (frag 100000 total 0) offset 98736 (447669 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33692.m4s#7 (100000 bytes) in 330574 us - target push 363000 us
+[ROUTE] Missing timing for fragment 7 of segment 1619672403/chunk-stream_t_0-33692.m4s - timing estimated from bitrate: TS 67451014 (1632 in segment) dur 218
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 0 (448933 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 1448 (450381 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 15928 (31994 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 2896 (451829 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 4344 (453277 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 5792 (454725 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 7240 (456173 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 8688 (457621 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 10136 (459069 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 11584 (460517 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 13032 (461965 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 14480 (463413 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 15928 (464861 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 17376 (466309 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 18824 (467757 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 20272 (469205 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 21720 (470653 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 23168 (472101 in obj)
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 17376 (33442 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 24616 (473549 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 26064 (474997 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 27512 (476445 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 28960 (477893 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 30408 (479341 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 31856 (480789 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 33304 (482237 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 34752 (483685 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 36200 (485133 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 37648 (486581 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 39096 (488029 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 40544 (489477 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 41992 (490925 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 43440 (492373 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 44888 (493821 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 1448 (frag 21157 total 37223) offset 18824 (34890 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 46336 (495269 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 47784 (496717 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 49232 (498165 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 50680 (499613 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 52128 (501061 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 53576 (502509 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 55024 (503957 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 56472 (505405 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 1448 (frag 60107 total 509040) offset 57920 (506853 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33692 size 739 (frag 60107 total 509040) offset 59368 (508301 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33692.m4s#8 (60107 bytes) in 214866 us - target push 218000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_0-33692.m4s (8 frags 509040 bytes) in 1847319 us - target push 2002000 us
+[ROUTE] Segment 1619672403/chunk-stream_t_0-33692.m4s pushed early by 154681 us
+[ROUTE] LCT SID 0 TSI 10 TOI 33692 size 885 (frag 21157 total 37223) offset 20272 (36338 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_1-33692.m4s#2 (21157 bytes) in 743094 us - target push 1137000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_1-33692.m4s (2 frags 37223 bytes) in 1953807 us - target push 2002000 us
+[ROUTE] Segment 1619672403/chunk-stream_t_1-33692.m4s pushed early by 48193 us
+[ROUTE] Segment 1619672403/chunk-stream_t_1-33692.m4s rate 148743 but stream rate 105600, updating bitrate
+[ROUTE] Missing timing for fragment 0 of segment 1619672403/chunk-stream_t_0-33693.m4s - timing estimated from bitrate: TS 67451384 (0 in segment) dur 59
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+[ROUTE] LCT SID 0 TSI 20 TOI 4294967295 size 829 (frag 829 total 829) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 1452 (1452 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 2904 (2904 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 4356 (4356 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 5808 (5808 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 7260 (7260 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 8712 (8712 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 10164 (10164 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 11616 (11616 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 13068 (13068 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 16374 total 0) offset 14520 (14520 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 402 (frag 16374 total 0) offset 15972 (15972 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33693.m4s#1 (16374 bytes) in 234 us - target push 59000 us
+[ROUTE] Missing timing for fragment 1 of segment 1619672403/chunk-stream_t_0-33693.m4s - timing estimated from bitrate: TS 67451443 (59 in segment) dur 178
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 0 (16374 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 1452 (17826 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 2904 (19278 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 4356 (20730 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 5808 (22182 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 7260 (23634 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 8712 (25086 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 10164 (26538 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 11616 (27990 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 13068 (29442 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 14520 (30894 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 15972 (32346 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 17424 (33798 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 18876 (35250 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 20328 (36702 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 21780 (38154 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 23232 (39606 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 24684 (41058 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 26136 (42510 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 27588 (43962 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 29040 (45414 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 30492 (46866 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 31944 (48318 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 33396 (49770 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 34848 (51222 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 36300 (52674 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 37752 (54126 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 39204 (55578 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 40656 (57030 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 42108 (58482 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 43560 (59934 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 45012 (61386 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 49152 total 0) offset 46464 (62838 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1236 (frag 49152 total 0) offset 47916 (64290 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33693.m4s#2 (49152 bytes) in 435 us - target push 178000 us
+[ROUTE] Mux rate 1782 kbps
+[ROUTE] Missing timing for fragment 2 of segment 1619672403/chunk-stream_t_0-33693.m4s - timing estimated from bitrate: TS 67451622 (238 in segment) dur 357
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 0 (65526 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 1452 (66978 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 2904 (68430 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 4356 (69882 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 5808 (71334 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 7260 (72786 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 8712 (74238 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 10164 (75690 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 11616 (77142 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 13068 (78594 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 14520 (80046 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 15972 (81498 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 17424 (82950 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 18876 (84402 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 20328 (85854 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 21780 (87306 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 23232 (88758 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 24684 (90210 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 26136 (91662 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 27588 (93114 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 29040 (94566 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 30492 (96018 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 31944 (97470 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 33396 (98922 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 34848 (100374 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 36300 (101826 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 37752 (103278 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 39204 (104730 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 40656 (106182 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 42108 (107634 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 43560 (109086 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 45012 (110538 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 46464 (111990 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 47916 (113442 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 49368 (114894 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 50820 (116346 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 52272 (117798 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 53724 (119250 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 55176 (120702 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 56628 (122154 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 58080 (123606 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 59532 (125058 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 60984 (126510 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 62436 (127962 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 63888 (129414 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 65340 (130866 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 66792 (132318 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 68244 (133770 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 69696 (135222 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 71148 (136674 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 72600 (138126 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 74052 (139578 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 75504 (141030 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 76956 (142482 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 78408 (143934 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 79860 (145386 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 81312 (146838 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 82764 (148290 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 84216 (149742 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 85668 (151194 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 87120 (152646 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 88572 (154098 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 90024 (155550 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 91476 (157002 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 92928 (158454 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 94380 (159906 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 98304 total 0) offset 95832 (161358 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1020 (frag 98304 total 0) offset 97284 (162810 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33693.m4s#3 (98304 bytes) in 211480 us - target push 357000 us
+[ROUTE] Missing timing for fragment 3 of segment 1619672403/chunk-stream_t_0-33693.m4s - timing estimated from bitrate: TS 67451979 (595 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 0 (163830 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 1452 (165282 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 2904 (166734 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 4356 (168186 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 5808 (169638 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 7260 (171090 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 8712 (172542 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 10164 (173994 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 11616 (175446 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 13068 (176898 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 14520 (178350 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 15972 (179802 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 17424 (181254 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 18876 (182706 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 20328 (184158 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 21780 (185610 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 23232 (187062 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 24684 (188514 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 26136 (189966 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 27588 (191418 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 29040 (192870 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 30492 (194322 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 31944 (195774 in obj)
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 33396 (197226 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 34848 (198678 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 36300 (200130 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 37752 (201582 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 39204 (203034 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 40656 (204486 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 42108 (205938 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 43560 (207390 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 45012 (208842 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 46464 (210294 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 47916 (211746 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 49368 (213198 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 50820 (214650 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 52272 (216102 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 53724 (217554 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 55176 (219006 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 56628 (220458 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 58080 (221910 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 59532 (223362 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 60984 (224814 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 62436 (226266 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 63888 (227718 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 65340 (229170 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 66792 (230622 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 68244 (232074 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 69696 (233526 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 71148 (234978 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 72600 (236430 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 74052 (237882 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 75504 (239334 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 76956 (240786 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 78408 (242238 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 79860 (243690 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 81312 (245142 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 82764 (246594 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 84216 (248046 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 85668 (249498 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 87120 (250950 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 88572 (252402 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 90024 (253854 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 91476 (255306 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 92928 (256758 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 94380 (258210 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 95832 (259662 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 97284 (261114 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1264 (frag 100000 total 0) offset 98736 (262566 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33693.m4s#4 (100000 bytes) in 312480 us - target push 363000 us
+[ROUTE] Missing timing for fragment 0 of segment 1619672403/chunk-stream_t_1-33693.m4s - timing estimated from bitrate: TS 67451384 (0 in segment) dur 864
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] LCT SID 0 TSI 10 TOI 4294967295 size 770 (frag 770 total 770) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 1452 (1452 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 2904 (2904 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 4356 (4356 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 5808 (5808 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 7260 (7260 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 8712 (8712 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 10164 (10164 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 11616 (11616 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 13068 (13068 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1452 (frag 16081 total 0) offset 14520 (14520 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 109 (frag 16081 total 0) offset 15972 (15972 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_1-33693.m4s#1 (16081 bytes) in 213 us - target push 864000 us
+[ROUTE] Missing timing for fragment 4 of segment 1619672403/chunk-stream_t_0-33693.m4s - timing estimated from bitrate: TS 67452343 (959 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 0 (263830 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 1452 (265282 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 2904 (266734 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 4356 (268186 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 5808 (269638 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 7260 (271090 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 8712 (272542 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 10164 (273994 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 11616 (275446 in obj)
+[ROUTE] Missing timing for fragment 1 of segment 1619672403/chunk-stream_t_1-33693.m4s - timing estimated from bitrate: TS 67452248 (864 in segment) dur 1134
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 0 (16081 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 1448 (17529 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 2896 (18977 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 13068 (276898 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 14520 (278350 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 15972 (279802 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 4344 (20425 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 17424 (281254 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 18876 (282706 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 20328 (284158 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 21780 (285610 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 23232 (287062 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 24684 (288514 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 26136 (289966 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 27588 (291418 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 29040 (292870 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 30492 (294322 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 31944 (295774 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 33396 (297226 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 34848 (298678 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 36300 (300130 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 5792 (21873 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 37752 (301582 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 39204 (303034 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 40656 (304486 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 42108 (305938 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 43560 (307390 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 45012 (308842 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 46464 (310294 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 47916 (311746 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 49368 (313198 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 50820 (314650 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 52272 (316102 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 53724 (317554 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 55176 (319006 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 56628 (320458 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 58080 (321910 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 7240 (23321 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 59532 (323362 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 60984 (324814 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 62436 (326266 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 63888 (327718 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 65340 (329170 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 66792 (330622 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 68244 (332074 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 69696 (333526 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 71148 (334978 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 72600 (336430 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 74052 (337882 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 75504 (339334 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 76956 (340786 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 78408 (342238 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 79860 (343690 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 8688 (24769 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 81312 (345142 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 82764 (346594 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 84216 (348046 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 85668 (349498 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 87120 (350950 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 88572 (352402 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 90024 (353854 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 91476 (355306 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 92928 (356758 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 94380 (358210 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 95832 (359662 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 97284 (361114 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1264 (frag 100000 total 0) offset 98736 (362566 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33693.m4s#5 (100000 bytes) in 313480 us - target push 363000 us
+[ROUTE] Missing timing for fragment 5 of segment 1619672403/chunk-stream_t_0-33693.m4s - timing estimated from bitrate: TS 67452707 (1323 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 0 (363830 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 1452 (365282 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 10136 (26217 in obj)
+[ROUTE] Mux rate 2681 kbps
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 2904 (366734 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 4356 (368186 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 5808 (369638 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 7260 (371090 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 8712 (372542 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 10164 (373994 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 11616 (375446 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 13068 (376898 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 14520 (378350 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 15972 (379802 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 17424 (381254 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 18876 (382706 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 20328 (384158 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 21780 (385610 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 11584 (27665 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 23232 (387062 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 24684 (388514 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 26136 (389966 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 27588 (391418 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 29040 (392870 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 30492 (394322 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 31944 (395774 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 33396 (397226 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 34848 (398678 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 36300 (400130 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 37752 (401582 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 39204 (403034 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 40656 (404486 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 42108 (405938 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 43560 (407390 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 13032 (29113 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 45012 (408842 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 46464 (410294 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 47916 (411746 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 49368 (413198 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 50820 (414650 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 52272 (416102 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 53724 (417554 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 55176 (419006 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 56628 (420458 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 58080 (421910 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 59532 (423362 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 60984 (424814 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 62436 (426266 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 63888 (427718 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 65340 (429170 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 14480 (30561 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 66792 (430622 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 68244 (432074 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 69696 (433526 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 71148 (434978 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 72600 (436430 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 74052 (437882 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 75504 (439334 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 76956 (440786 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 78408 (442238 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 79860 (443690 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 81312 (445142 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 82764 (446594 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 84216 (448046 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 85668 (449498 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 87120 (450950 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 15928 (32009 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 88572 (452402 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 90024 (453854 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 91476 (455306 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 92928 (456758 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 94380 (458210 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 95832 (459662 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1452 (frag 100000 total 0) offset 97284 (461114 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1264 (frag 100000 total 0) offset 98736 (462566 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33693.m4s#6 (100000 bytes) in 358512 us - target push 363000 us
+[ROUTE] Missing timing for fragment 6 of segment 1619672403/chunk-stream_t_0-33693.m4s - timing estimated from bitrate: TS 67453070 (1686 in segment) dur 164
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 0 (463830 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 1448 (465278 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 2896 (466726 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 4344 (468174 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 5792 (469622 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 7240 (471070 in obj)
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 8688 (472518 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 17376 (33457 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 10136 (473966 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 11584 (475414 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 13032 (476862 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 14480 (478310 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 15928 (479758 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 17376 (481206 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 18824 (482654 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 20272 (484102 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 21720 (485550 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 23168 (486998 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 24616 (488446 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 26064 (489894 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 27512 (491342 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 28960 (492790 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 1448 (frag 21100 total 37181) offset 18824 (34905 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 30408 (494238 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 31856 (495686 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 33304 (497134 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 34752 (498582 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 36200 (500030 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 37648 (501478 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 39096 (502926 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 40544 (504374 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 41992 (505822 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 1448 (frag 45211 total 509041) offset 43440 (507270 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33693 size 323 (frag 45211 total 509041) offset 44888 (508718 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33693.m4s#7 (45211 bytes) in 149532 us - target push 164000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_0-33693.m4s (7 frags 509041 bytes) in 1570387 us - target push 2002000 us
+[ROUTE] Segment 1619672403/chunk-stream_t_0-33693.m4s pushed early by 153151 us
+[ROUTE] LCT SID 0 TSI 10 TOI 33693 size 828 (frag 21100 total 37181) offset 20272 (36353 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_1-33693.m4s#2 (21100 bytes) in 868984 us - target push 1134000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_1-33693.m4s (2 frags 37181 bytes) in 869994 us - target push 2002000 us
+[ROUTE] Segment 1619672403/chunk-stream_t_1-33693.m4s pushed early by 48206 us
+[ROUTE] Missing timing for fragment 0 of segment 1619672403/chunk-stream_t_1-33694.m4s - timing estimated from bitrate: TS 67453386 (0 in segment) dur 1744
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] LCT SID 0 TSI 10 TOI 4294967295 size 770 (frag 770 total 770) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 1452 (1452 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 2904 (2904 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 4356 (4356 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 5808 (5808 in obj)
+[ROUTE] Missing timing for fragment 0 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67453386 (0 in segment) dur 58
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+[ROUTE] LCT SID 0 TSI 20 TOI 4294967295 size 829 (frag 829 total 829) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 1452 (1452 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 2904 (2904 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 4356 (4356 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 5808 (5808 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 7260 (7260 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 8712 (8712 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 10164 (10164 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 11616 (11616 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 13068 (13068 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16075 total 0) offset 14520 (14520 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 103 (frag 16075 total 0) offset 15972 (15972 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#1 (16075 bytes) in 202 us - target push 58000 us
+[ROUTE] Missing timing for fragment 1 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67453444 (58 in segment) dur 59
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 0 (16075 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 1452 (17527 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 2904 (18979 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 4356 (20431 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 5808 (21883 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 7260 (23335 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 8712 (24787 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 10164 (26239 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 11616 (27691 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 13068 (29143 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 16464 total 0) offset 14520 (30595 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 492 (frag 16464 total 0) offset 15972 (32047 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#2 (16464 bytes) in 355 us - target push 59000 us
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 7260 (7260 in obj)
+[ROUTE] Mux rate 1558 kbps
+[ROUTE] Missing timing for fragment 2 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67453504 (118 in segment) dur 118
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 0 (32539 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 1452 (33991 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 2904 (35443 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 4356 (36895 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 5808 (38347 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 7260 (39799 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 8712 (41251 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 10164 (42703 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 11616 (44155 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 13068 (45607 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 14520 (47059 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 15972 (48511 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 17424 (49963 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 18876 (51415 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 20328 (52867 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 21780 (54319 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 23232 (55771 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 24684 (57223 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 26136 (58675 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 27588 (60127 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 29040 (61579 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 32688 total 0) offset 30492 (63031 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 744 (frag 32688 total 0) offset 31944 (64483 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#3 (32688 bytes) in 492 us - target push 118000 us
+[ROUTE] Missing timing for fragment 3 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67453623 (237 in segment) dur 189
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 0 (65227 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 1452 (66679 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 2904 (68131 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 4356 (69583 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 5808 (71035 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 7260 (72487 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 8712 (73939 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 10164 (75391 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 11616 (76843 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 13068 (78295 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 14520 (79747 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 15972 (81199 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 17424 (82651 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 18876 (84103 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 20328 (85555 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 21780 (87007 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 23232 (88459 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 24684 (89911 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 26136 (91363 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 27588 (92815 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 29040 (94267 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 30492 (95719 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 31944 (97171 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 33396 (98623 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 34848 (100075 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 36300 (101527 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 37752 (102979 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 39204 (104431 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 40656 (105883 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 8712 (8712 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 42108 (107335 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 43560 (108787 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 45012 (110239 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 46464 (111691 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 47916 (113143 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 52130 total 0) offset 49368 (114595 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1310 (frag 52130 total 0) offset 50820 (116047 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#4 (52130 bytes) in 38302 us - target push 189000 us
+[ROUTE] Missing timing for fragment 4 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67453812 (426 in segment) dur 167
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 0 (117357 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 1452 (118809 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 2904 (120261 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 4356 (121713 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 5808 (123165 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 7260 (124617 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 8712 (126069 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 10164 (127521 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 10164 (10164 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 11616 (128973 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 13068 (130425 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 14520 (131877 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 15972 (133329 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 17424 (134781 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 18876 (136233 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 20328 (137685 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 21780 (139137 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 23232 (140589 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 24684 (142041 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 26136 (143493 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 27588 (144945 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 29040 (146397 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 30492 (147849 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 31944 (149301 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 11616 (11616 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 33396 (150753 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 34848 (152205 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 36300 (153657 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 37752 (155109 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 39204 (156561 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 40656 (158013 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 42108 (159465 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 46174 total 0) offset 43560 (160917 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1162 (frag 46174 total 0) offset 45012 (162369 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#5 (46174 bytes) in 145649 us - target push 167000 us
+[ROUTE] Missing timing for fragment 5 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67453980 (594 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 0 (163531 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 1452 (164983 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 2904 (166435 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 4356 (167887 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 5808 (169339 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 7260 (170791 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 13068 (13068 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 8712 (172243 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 10164 (173695 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 11616 (175147 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 13068 (176599 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 14520 (178051 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 15972 (179503 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 17424 (180955 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 18876 (182407 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 20328 (183859 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 21780 (185311 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 23232 (186763 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 24684 (188215 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 26136 (189667 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 27588 (191119 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 29040 (192571 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 14520 (14520 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 30492 (194023 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 31944 (195475 in obj)
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 33396 (196927 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 34848 (198379 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 36300 (199831 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 37752 (201283 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 39204 (202735 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 40656 (204187 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 42108 (205639 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 43560 (207091 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 45012 (208543 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 46464 (209995 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 47916 (211447 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 49368 (212899 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 50820 (214351 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 15972 (15972 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 52272 (215803 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 53724 (217255 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 55176 (218707 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 56628 (220159 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 58080 (221611 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 59532 (223063 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 60984 (224515 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 62436 (225967 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 63888 (227419 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 65340 (228871 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 66792 (230323 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 68244 (231775 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 69696 (233227 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 71148 (234679 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 17424 (17424 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 72600 (236131 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 74052 (237583 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 75504 (239035 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 76956 (240487 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 78408 (241939 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 79860 (243391 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 81312 (244843 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 82764 (246295 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 84216 (247747 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 85668 (249199 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 87120 (250651 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 88572 (252103 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 90024 (253555 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 91476 (255007 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 92928 (256459 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 18876 (18876 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 94380 (257911 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 95832 (259363 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 97284 (260815 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1264 (frag 100000 total 0) offset 98736 (262267 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#6 (100000 bytes) in 347215 us - target push 363000 us
+[ROUTE] Missing timing for fragment 6 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67454344 (958 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 0 (263531 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 1452 (264983 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 2904 (266435 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 4356 (267887 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 5808 (269339 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 7260 (270791 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 8712 (272243 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 10164 (273695 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 11616 (275147 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 13068 (276599 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 14520 (278051 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 20328 (20328 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 15972 (279503 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 17424 (280955 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 18876 (282407 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 20328 (283859 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 21780 (285311 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 23232 (286763 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 24684 (288215 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 26136 (289667 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 27588 (291119 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 29040 (292571 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 30492 (294023 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 31944 (295475 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 33396 (296927 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 34848 (298379 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 36300 (299831 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 21780 (21780 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 37752 (301283 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 39204 (302735 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 40656 (304187 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 42108 (305639 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 43560 (307091 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 45012 (308543 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 46464 (309995 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 47916 (311447 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 49368 (312899 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 50820 (314351 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 52272 (315803 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 53724 (317255 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 55176 (318707 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 56628 (320159 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 58080 (321611 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 23232 (23232 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 59532 (323063 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 60984 (324515 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 62436 (325967 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 63888 (327419 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 65340 (328871 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 66792 (330323 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 68244 (331775 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 69696 (333227 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 71148 (334679 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 72600 (336131 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 74052 (337583 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 75504 (339035 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 76956 (340487 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 78408 (341939 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 24684 (24684 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 79860 (343391 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 81312 (344843 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 82764 (346295 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 84216 (347747 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 85668 (349199 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 87120 (350651 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 88572 (352103 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 90024 (353555 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 91476 (355007 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 92928 (356459 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 94380 (357911 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 95832 (359363 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 97284 (360815 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1264 (frag 100000 total 0) offset 98736 (362267 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#7 (100000 bytes) in 334611 us - target push 363000 us
+[ROUTE] Missing timing for fragment 7 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67454707 (1321 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 0 (363531 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 26136 (26136 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 1452 (364983 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 2904 (366435 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 4356 (367887 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 5808 (369339 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 7260 (370791 in obj)
+[ROUTE] Mux rate 2918 kbps
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 8712 (372243 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 10164 (373695 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 11616 (375147 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 13068 (376599 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 14520 (378051 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 15972 (379503 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 17424 (380955 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 18876 (382407 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 20328 (383859 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 21780 (385311 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 27588 (27588 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 23232 (386763 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 24684 (388215 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 26136 (389667 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 27588 (391119 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 29040 (392571 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 30492 (394023 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 31944 (395475 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 33396 (396927 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 34848 (398379 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 36300 (399831 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 37752 (401283 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 39204 (402735 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 40656 (404187 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 42108 (405639 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 43560 (407091 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 29040 (29040 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 45012 (408543 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 46464 (409995 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 47916 (411447 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 49368 (412899 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 50820 (414351 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 52272 (415803 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 53724 (417255 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 55176 (418707 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 56628 (420159 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 58080 (421611 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 59532 (423063 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 60984 (424515 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 62436 (425967 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 63888 (427419 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 65340 (428871 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1452 (frag 32441 total 0) offset 30492 (30492 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 66792 (430323 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 68244 (431775 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 69696 (433227 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 71148 (434679 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 72600 (436131 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 74052 (437583 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 75504 (439035 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 76956 (440487 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 78408 (441939 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 79860 (443391 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 81312 (444843 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 82764 (446295 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 84216 (447747 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 85668 (449199 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 497 (frag 32441 total 0) offset 31944 (31944 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_1-33694.m4s#1 (32441 bytes) in 1408657 us - target push 1744000 us
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 87120 (450651 in obj)
+[ROUTE] Missing timing for fragment 1 of segment 1619672403/chunk-stream_t_1-33694.m4s - timing estimated from bitrate: TS 67455125 (1739 in segment) dur 262
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 88572 (452103 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 90024 (453555 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 91476 (455007 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 92928 (456459 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1448 (frag 4897 total 37338) offset 0 (32441 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 94380 (457911 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 95832 (459363 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1452 (frag 100000 total 0) offset 97284 (460815 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1264 (frag 100000 total 0) offset 98736 (462267 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#8 (100000 bytes) in 356471 us - target push 363000 us
+[ROUTE] Missing timing for fragment 8 of segment 1619672403/chunk-stream_t_0-33694.m4s - timing estimated from bitrate: TS 67455071 (1685 in segment) dur 165
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 0 (463531 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 1448 (464979 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 2896 (466427 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 4344 (467875 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 5792 (469323 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 7240 (470771 in obj)
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 8688 (472219 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 10136 (473667 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 11584 (475115 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 13032 (476563 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1448 (frag 4897 total 37338) offset 1448 (33889 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 14480 (478011 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 15928 (479459 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 17376 (480907 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 18824 (482355 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 20272 (483803 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 21720 (485251 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 23168 (486699 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 24616 (488147 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 26064 (489595 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 27512 (491043 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 28960 (492491 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 30408 (493939 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 31856 (495387 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 33304 (496835 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 34752 (498283 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 1448 (frag 4897 total 37338) offset 2896 (35337 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 36200 (499731 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 37648 (501179 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 39096 (502627 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 40544 (504075 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 41992 (505523 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 1448 (frag 45511 total 509042) offset 43440 (506971 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33694 size 623 (frag 45511 total 509042) offset 44888 (508419 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33694.m4s#9 (45511 bytes) in 140380 us - target push 165000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_0-33694.m4s (9 frags 509042 bytes) in 1547162 us - target push 2002000 us
+[ROUTE] Segment 1619672403/chunk-stream_t_0-33694.m4s pushed early by 154259 us
+[ROUTE] LCT SID 0 TSI 10 TOI 33694 size 553 (frag 4897 total 37338) offset 4344 (36785 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_1-33694.m4s#2 (4897 bytes) in 252768 us - target push 262000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_1-33694.m4s (2 frags 37338 bytes) in 1663357 us - target push 2002000 us
+[ROUTE] Segment 1619672403/chunk-stream_t_1-33694.m4s pushed early by 30019 us
+[ROUTE] Segment 1619672403/chunk-stream_t_1-33694.m4s rate 149202 but stream rate 148743, updating bitrate
+[ROUTE] Missing timing for fragment 0 of segment 1619672403/chunk-stream_t_1-33695.m4s - timing estimated from bitrate: TS 67455388 (0 in segment) dur 1609
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] LCT SID 0 TSI 10 TOI 4294967295 size 770 (frag 770 total 770) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 1452 (1452 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 2904 (2904 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 4356 (4356 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 5808 (5808 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 7260 (7260 in obj)
+[ROUTE] Mux rate 1276 kbps
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 8712 (8712 in obj)
+[ROUTE] Missing timing for fragment 0 of segment 1619672403/chunk-stream_t_0-33695.m4s - timing estimated from bitrate: TS 67455388 (0 in segment) dur 58
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+[ROUTE] LCT SID 0 TSI 20 TOI 4294967295 size 829 (frag 829 total 829) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 0 (0 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 1452 (1452 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 2904 (2904 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 4356 (4356 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 5808 (5808 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 7260 (7260 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 8712 (8712 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 10164 (10164 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 11616 (11616 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 13068 (13068 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 16080 total 0) offset 14520 (14520 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 108 (frag 16080 total 0) offset 15972 (15972 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33695.m4s#1 (16080 bytes) in 203 us - target push 58000 us
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 10164 (10164 in obj)
+[ROUTE] Missing timing for fragment 1 of segment 1619672403/chunk-stream_t_0-33695.m4s - timing estimated from bitrate: TS 67455446 (58 in segment) dur 178
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 0 (16080 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 1452 (17532 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 2904 (18984 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 4356 (20436 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 5808 (21888 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 7260 (23340 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 8712 (24792 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 10164 (26244 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 11616 (27696 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 13068 (29148 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 14520 (30600 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 15972 (32052 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 17424 (33504 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 18876 (34956 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 20328 (36408 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 21780 (37860 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 23232 (39312 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 24684 (40764 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 26136 (42216 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 27588 (43668 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 29040 (45120 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 30492 (46572 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 31944 (48024 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 33396 (49476 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 34848 (50928 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 36300 (52380 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 37752 (53832 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 39204 (55284 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 40656 (56736 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 42108 (58188 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 43560 (59640 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 45012 (61092 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 49152 total 0) offset 46464 (62544 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1236 (frag 49152 total 0) offset 47916 (63996 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33695.m4s#2 (49152 bytes) in 446 us - target push 178000 us
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 11616 (11616 in obj)
+[ROUTE] Missing timing for fragment 2 of segment 1619672403/chunk-stream_t_0-33695.m4s - timing estimated from bitrate: TS 67455625 (237 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 0 (65232 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 1452 (66684 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 2904 (68136 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 4356 (69588 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 5808 (71040 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 7260 (72492 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 8712 (73944 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 10164 (75396 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 11616 (76848 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 13068 (78300 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 14520 (79752 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 15972 (81204 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 17424 (82656 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 18876 (84108 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 20328 (85560 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 21780 (87012 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 23232 (88464 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 24684 (89916 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 26136 (91368 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 27588 (92820 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 29040 (94272 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 30492 (95724 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 31944 (97176 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 33396 (98628 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 34848 (100080 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 36300 (101532 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 37752 (102984 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 39204 (104436 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 40656 (105888 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 42108 (107340 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 43560 (108792 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 45012 (110244 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 46464 (111696 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 47916 (113148 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 49368 (114600 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 50820 (116052 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 52272 (117504 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 53724 (118956 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 55176 (120408 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 56628 (121860 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 58080 (123312 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 59532 (124764 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 60984 (126216 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 62436 (127668 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 63888 (129120 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 65340 (130572 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 66792 (132024 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 68244 (133476 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 69696 (134928 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 71148 (136380 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 72600 (137832 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 74052 (139284 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 75504 (140736 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 76956 (142188 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 78408 (143640 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 79860 (145092 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 81312 (146544 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 82764 (147996 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 84216 (149448 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 85668 (150900 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 87120 (152352 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 88572 (153804 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 90024 (155256 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 91476 (156708 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 92928 (158160 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 94380 (159612 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 95832 (161064 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 97284 (162516 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1264 (frag 100000 total 0) offset 98736 (163968 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33695.m4s#3 (100000 bytes) in 1173 us - target push 363000 us
+[ROUTE] Missing timing for fragment 3 of segment 1619672403/chunk-stream_t_0-33695.m4s - timing estimated from bitrate: TS 67455988 (600 in segment) dur 53
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 0 (165232 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 1452 (166684 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 2904 (168136 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 4356 (169588 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 13068 (13068 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 5808 (171040 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 7260 (172492 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 8712 (173944 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 10164 (175396 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 11616 (176848 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 14688 total 0) offset 13068 (178300 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 168 (frag 14688 total 0) offset 14520 (179752 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33695.m4s#4 (14688 bytes) in 41512 us - target push 53000 us
+[ROUTE] Missing timing for fragment 4 of segment 1619672403/chunk-stream_t_0-33695.m4s - timing estimated from bitrate: TS 67456042 (654 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 0 (179920 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 1452 (181372 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 2904 (182824 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 4356 (184276 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 5808 (185728 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 7260 (187180 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 8712 (188632 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 10164 (190084 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 11616 (191536 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 14520 (14520 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 13068 (192988 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 14520 (194440 in obj)
+[ROUTE] LCT SID 0 TSI 0 TOI 2147614722 size 1278 (frag 1278 total 1278) offset 0 (0 in obj)
+[ROUTE] Sent service 0 bundle (1278 bytes)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 15972 (195892 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 17424 (197344 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 18876 (198796 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 20328 (200248 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 21780 (201700 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 23232 (203152 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 24684 (204604 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 26136 (206056 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 27588 (207508 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 29040 (208960 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 30492 (210412 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 31944 (211864 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 33396 (213316 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 15972 (15972 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 34848 (214768 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 36300 (216220 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 37752 (217672 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 39204 (219124 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 40656 (220576 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 42108 (222028 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 43560 (223480 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 45012 (224932 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 46464 (226384 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 47916 (227836 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 49368 (229288 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 50820 (230740 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 52272 (232192 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 53724 (233644 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 17424 (17424 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 55176 (235096 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 56628 (236548 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 58080 (238000 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 59532 (239452 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 60984 (240904 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 62436 (242356 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 63888 (243808 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 65340 (245260 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 66792 (246712 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 68244 (248164 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 69696 (249616 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 71148 (251068 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 72600 (252520 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 74052 (253972 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 75504 (255424 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 18876 (18876 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 76956 (256876 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 78408 (258328 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 79860 (259780 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 81312 (261232 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 82764 (262684 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 84216 (264136 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 85668 (265588 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 87120 (267040 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 88572 (268492 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 90024 (269944 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 91476 (271396 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 92928 (272848 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 94380 (274300 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 95832 (275752 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 97284 (277204 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 20328 (20328 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1264 (frag 100000 total 0) offset 98736 (278656 in obj)
+[ROUTE] pushed fragment 1619672403/chunk-stream_t_0-33695.m4s#5 (100000 bytes) in 337661 us - target push 363000 us
+[ROUTE] Missing timing for fragment 5 of segment 1619672403/chunk-stream_t_0-33695.m4s - timing estimated from bitrate: TS 67456405 (1017 in segment) dur 363
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 0 (279920 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 1452 (281372 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 2904 (282824 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 4356 (284276 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 5808 (285728 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 7260 (287180 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 8712 (288632 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 10164 (290084 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 11616 (291536 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 13068 (292988 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 14520 (294440 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 15972 (295892 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 17424 (297344 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 18876 (298796 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 21780 (21780 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 20328 (300248 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 21780 (301700 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 23232 (303152 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 24684 (304604 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 26136 (306056 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 27588 (307508 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 29040 (308960 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 30492 (310412 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 31944 (311864 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 33396 (313316 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 34848 (314768 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 36300 (316220 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 37752 (317672 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 39204 (319124 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 40656 (320576 in obj)
+[ROUTE] LCT SID 0 TSI 10 TOI 33695 size 1452 (frag 30023 total 0) offset 23232 (23232 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 42108 (322028 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 43560 (323480 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 45012 (324932 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 46464 (326384 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 47916 (327836 in obj)
+[ROUTE] LCT SID 0 TSI 20 TOI 33695 size 1452 (frag 100000 total 0) offset 49368 (329288 in obj)
+

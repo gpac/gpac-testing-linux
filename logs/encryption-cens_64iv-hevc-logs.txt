@@ -1,0 +1,70 @@
+*** encryption-cens_64iv-hevc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:34:19 ***
+
+Computing ./results/temp/cens_64iv-hevc-crypted.mp4  (crypt) hash: 
+File hash (SHA-1): 0817D718B91D4081ED7F6B583C244AC5E8D70658
+Hash OK for ./results/temp/cens_64iv-hevc-crypted.mp4
+
+*** Subtest "Encrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/cens_64iv.xml -out ./results/temp/cens_64iv-hevc-crypted.mp4 ./results/temp/source_media.mp4" ***
+
+Computing ./results/temp/cens_64iv-hevc-decrypted.mp4  (decrypt) hash: 
+File hash (SHA-1): FF142A08FF066EAADBE3F418FBA01F87A38A3E6E
+Hash OK for ./results/temp/cens_64iv-hevc-decrypted.mp4
+
+*** Subtest "Decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/cens_64iv.xml -out ./results/temp/cens_64iv-hevc-decrypted.mp4 ./results/temp/cens_64iv-hevc-crypted.mp4" ***
+
+Same Hash for ./results/temp/source_media.mp4 and ./results/temp/cens_64iv-hevc-decrypted.mp4
+
+*** Subtest "INFO": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/cens_64iv-hevc-crypted.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.080
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand iso4 - version 1 - compatible brands: iso4
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 25000
+Media Duration 00:00:10.080 
+Media Info: Language "Undetermined (und)" - Type "vide:encv" - 252 samples
+Visual Sample Entry Info: width=1280 height=720 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=1280 height=720
+HEVC Video - Visual Size 1280 x 720
+	HEVC Info: Profile Main @ Level 6.2 - Chroma Format YUV 4:2:0
+
+	NAL Unit length bits: 32 - general profile compatibility 0x60000000
+
+	Parameter Sets: 1 VPS 1 SPS 1 PPS 
+	SPS resolution 1280x720
+	Bit Depth luma 8 - Chroma 8 - 2 temporal layers
+	VPS#1 hash: 9E811E99CCFE114792C63911120CBE88BA7BD8CD
+	SPS#1 hash: BA22AAE3C2B2C9488D5811717CF8A1A2976F748C
+	PPS#1 hash: A7386EEF7CBEA134DAEDABE7B8E66804B3323450
+
+
+	Protected by CENC scheme cens version 0x00010000 - Pattern 1:10
+		KID 279926496A7F5D25DA69F2B3B2799A7F - IV size 39 
+
+	RFC6381 Codec Parameters: hvc1.1.6.L186.80
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 25 samples
+	Max sample duration: 1000 / 25000
+
+
+Computing ./results/temp/cens_64iv-hevc-crypted_dashinit.mp4  (crypt-dash-init) hash: 
+File hash (SHA-1): 29DC6963BE5D8CCA98585B018FA1E198C1A3E7F4
+Hash OK for ./results/temp/cens_64iv-hevc-crypted_dashinit.mp4
+Computing ./results/temp/cens_64iv-hevc-crypted_dash1.m4s  (crypt-dash-seg) hash: 
+File hash (SHA-1): 334F7E95BFE4E97283DE5233A8EF0883F0368063
+Hash OK for ./results/temp/cens_64iv-hevc-crypted_dash1.m4s
+
+*** Subtest "DASH": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/cens_64iv-hevc-crypted.mp4" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 4 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 8 end 3
+[MPD] Generating MPD at time 2021-04-29T23:34:19.878Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 10.08 end 4
+
+

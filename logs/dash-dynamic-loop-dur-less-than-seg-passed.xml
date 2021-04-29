@@ -1,0 +1,9 @@
+ <test name="dash-dynamic-loop-dur-less-than-seg" result="OK" date="29/04/2021 23:30:55">
+
+  <stat subtest="dash-gen" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="53028" cpu_percent="3%" cpu_elapsed_time="0:02.48" cpu_user_time="0.07" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash-live 2000 -subdur 2000 -profile live -mpd-refresh 10 -time-shift -1 -run-for 4000 ./results/temp/file.mp4#video:dur=1.40001 ./results/temp/file.mp4#audio:dur=1.40001 -out ./results/temp/file.mpd</command_line>
+  </stat>
+  <stat subtest="inspect" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52536" cpu_percent="2%" cpu_elapsed_time="0:03.07" cpu_user_time="0.06" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:dur=2/1:log=./results/temp/inspect.txt</command_line>
+  </stat>
+ </test>

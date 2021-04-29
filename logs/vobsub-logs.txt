@@ -1,0 +1,53 @@
+*** vobsub logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:47:00 ***
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/vobsub/vobsub.idx inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -619004032
+
+Filter stats - 4 filters
+	Filter fin (src=./external_media/vobsub/vobsub.idx) : 0 input pids 1 output pids 4 tasks 630 us process time
+		1 packets sent 1018 bytes sent (1587.3 pck/sec 12.927 mbps)
+		* output PID vobsub.idx: 1 packets sent
+	Filter inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 17 tasks 228 us process time
+		15 packets processed 37998 bytes processed (65789.5 pck/sec 1333.26 mbps)
+		* input PID vobsub.idx: 15 packets received
+	Filter vobsubdmx : 2 input pids 1 output pids 31 tasks 244 us process time
+		2 packets processed 50170 bytes processed (8196.72 pck/sec 1644.92 mbps)
+		15 packets sent 37998 bytes sent (61475.4 pck/sec 1245.84 mbps)
+		* input PID vobsub.idx: 1 packets received
+		* input PID vobsub.sub: 1 frames (10 packets) received
+		* output PID vobsub.idx: 15 packets sent
+	Filter fin (src=./external_media/vobsub/vobsub.sub:allp:deep:interleave=false:log=./results/temp/inspect.txt) : 0 input pids 1 output pids 12 tasks 173 us process time
+		10 packets sent 49152 bytes sent (57803.5 pck/sec 2272.92 mbps)
+		* output PID vobsub.sub: 10 packets sent
+Session stats - threads 1
+	Thread 1: run_time 1311 us active_time 1301 us nb_tasks 67
+
+Total: run_time 1311 us active_time 1301 us nb_tasks 67
+
+Filters connected:
+fin (src=./external_media/vobsub/vobsub.idx) (ptr=0x559926152840)
+-(PID vobsub.idx) vobsubdmx (ptr=0x559926159610)
+--(PID vobsub.idx) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x559926155140)
+fin (src=./external_media/vobsub/vobsub.sub:allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55992615b0e0)
+-(PID vobsub.sub) vobsubdmx (ptr=0x559926159610)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): FAC11CE8DA9F51A70653B0615CE9F20C8FF6B857
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/vobsub/vobsub.idx -new ./results/temp/test.mp4" ***
+Track Importing VobSub - Width 720 Height 576 FPS 25/1
+
+Computing ./results/temp/test.mp4  (mp4) hash: 
+File hash (SHA-1): 4032AB4DD91753D6EB79EA2120563A68E7E113FF
+Hash OK for ./results/temp/test.mp4
+Computing ./results/temp/test_track1.idx  (dump-idx) hash: 
+File hash (SHA-1): FE2B4A356E292D06885CA3D3D58D636A436F9FDE
+Hash OK for ./results/temp/test_track1.idx
+Computing ./results/temp/test_track1.sub  (dump-sub) hash: 
+File hash (SHA-1): 7BC3632B72F248AC24048EE72A089763440D1AE3
+Hash OK for ./results/temp/test_track1.sub
+
+*** Subtest "dump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raw 1 ./results/temp/test.mp4" ***
+

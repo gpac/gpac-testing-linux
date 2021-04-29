@@ -1,0 +1,577 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - /home/travis/build/gpac/gpac/modules/jack/jack.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../../../index.html">top level</a> - <a href="index.html">home/travis/build/gpac/gpac/modules/jack</a> - jack.c<span style="font-size: 80%;"> (source / <a href="jack.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">67</td>
+            <td class="headerCovTableEntry">209</td>
+            <td class="headerCovTableEntryLo">32.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryLo">43.8 %</td>
+          </tr>
+          <tr><td><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Pierre Souchay , Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2008-2019
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  Jack audio output module : output audio thru the jackd daemon
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;strings.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;jack/types.h&gt;
+<span class="lineNum">      32 </span>            : #include &lt;jack/jack.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;jack/ringbuffer.h&gt;
+<span class="lineNum">      34 </span>            : #include &lt;gpac/modules/audio_out.h&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #define MAX_JACK_CLIENT_NAME_SZ 128
+<span class="lineNum">      37 </span>            : /*
+<span class="lineNum">      38 </span>            :  * This structure defines the handle to a Jack driver
+<span class="lineNum">      39 </span>            :  */
+<span class="lineNum">      40 </span>            : typedef struct
+<span class="lineNum">      41 </span>            : {
+<span class="lineNum">      42 </span>            :         char jackClientName[MAX_JACK_CLIENT_NAME_SZ];
+<span class="lineNum">      43 </span>            :         jack_client_t *jack;
+<span class="lineNum">      44 </span>            :         jack_port_t **jackPorts;
+<span class="lineNum">      45 </span>            :         jack_nframes_t currentBlockSize;
+<span class="lineNum">      46 </span>            :         u32 numChannels;
+<span class="lineNum">      47 </span>            :         char *buffer;
+<span class="lineNum">      48 </span>            :         u32 bufferSz;
+<span class="lineNum">      49 </span>            :         u32 bytesPerSample;
+<span class="lineNum">      50 </span>            :         Bool isActive;
+<span class="lineNum">      51 </span>            :         Bool autoConnect;
+<span class="lineNum">      52 </span>            :         jack_default_audio_sample_t **channels;
+<span class="lineNum">      53 </span>            :         float volume;
+<span class="lineNum">      54 </span>            : } JackContext;
+<a name="55"><span class="lineNum">      55 </span>            : </a>
+<span class="lineNum">      56 </span>            : static void
+<span class="lineNum">      57 </span><span class="lineCov">         14 : Jack_cleanup (JackContext * ctx)</span>
+<span class="lineNum">      58 </span>            : {
+<span class="lineNum">      59 </span>            :         u32 channels;
+<span class="lineNum">      60 </span><span class="lineCov">         14 :         if (ctx == NULL)</span>
+<span class="lineNum">      61 </span>            :                 return;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">         14 :         GF_LOG (GF_LOG_DEBUG, GF_LOG_MMIO, (&quot;[Jack] Jack_cleanup\n&quot;));</span>
+<span class="lineNum">      64 </span><span class="lineCov">         14 :         if (ctx-&gt;jack != NULL &amp;&amp; ctx-&gt;isActive)</span>
+<span class="lineNum">      65 </span>            :         {
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :                 jack_deactivate (ctx-&gt;jack);</span>
+<span class="lineNum">      67 </span>            :         }
+<span class="lineNum">      68 </span><span class="lineCov">         14 :         if (ctx-&gt;buffer != NULL)</span>
+<span class="lineNum">      69 </span>            :         {
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :                 gf_free(ctx-&gt;buffer);</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :                 ctx-&gt;bufferSz = 0;</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :                 ctx-&gt;buffer = NULL;</span>
+<span class="lineNum">      73 </span>            :         }
+<span class="lineNum">      74 </span><span class="lineCov">         14 :         if (ctx-&gt;jackPorts != NULL)</span>
+<span class="lineNum">      75 </span>            :         {
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :                 for (channels = 0; channels &lt; ctx-&gt;numChannels; channels++)</span>
+<span class="lineNum">      77 </span>            :                 {
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;jackPorts[channels] != NULL)</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :                                 jack_port_unregister (ctx-&gt;jack, ctx-&gt;jackPorts[channels]);</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :                         ctx-&gt;jackPorts[channels] = NULL;</span>
+<span class="lineNum">      81 </span>            :                 }
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :                 gf_free(ctx-&gt;jackPorts);</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                 ctx-&gt;jackPorts = NULL;</span>
+<span class="lineNum">      84 </span>            :         }
+<span class="lineNum">      85 </span><span class="lineCov">         14 :         if (ctx-&gt;jack != NULL)</span>
+<span class="lineNum">      86 </span>            :         {
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :                 jack_client_close (ctx-&gt;jack);</span>
+<span class="lineNum">      88 </span>            :         }
+<span class="lineNum">      89 </span><span class="lineCov">         14 :         if (ctx-&gt;channels != NULL)</span>
+<span class="lineNum">      90 </span>            :         {
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :                 gf_free(ctx-&gt;channels);</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :                 ctx-&gt;channels = NULL;</span>
+<span class="lineNum">      93 </span>            :         }
+<span class="lineNum">      94 </span><span class="lineCov">         14 :         ctx-&gt;numChannels = 0;</span>
+<span class="lineNum">      95 </span><span class="lineCov">         14 :         ctx-&gt;currentBlockSize = 0;</span>
+<span class="lineNum">      96 </span><span class="lineCov">         14 :         memset (ctx-&gt;jackClientName, 0, MAX_JACK_CLIENT_NAME_SZ);</span>
+<span class="lineNum">      97 </span><span class="lineCov">         14 :         ctx-&gt;jack = NULL;</span>
+<span class="lineNum">      98 </span><span class="lineCov">         14 :         ctx-&gt;isActive = 0;</span>
+<span class="lineNum">      99 </span>            : }
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : /**
+<span class="lineNum">     102 </span>            :  * The callback called by the jack thread
+<a name="103"><span class="lineNum">     103 </span>            :  */</a>
+<span class="lineNum">     104 </span>            : static int
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 : process_callback (jack_nframes_t nframes, void *arg)</span>
+<span class="lineNum">     106 </span>            : {
+<span class="lineNum">     107 </span>            :         unsigned int channel, i;
+<span class="lineNum">     108 </span>            :         size_t toRead;
+<span class="lineNum">     109 </span>            :         size_t bytesToRead;
+<span class="lineNum">     110 </span>            :         GF_AudioOutput *dr = (GF_AudioOutput *) arg;
+<span class="lineNum">     111 </span>            :         JackContext *ctx;
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :         if (dr == NULL)</span>
+<span class="lineNum">     113 </span>            :         {
+<span class="lineNum">     114 </span>            :                 // Should not happen
+<span class="lineNum">     115 </span>            :                 return 1;
+<span class="lineNum">     116 </span>            :         }
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :         ctx = dr-&gt;opaque;</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :         toRead = nframes * ctx-&gt;numChannels;</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :         bytesToRead = toRead * ctx-&gt;bytesPerSample;</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :         dr-&gt;FillBuffer (dr-&gt;audio_renderer, (void *) ctx-&gt;buffer,</span>
+<span class="lineNum">     121 </span>            :                                  bytesToRead);
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :         if (ctx-&gt;bytesPerSample == 2)</span>
+<span class="lineNum">     124 </span>            :         {
+<span class="lineNum">     125 </span>            :                 short *tmpBuffer;
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                 tmpBuffer = (short *) ctx-&gt;buffer;</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :                 for (channel = 0; channel &lt; nframes; channel += ctx-&gt;numChannels)</span>
+<span class="lineNum">     128 </span>            :                 {
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :                         for (i = 0; i &lt; ctx-&gt;numChannels; i++)</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :                                 ctx-&gt;channels[i][channel] =</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :                                     (float) (ctx-&gt;volume / 32768.0 *</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :                                              (tmpBuffer[channel * ctx-&gt;numChannels + i]));</span>
+<span class="lineNum">     133 </span>            :                 }
+<span class="lineNum">     134 </span>            :         }
+<span class="lineNum">     135 </span>            :         else
+<span class="lineNum">     136 </span>            :         {
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :                 for (channel = 0; channel &lt; nframes; channel += ctx-&gt;numChannels)</span>
+<span class="lineNum">     138 </span>            :                 {
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :                         for (i = 0; i &lt; ctx-&gt;numChannels; i++)</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :                                 ctx-&gt;channels[i][channel] =</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :                                     (float) (ctx-&gt;volume / 255.0 *</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :                                              (ctx-&gt;buffer[channel * ctx-&gt;numChannels + i]));</span>
+<span class="lineNum">     143 </span>            :                 }
+<span class="lineNum">     144 </span>            :         }
+<span class="lineNum">     145 </span>            :         return 0;
+<span class="lineNum">     146 </span>            : }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            : /**
+<span class="lineNum">     149 </span>            :  * Called when jackbuffer size change
+<a name="150"><span class="lineNum">     150 </span>            :  */</a>
+<span class="lineNum">     151 </span>            : static int
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 : onBufferSizeChanged (jack_nframes_t nframes, void *arg)</span>
+<span class="lineNum">     153 </span>            : {
+<span class="lineNum">     154 </span>            :         GF_AudioOutput *dr = (GF_AudioOutput *) arg;
+<span class="lineNum">     155 </span>            :         JackContext *ctx;
+<span class="lineNum">     156 </span>            :         size_t realBuffSize;
+<span class="lineNum">     157 </span>            :         u32 channel;
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :         if (dr == NULL)</span>
+<span class="lineNum">     159 </span>            :         {
+<span class="lineNum">     160 </span>            :                 // Should not happen
+<span class="lineNum">     161 </span>            :                 return 1;
+<span class="lineNum">     162 </span>            :         }
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :         ctx = dr-&gt;opaque;</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :         realBuffSize = nframes * ctx-&gt;numChannels * sizeof (short);</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :         if (ctx-&gt;buffer != NULL &amp;&amp; ctx-&gt;bufferSz == realBuffSize)</span>
+<span class="lineNum">     166 </span>            :                 return 0;
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :         if (ctx-&gt;channels != NULL)</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                 gf_free(ctx-&gt;channels);</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :         ctx-&gt;channels = NULL;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :         ctx-&gt;channels = gf_calloc (ctx-&gt;numChannels, sizeof (jack_default_audio_sample_t *));</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :         if (ctx-&gt;channels == NULL)</span>
+<span class="lineNum">     172 </span>            :         {
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :                 Jack_cleanup (ctx);</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :                 return 2;</span>
+<span class="lineNum">     175 </span>            :         }
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :         for (channel = 0; channel &lt; ctx-&gt;numChannels; channel++)</span>
+<span class="lineNum">     177 </span>            :         {
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :                 ctx-&gt;channels[channel] =</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :                     jack_port_get_buffer (ctx-&gt;jackPorts[channel], nframes);</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;channels[channel] == NULL)</span>
+<span class="lineNum">     181 </span>            :                 {
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :                         Jack_cleanup (ctx);</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                         return 3;</span>
+<span class="lineNum">     184 </span>            :                 }
+<span class="lineNum">     185 </span>            :         }
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :         if (ctx-&gt;buffer != NULL)</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                 gf_free(ctx-&gt;buffer);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :         ctx-&gt;buffer = gf_calloc (realBuffSize, sizeof (char));</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :         if (ctx-&gt;buffer == NULL)</span>
+<span class="lineNum">     191 </span>            :         {
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                 Jack_cleanup (ctx);</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :                 return 4;</span>
+<span class="lineNum">     194 </span>            :         }
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :         ctx-&gt;bufferSz = realBuffSize;</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :         GF_LOG (GF_LOG_DEBUG, GF_LOG_MMIO,</span>
+<span class="lineNum">     197 </span>            :                 (&quot;[Jack] onBufferSizeChanged : resized to %d.\n&quot;, realBuffSize));
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         if (ctx-&gt;buffer == NULL)</span>
+<span class="lineNum">     199 </span>            :         {
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                 ctx-&gt;bufferSz = 0;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                 Jack_cleanup (ctx);</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                 return 5;</span>
+<span class="lineNum">     203 </span>            :         }
+<span class="lineNum">     204 </span>            :         return 0;
+<span class="lineNum">     205 </span>            : }
+<a name="206"><span class="lineNum">     206 </span>            : </a>
+<span class="lineNum">     207 </span>            : static GF_Err
+<span class="lineNum">     208 </span><span class="lineCov">          1 : Jack_Setup (GF_AudioOutput * dr, void *os_handle, u32 num_buffers,</span>
+<span class="lineNum">     209 </span>            :             u32 total_duration)
+<span class="lineNum">     210 </span>            : {
+<span class="lineNum">     211 </span><span class="lineCov">          1 :         JackContext *ctx = (JackContext *) dr-&gt;opaque;</span>
+<span class="lineNum">     212 </span>            :         jack_status_t status;
+<span class="lineNum">     213 </span>            :         jack_options_t options = JackNullOption;
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineCov">          1 :         memset (ctx-&gt;jackClientName, 0, MAX_JACK_CLIENT_NAME_SZ);</span>
+<span class="lineNum">     216 </span><span class="lineCov">          1 :         snprintf (ctx-&gt;jackClientName, MAX_JACK_CLIENT_NAME_SZ, &quot;gpac-%d&quot;, gf_sys_get_process_id() );</span>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineCov">          1 :         ctx-&gt;autoConnect = GF_TRUE;</span>
+<span class="lineNum">     219 </span><span class="lineCov">          1 :         if (gf_opts_get_bool(&quot;Jack&quot;, &quot;NoAutoConnect&quot;))</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                 ctx-&gt;autoConnect = GF_FALSE;</span>
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">          1 :         if (gf_opts_get_bool(&quot;Jack&quot;, &quot;NoStartServer&quot;))</span>
+<span class="lineNum">     223 </span>            :                 options |= JackNoStartServer;
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineCov">          1 :         ctx-&gt;jack = jack_client_open (ctx-&gt;jackClientName, options, &amp;status, NULL);</span>
+<span class="lineNum">     226 </span><span class="lineCov">          1 :         if (status &amp; JackNameNotUnique)</span>
+<span class="lineNum">     227 </span>            :         {
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :                 GF_LOG (GF_LOG_ERROR, GF_LOG_MMIO,</span>
+<span class="lineNum">     229 </span>            :                         (&quot;[Jack] Cannot open connection to jackd as %s since name was not unique.\n&quot;,
+<span class="lineNum">     230 </span>            :                          ctx-&gt;jackClientName));
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :                 Jack_cleanup (ctx);</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :                 return GF_IO_ERR;</span>
+<span class="lineNum">     233 </span>            :         }
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">          1 :         if (ctx-&gt;jack == NULL)</span>
+<span class="lineNum">     236 </span>            :         {
+<span class="lineNum">     237 </span><span class="lineCov">          1 :                 GF_LOG (GF_LOG_ERROR, GF_LOG_MMIO,</span>
+<span class="lineNum">     238 </span>            :                         (&quot;[Jack] Cannot open connection to jackd as %s.\n&quot;,
+<span class="lineNum">     239 </span>            :                          ctx-&gt;jackClientName));
+<span class="lineNum">     240 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     241 </span>            :         }
+<span class="lineNum">     242 </span>            :         return GF_OK;
+<span class="lineNum">     243 </span>            : }
+<a name="244"><span class="lineNum">     244 </span>            : </a>
+<span class="lineNum">     245 </span>            : static void
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 : Jack_Shutdown (GF_AudioOutput * dr)</span>
+<span class="lineNum">     247 </span>            : {
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :         JackContext *ctx = (JackContext *) dr-&gt;opaque;</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :         Jack_cleanup (ctx);</span>
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            : #define JACK_PORT_NAME_MAX_SZ 128
+<a name="253"><span class="lineNum">     253 </span>            : </a>
+<span class="lineNum">     254 </span>            : static GF_Err
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 : Jack_Configure(GF_AudioOutput * dr, u32 * SampleRate, u32 * NbChannels, u32 *audioFormat, u64 channel_cfg)</span>
+<span class="lineNum">     256 </span>            : {
+<span class="lineNum">     257 </span>            :         u32 channels;
+<span class="lineNum">     258 </span>            :         u32 i;
+<span class="lineNum">     259 </span>            :         char port_name[JACK_PORT_NAME_MAX_SZ];
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :         JackContext *ctx = (JackContext *) dr-&gt;opaque;</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :         if (!ctx)</span>
+<span class="lineNum">     262 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            :         //only support for PCM 8/16/24/32 packet mode
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :         switch (*audioFormat) {</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :         case GF_AUDIO_FMT_U8:</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :                 ctx-&gt;bytesPerSample = 1;</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     270 </span>            :                 //otherwise force PCM16
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :                 *audioFormat = GF_AUDIO_FMT_S16;</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :         case GF_AUDIO_FMT_S16:</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :                 ctx-&gt;bytesPerSample = 2;</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     275 </span>            :         }
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :         ctx-&gt;numChannels = *NbChannels;</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :         *SampleRate = jack_get_sample_rate (ctx-&gt;jack);</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :         GF_LOG (GF_LOG_DEBUG, GF_LOG_MMIO,</span>
+<span class="lineNum">     279 </span>            :                 (&quot;[Jack] Jack_ConfigureOutput channels=%d, srate=%d audio format %s\n&quot;,
+<span class="lineNum">     280 </span>            :                  *NbChannels, *SampleRate, gf_audio_fmt_name(*audioFormat) ));
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :         if (ctx-&gt;jackPorts == NULL)</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :                 ctx-&gt;jackPorts = gf_calloc (ctx-&gt;numChannels, sizeof (jack_port_t *));</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :         if (ctx-&gt;jackPorts == NULL)</span>
+<span class="lineNum">     284 </span>            :         {
+<span class="lineNum">     285 </span>            :                 goto exit_cleanup;
+<span class="lineNum">     286 </span>            :         }
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;isActive)</span>
+<span class="lineNum">     288 </span>            :         {
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :                 for (channels = 0; channels &lt; ctx-&gt;numChannels; channels++)</span>
+<span class="lineNum">     290 </span>            :                 {
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                         snprintf (port_name, JACK_PORT_NAME_MAX_SZ, &quot;playback_%d&quot;,</span>
+<span class="lineNum">     292 </span>            :                                   channels + 1);
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                         ctx-&gt;jackPorts[channels] =</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                             jack_port_register (ctx-&gt;jack, port_name, JACK_DEFAULT_AUDIO_TYPE,</span>
+<span class="lineNum">     295 </span>            :                                                 JackPortIsOutput, 0);
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;jackPorts[channels] == NULL)</span>
+<span class="lineNum">     297 </span>            :                                 goto exit_cleanup;
+<span class="lineNum">     298 </span>            :                 }
+<span class="lineNum">     299 </span>            : //              onBufferSizeChanged (jack_get_buffer_size (ctx-&gt;jack), dr);
+<span class="lineNum">     300 </span>            : //              if (!ctx-&gt;jack) return GF_IO_ERR;
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :                 jack_set_buffer_size_callback (ctx-&gt;jack, onBufferSizeChanged, dr);</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :                 jack_set_process_callback (ctx-&gt;jack, process_callback, dr);</span>
+<span class="lineNum">     304 </span>            :         }
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :         ctx-&gt;currentBlockSize = jack_get_buffer_size (ctx-&gt;jack);</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;isActive)</span>
+<span class="lineNum">     307 </span>            :         {
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :                 jack_activate (ctx-&gt;jack);</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;autoConnect)</span>
+<span class="lineNum">     310 </span>            :                 {
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :                         const char **matching_outputs =</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :                             jack_get_ports (ctx-&gt;jack, NULL, NULL,</span>
+<span class="lineNum">     313 </span>            :                                             JackPortIsInput | JackPortIsPhysical |
+<span class="lineNum">     314 </span>            :                                             JackPortIsTerminal);
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                         if (matching_outputs != NULL)</span>
+<span class="lineNum">     316 </span>            :                         {
+<span class="lineNum">     317 </span>            :                                 channels = 0;
+<span class="lineNum">     318 </span>            :                                 i = 0;
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                                 while (matching_outputs[i] != NULL</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :                                         &amp;&amp; channels &lt; ctx-&gt;numChannels)</span>
+<span class="lineNum">     321 </span>            :                                 {
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :                                         if (!jack_connect (ctx-&gt;jack,</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :                                                            jack_port_name (ctx-&gt;</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                                                                            jackPorts[channels++]),</span>
+<span class="lineNum">     325 </span>            :                                                            matching_outputs[i]))
+<span class="lineNum">     326 </span>            :                                         {
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                                                 GF_LOG (GF_LOG_INFO, GF_LOG_MMIO,</span>
+<span class="lineNum">     328 </span>            :                                                         (&quot;[Jack] Jack_ConfigureOutput: Failed to connect port[%d] to %s.\n&quot;,
+<span class="lineNum">     329 </span>            :                                                          channels - 1, matching_outputs[i]));
+<span class="lineNum">     330 </span>            :                                         }
+<span class="lineNum">     331 </span>            :                                         i++;
+<span class="lineNum">     332 </span>            :                                 }
+<span class="lineNum">     333 </span>            :                         }
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :                         jack_free (matching_outputs);</span>
+<span class="lineNum">     335 </span>            :                 }
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :                 ctx-&gt;isActive = GF_TRUE;</span>
+<span class="lineNum">     337 </span>            :         }
+<span class="lineNum">     338 </span>            :         return GF_OK;
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 : exit_cleanup:</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :         Jack_cleanup (ctx);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :         return GF_IO_ERR;</span>
+<span class="lineNum">     342 </span>            : }
+<a name="343"><span class="lineNum">     343 </span>            : </a>
+<span class="lineNum">     344 </span>            : static void
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 : Jack_SetVolume (GF_AudioOutput * dr, u32 Volume)</span>
+<span class="lineNum">     346 </span>            : {
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :         JackContext *ctx = (JackContext *) dr-&gt;opaque;</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :         if (ctx == NULL)</span>
+<span class="lineNum">     349 </span>            :         {
+<span class="lineNum">     350 </span>            :                 return;
+<span class="lineNum">     351 </span>            :         }
+<span class="lineNum">     352 </span>            :         /* We support ajust the volume to more than 100, up to +6dB even
+<span class="lineNum">     353 </span>            :          * if frontends don't support it, it may be useful */
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :         if (Volume &gt; 400)</span>
+<span class="lineNum">     355 </span>            :                 Volume = 400;
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :         ctx-&gt;volume = (float) Volume / 100.0;</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :         GF_LOG (GF_LOG_DEBUG, GF_LOG_MMIO,</span>
+<span class="lineNum">     358 </span>            :                 (&quot;[Jack] Jack_SetVolume: Volume set to %d%%.\n&quot;, Volume));
+<span class="lineNum">     359 </span>            : }
+<a name="360"><span class="lineNum">     360 </span>            : </a>
+<span class="lineNum">     361 </span>            : static void
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 : Jack_SetPan (GF_AudioOutput * dr, u32 Pan)</span>
+<span class="lineNum">     363 </span>            : {
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :         GF_LOG (GF_LOG_INFO, GF_LOG_MMIO, (&quot;[Jack] Jack_SetPan: Not supported.\n&quot;));</span>
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 : }</span>
+<a name="367"><span class="lineNum">     367 </span>            : </a>
+<span class="lineNum">     368 </span>            : static void
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 : Jack_SetPriority (GF_AudioOutput * dr, u32 Priority)</span>
+<span class="lineNum">     370 </span>            : {
+<span class="lineNum">     371 </span>            :         /**
+<span class="lineNum">     372 </span>            :          * Jack manages the priority itself, we don't need
+<span class="lineNum">     373 </span>            :          * to interfere here...
+<span class="lineNum">     374 </span>            :          */
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 : }</span>
+<a name="376"><span class="lineNum">     376 </span>            : </a>
+<span class="lineNum">     377 </span>            : static u32
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 : Jack_GetAudioDelay (GF_AudioOutput * dr)</span>
+<span class="lineNum">     379 </span>            : {
+<span class="lineNum">     380 </span>            :         jack_nframes_t max = 0;
+<span class="lineNum">     381 </span>            :         jack_nframes_t latency;
+<span class="lineNum">     382 </span>            :         u32 channel;
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :         JackContext *ctx = (JackContext *) dr-&gt;opaque;</span>
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :         if (ctx == NULL)</span>
+<span class="lineNum">     385 </span>            :         {
+<span class="lineNum">     386 </span>            :                 return 0;
+<span class="lineNum">     387 </span>            :         }
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :         jack_recompute_total_latencies (ctx-&gt;jack);</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :         for (channel = 0; channel &lt; ctx-&gt;numChannels; channel++)</span>
+<span class="lineNum">     390 </span>            :         {
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :                 latency =</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :                     jack_port_get_total_latency (ctx-&gt;jack, ctx-&gt;jackPorts[channel]);</span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :                 if (latency &gt; max)</span>
+<span class="lineNum">     394 </span>            :                         max = latency;
+<span class="lineNum">     395 </span>            :         }
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :         channel = max * 1000 / jack_get_sample_rate (ctx-&gt;jack);</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :         GF_LOG (GF_LOG_DEBUG, GF_LOG_MMIO,</span>
+<span class="lineNum">     398 </span>            :                 (&quot;[Jack] Jack_GetAudioDelay latency = %d ms.\n&quot;, channel));
+<span class="lineNum">     399 </span>            :         return channel;
+<span class="lineNum">     400 </span>            : }
+<a name="401"><span class="lineNum">     401 </span>            : </a>
+<span class="lineNum">     402 </span>            : static GF_Err
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 : Jack_QueryOutputSampleRate (GF_AudioOutput * dr, u32 * desired_sr,</span>
+<span class="lineNum">     404 </span>            :                             u32 * NbChannels, u32 * nbBitsPerSample)
+<span class="lineNum">     405 </span>            : {
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :         JackContext *ctx = (JackContext *) dr-&gt;opaque;</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :         if (!ctx)</span>
+<span class="lineNum">     408 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :         *desired_sr = jack_get_sample_rate (ctx-&gt;jack);</span>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :         *NbChannels = 2;</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :         GF_LOG (GF_LOG_DEBUG, GF_LOG_MMIO,</span>
+<span class="lineNum">     412 </span>            :                 (&quot;[Jack] Jack output sample rate %d\n&quot;, *desired_sr));
+<span class="lineNum">     413 </span>            :         return GF_OK;
+<span class="lineNum">     414 </span>            : }
+<a name="415"><span class="lineNum">     415 </span>            : </a>
+<span class="lineNum">     416 </span>            : void *
+<span class="lineNum">     417 </span><span class="lineCov">         14 : NewJackOutput ()</span>
+<span class="lineNum">     418 </span>            : {
+<span class="lineNum">     419 </span>            :         JackContext *ctx;
+<span class="lineNum">     420 </span>            :         GF_AudioOutput *driv;
+<span class="lineNum">     421 </span><span class="lineCov">         14 :         GF_SAFEALLOC (ctx, JackContext);</span>
+<span class="lineNum">     422 </span><span class="lineCov">         14 :         if (!ctx)</span>
+<span class="lineNum">     423 </span>            :                 return NULL;
+<span class="lineNum">     424 </span><span class="lineCov">         14 :         GF_SAFEALLOC (driv, GF_AudioOutput);</span>
+<span class="lineNum">     425 </span><span class="lineCov">         14 :         if (!driv)</span>
+<span class="lineNum">     426 </span>            :         {
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :                 gf_free(ctx);</span>
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     429 </span>            :         }
+<span class="lineNum">     430 </span><span class="lineCov">         14 :         driv-&gt;opaque = ctx;</span>
+<span class="lineNum">     431 </span><span class="lineCov">         14 :         driv-&gt;SelfThreaded = 1;</span>
+<span class="lineNum">     432 </span><span class="lineCov">         14 :         driv-&gt;Setup = Jack_Setup;</span>
+<span class="lineNum">     433 </span><span class="lineCov">         14 :         driv-&gt;Shutdown = Jack_Shutdown;</span>
+<span class="lineNum">     434 </span><span class="lineCov">         14 :         driv-&gt;Configure = Jack_Configure;</span>
+<span class="lineNum">     435 </span><span class="lineCov">         14 :         driv-&gt;GetAudioDelay = Jack_GetAudioDelay;</span>
+<span class="lineNum">     436 </span><span class="lineCov">         14 :         driv-&gt;SetVolume = Jack_SetVolume;</span>
+<span class="lineNum">     437 </span><span class="lineCov">         14 :         driv-&gt;SetPan = Jack_SetPan;</span>
+<span class="lineNum">     438 </span><span class="lineCov">         14 :         driv-&gt;SetPriority = Jack_SetPriority;</span>
+<span class="lineNum">     439 </span><span class="lineCov">         14 :         driv-&gt;QueryOutputSampleRate = Jack_QueryOutputSampleRate;</span>
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span><span class="lineCov">         14 :         ctx-&gt;jack = NULL;</span>
+<span class="lineNum">     442 </span><span class="lineCov">         14 :         ctx-&gt;numChannels = 0;</span>
+<span class="lineNum">     443 </span><span class="lineCov">         14 :         ctx-&gt;jackPorts = NULL;</span>
+<span class="lineNum">     444 </span><span class="lineCov">         14 :         ctx-&gt;currentBlockSize = 0;</span>
+<span class="lineNum">     445 </span>            :         ctx-&gt;numChannels = 0;
+<span class="lineNum">     446 </span><span class="lineCov">         14 :         ctx-&gt;buffer = NULL;</span>
+<span class="lineNum">     447 </span><span class="lineCov">         14 :         ctx-&gt;bufferSz = 0;</span>
+<span class="lineNum">     448 </span><span class="lineCov">         14 :         ctx-&gt;bytesPerSample = 0;</span>
+<span class="lineNum">     449 </span><span class="lineCov">         14 :         ctx-&gt;isActive = GF_FALSE;</span>
+<span class="lineNum">     450 </span><span class="lineCov">         14 :         ctx-&gt;autoConnect = GF_FALSE;</span>
+<span class="lineNum">     451 </span><span class="lineCov">         14 :         ctx-&gt;volume = 1.0;</span>
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span><span class="lineCov">         14 :         GF_REGISTER_MODULE_INTERFACE (driv, GF_AUDIO_OUTPUT_INTERFACE,</span>
+<span class="lineNum">     454 </span>            :                                       &quot;Jack Audio Output&quot;, &quot;gpac distribution&quot;);
+<span class="lineNum">     455 </span><span class="lineCov">         14 :         return driv;</span>
+<span class="lineNum">     456 </span>            : }
+<a name="457"><span class="lineNum">     457 </span>            : </a>
+<span class="lineNum">     458 </span>            : void
+<span class="lineNum">     459 </span><span class="lineCov">         14 : DeleteJackOutput (void *ifce)</span>
+<span class="lineNum">     460 </span>            : {
+<span class="lineNum">     461 </span>            :         GF_AudioOutput *dr = (GF_AudioOutput *) ifce;
+<span class="lineNum">     462 </span><span class="lineCov">         14 :         JackContext *ctx = (JackContext *) dr-&gt;opaque;</span>
+<span class="lineNum">     463 </span><span class="lineCov">         14 :         Jack_cleanup (ctx);</span>
+<span class="lineNum">     464 </span><span class="lineCov">         14 :         gf_free(ctx);</span>
+<span class="lineNum">     465 </span><span class="lineCov">         14 :         dr-&gt;opaque = NULL;</span>
+<span class="lineNum">     466 </span><span class="lineCov">         14 :         gf_free(dr);</span>
+<span class="lineNum">     467 </span><span class="lineCov">         14 : }</span>
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            : /*
+<span class="lineNum">     470 </span>            :  * ********************************************************************
+<span class="lineNum">     471 </span>            :  * interface
+<span class="lineNum">     472 </span>            :  */
+<a name="473"><span class="lineNum">     473 </span>            : </a>
+<span class="lineNum">     474 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">     475 </span><span class="lineCov">        663 : const u32 *QueryInterfaces()</span>
+<span class="lineNum">     476 </span>            : {
+<span class="lineNum">     477 </span>            :         static u32 si [] = {
+<span class="lineNum">     478 </span>            :                 GF_AUDIO_OUTPUT_INTERFACE,
+<span class="lineNum">     479 </span>            :                 0
+<span class="lineNum">     480 </span>            :         };
+<span class="lineNum">     481 </span><span class="lineCov">        663 :         return si;</span>
+<span class="lineNum">     482 </span>            : }
+<a name="483"><span class="lineNum">     483 </span>            : </a>
+<span class="lineNum">     484 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">     485 </span><span class="lineCov">         14 : GF_BaseInterface *LoadInterface (u32 InterfaceType)</span>
+<span class="lineNum">     486 </span>            : {
+<span class="lineNum">     487 </span><span class="lineCov">         14 :         if (InterfaceType == GF_AUDIO_OUTPUT_INTERFACE)</span>
+<span class="lineNum">     488 </span>            :         {
+<span class="lineNum">     489 </span><span class="lineCov">         14 :                 return NewJackOutput ();</span>
+<span class="lineNum">     490 </span>            :         }
+<span class="lineNum">     491 </span>            :         return NULL;
+<span class="lineNum">     492 </span>            : }
+<a name="493"><span class="lineNum">     493 </span>            : </a>
+<span class="lineNum">     494 </span>            : GPAC_MODULE_EXPORT
+<span class="lineNum">     495 </span><span class="lineCov">         14 : void ShutdownInterface (GF_BaseInterface * ifce)</span>
+<span class="lineNum">     496 </span>            : {
+<span class="lineNum">     497 </span><span class="lineCov">         14 :         if (ifce-&gt;InterfaceType == GF_AUDIO_OUTPUT_INTERFACE)</span>
+<span class="lineNum">     498 </span><span class="lineCov">         14 :                 DeleteJackOutput ((GF_AudioOutput *) ifce);</span>
+<span class="lineNum">     499 </span><span class="lineCov">         14 : }</span>
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span>            : GPAC_MODULE_STATIC_DECLARATION( jack )
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

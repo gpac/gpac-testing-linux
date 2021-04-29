@@ -1,0 +1,501 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/rewrite_obu.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - rewrite_obu.c<span style="font-size: 80%;"> (source / <a href="rewrite_obu.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">157</td>
+            <td class="headerCovTableEntry">187</td>
+            <td class="headerCovTableEntryMed">84.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2018-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / AV1 OBU rewrite filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/internal/media_dev.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : typedef struct
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            :         //opts
+<span class="lineNum">      36 </span>            :         Bool rcfg, tsep;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :         //only one input pid declared
+<span class="lineNum">      39 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      40 </span>            :         //only one output pid declared
+<span class="lineNum">      41 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :         u32 crc;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :         Bool ivf_hdr;
+<span class="lineNum">      46 </span>            :         u32 mode;
+<span class="lineNum">      47 </span>            :         GF_BitStream *bs_w;
+<span class="lineNum">      48 </span>            :         GF_BitStream *bs_r;
+<span class="lineNum">      49 </span>            :         u32 w, h;
+<span class="lineNum">      50 </span>            :         GF_Fraction fps;
+<span class="lineNum">      51 </span>            :         GF_AV1Config *av1c;
+<span class="lineNum">      52 </span>            :         u32 av1b_cfg_size;
+<span class="lineNum">      53 </span>            :         u32 codec_id;
+<a name="54"><span class="lineNum">      54 </span>            : } GF_OBUMxCtx;</a>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">          4 : GF_Err obumx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      57 </span>            : {
+<span class="lineNum">      58 </span>            :         u32 crc;
+<span class="lineNum">      59 </span>            :         const GF_PropertyValue *p, *dcd;
+<span class="lineNum">      60 </span><span class="lineCov">          4 :         GF_OBUMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineCov">          4 :         if (is_remove) {</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">      67 </span>            :                 }
+<span class="lineNum">      68 </span>            :                 return GF_OK;
+<span class="lineNum">      69 </span>            :         }
+<span class="lineNum">      70 </span><span class="lineCov">          4 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">      71 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">          4 :         dcd = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">      74 </span><span class="lineCov">          4 :         if (!dcd) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">          4 :         crc = gf_crc_32(dcd-&gt;value.data.ptr, dcd-&gt;value.data.size);</span>
+<span class="lineNum">      77 </span><span class="lineCov">          4 :         if (ctx-&gt;crc == crc) return GF_OK;</span>
+<span class="lineNum">      78 </span><span class="lineCov">          4 :         ctx-&gt;crc = crc;</span>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineCov">          4 :         if (!ctx-&gt;opid) {</span>
+<span class="lineNum">      81 </span><span class="lineCov">          4 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">      82 </span>            :         }
+<span class="lineNum">      83 </span>            :         //copy properties at init or reconfig
+<span class="lineNum">      84 </span><span class="lineCov">          4 :         gf_filter_pid_copy_properties(ctx-&gt;opid, pid);</span>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_UNFRAMED, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineCov">          4 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">          4 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG, NULL);</span>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span><span class="lineCov">          4 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_CODECID);</span>
+<span class="lineNum">      93 </span><span class="lineCov">          4 :         ctx-&gt;codec_id = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">      94 </span><span class="lineCov">          4 :         switch (ctx-&gt;codec_id) {</span>
+<span class="lineNum">      95 </span><span class="lineCov">          4 :         case GF_CODECID_AV1:</span>
+<span class="lineNum">      96 </span>            :                 //check output type OBU vs av1b
+<span class="lineNum">      97 </span><span class="lineCov">          4 :                 p = gf_filter_pid_caps_query(ctx-&gt;opid, GF_PROP_PID_FILE_EXT);</span>
+<span class="lineNum">      98 </span><span class="lineCov">          4 :                 if (p) {</span>
+<span class="lineNum">      99 </span><span class="lineCov">          4 :                         if (!strcmp(p-&gt;value.string, &quot;obu&quot;)) ctx-&gt;mode = 0;</span>
+<span class="lineNum">     100 </span><span class="lineCov">          3 :                         else if (!strcmp(p-&gt;value.string, &quot;av1b&quot;) || !strcmp(p-&gt;value.string, &quot;av1&quot;)) ctx-&gt;mode = 1;</span>
+<span class="lineNum">     101 </span>            :                         //we might want to add a generic IVF read/write at some point
+<span class="lineNum">     102 </span><span class="lineCov">          1 :                         else if (!strcmp(p-&gt;value.string, &quot;ivf&quot;)) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :                                 ctx-&gt;mode = 2;</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :                                 ctx-&gt;ivf_hdr = 1;</span>
+<span class="lineNum">     105 </span>            :                         }
+<span class="lineNum">     106 </span>            :                 } else {
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, (&quot;[OBUWrite] Couldn't guess desired output format type, assuming plain OBU\n&quot;));</span>
+<span class="lineNum">     108 </span>            :                 }
+<span class="lineNum">     109 </span>            :                 break;
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :         case GF_CODECID_VP8:</span>
+<span class="lineNum">     111 </span>            :         case GF_CODECID_VP9:
+<span class="lineNum">     112 </span>            :         case GF_CODECID_VP10:
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                 ctx-&gt;mode = 2; //IVF only</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :                 ctx-&gt;ivf_hdr = 1;</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     116 </span>            :         }
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineCov">          4 :         if (ctx-&gt;av1c) gf_odf_av1_cfg_del(ctx-&gt;av1c);</span>
+<span class="lineNum">     119 </span><span class="lineCov">          4 :         ctx-&gt;av1c = NULL;</span>
+<span class="lineNum">     120 </span><span class="lineCov">          4 :         if (ctx-&gt;mode==1) {</span>
+<span class="lineNum">     121 </span><span class="lineCov">          2 :                 u32 i=0;</span>
+<span class="lineNum">     122 </span>            :                 GF_AV1_OBUArrayEntry *obu;
+<span class="lineNum">     123 </span><span class="lineCov">          2 :                 ctx-&gt;av1c = gf_odf_av1_cfg_read(dcd-&gt;value.data.ptr, dcd-&gt;value.data.size);</span>
+<span class="lineNum">     124 </span><span class="lineCov">          2 :                 if (!ctx-&gt;av1c) {</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[OBUWrite] Invalid av1 config\n&quot;));</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                         return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     127 </span>            :                 }
+<span class="lineNum">     128 </span><span class="lineCov">          2 :                 ctx-&gt;av1b_cfg_size = 0;</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">          6 :                 while ((obu = gf_list_enum(ctx-&gt;av1c-&gt;obu_array, &amp;i))) {</span>
+<span class="lineNum">     131 </span>            :                         //we don't output sequence header since it shall be present in sync sample
+<span class="lineNum">     132 </span>            :                         //this avoids creating duplicate of the seqeunce header in the output stream
+<span class="lineNum">     133 </span><span class="lineCov">          2 :                         if (obu-&gt;obu_type==OBU_SEQUENCE_HEADER) {</span>
+<span class="lineNum">     134 </span><span class="lineCov">          2 :                                 i--;</span>
+<span class="lineNum">     135 </span><span class="lineCov">          2 :                                 gf_list_rem(ctx-&gt;av1c-&gt;obu_array, i);</span>
+<span class="lineNum">     136 </span><span class="lineCov">          2 :                                 gf_free(obu-&gt;obu);</span>
+<span class="lineNum">     137 </span><span class="lineCov">          2 :                                 gf_free(obu);</span>
+<span class="lineNum">     138 </span><span class="lineCov">          2 :                                 continue;</span>
+<span class="lineNum">     139 </span>            :                         }
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :                         ctx-&gt;av1b_cfg_size += (u32) obu-&gt;obu_length;</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :                         ctx-&gt;av1b_cfg_size += gf_av1_leb128_size(obu-&gt;obu_length);</span>
+<span class="lineNum">     142 </span>            :                 }
+<span class="lineNum">     143 </span>            :         }
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          4 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_WIDTH);</span>
+<span class="lineNum">     147 </span><span class="lineCov">          4 :         if (p) ctx-&gt;w = p-&gt;value.uint;</span>
+<span class="lineNum">     148 </span><span class="lineCov">          4 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_HEIGHT);</span>
+<span class="lineNum">     149 </span><span class="lineCov">          4 :         if (p) ctx-&gt;h = p-&gt;value.uint;</span>
+<span class="lineNum">     150 </span><span class="lineCov">          4 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_FPS);</span>
+<span class="lineNum">     151 </span><span class="lineCov">          4 :         if (p) ctx-&gt;fps = p-&gt;value.frac;</span>
+<span class="lineNum">     152 </span><span class="lineCov">          4 :         if (!ctx-&gt;fps.num || !ctx-&gt;fps.den) {</span>
+<span class="lineNum">     153 </span><span class="lineCov">          1 :                 ctx-&gt;fps.num = 25;</span>
+<span class="lineNum">     154 </span><span class="lineCov">          1 :                 ctx-&gt;fps.den = 1;</span>
+<span class="lineNum">     155 </span>            :         }
+<span class="lineNum">     156 </span><span class="lineCov">          4 :         gf_filter_pid_set_property_str(ctx-&gt;opid, &quot;obu:mode&quot;, &amp;PROP_UINT(ctx-&gt;mode) );</span>
+<span class="lineNum">     157 </span><span class="lineCov">          4 :         gf_filter_pid_set_framing_mode(ctx-&gt;ipid, GF_TRUE);</span>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineCov">          4 :         return GF_OK;</span>
+<span class="lineNum">     160 </span>            : }
+<a name="161"><span class="lineNum">     161 </span>            : </a>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span><span class="lineCov">        524 : GF_Err obumx_process(GF_Filter *filter)</span>
+<span class="lineNum">     164 </span>            : {
+<span class="lineNum">     165 </span>            :         u32 i;
+<span class="lineNum">     166 </span>            :         u32 frame_sizes[128], max_frames;
+<span class="lineNum">     167 </span><span class="lineCov">        524 :         GF_OBUMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     168 </span>            :         GF_FilterPacket *pck, *dst_pck;
+<span class="lineNum">     169 </span>            :         u8 *data, *output;
+<span class="lineNum">     170 </span>            :         u32 pck_size, size, sap_type, hdr_size, av1b_frame_size=0;
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">        524 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     174 </span><span class="lineCov">        524 :         if (!pck) {</span>
+<span class="lineNum">     175 </span><span class="lineCov">          4 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     176 </span><span class="lineCov">          4 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     177 </span><span class="lineCov">          4 :                         return GF_EOS;</span>
+<span class="lineNum">     178 </span>            :                 }
+<span class="lineNum">     179 </span>            :                 return GF_OK;
+<span class="lineNum">     180 </span>            :         }
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span><span class="lineCov">        520 :         data = (char *) gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     183 </span>            :         hdr_size = 0;
+<span class="lineNum">     184 </span><span class="lineCov">        520 :         size = pck_size;</span>
+<span class="lineNum">     185 </span>            :         //always add temporal delim
+<span class="lineNum">     186 </span><span class="lineCov">        520 :         if (ctx-&gt;codec_id==GF_CODECID_AV1)</span>
+<span class="lineNum">     187 </span><span class="lineCov">        520 :                 size += 2;</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">        520 :         sap_type = gf_filter_pck_get_sap(pck);</span>
+<span class="lineNum">     190 </span><span class="lineCov">        520 :         if (!sap_type) {</span>
+<span class="lineNum">     191 </span><span class="lineCov">        516 :                 u8 flags = gf_filter_pck_get_dependency_flags(pck);</span>
+<span class="lineNum">     192 </span><span class="lineCov">        516 :                 if (flags) {</span>
+<span class="lineNum">     193 </span>            :                         //get dependsOn
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                         flags&gt;&gt;=4;</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :                         flags &amp;= 0x3;</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :                         if (flags==2) sap_type = 3; //could be 1, 2 or 3</span>
+<span class="lineNum">     197 </span>            :                 }
+<span class="lineNum">     198 </span>            :         }
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            :         memset(frame_sizes, 0, sizeof(u32)*128);
+<span class="lineNum">     201 </span><span class="lineCov">        520 :         if (ctx-&gt;mode==2) {</span>
+<span class="lineNum">     202 </span><span class="lineCov">        173 :                 if (ctx-&gt;ivf_hdr) hdr_size += 32;</span>
+<span class="lineNum">     203 </span><span class="lineCov">        173 :                 hdr_size += 12;</span>
+<span class="lineNum">     204 </span>            :         }
+<span class="lineNum">     205 </span><span class="lineCov">        520 :         if (ctx-&gt;mode==1) {</span>
+<span class="lineNum">     206 </span>            :                 u32 obu_sizes=0;
+<span class="lineNum">     207 </span>            :                 u32 frame_idx=0;
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span><span class="lineCov">        174 :                 obu_sizes = frame_sizes[0] = 3;</span>
+<span class="lineNum">     210 </span><span class="lineCov">        174 :                 if (sap_type &amp;&amp; ctx-&gt;av1b_cfg_size) {</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :                         frame_sizes[0] += ctx-&gt;av1b_cfg_size;</span>
+<span class="lineNum">     212 </span>            :                         obu_sizes += ctx-&gt;av1b_cfg_size;
+<span class="lineNum">     213 </span>            :                 }
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineCov">        174 :                 if (!ctx-&gt;bs_r) ctx-&gt;bs_r = gf_bs_new(data, pck_size, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     216 </span><span class="lineCov">        172 :                 else gf_bs_reassign_buffer(ctx-&gt;bs_r, data, pck_size);</span>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineCov">        367 :                 while (gf_bs_available(ctx-&gt;bs_r)) {</span>
+<span class="lineNum">     219 </span>            :                         ObuType obu_type;
+<span class="lineNum">     220 </span>            :                         u32 obu_size;
+<span class="lineNum">     221 </span>            :                         Bool obu_extension_flag, obu_has_size_field;
+<span class="lineNum">     222 </span>            :                         u8 temporal_id, spatial_id;
+<span class="lineNum">     223 </span><span class="lineCov">        193 :                         u32 obu_hdr_size = (u32) gf_bs_get_position(ctx-&gt;bs_r);</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineCov">        193 :                         gf_av1_parse_obu_header(ctx-&gt;bs_r, &amp;obu_type, &amp;obu_extension_flag, &amp;obu_has_size_field, &amp;temporal_id, &amp;spatial_id);</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">        193 :                         if (!obu_has_size_field) {</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODING, (&quot;[OBUWrite] OBU without size field, bug in demux filter !!\n&quot;));</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :                                 return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     230 </span>            :                         }
+<span class="lineNum">     231 </span><span class="lineCov">        193 :                         obu_size = (u32)gf_av1_leb128_read(ctx-&gt;bs_r, NULL);</span>
+<span class="lineNum">     232 </span><span class="lineCov">        193 :                         obu_hdr_size = (u32) gf_bs_get_position(ctx-&gt;bs_r) - obu_hdr_size;</span>
+<span class="lineNum">     233 </span><span class="lineCov">        193 :                         gf_bs_skip_bytes(ctx-&gt;bs_r, obu_size);</span>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">        193 :                         obu_size += obu_hdr_size;</span>
+<span class="lineNum">     236 </span><span class="lineCov">        193 :                         obu_sizes += obu_size + gf_av1_leb128_size(obu_size);</span>
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineCov">        193 :                         if (obu_type==OBU_FRAME) {</span>
+<span class="lineNum">     239 </span><span class="lineCov">        191 :                                 frame_idx++;</span>
+<span class="lineNum">     240 </span><span class="lineCov">        191 :                                 if (frame_idx==128) {</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODING, (&quot;[OBUWrite] more than 128 frames in a temporal unit not supported\n&quot;));</span>
+<span class="lineNum">     242 </span>            :                                         return GF_NOT_SUPPORTED;
+<span class="lineNum">     243 </span>            :                                 }
+<span class="lineNum">     244 </span><span class="lineCov">        191 :                                 if (frame_idx&gt;1)</span>
+<span class="lineNum">     245 </span><span class="lineCov">         17 :                                         frame_sizes[frame_idx-1] = 0;</span>
+<span class="lineNum">     246 </span>            :                         }
+<span class="lineNum">     247 </span><span class="lineCov">        193 :                         frame_sizes[frame_idx ? (frame_idx-1) : 0] += obu_size + gf_av1_leb128_size(obu_size);</span>
+<span class="lineNum">     248 </span>            :                 }
+<span class="lineNum">     249 </span>            :                 max_frames = frame_idx;
+<span class="lineNum">     250 </span>            :                 size = obu_sizes;
+<span class="lineNum">     251 </span>            :                 //packet without frame
+<span class="lineNum">     252 </span><span class="lineCov">        174 :                 if (!max_frames) {</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :                         size += gf_av1_leb128_size(frame_sizes[0]);</span>
+<span class="lineNum">     254 </span>            :                 } else {
+<span class="lineNum">     255 </span><span class="lineCov">        365 :                         for (i=0;i&lt;max_frames; i++) {</span>
+<span class="lineNum">     256 </span><span class="lineCov">        191 :                                 size += gf_av1_leb128_size(frame_sizes[i]);</span>
+<span class="lineNum">     257 </span>            :                         }
+<span class="lineNum">     258 </span>            :                 }
+<span class="lineNum">     259 </span>            :                 av1b_frame_size = size;
+<span class="lineNum">     260 </span><span class="lineCov">        174 :                 size += gf_av1_leb128_size(size);</span>
+<span class="lineNum">     261 </span>            :         } else {
+<span class="lineNum">     262 </span><span class="lineCov">        346 :                 if (sap_type &amp;&amp; ctx-&gt;av1b_cfg_size) size += ctx-&gt;av1b_cfg_size;</span>
+<span class="lineNum">     263 </span>            :         }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineCov">        520 :         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, hdr_size+size, &amp;output);</span>
+<span class="lineNum">     266 </span><span class="lineCov">        520 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     267 </span>            :         
+<span class="lineNum">     268 </span><span class="lineCov">        520 :         gf_filter_pck_merge_properties(pck, dst_pck);</span>
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span><span class="lineCov">        520 :         if (!ctx-&gt;bs_w) ctx-&gt;bs_w = gf_bs_new(output, hdr_size+size, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     271 </span><span class="lineCov">        516 :         else gf_bs_reassign_buffer(ctx-&gt;bs_w, output, hdr_size+size);</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineCov">        520 :         if (ctx-&gt;mode==1) {</span>
+<span class="lineNum">     274 </span>            :                 u32 frame_idx = 0;
+<span class="lineNum">     275 </span>            :                 //temporal unit
+<span class="lineNum">     276 </span><span class="lineCov">        174 :                 gf_av1_leb128_write(ctx-&gt;bs_w, av1b_frame_size);</span>
+<span class="lineNum">     277 </span>            :                 assert(frame_sizes[0]);
+<span class="lineNum">     278 </span><span class="lineCov">        174 :                 gf_av1_leb128_write(ctx-&gt;bs_w, frame_sizes[0]);</span>
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            :                 //write temporal delim with obu size set
+<span class="lineNum">     281 </span><span class="lineCov">        174 :                 gf_av1_leb128_write(ctx-&gt;bs_w, 2);</span>
+<span class="lineNum">     282 </span><span class="lineCov">        174 :                 gf_bs_write_u8(ctx-&gt;bs_w, 0x12);</span>
+<span class="lineNum">     283 </span><span class="lineCov">        174 :                 gf_bs_write_u8(ctx-&gt;bs_w, 0);</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">        174 :                 if (sap_type &amp;&amp; ctx-&gt;av1b_cfg_size) {</span>
+<span class="lineNum">     286 </span>            :                         GF_AV1_OBUArrayEntry *obu;
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :                         i=0;</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :                         while ((obu = gf_list_enum(ctx-&gt;av1c-&gt;obu_array, &amp;i))) {</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :                                 gf_av1_leb128_write(ctx-&gt;bs_w, obu-&gt;obu_length);</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :                                 gf_bs_write_data(ctx-&gt;bs_w, obu-&gt;obu, (u32) obu-&gt;obu_length);</span>
+<span class="lineNum">     291 </span>            :                         }
+<span class="lineNum">     292 </span>            :                 }
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span><span class="lineCov">        174 :                 gf_bs_reassign_buffer(ctx-&gt;bs_r, data, pck_size);</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineCov">        541 :                 while (gf_bs_available(ctx-&gt;bs_r)) {</span>
+<span class="lineNum">     297 </span>            :                         ObuType obu_type;
+<span class="lineNum">     298 </span>            :                         u32 obu_size;
+<span class="lineNum">     299 </span>            :                         Bool obu_extension_flag, obu_has_size_field;
+<span class="lineNum">     300 </span>            :                         u8 temporal_id, spatial_id;
+<span class="lineNum">     301 </span><span class="lineCov">        193 :                         u32 obu_hdr_size, start = (u32) gf_bs_get_position(ctx-&gt;bs_r);</span>
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span><span class="lineCov">        193 :                         gf_av1_parse_obu_header(ctx-&gt;bs_r, &amp;obu_type, &amp;obu_extension_flag, &amp;obu_has_size_field, &amp;temporal_id, &amp;spatial_id);</span>
+<span class="lineNum">     304 </span><span class="lineCov">        193 :                         obu_size = (u32)gf_av1_leb128_read(ctx-&gt;bs_r, NULL);</span>
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span><span class="lineCov">        193 :                         obu_hdr_size = (u32) gf_bs_get_position(ctx-&gt;bs_r) - start;</span>
+<span class="lineNum">     307 </span><span class="lineCov">        193 :                         gf_bs_skip_bytes(ctx-&gt;bs_r, obu_size);</span>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineCov">        193 :                         if (obu_type==OBU_FRAME) {</span>
+<span class="lineNum">     310 </span><span class="lineCov">        191 :                                 frame_idx++;</span>
+<span class="lineNum">     311 </span><span class="lineCov">        191 :                                 if (frame_idx&gt;1) {</span>
+<span class="lineNum">     312 </span><span class="lineCov">         17 :                                         gf_av1_leb128_write(ctx-&gt;bs_w, frame_sizes[frame_idx-1] );</span>
+<span class="lineNum">     313 </span>            :                                 }
+<span class="lineNum">     314 </span>            :                         }
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span><span class="lineCov">        193 :                         obu_size += obu_hdr_size;</span>
+<span class="lineNum">     317 </span><span class="lineCov">        193 :                         gf_av1_leb128_write(ctx-&gt;bs_w, obu_size);</span>
+<span class="lineNum">     318 </span><span class="lineCov">        193 :                         gf_bs_write_data(ctx-&gt;bs_w, data+start, obu_size);</span>
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span>            :                 }
+<span class="lineNum">     321 </span>            :                 assert(gf_bs_get_position(ctx-&gt;bs_w) == size);
+<span class="lineNum">     322 </span>            :         } else {
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span>            :                 //write IVF headers
+<span class="lineNum">     325 </span><span class="lineCov">        346 :                 if (ctx-&gt;ivf_hdr) {</span>
+<span class="lineNum">     326 </span><span class="lineCov">          1 :                         gf_bs_write_u32(ctx-&gt;bs_w, GF_4CC('D', 'K', 'I', 'F'));</span>
+<span class="lineNum">     327 </span><span class="lineCov">          1 :                         gf_bs_write_u16_le(ctx-&gt;bs_w, 0);</span>
+<span class="lineNum">     328 </span><span class="lineCov">          1 :                         gf_bs_write_u16_le(ctx-&gt;bs_w, 32);</span>
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineCov">          1 :                         gf_bs_write_u32(ctx-&gt;bs_w, GF_4CC('A', 'V', '0', '1') ); //codec_fourcc</span>
+<span class="lineNum">     331 </span><span class="lineCov">          1 :                         gf_bs_write_u16_le(ctx-&gt;bs_w, ctx-&gt;w);</span>
+<span class="lineNum">     332 </span><span class="lineCov">          1 :                         gf_bs_write_u16_le(ctx-&gt;bs_w, ctx-&gt;h);</span>
+<span class="lineNum">     333 </span><span class="lineCov">          1 :                         gf_bs_write_u32_le(ctx-&gt;bs_w, ctx-&gt;fps.num);</span>
+<span class="lineNum">     334 </span><span class="lineCov">          1 :                         gf_bs_write_u32_le(ctx-&gt;bs_w, ctx-&gt;fps.den);</span>
+<span class="lineNum">     335 </span><span class="lineCov">          1 :                         gf_bs_write_u32_le(ctx-&gt;bs_w, 0); //nb frames</span>
+<span class="lineNum">     336 </span><span class="lineCov">          1 :                         gf_bs_write_u32_le(ctx-&gt;bs_w, 0);</span>
+<span class="lineNum">     337 </span><span class="lineCov">          1 :                         ctx-&gt;ivf_hdr = 0;</span>
+<span class="lineNum">     338 </span>            :                 }
+<span class="lineNum">     339 </span><span class="lineCov">        346 :                 if (ctx-&gt;mode==2) {</span>
+<span class="lineNum">     340 </span><span class="lineCov">        173 :                         u64 cts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     341 </span><span class="lineCov">        173 :                         cts *= ctx-&gt;fps.den;</span>
+<span class="lineNum">     342 </span><span class="lineCov">        173 :                         cts /= ctx-&gt;fps.num;</span>
+<span class="lineNum">     343 </span><span class="lineCov">        173 :                         cts /= gf_filter_pck_get_timescale(pck);</span>
+<span class="lineNum">     344 </span><span class="lineCov">        173 :                         gf_bs_write_u32_le(ctx-&gt;bs_w, size);</span>
+<span class="lineNum">     345 </span><span class="lineCov">        173 :                         gf_bs_write_u64(ctx-&gt;bs_w, cts);</span>
+<span class="lineNum">     346 </span>            :                 }
+<span class="lineNum">     347 </span><span class="lineCov">        346 :                 if (ctx-&gt;codec_id==GF_CODECID_AV1) {</span>
+<span class="lineNum">     348 </span>            :                         //write temporal delim with obu size set
+<span class="lineNum">     349 </span><span class="lineCov">        346 :                         gf_bs_write_u8(ctx-&gt;bs_w, 0x12);</span>
+<span class="lineNum">     350 </span><span class="lineCov">        346 :                         gf_bs_write_u8(ctx-&gt;bs_w, 0);</span>
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span><span class="lineCov">        346 :                         if (sap_type &amp;&amp; ctx-&gt;av1b_cfg_size) {</span>
+<span class="lineNum">     353 </span>            :                                 GF_AV1_OBUArrayEntry *obu;
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                                 i=0;</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :                                 while ((obu = gf_list_enum(ctx-&gt;av1c-&gt;obu_array, &amp;i))) {</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                                         gf_av1_leb128_write(ctx-&gt;bs_w, obu-&gt;obu_length);</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                                         gf_bs_write_data(ctx-&gt;bs_w, obu-&gt;obu, (u32) obu-&gt;obu_length);</span>
+<span class="lineNum">     358 </span>            :                                 }
+<span class="lineNum">     359 </span>            :                         }
+<span class="lineNum">     360 </span>            :                 }
+<span class="lineNum">     361 </span><span class="lineCov">        346 :                 gf_bs_write_data(ctx-&gt;bs_w, data, pck_size);</span>
+<span class="lineNum">     362 </span>            :         }
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineCov">        520 :         if (!ctx-&gt;rcfg) {</span>
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :                 ctx-&gt;av1b_cfg_size = 0;</span>
+<span class="lineNum">     366 </span>            :         }
+<span class="lineNum">     367 </span><span class="lineCov">        520 :         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     368 </span><span class="lineCov">        520 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     369 </span>            : 
+<a name="370"><span class="lineNum">     370 </span><span class="lineCov">        520 :         return GF_OK;</span></a>
+<span class="lineNum">     371 </span>            : }
+<span class="lineNum">     372 </span><span class="lineCov">          4 : static void obumx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     373 </span>            : {
+<span class="lineNum">     374 </span><span class="lineCov">          4 :         GF_OBUMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     375 </span><span class="lineCov">          4 :         if (ctx-&gt;bs_r) gf_bs_del(ctx-&gt;bs_r);</span>
+<span class="lineNum">     376 </span><span class="lineCov">          4 :         if (ctx-&gt;bs_w) gf_bs_del(ctx-&gt;bs_w);</span>
+<span class="lineNum">     377 </span><span class="lineCov">          4 :         if (ctx-&gt;av1c) gf_odf_av1_cfg_del(ctx-&gt;av1c);</span>
+<span class="lineNum">     378 </span><span class="lineCov">          4 : }</span>
+<span class="lineNum">     379 </span>            : 
+<span class="lineNum">     380 </span>            : static const GF_FilterCapability OBUMxCaps[] =
+<span class="lineNum">     381 </span>            : {
+<span class="lineNum">     382 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     383 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_AV1),
+<span class="lineNum">     384 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_VP8),
+<span class="lineNum">     385 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_VP9),
+<span class="lineNum">     386 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_VP10),
+<span class="lineNum">     387 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     388 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     389 </span>            : };
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : #define OFFS(_n)        #_n, offsetof(GF_OBUMxCtx, _n)
+<span class="lineNum">     394 </span>            : static const GF_FilterArgs OBUMxArgs[] =
+<span class="lineNum">     395 </span>            : {
+<span class="lineNum">     396 </span>            :         { OFFS(rcfg), &quot;force repeating decoder config at each I-frame&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, 0},
+<span class="lineNum">     397 </span>            :         {0}
+<span class="lineNum">     398 </span>            : };
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            : GF_FilterRegister OBUMxRegister = {
+<span class="lineNum">     402 </span>            :         .name = &quot;ufobu&quot;,
+<span class="lineNum">     403 </span>            :         GF_FS_SET_DESCRIPTION(&quot;IVF/OBU/annexB writer&quot;)
+<span class="lineNum">     404 </span>            :         GF_FS_SET_HELP(&quot;This filter is used to rewrite AV1 OBU bitstream into IVF, annex B or OBU sequence, reinserting the temporal delimiter OBU.&quot;)
+<span class="lineNum">     405 </span>            :         .private_size = sizeof(GF_OBUMxCtx),
+<span class="lineNum">     406 </span>            :         .args = OBUMxArgs,
+<span class="lineNum">     407 </span>            :         SETCAPS(OBUMxCaps),
+<span class="lineNum">     408 </span>            :         .finalize = obumx_finalize,
+<span class="lineNum">     409 </span>            :         .configure_pid = obumx_configure_pid,
+<span class="lineNum">     410 </span>            :         .process = obumx_process
+<span class="lineNum">     411 </span>            : };
+<a name="412"><span class="lineNum">     412 </span>            : </a>
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span><span class="lineCov">       2877 : const GF_FilterRegister *obumx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     415 </span>            : {
+<span class="lineNum">     416 </span><span class="lineCov">       2877 :         return &amp;OBUMxRegister;</span>
+<span class="lineNum">     417 </span>            : }
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span>            : #else
+<span class="lineNum">     420 </span>            : const GF_FilterRegister *obumx_register(GF_FilterSession *session)
+<span class="lineNum">     421 </span>            : {
+<span class="lineNum">     422 </span>            :         return NULL;
+<span class="lineNum">     423 </span>            : }
+<span class="lineNum">     424 </span>            : #endif // GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     425 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

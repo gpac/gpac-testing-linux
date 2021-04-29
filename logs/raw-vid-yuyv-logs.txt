@@ -1,0 +1,30 @@
+*** raw-vid-yuyv logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:44 ***
+
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/vid.mp4 -o ./results/temp/raw.yuyv -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+Computing ./results/temp/raw.yuyv  (dump) hash: 
+File hash (SHA-1): 0AF724A192D98DA80B72C2A62BBAE5A782E58A37
+Hash OK for ./results/temp/raw.yuyv
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuyv:size=128x128 inspect:fmt=@pn@-@cts@-@bo@@lf@:log=./results/temp/dump.txt" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): CACED967F1CA9A2F4162A2260FAB97F850AE91D1
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "gpu_dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuyv:size=128x128 vout:dumpframes=20:out=./results/temp/gpudump.rgb" ***
+Type 'h' in window for command list
+
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuyv:size=128x128 vcrop:wnd=32x10x64x64 @ -o ./results/temp/dumpcrop.yuyv" ***
+
+Computing ./results/temp/dumpcrop.yuyv  (crop) hash: 
+File hash (SHA-1): 26C2DAAA74934F93DCC65E1D65506DFE8F65BB1A
+Hash OK for ./results/temp/dumpcrop.yuyv
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuyv:size=128x128 vcrop:copy:wnd=32x10x64x64 @ -o ./results/temp/dumpcropcp.yuyv" ***
+
+Computing ./results/temp/dumpcropcp.yuyv  (crop) hash: 
+File hash (SHA-1): 26C2DAAA74934F93DCC65E1D65506DFE8F65BB1A
+Hash OK for ./results/temp/dumpcropcp.yuyv

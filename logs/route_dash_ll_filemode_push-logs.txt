@@ -1,0 +1,573 @@
+*** route_dash_ll_filemode_push logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:44:51 ***
+
+
+*** Subtest "receive": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i route://225.1.1.0:6000 dashin:forward=file @ -o http://127.0.0.1:8080/live.mpd --hmode=push -runfor=6000 -req-timeout=2000 -logs=route:dash@info" ***
+[ROUTE] Setting up service 1 destination IP 225.1.1.0 port 6000
+[ROUTE] Service 1 got TSI 0 config package:
+Content-Type: multipart/related; type="application/dash+xml"; boundary="_GPAC_BOUNDARY_ROUTE_.67706163_"
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/dash+xml
+Content-Location: out.mpd
+
+<?xml version="1.0" encoding="utf-8"?>
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:mpeg:dash:schema:mpd:2011"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
+	profiles="urn:mpeg:dash:profile:isoff-live:2011"
+	type="dynamic"
+	minimumUpdatePeriod="PT500S"
+	suggestedPresentationDelay="PT2S"
+	availabilityStartTime="2021-04-29T05:00:03Z"
+	publishTime="2021-04-29T23:44:49Z"
+	timeShiftBufferDepth="PT6.0S"
+	minBufferTime="PT2.0S">
+	<ProgramInformation>
+	</ProgramInformation>
+	<Period start="PT0.0S">
+		<AdaptationSet contentType="video" segmentAlignment="true" bitstreamSwitching="true" frameRate="30000/1001">
+			<Representation id="0" mimeType="video/mp4" codecs="avc1.64001f" bandwidth="2000000" width="1280" height="720" frameRate="30000/1001">
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.969" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+		<AdaptationSet contentType="audio" segmentAlignment="true" bitstreamSwitching="true">
+			<Representation id="1" mimeType="audio/mp4" codecs="mp4a.40.2" bandwidth="96000" audioSamplingRate="48000">
+				<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2" />
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.981" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+	</Period>
+</MPD>
+
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/route-s-tsid+xml
+Content-Location: stsid.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<S-TSID xmlns="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/S-TSID/1.0/" xmlns:afdt="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/ATSC-FDT/1.0/" xmlns:fdt="urn:ietf:params:xml:ns:fdt">
+ <RS dIpAddr="225.1.1.0" dPort="6000" sIpAddr="225.1.1.0">
+  <LS tsi="10" bw="2200">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_0-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="4566">
+      <fdt:File Content-Location="1619672403/init-stream0.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="0" contentType="video"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+  <LS tsi="20" bw="105">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_1-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="5098">
+      <fdt:File Content-Location="1619672403/init-stream1.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="1" contentType="audio"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+ </RS>
+</S-TSID>
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_--
+
+[ROUTE] Service 1 received MPD file out.mpd
+[ROUTE] Service 1 object TSI 20 TOI 33711 started without total-length assigned !
+[ROUTE] Service 1 object TSI 10 TOI 33711 started without total-length assigned !
+[DASHDmx] Creating manifest output PID
+[DASHDmx] Manifest out.mpd updated, forwarding
+[DASH] Detected ROUTE DASH service ID 1
+[DASH] Setting up period start 0 duration 0 xlink none ID none
+[DASH] AS#1 changed quality to bitrate 2000 kbps - Width 1280 Height 720 FPS 30000/1001 (playback speed 1)
+[DASH] AS#2 changed quality to bitrate 96 kbps - sample rate 48000 (playback speed 1)
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[ROUTE] Service 1 object TSI 10 TOI 33711 was started without total-length assigned, assigning to 509771
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[ROUTE] Service 1 object TSI 20 TOI 33711 was started without total-length assigned, assigning to 37485
+[DASH] Waiting for ROUTE clock ...
+[DASH] Waiting for ROUTE clock ...
+[ROUTE] Pushing file 1619672403/chunk-stream_t_0-33711.m4s to cache
+[ROUTE] Service 1 got file 1619672403/init-stream0.m4s (TSI 10 TOI 4294967295) size 829 in 0 ms
+[ROUTE] Pushing file 1619672403/init-stream0.m4s to cache
+[ROUTE] Service 1 object TSI 10 TOI 33712 started without total-length assigned !
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[DASH] Estimated UTC diff of ROUTE broadcast 2216 ms (UTC fetch 1619739894638 - server UTC 1619739892422 - MPD AST 1619672403000 - MPD PublishTime 1619739889000 - bootstraping on segment 1619672403/chunk-stream_t_0-33711.m4s
+[DASH] AST at init 1619672405216
+[DASH] At current time 67489422 ms: Initializing Timeline: startNumber=1 segmentNumber=33710 segmentDuration=2.002000 - 1.969 seconds in segment (start range 67489.4)
+[DASH] ROUTE clock already setup - UTC diff of ROUTE broadcast 2216 ms
+[DASH] AST at init 1619672405216
+[DASH] At current time 67489422 ms: Initializing Timeline: startNumber=1 segmentNumber=33710 segmentDuration=2.002000 - 1.981 seconds in segment (start range 67489.4)
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream1.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[Downloader] failed to create session for http://groute/service1/1619672403/init-stream1.m4s: Requested URL is not valid or cannot be found
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing file 1619672403/chunk-stream_t_1-33711.m4s to cache
+[ROUTE] Service 1 got file 1619672403/init-stream1.m4s (TSI 20 TOI 4294967295) size 770 in 1 ms
+[ROUTE] Pushing file 1619672403/init-stream1.m4s to cache
+[ROUTE] Service 1 object TSI 20 TOI 33712 started without total-length assigned !
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[DASHDmx] setting up group 0 from http://groute/service1/1619672403/init-stream0.m4s
+[DASHDmx] setting up group 1 from http://groute/service1/1619672403/init-stream1.m4s
+[DASH] Set #1 At 3435 Next segment 33711 (AST 1619739892669 - sec in period 67489.4) should now be available on server since 2169 ms - requesting it
+[DASH] Queing next segment: chunk-stream_t_0-33711.m4s
+[DASH] Set #2 At 3435 Next segment 33711 (AST 1619739892657 - sec in period 67489.4) should now be available on server since 2181 ms - requesting it
+[DASH] Queing next segment: chunk-stream_t_1-33711.m4s
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[DASH] AS#2 got chunk-stream_t_1-33711.m4s stats: 37485 bytes in 0.000648 sec at 129 kbps - dur 2.002 sec - bitrate: 149 (avg 96) kbps - buffer 4004 ms
+[DASH] Set #2 At 3753 Next segment 33712 (AST 1619739894659 - sec in period 67491.4) should now be available on server since 497 ms - requesting it
+[DASH] Queing next segment: chunk-stream_t_1-33712.m4s
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[DASH] AS#1 got chunk-stream_t_0-33711.m4s stats: 509771 bytes in 0.248 sec at 1890 kbps - dur 2.002 sec - bitrate: 2037 (avg 2000) kbps - buffer 2002 ms
+[HTTPOut] Error closing output /1619672403/chunk-stream_t_0-33711.m4s: Network Timeout
+[DASH] Set #1 At 5508 Next segment 33712 (AST 1619739894671 - sec in period 67491.4) should now be available on server since 2240 ms - requesting it
+[DASH] Queing next segment: chunk-stream_t_0-33712.m4s
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Pushing fragment from file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[ROUTE] Service 1 object TSI 10 TOI 33713 started without total-length assigned !
+[ROUTE] Service 1 object TSI 10 TOI 33712 not completely received but in-order delivery signaled and new TOI 33713 - forcing dispatch
+[ROUTE] Service 1 : object TSI 10 TOI 33712 partial received only
+[ROUTE] Pushing file 1619672403/chunk-stream_t_0-33712.m4s to cache
+[DASH] AS#1 got chunk-stream_t_0-33712.m4s stats: 390177 bytes in 0.00453 sec at 0 kbps - dur 2.002 sec - bitrate: 1559 (avg 2000) kbps - buffer 2002 ms
+[HTTPOut] Error closing output /1619672403/chunk-stream_t_0-33712.m4s: Network Timeout
+[ROUTE] Service 1 object TSI 20 TOI 33713 started without total-length assigned !
+[ROUTE] Service 1 object TSI 20 TOI 33712 not completely received but in-order delivery signaled and new TOI 33713 - forcing dispatch
+[ROUTE] Service 1 : object TSI 20 TOI 33712 partial received only
+[ROUTE] Pushing file 1619672403/chunk-stream_t_1-33712.m4s to cache
+[HTTPOut] Error closing output /1619672403/chunk-stream_t_1-33712.m4s: Network Timeout
+
+
+*** Subtest "send": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i https://akamaibroadcasteruseast.akamaized.net/cmaf/live/657078/akasource/out.mpd dashin:forward=file @ -o route://225.1.1.0:6000/:llmode:runfor=10000 -logs=route@info" ***
+[ROUTE] Updated Manifest+S-TSID bundle to:
+Content-Type: multipart/related; type="application/dash+xml"; boundary="_GPAC_BOUNDARY_ROUTE_.67706163_"
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/dash+xml
+Content-Location: out.mpd
+
+<?xml version="1.0" encoding="utf-8"?>
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:mpeg:dash:schema:mpd:2011"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"
+	profiles="urn:mpeg:dash:profile:isoff-live:2011"
+	type="dynamic"
+	minimumUpdatePeriod="PT500S"
+	suggestedPresentationDelay="PT2S"
+	availabilityStartTime="2021-04-29T05:00:03Z"
+	publishTime="2021-04-29T23:44:49Z"
+	timeShiftBufferDepth="PT6.0S"
+	minBufferTime="PT2.0S">
+	<ProgramInformation>
+	</ProgramInformation>
+	<Period start="PT0.0S">
+		<AdaptationSet contentType="video" segmentAlignment="true" bitstreamSwitching="true" frameRate="30000/1001">
+			<Representation id="0" mimeType="video/mp4" codecs="avc1.64001f" bandwidth="2000000" width="1280" height="720" frameRate="30000/1001">
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.969" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+		<AdaptationSet contentType="audio" segmentAlignment="true" bitstreamSwitching="true">
+			<Representation id="1" mimeType="audio/mp4" codecs="mp4a.40.2" bandwidth="96000" audioSamplingRate="48000">
+				<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2" />
+				<SegmentTemplate timescale="1000000" duration="2002000" availabilityTimeOffset="1.981" initialization="1619672403/init-stream$RepresentationID$.m4s" media="1619672403/chunk-stream_t_$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+	</Period>
+</MPD>
+
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_
+Content-Type: application/route-s-tsid+xml
+Content-Location: stsid.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<S-TSID xmlns="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/S-TSID/1.0/" xmlns:afdt="tag:atsc.org,2016:XMLSchemas/ATSC3/Delivery/ATSC-FDT/1.0/" xmlns:fdt="urn:ietf:params:xml:ns:fdt">
+ <RS dIpAddr="225.1.1.0" dPort="6000" sIpAddr="225.1.1.0">
+  <LS tsi="10" bw="2200">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_0-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="4566">
+      <fdt:File Content-Location="1619672403/init-stream0.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="0" contentType="video"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+  <LS tsi="20" bw="105">
+   <SrcFlow rt="true">
+    <EFDT>
+     <FDT-Instance afdt:efdtVersion="0" afdt:fileTemplate="1619672403/chunk-stream_t_1-$TOI%05d$.m4s" Expires="4294967295" afdt:maxTransportSize="5098">
+      <fdt:File Content-Location="1619672403/init-stream1.m4s" TOI="4294967295"/>
+     </FDT-Instance>
+    </EFDT>
+    <ContentInfo>
+     <MediaInfo repId="1" contentType="audio"/>
+    </ContentInfo>
+    <Payload codePoint="128" formatId="1" frag="0" order="true"/>
+   </SrcFlow>
+  </LS>
+ </RS>
+</S-TSID>
+
+--_GPAC_BOUNDARY_ROUTE_.67706163_--
+
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+[ROUTE] Mux rate 152 kbps
+[ROUTE] Mux rate 2348 kbps
+[ROUTE] Pushed 1619672403/chunk-stream_t_0-33711.m4s (8 frags 509771 bytes) in 1850198 us - target push 2002000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_1-33711.m4s (4 frags 37485 bytes) in 2043027 us - target push 2002000 us
+[ROUTE] Segment 1619672403/chunk-stream_t_1-33711.m4s pushed too late by 41027 us
+[ROUTE] Segment 1619672403/chunk-stream_t_1-33711.m4s rate 149790 but stream rate 105600, updating bitrate
+[ROUTE] Mux rate 1942 kbps
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] Mux rate 2593 kbps
+[ROUTE] Pushed 1619672403/chunk-stream_t_0-33712.m4s (6 frags 508293 bytes) in 1678322 us - target push 2002000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_1-33712.m4s (5 frags 37123 bytes) in 1557069 us - target push 2002000 us
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+[ROUTE] Mux rate 2026 kbps
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] Mux rate 2433 kbps
+[ROUTE] Pushed 1619672403/chunk-stream_t_1-33713.m4s (5 frags 36816 bytes) in 1695649 us - target push 2002000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_0-33713.m4s (6 frags 509027 bytes) in 1749612 us - target push 2002000 us
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] Mux rate 1781 kbps
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+[ROUTE] Mux rate 2686 kbps
+[ROUTE] Pushed 1619672403/chunk-stream_t_1-33714.m4s (5 frags 37297 bytes) in 1714284 us - target push 2002000 us
+[ROUTE] Pushed 1619672403/chunk-stream_t_0-33714.m4s (7 frags 509149 bytes) in 1708294 us - target push 2002000 us
+[ROUTE] Sending init segment 1619672403/init-stream1.m4s
+[ROUTE] Mux rate 1776 kbps
+[ROUTE] Sending init segment 1619672403/init-stream0.m4s
+
+
+*** Subtest "server": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 httpout:port=8080:rdirs=./results/temp:wdir=./results/temp:reqlog=PUT -runfor=8000 -req-timeout=10000" ***
+[HTTPOut] Server running on port 8080
+[HTTPOut] REQ#1 127.0.0.1 PUT live.mpd start chunk-transfer
+[HTTPOut] REQ#1 PUT done: reply 200 - 1852 bytes in 0 ms at 146.693 mbps
+[HTTPOut] REQ#2 127.0.0.1 PUT 1619672403/init-stream0.m4s start chunk-transfer
+[HTTPOut] REQ#2 PUT done: reply 201 - 829 bytes in 0 ms at 195.059 mbps
+[HTTPOut] REQ#3 127.0.0.1 PUT 1619672403/init-stream1.m4s start chunk-transfer
+[HTTPOut] REQ#3 PUT done: reply 201 - 770 bytes in 0 ms at 133.913 mbps
+[HTTPOut] REQ#4 127.0.0.1 PUT 1619672403/chunk-stream_t_0-33711.m4s start chunk-transfer
+[HTTPOut] REQ#5 127.0.0.1 PUT 1619672403/chunk-stream_t_1-33711.m4s start chunk-transfer
+[HTTPOut] REQ#5 PUT done: reply 201 - 37485 bytes in 196 ms at 1.52422 mbps
+[HTTPOut] REQ#6 127.0.0.1 PUT 1619672403/chunk-stream_t_1-33712.m4s start chunk-transfer
+[HTTPOut] REQ#7 127.0.0.1 PUT 1619672403/chunk-stream_t_0-33712.m4s start chunk-transfer
+

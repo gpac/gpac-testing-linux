@@ -1,0 +1,71 @@
+*** mp4box-io-LordOfTheFlies.qcp logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:00 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/LordOfTheFlies.qcp" ***
+Import probing results for ./external_media/import/LordOfTheFlies.qcp:
+File has 1 tracks
+- Track 1 type: Audio - Codec EVRC Voice
+	SampleRate 8000 - 1 channels
+
+For more details, use `gpac -i LordOfTheFlies.qcp inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/LordOfTheFlies.qcp.mp4  (add) hash: 
+File hash (SHA-1): AD916DC2F23615E8B9B33F873B55ED47FB73313E
+Hash OK for ./results/temp/LordOfTheFlies.qcp.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/LordOfTheFlies.qcp -new ./results/temp/LordOfTheFlies.qcp.mp4" ***
+Track Importing EVRC - SampleRate 8000 Num Channels 1
+
+Computing ./results/temp/LordOfTheFlies.qcp.1.tmp  (diso) hash: 
+File hash (SHA-1): 5C9331CE9E321A0600FA01F39EA2570F930CA2CA
+Hash OK for ./results/temp/LordOfTheFlies.qcp.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/LordOfTheFlies.qcp.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:05:03.680
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand 3g2a - version 65536 - compatible brands: isom 3g2a
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 8000
+Media Duration 00:05:03.680 
+Media Info: Language "Undetermined (und)" - Type "soun:sevc" - 15184 samples
+	3GPP EVRC stream - Sample Rate 8000 - 1 channel(s) 16 bps
+	RFC6381 Codec Parameters: sevc
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 160 / 8000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/LordOfTheFlies.qcp.mp4 -out ./results/temp/LordOfTheFlies.qcp.1.tmp" ***
+
+Computing ./results/temp/LordOfTheFlies.qcp.2.tmp  (dts) hash: 
+File hash (SHA-1): E4FC4E7AF2857540AE813A1042E59706926971B2
+Hash OK for ./results/temp/LordOfTheFlies.qcp.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/LordOfTheFlies.qcp.mp4 -out ./results/temp/LordOfTheFlies.qcp.2.tmp" ***
+
+Computing ./results/temp/LordOfTheFlies.qcp.mp4.hint  (hint) hash: 
+File hash (SHA-1): 81B97CA0D6AB36C8AD47B9D9EE4678B785A95572
+Hash OK for ./results/temp/LordOfTheFlies.qcp.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/LordOfTheFlies.qcp.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 9C2BADEA574135C4076646208336FBDBF3A5D663
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/LordOfTheFlies.qcp.mp4 -out ./results/temp/LordOfTheFlies.qcp.mp4.hint" ***
+Hinting track ID 1 - Type "sevc:sevc" (EVRC0) - BW 4 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/LordOfTheFlies.qcp.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/LordOfTheFlies.qcp.mp4.hint  (unhint) hash: 
+File hash (SHA-1): F58DC99A577F63C267E3A1350FF1AD55F1ADA140
+Hash OK for ./results/temp/LordOfTheFlies.qcp.mp4.hint

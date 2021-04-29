@@ -1,0 +1,46 @@
+*** decoder-aac-ffdec logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:28 ***
+
+
+*** Subtest "decoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4 -o ./results/temp/test.pcm -graph -stats -blacklist=faad" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1695059840
+
+Filter stats - 6 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 6 tasks 604 us process time
+		1 packets sent 5000 bytes sent (1655.63 pck/sec 66.2252 mbps)
+		* output PID in.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/test.pcm) : 1 input pids 0 output pids 20 tasks 268 us process time
+		18 packets processed 73728 bytes processed (67164.2 pck/sec 2200.84 mbps)
+		* input PID in.mp4: 18 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 9 tasks 827 us process time
+		2 packets processed 5000 bytes processed (2418.38 pck/sec 48.3676 mbps)
+		19 packets sent 4288 bytes sent (22974.6 pck/sec 41.48 mbps)
+		* input PID in.mp4: 2 packets received
+		* output PID in.mp4: 19 packets sent
+	Filter ffdec "ffdec:aac" : 1 input pids 1 output pids 6 tasks 2445 us process time
+		19 packets processed 4288 bytes processed (7770.96 pck/sec 14.0303 mbps)
+		18 packets sent 147456 bytes sent (7361.96 pck/sec 482.474 mbps)
+		* input PID in.mp4: 19 packets received
+		* output PID in.mp4: 18 packets sent
+	Filter writegen : 1 input pids 1 output pids 24 tasks 106 us process time
+		18 packets processed 73728 bytes processed (169811 pck/sec 5564.38 mbps)
+		18 packets sent 73728 bytes sent (169811 pck/sec 5564.38 mbps)
+		* input PID in.mp4: 18 packets received
+		* output PID in.mp4: 18 packets sent
+	Filter resample : 1 input pids 1 output pids 4 tasks 1046 us process time
+		18 packets processed 147456 bytes processed (17208.4 pck/sec 1127.77 mbps)
+		18 packets sent 73728 bytes sent (17208.4 pck/sec 563.885 mbps)
+		* input PID in.mp4: 18 packets received
+		* output PID in.mp4: 18 packets sent
+Session stats - threads 1
+	Thread 1: run_time 5343 us active_time 5327 us nb_tasks 74
+
+Total: run_time 5343 us active_time 5327 us nb_tasks 74
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x56036af45f70)
+-(PID in.mp4) mp4dmx (ptr=0x56036af581b0)
+--(PID in.mp4) ffdec "ffdec:aac" (ptr=0x56036af62670)
+---(PID in.mp4) resample (ptr=0x56036af841f0)
+----(PID in.mp4) writegen (ptr=0x56036af63810)
+-----(PID in.mp4) fout (dst=./results/temp/test.pcm) (ptr=0x56036af47060)
+

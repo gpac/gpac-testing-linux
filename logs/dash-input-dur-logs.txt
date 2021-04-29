@@ -1,0 +1,67 @@
+*** dash-input-dur logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:45 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264 -add ./external_media/counter/counter_30s_audio.aac -new ./results/temp/file.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+AVC|H264 Import results: 750 samples (840 NALUs) - Slices: 30 I 720 P 0 B - 1 SEI - 30 IDR
+AVC|H264 Max NALU size is 32815 - stream could be optimized by setting nal_length=2
+Track Importing AAC  - SampleRate 44100 Num Channels 1
+
+
+*** Subtest "dash-input-dur-dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -rap ./results/temp/file.mp4#video:dur=17 ./results/temp/file.mp4#audio:dur=17 -out ./results/temp/file.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 0.998458 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3 end 4
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.99692 end 3
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5 end 6
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.99537 end 4
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6 end 7
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 3.99383 end 5
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 8 end 9
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 4.99229 end 6
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 9 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 10 end 11
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 5.99075 end 7
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 11 end 12
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 6.98921 end 8
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 12 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 13 end 14
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 7.98766 end 9
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 14 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 15 end 16
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 8.98612 end 10
+[MP4Mux] Done writing segment 16 - estimated next fragment times start 16 end 17
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 9.98458 end 11
+[MP4Mux] Done writing segment 17 - estimated next fragment times start 17 end 18
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 10.983 end 12
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 11.9815 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 12.98 end 14
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 13.9784 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 14.9769 end 16
+[MP4Mux] Done writing segment 16 - estimated next fragment times start 15.9985 end 17
+[MP4Mux] Done writing segment 17 - estimated next fragment times start 16.997 end 18
+[MPD] Generating MPD at time 2021-04-29T23:31:46.149Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/file_dash_track2_init.mp4  (dash-input-dur-hash-init-segment-audio) hash: 
+File hash (SHA-1): 5658BFAE8F0677C5920ED37BC6280CFFDE899C43
+Hash OK for ./results/temp/file_dash_track2_init.mp4
+Computing ./results/temp/file_dash_track1_init.mp4  (dash-input-dur-hash-init-segment-video) hash: 
+File hash (SHA-1): 8B62042F6DB8E12AA3EB901788479B57AC327944
+Hash OK for ./results/temp/file_dash_track1_init.mp4
+Computing ./results/temp/file.mpd  (dash-input-dur-hash-mpd) hash: 
+File hash (SHA-1): A8706411AC21E5975A9BE9A3FADC4F676AF188C4
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 8362F50D1CB3FCACDA7378E80ED913D1BD0C18CF
+Hash fail, ref hash ./hash_refs/dash-input-dur-inspect.hash was 2FDD266C0CE4E3CC77F4C57673021F53AE8BFD1A
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+

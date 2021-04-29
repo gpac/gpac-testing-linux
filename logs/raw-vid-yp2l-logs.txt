@@ -1,0 +1,30 @@
+*** raw-vid-yp2l logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:40 ***
+
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/vid.mp4 -o ./results/temp/raw.yp2l -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+Computing ./results/temp/raw.yp2l  (dump) hash: 
+File hash (SHA-1): 05008E336661D99624468E9C92DA5C188FD4DFCE
+Hash OK for ./results/temp/raw.yp2l
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yp2l:size=128x128 inspect:fmt=@pn@-@cts@-@bo@@lf@:log=./results/temp/dump.txt" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): CCB0A5A54B8A9E53A1C506D781B4660A62474979
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "gpu_dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yp2l:size=128x128 vout:dumpframes=20:out=./results/temp/gpudump.rgb" ***
+Type 'h' in window for command list
+
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yp2l:size=128x128 vcrop:wnd=32x10x64x64 @ -o ./results/temp/dumpcrop.yp2l" ***
+
+Computing ./results/temp/dumpcrop.yp2l  (crop) hash: 
+File hash (SHA-1): B3455EC5D701DC48F8159FE89B7DFAC319334698
+Hash OK for ./results/temp/dumpcrop.yp2l
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yp2l:size=128x128 vcrop:copy:wnd=32x10x64x64 @ -o ./results/temp/dumpcropcp.yp2l" ***
+
+Computing ./results/temp/dumpcropcp.yp2l  (crop) hash: 
+File hash (SHA-1): B3455EC5D701DC48F8159FE89B7DFAC319334698
+Hash OK for ./results/temp/dumpcropcp.yp2l

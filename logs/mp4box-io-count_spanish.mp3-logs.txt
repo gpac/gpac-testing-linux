@@ -1,0 +1,71 @@
+*** mp4box-io-count_spanish.mp3 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:26 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/count_spanish.mp3" ***
+Import probing results for ./media/auxiliary_files/count_spanish.mp3:
+File has 1 tracks
+- Track 1 type: Audio - Codec MPEG-2 Audio
+	SampleRate 22050 - 2 channels
+
+For more details, use `gpac -i count_spanish.mp3 inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/count_spanish.mp3.mp4  (add) hash: 
+File hash (SHA-1): 5C68126C4CE788F40C1F125ACAD11E977D1D76CB
+Hash OK for ./results/temp/count_spanish.mp3.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_spanish.mp3 -new ./results/temp/count_spanish.mp3.mp4" ***
+Track Importing MP3 - SampleRate 22050 Num Channels 2
+
+Computing ./results/temp/count_spanish.mp3.1.tmp  (diso) hash: 
+File hash (SHA-1): F75EA9930167C5D815F029C9CA8F63F0D455C553
+Hash OK for ./results/temp/count_spanish.mp3.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/count_spanish.mp3.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.030
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 22050
+Media Duration 00:00:10.031 
+Media Info: Language "Undetermined (und)" - Type "soun:.mp3" - 384 samples
+	MPEG 1/2 Audio stream - Sample Rate 22050 - 2 channel(s) 16 bps
+	RFC6381 Codec Parameters: mp4a.6B
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 576 / 22050
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/count_spanish.mp3.mp4 -out ./results/temp/count_spanish.mp3.1.tmp" ***
+
+Computing ./results/temp/count_spanish.mp3.2.tmp  (dts) hash: 
+File hash (SHA-1): 0A742098D495D68CC9A078FAE2AE7CC0437539EA
+Hash OK for ./results/temp/count_spanish.mp3.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/count_spanish.mp3.mp4 -out ./results/temp/count_spanish.mp3.2.tmp" ***
+
+Computing ./results/temp/count_spanish.mp3.mp4.hint  (hint) hash: 
+File hash (SHA-1): 8645AB164B776AC6C861BF223BEC9D108A92707D
+Hash OK for ./results/temp/count_spanish.mp3.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/count_spanish.mp3.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): BB3BC1E316F71556B79C941DA124D394216DCAF5
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/count_spanish.mp3.mp4 -out ./results/temp/count_spanish.mp3.mp4.hint" ***
+Hinting track ID 1 - Type ".mp3:.mp3" (MPA) - BW 48 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/count_spanish.mp3.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/count_spanish.mp3.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 4BDF386E03B35A248DAAE3FA4636BD401635FF56
+Hash OK for ./results/temp/count_spanish.mp3.mp4.hint

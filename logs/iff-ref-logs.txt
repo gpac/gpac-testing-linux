@@ -1,0 +1,32 @@
+*** iff-ref logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:36:32 ***
+
+
+*** Subtest "create-iff-video": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264 -ab heic -new ./results/temp/video.heic" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/video.heic  (create-iff-video) hash: 
+File hash (SHA-1): 770C826165376763F91F1C9FD131DF1F41A79E6F
+Hash OK for ./results/temp/video.heic
+
+*** Subtest "create-iff-self": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add-image tk=1:samp=163 ./results/temp/video.heic -out ./results/temp/img_self.heic" ***
+Adding sample 163 as item 1
+
+Computing ./results/temp/img_self.heic  (create-iff-self) hash: 
+File hash (SHA-1): AE6719E69FDF5A9B4D20815F0DDB65DE9EF5428D
+Hash OK for ./results/temp/img_self.heic
+
+*** Subtest "create-iff-ref": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add-image ref:samp=163 ./results/temp/video.heic -out ./results/temp/img_ref.heic" ***
+referring trackID 1 sample 163 as item 1
+
+Computing ./results/temp/img_ref.heic  (create-iff-ref) hash: 
+File hash (SHA-1): 0DDD7D5FD0C62998838C37F69C1142C198E64CDC
+Hash fail, ref hash ./hash_refs/iff-ref-create-iff-ref.hash was 0407A525B62F2A97DCFAE9BF0471346F355B34CB
+
+*** Subtest "remux-iff-ref": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -inter 500 ./results/temp/img_ref.heic -out ./results/temp/img_ref_remux.heic" ***
+
+Computing ./results/temp/img_ref_remux.heic  (remux-iff-ref) hash: 
+File hash (SHA-1): 0DDD7D5FD0C62998838C37F69C1142C198E64CDC
+Hash fail, ref hash ./hash_refs/iff-ref-remux-iff-ref.hash was 0407A525B62F2A97DCFAE9BF0471346F355B34CB

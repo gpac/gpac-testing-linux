@@ -1,0 +1,131 @@
+*** rtp-latm logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:45:07 ***
+
+
+*** Subtest "init": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/aac.mp4 -o ./results/temp/session.sdp:runfor=0:ip=127.0.0.1:latm" ***
+
+Computing ./results/temp/session.sdp  (init) hash: 
+File hash (SHA-1): 0BE3EE7BECC5AC4B8A30BE925459D8E1F0A8FA7D
+Hash OK for ./results/temp/session.sdp
+Computing ./results/temp/session_dashinit.mp4  (dump-dash-init) hash: 
+File hash (SHA-1): 94DFDFB5951D0DC216384C063CFA4C437678AC06
+Hash OK for ./results/temp/session_dashinit.mp4
+Computing ./results/temp/dump.mpd  (dump-dash-mpd) hash: 
+File hash (SHA-1): 13DABA31D20AFF22AB65B2A83BC82433B99242EE
+Hash fail, ref hash ./hash_refs/rtp-latm-dump-dash-mpd.hash was 3AE1DE38964D2D21E564285D34C4459C1B5E8788
+Computing ./results/temp/session_dash1.m4s  (dump-dash-seg) hash: 
+File hash (SHA-1): 85181E563DD2C4478C1E7D85430DF38ADCB7A614
+Hash OK for ./results/temp/session_dash1.m4s
+Computing ./results/temp/dump.mp4  (dump-mp4) hash: 
+File hash (SHA-1): E8394CDA1F1D23FF82B67295ABFD3D63BE46897C
+Hash OK for ./results/temp/dump.mp4
+Computing ./results/temp/dump.latm  (dump-native) hash: 
+File hash (SHA-1): D623FA87F83C8A0D821FA21316A39E94E242E43B
+Hash OK for ./results/temp/dump.latm
+Computing ./results/temp/dump.ts  (dump-ts) hash: 
+File hash (SHA-1): 767D67D97F888178A81052E934250B21C25F7BBA
+Hash OK for ./results/temp/dump.ts
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -for-test -runfor=2000 -i ./results/temp/session.sdp:ifce=127.0.0.1:nat_keepalive=500 -o ./results/temp/dump.latm -o ./results/temp/dump.mp4 -o ./results/temp/dump.ts:pcr_init=0:pes_pack=none -o ./results/temp/dump.mpd -stats -graph" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -13713536
+
+Filter stats - 13 filters
+	Filter fin (src=./results/temp/session.sdp:ifce=127.0.0.1:nat_keepalive=500) : 0 input pids 1 output pids 4 tasks 1306 us process time
+		1 packets sent 280 bytes sent (765.697 pck/sec 1.71516 mbps)
+		* output PID session.sdp: 1 packets sent
+	Filter fout (dst=./results/temp/dump.latm) : 1 input pids 0 output pids 49 tasks 276 us process time
+		47 packets processed 11712 bytes processed (170290 pck/sec 339.478 mbps)
+		* input PID session.sdp: 47 packets received
+	Filter fout (dst=./results/temp/dump.mp4) : 1 input pids 0 output pids 5 tasks 85 us process time
+		3 packets processed 12289 bytes processed (35294.1 pck/sec 1156.61 mbps)
+		* input PID session.sdp: 3 packets received
+	Filter fout (dst=./results/temp/dump.ts:pcr_init=0:pes_pack=none) : 1 input pids 0 output pids 30 tasks 284 us process time
+		28 packets processed 19552 bytes processed (98591.5 pck/sec 550.761 mbps)
+		* input PID ts_mux: 28 packets received
+	Filter fout (dst=./results/temp/dump.mpd) : 1 input pids 0 output pids 3 tasks 116 us process time
+		1 packets processed 877 bytes processed (8620.69 pck/sec 60.4828 mbps)
+		* input PID manifest_mpd: 1 packets received
+	Filter rtpin : 1 input pids 1 output pids 274990 tasks 293672 us process time
+		1 packets processed 280 bytes processed (3.40516 pck/sec 0.00762756 mbps)
+		47 packets sent 11449 bytes sent (160.042 pck/sec 0.311885 mbps)
+		* input PID session.sdp: 1 packets received
+		* output PID session.sdp: 47 packets sent
+	Filter uflatm : 1 input pids 1 output pids 99 tasks 1465 us process time
+		47 packets processed 11449 bytes processed (32081.9 pck/sec 62.5201 mbps)
+		47 packets sent 11712 bytes sent (32081.9 pck/sec 63.9563 mbps)
+		* input PID session.sdp: 47 packets received
+		* output PID session.sdp: 47 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 91 tasks 917 us process time
+		47 packets processed 11449 bytes processed (51254.1 pck/sec 99.8822 mbps)
+		3 packets sent 12289 bytes sent (3271.54 pck/sec 107.21 mbps)
+		* input PID session.sdp: 47 packets received
+		* output PID session.sdp: 3 packets sent
+	Filter m2tsmx : 1 input pids 1 output pids 24 tasks 668 us process time
+		47 packets processed 11449 bytes processed (70359.3 pck/sec 137.114 mbps)
+		28 packets sent 19552 bytes sent (41916.2 pck/sec 234.156 mbps)
+		* input PID session.sdp: 47 packets received
+		* output PID ts_mux: 28 packets sent
+	Filter dasher ID _0x5606af945bc0_ : 1 input pids 2 output pids 341509 tasks 71652 us process time
+		47 packets processed 11449 bytes processed (655.948 pck/sec 1.27829 mbps)
+		48 packets sent 12326 bytes sent (669.905 pck/sec 1.37621 mbps)
+		* input PID session.sdp: 47 packets received
+		* output PID manifest_mpd: 1 packets sent
+		* output PID session.sdp: 47 packets sent
+	Filter writegen : 1 input pids 1 output pids 99 tasks 215 us process time
+		47 packets processed 11712 bytes processed (218605 pck/sec 435.795 mbps)
+		47 packets sent 11712 bytes sent (218605 pck/sec 435.795 mbps)
+		* input PID session.sdp: 47 packets received
+		* output PID session.sdp: 47 packets sent
+	Filter fout (dst=./results/temp/session_dashinit.mp4:gfopt:frag:xps_inband=no:psshs=moov:mime=audio/mp4) : 1 input pids 0 output pids 7 tasks 297 us process time
+		5 packets processed 12532 bytes processed (16835 pck/sec 337.562 mbps)
+		* input PID session.sdp: 5 packets received
+	Filter mp4mx : 1 input pids 1 output pids 54 tasks 644 us process time
+		47 packets processed 11449 bytes processed (72981.4 pck/sec 142.224 mbps)
+		5 packets sent 12532 bytes sent (7763.98 pck/sec 155.677 mbps)
+		* input PID session.sdp: 47 packets received
+		* output PID session.sdp: 5 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2027511 us active_time 568711 us nb_tasks 617010
+
+Total: run_time 2027511 us active_time 568711 us nb_tasks 617010
+
+Filters connected:
+fin (src=./results/temp/session.sdp:ifce=127.0.0.1:nat_keepalive=500) (ptr=0x5606af923850)
+-(PID session.sdp) rtpin (ptr=0x5606af9322c0)
+--(PID session.sdp) uflatm (ptr=0x5606af93ae30)
+---(PID session.sdp) writegen (ptr=0x5606af949190)
+----(PID session.sdp) fout (dst=./results/temp/dump.latm) (ptr=0x5606af926430)
+--(PID session.sdp) mp4mx (ptr=0x5606af93cd80)
+---(PID session.sdp) fout (dst=./results/temp/dump.mp4) (ptr=0x5606af9288a0)
+--(PID session.sdp) m2tsmx (ptr=0x5606af941190)
+---(PID ts_mux) fout (dst=./results/temp/dump.ts:pcr_init=0:pes_pack=none) (ptr=0x5606af92ac40)
+--(PID session.sdp) dasher (ID=_0x5606af945bc0_)
+---(PID manifest_mpd) fout (dst=./results/temp/dump.mpd) (ptr=0x5606af92d1a0)
+---(PID session.sdp) mp4mx (ptr=0x5606af9651f0)
+----(PID session.sdp) fout (dst=./results/temp/session_dashinit.mp4:gfopt:frag:xps_inband=no:psshs=moov:mime=audio/mp4) (ptr=0x5606af960dc0)
+
+
+*** Subtest "stream": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/aac.mp4 -o ./results/temp/session.sdp:loop=no:ip=127.0.0.1:ifce=127.0.0.1:tso=100000:latm -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1128505216
+
+Filter stats - 4 filters
+	Filter fin (src=./results/temp/aac.mp4) : 0 input pids 1 output pids 6 tasks 1106 us process time
+		1 packets sent 5000 bytes sent (904.159 pck/sec 36.1664 mbps)
+		* output PID aac.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/session.sdp:loop=no:ip=127.0.0.1:ifce=127.0.0.1:tso=100000:latm) : 1 input pids 0 output pids 2 tasks 186 us process time
+		1 packets processed 280 bytes processed (5376.34 pck/sec 12.043 mbps)
+		* input PID SDP: 1 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 54 tasks 2238 us process time
+		2 packets processed 5000 bytes processed (893.655 pck/sec 17.8731 mbps)
+		47 packets sent 11449 bytes sent (21000.9 pck/sec 40.9258 mbps)
+		* input PID aac.mp4: 2 packets received
+		* output PID aac.mp4: 47 packets sent
+	Filter rtpout : 1 input pids 1 output pids 158443 tasks 28420 us process time
+		47 packets processed 11449 bytes processed (1653.76 pck/sec 3.2228 mbps)
+		1 packets sent 280 bytes sent (35.1865 pck/sec 0.0788177 mbps)
+		* input PID aac.mp4: 47 packets received
+		* output PID SDP: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 983351 us active_time 82089 us nb_tasks 158554
+
+Total: run_time 983351 us active_time 82089 us nb_tasks 158554
+

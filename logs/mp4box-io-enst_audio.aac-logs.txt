@@ -1,0 +1,76 @@
+*** mp4box-io-enst_audio.aac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:28 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/enst_audio.aac" ***
+Import probing results for ./media/auxiliary_files/enst_audio.aac:
+File has 1 tracks
+- Track 1 type: Audio - Codec MPEG-4 AAC Audio
+	SampleRate 48000 - 2 channels
+
+For more details, use `gpac -i enst_audio.aac inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/enst_audio.aac.mp4  (add) hash: 
+File hash (SHA-1): F7CFAAEDCF593450996465F690B9B80C976937A4
+Hash OK for ./results/temp/enst_audio.aac.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_audio.aac -new ./results/temp/enst_audio.aac.mp4" ***
+Track Importing AAC  - SampleRate 48000 Num Channels 2
+
+Computing ./results/temp/enst_audio.aac.1.tmp  (diso) hash: 
+File hash (SHA-1): DAADC63DC1F990EE80129E50D9E8C51D1E5DC68F
+Hash OK for ./results/temp/enst_audio.aac.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/enst_audio.aac.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:07.040
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: No visual capability required (0xff)
+Audio PL: AAC Profile @ Level 2 (0x29)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 48000
+Media Duration 00:00:07.040 
+Media Info: Language "Undetermined (und)" - Type "soun:mp4a" - 330 samples
+MPEG-4 Audio AAC LC (AOT=2 implicit) - 2 Channel(s) - SampleRate 48000
+	RFC6381 Codec Parameters: mp4a.40.2
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1024 / 48000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/enst_audio.aac.mp4 -out ./results/temp/enst_audio.aac.1.tmp" ***
+
+Computing ./results/temp/enst_audio.aac.2.tmp  (dts) hash: 
+File hash (SHA-1): 7D24D5C106C7E57CEF5619AA126C7AC0AAEEA1D1
+Hash OK for ./results/temp/enst_audio.aac.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/enst_audio.aac.mp4 -out ./results/temp/enst_audio.aac.2.tmp" ***
+
+Computing ./results/temp/enst_audio.aac.mp4.hint  (hint) hash: 
+File hash (SHA-1): 724421CE0D33B033E0712508909C472C8C63FBE9
+Hash OK for ./results/temp/enst_audio.aac.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/enst_audio.aac.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 27AA869247A4F9F25645377304AD73BCE9DB320F
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/enst_audio.aac.mp4 -out ./results/temp/enst_audio.aac.mp4.hint" ***
+Hinting track ID 1 - Type "mp4a:mp4a" (mpeg4-generic) - BW 94 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/enst_audio.aac.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/enst_audio.aac.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 70CF2DEC7701A2BF947DEE998065E92A13D8E1AF
+Hash OK for ./results/temp/enst_audio.aac.mp4.hint

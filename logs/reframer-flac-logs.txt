@@ -1,0 +1,43 @@
+*** reframer-flac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:57 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/import/enst_audio.flac reframer @ -o ./results/temp/enst_audio.flac  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1182908544
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/import/enst_audio.flac) : 0 input pids 1 output pids 197 tasks 1205 us process time
+		194 packets sent 969746 bytes sent (160996 pck/sec 6438.15 mbps)
+		* output PID enst_audio.flac: 194 packets sent
+	Filter reframer ID _0x55c08f9fb040_ : 1 input pids 1 output pids 148 tasks 350 us process time
+		74 packets processed 961458 bytes processed (211429 pck/sec 21976.2 mbps)
+		74 packets sent 961458 bytes sent (211429 pck/sec 21976.2 mbps)
+		* input PID audio: 74 packets received
+		* output PID audio: 74 packets sent
+	Filter fout (dst=./results/temp/enst_audio.flac) : 1 input pids 0 output pids 77 tasks 824 us process time
+		75 packets processed 961496 bytes processed (91019.4 pck/sec 9334.91 mbps)
+		* input PID audio: 75 packets received
+	Filter rfflac : 1 input pids 1 output pids 203 tasks 696 us process time
+		194 packets processed 969746 bytes processed (278736 pck/sec 11146.5 mbps)
+		74 packets sent 961458 bytes sent (106322 pck/sec 11051.2 mbps)
+		* input PID enst_audio.flac: 194 packets received
+		* output PID audio: 74 packets sent
+	Filter writegen : 1 input pids 1 output pids 151 tasks 158 us process time
+		74 packets processed 961458 bytes processed (468354 pck/sec 48681.4 mbps)
+		75 packets sent 961496 bytes sent (474684 pck/sec 48683.3 mbps)
+		* input PID audio: 74 packets received
+		* output PID audio: 75 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3486 us active_time 3442 us nb_tasks 781
+
+Total: run_time 3486 us active_time 3442 us nb_tasks 781
+
+Filters connected:
+fin (src=./external_media/import/enst_audio.flac) (ptr=0x55c08f9f87f0)
+-(PID enst_audio.flac) rfflac (ptr=0x55c08fa001b0)
+--(PID audio) reframer (ID=_0x55c08f9fb040_)
+---(PID audio) writegen (ptr=0x55c08fa081e0)
+----(PID audio) fout (dst=./results/temp/enst_audio.flac) (ptr=0x55c08f9fc260)
+
+Computing ./results/temp/enst_audio.flac  (rewrite) hash: 
+File hash (SHA-1): 7DAB0691890E1E1B6E280BA45007954A39D580CD
+Hash OK for ./results/temp/enst_audio.flac

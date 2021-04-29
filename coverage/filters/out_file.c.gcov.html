@@ -1,0 +1,791 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/out_file.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - out_file.c<span style="font-size: 80%;"> (source / <a href="out_file.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">257</td>
+            <td class="headerCovTableEntry">319</td>
+            <td class="headerCovTableEntryMed">80.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2020
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / generic FILE output filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/xml.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : enum
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :         FOUT_CAT_NONE = 0,
+<span class="lineNum">      34 </span>            :         FOUT_CAT_AUTO,
+<span class="lineNum">      35 </span>            :         FOUT_CAT_ALL
+<span class="lineNum">      36 </span>            : };
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : typedef struct
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span>            :         //options
+<span class="lineNum">      41 </span>            :         Double start, speed;
+<span class="lineNum">      42 </span>            :         char *dst, *mime, *ext;
+<span class="lineNum">      43 </span>            :         Bool append, dynext, ow, redund;
+<span class="lineNum">      44 </span>            :         u32 cat;
+<span class="lineNum">      45 </span>            :         u32 mvbk;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :         //only one input pid
+<span class="lineNum">      48 </span>            :         GF_FilterPid *pid;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         FILE *file;
+<span class="lineNum">      51 </span>            :         Bool is_std;
+<span class="lineNum">      52 </span>            :         u64 nb_write;
+<span class="lineNum">      53 </span>            :         Bool use_templates;
+<span class="lineNum">      54 </span>            :         GF_FilterCapability in_caps[2];
+<span class="lineNum">      55 </span>            :         char szExt[10];
+<span class="lineNum">      56 </span>            :         char szFileName[GF_MAX_PATH];
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :         Bool patch_blocks;
+<span class="lineNum">      59 </span>            :         Bool is_null;
+<span class="lineNum">      60 </span>            :         GF_Err is_error;
+<span class="lineNum">      61 </span>            :         u32 dash_mode;
+<span class="lineNum">      62 </span>            :         u64 offset_at_seg_start;
+<span class="lineNum">      63 </span>            :         const char *original_url;
+<span class="lineNum">      64 </span>            :         GF_FileIO *gfio_ref;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :         FILE *hls_chunk;
+<span class="lineNum">      67 </span>            : } GF_FileOutCtx;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : #ifdef WIN32
+<span class="lineNum">      70 </span>            : #include &lt;io.h&gt;
+<span class="lineNum">      71 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      72 </span>            : #endif //WIN32
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : static void fileout_close_hls_chunk(GF_FileOutCtx *ctx, Bool final_flush)
+<span class="lineNum">      75 </span>            : {
+<span class="lineNum">      76 </span><span class="lineCov">       7199 :         if (!ctx-&gt;hls_chunk) return;</span>
+<span class="lineNum">      77 </span><span class="lineCov">          4 :         gf_fclose(ctx-&gt;hls_chunk);</span>
+<span class="lineNum">      78 </span><span class="lineCov">          4 :         ctx-&gt;hls_chunk = NULL;</span>
+<a name="79"><span class="lineNum">      79 </span>            : }</a>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">      12537 : static GF_Err fileout_open_close(GF_FileOutCtx *ctx, const char *filename, const char *ext, u32 file_idx, Bool explicit_overwrite, char *file_suffix)</span>
+<span class="lineNum">      82 </span>            : {
+<span class="lineNum">      83 </span><span class="lineCov">      12537 :         if (ctx-&gt;file &amp;&amp; !ctx-&gt;is_std) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">       4976 :                 GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[FileOut] closing output file %s\n&quot;, ctx-&gt;szFileName));</span>
+<span class="lineNum">      85 </span><span class="lineCov">       4976 :                 gf_fclose(ctx-&gt;file);</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :                 fileout_close_hls_chunk(ctx, GF_FALSE);
+<span class="lineNum">      88 </span>            :         }
+<span class="lineNum">      89 </span><span class="lineCov">      12537 :         ctx-&gt;file = NULL;</span>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">      12537 :         if (!filename)</span>
+<span class="lineNum">      92 </span>            :                 return GF_OK;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">       4978 :         if (!strcmp(filename, &quot;std&quot;)) ctx-&gt;is_std = GF_TRUE;</span>
+<span class="lineNum">      95 </span><span class="lineCov">       4978 :         else if (!strcmp(filename, &quot;stdout&quot;)) ctx-&gt;is_std = GF_TRUE;</span>
+<span class="lineNum">      96 </span><span class="lineCov">       4976 :         else ctx-&gt;is_std = GF_FALSE;</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineCov">       4978 :         if (ctx-&gt;is_std) {</span>
+<span class="lineNum">      99 </span><span class="lineCov">          2 :                 ctx-&gt;file = stdout;</span>
+<span class="lineNum">     100 </span>            : #ifdef WIN32
+<span class="lineNum">     101 </span>            :                 _setmode(_fileno(stdout), _O_BINARY);
+<span class="lineNum">     102 </span>            : #endif
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :         } else {
+<span class="lineNum">     105 </span>            :                 char szFinalName[GF_MAX_PATH];
+<span class="lineNum">     106 </span><span class="lineCov">       4976 :                 Bool append = ctx-&gt;append;</span>
+<span class="lineNum">     107 </span>            :                 const char *url = filename;
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineCov">       4976 :                 if (!strncmp(filename, &quot;gfio://&quot;, 7))</span>
+<span class="lineNum">     110 </span><span class="lineCov">          5 :                         url = gf_fileio_translate_url(filename);</span>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineCov">       4976 :                 if (ctx-&gt;dynext) {</span>
+<span class="lineNum">     113 </span><span class="lineCov">        272 :                         const char *has_ext = gf_file_ext_start(url);</span>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :                         strcpy(szFinalName, url);
+<span class="lineNum">     116 </span><span class="lineCov">        272 :                         if (!has_ext &amp;&amp; ext) {</span>
+<span class="lineNum">     117 </span>            :                                 strcat(szFinalName, &quot;.&quot;);
+<span class="lineNum">     118 </span>            :                                 strcat(szFinalName, ext);
+<span class="lineNum">     119 </span>            :                         }
+<span class="lineNum">     120 </span>            :                 } else {
+<span class="lineNum">     121 </span>            :                         strcpy(szFinalName, url);
+<span class="lineNum">     122 </span>            :                 }
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineCov">       4976 :                 if (ctx-&gt;use_templates) {</span>
+<span class="lineNum">     125 </span>            :                         GF_Err e;
+<span class="lineNum">     126 </span>            :                         char szName[GF_MAX_PATH];
+<span class="lineNum">     127 </span>            :                         assert(ctx-&gt;dst);
+<span class="lineNum">     128 </span><span class="lineCov">        364 :                         if (!strcmp(filename, ctx-&gt;dst)) {</span>
+<span class="lineNum">     129 </span>            :                                 strcpy(szName, szFinalName);
+<span class="lineNum">     130 </span><span class="lineCov">        364 :                                 e = gf_filter_pid_resolve_file_template(ctx-&gt;pid, szName, szFinalName, file_idx, file_suffix);</span>
+<span class="lineNum">     131 </span>            :                         } else {
+<span class="lineNum">     132 </span>            :                                 char szFileName[GF_MAX_PATH];
+<span class="lineNum">     133 </span>            :                                 strcpy(szFileName, szFinalName);
+<span class="lineNum">     134 </span>            :                                 strcpy(szName, ctx-&gt;dst);
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :                                 e = gf_filter_pid_resolve_file_template_ex(ctx-&gt;pid, szName, szFinalName, file_idx, file_suffix, szFileName);</span>
+<span class="lineNum">     136 </span>            :                         }
+<span class="lineNum">     137 </span><span class="lineCov">        364 :                         if (e) {</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :                                 return ctx-&gt;is_error = e;</span>
+<span class="lineNum">     139 </span>            :                         }
+<span class="lineNum">     140 </span>            :                 }
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">       4976 :                 if (!gf_file_exists(szFinalName)) append = GF_FALSE;</span>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineCov">       4976 :                 if (!strcmp(szFinalName, ctx-&gt;szFileName) &amp;&amp; (ctx-&gt;cat==FOUT_CAT_AUTO))</span>
+<span class="lineNum">     145 </span>            :                         append = GF_TRUE;
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">       4976 :                 if (!ctx-&gt;ow &amp;&amp; gf_file_exists(szFinalName) &amp;&amp; !append) {</span>
+<span class="lineNum">     148 </span>            :                         char szRes[21];
+<span class="lineNum">     149 </span>            :                         s32 res;
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                         fprintf(stderr, &quot;File %s already exist - override (y/n/a) ?:&quot;, szFinalName);</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :                         res = scanf(&quot;%20s&quot;, szRes);</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                         if (!res || (szRes[0] == 'n') || (szRes[0] == 'N')) {</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                                 return ctx-&gt;is_error = GF_IO_ERR;</span>
+<span class="lineNum">     155 </span>            :                         }
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :                         if ((szRes[0] == 'a') || (szRes[0] == 'A')) ctx-&gt;ow = GF_TRUE;</span>
+<span class="lineNum">     157 </span>            :                 }
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineCov">       4976 :                 GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[FileOut] opening output file %s\n&quot;, szFinalName));</span>
+<span class="lineNum">     160 </span><span class="lineCov">       4976 :                 ctx-&gt;file = gf_fopen_ex(szFinalName, ctx-&gt;original_url, append ? &quot;a+b&quot; : &quot;w+b&quot;);</span>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineCov">       4976 :                 if (!strcmp(szFinalName, ctx-&gt;szFileName) &amp;&amp; !append &amp;&amp; ctx-&gt;nb_write &amp;&amp; !explicit_overwrite) {</span>
+<span class="lineNum">     163 </span><span class="lineCov">         47 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[FileOut] re-opening in write mode output file %s, content overwrite (use `cat` option to enable append)\n&quot;, szFinalName));</span>
+<span class="lineNum">     164 </span>            :                 }
+<span class="lineNum">     165 </span>            :                 strcpy(ctx-&gt;szFileName, szFinalName);
+<span class="lineNum">     166 </span>            :         }
+<span class="lineNum">     167 </span><span class="lineCov">       4978 :         ctx-&gt;nb_write = 0;</span>
+<span class="lineNum">     168 </span><span class="lineCov">       4978 :         if (!ctx-&gt;file) {</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] cannot open output file %s\n&quot;, ctx-&gt;szFileName));</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                 return ctx-&gt;is_error = GF_IO_ERR;;</span>
+<span class="lineNum">     171 </span>            :         }
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :         return GF_OK;
+<a name="174"><span class="lineNum">     174 </span>            : }</a>
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span><span class="lineCov">       1957 : static void fileout_setup_file(GF_FileOutCtx *ctx, Bool explicit_overwrite)</span>
+<span class="lineNum">     177 </span>            : {
+<span class="lineNum">     178 </span><span class="lineCov">       1957 :         const char *dst = ctx-&gt;dst;</span>
+<span class="lineNum">     179 </span>            :         const GF_PropertyValue *p, *ext;
+<span class="lineNum">     180 </span><span class="lineCov">       1957 :         p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_OUTPATH);</span>
+<span class="lineNum">     181 </span><span class="lineCov">       1957 :         ext = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_FILE_EXT);</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">       1957 :         if (p &amp;&amp; p-&gt;value.string) {</span>
+<span class="lineNum">     184 </span><span class="lineCov">         13 :                 fileout_open_close(ctx, p-&gt;value.string, (ext &amp;&amp; ctx-&gt;dynext) ? ext-&gt;value.string : NULL, 0, explicit_overwrite, NULL);</span>
+<span class="lineNum">     185 </span><span class="lineCov">         13 :                 return;</span>
+<span class="lineNum">     186 </span>            :         }
+<span class="lineNum">     187 </span><span class="lineCov">       1944 :         if (!dst) {</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                 p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_FILEPATH);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                 if (p &amp;&amp; p-&gt;value.string) {</span>
+<span class="lineNum">     190 </span>            :                         dst = p-&gt;value.string;
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :                         char *sep = strstr(dst, &quot;://&quot;);</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                         if (sep) {</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :                                 dst = strchr(sep+3, '/');</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                                 if (!dst) return;</span>
+<span class="lineNum">     195 </span>            :                         } else {
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :                                 if (!strncmp(dst, &quot;./&quot;, 2)) dst+= 2;</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :                                 else if (!strncmp(dst, &quot;.\\&quot;, 2)) dst+= 2;</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :                                 else if (!strncmp(dst, &quot;../&quot;, 3)) dst+= 3;</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :                                 else if (!strncmp(dst, &quot;..\\&quot;, 3)) dst+= 3;</span>
+<span class="lineNum">     200 </span>            :                         }
+<span class="lineNum">     201 </span>            :                 }
+<span class="lineNum">     202 </span>            :         }
+<span class="lineNum">     203 </span><span class="lineCov">       1944 :         if (ctx-&gt;dynext) {</span>
+<span class="lineNum">     204 </span><span class="lineCov">         30 :                 p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PCK_FILENUM);</span>
+<span class="lineNum">     205 </span><span class="lineCov">         30 :                 if (!p) {</span>
+<span class="lineNum">     206 </span><span class="lineCov">         30 :                         if (ext &amp;&amp; ext-&gt;value.string) {</span>
+<span class="lineNum">     207 </span><span class="lineCov">         30 :                                 fileout_open_close(ctx, dst, ext-&gt;value.string, 0, explicit_overwrite, NULL);</span>
+<span class="lineNum">     208 </span>            :                         }
+<span class="lineNum">     209 </span>            :                 }
+<span class="lineNum">     210 </span><span class="lineCov">       1914 :         } else if (ctx-&gt;dst) {</span>
+<span class="lineNum">     211 </span><span class="lineCov">       1914 :                 fileout_open_close(ctx, ctx-&gt;dst, NULL, 0, explicit_overwrite, NULL);</span>
+<span class="lineNum">     212 </span>            :         } else {
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                 p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_FILEPATH);</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                 if (!p) p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_URL);</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                 if (p &amp;&amp; p-&gt;value.string)</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :                         fileout_open_close(ctx, p-&gt;value.string, NULL, 0, explicit_overwrite, NULL);</span>
+<a name="217"><span class="lineNum">     217 </span>            :         }</a>
+<span class="lineNum">     218 </span>            : }
+<span class="lineNum">     219 </span><span class="lineCov">       2886 : static GF_Err fileout_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     220 </span>            : {
+<span class="lineNum">     221 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     222 </span><span class="lineCov">       2886 :         GF_FileOutCtx *ctx = (GF_FileOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     223 </span><span class="lineCov">       2886 :         if (is_remove) {</span>
+<span class="lineNum">     224 </span><span class="lineCov">         10 :                 ctx-&gt;pid = NULL;</span>
+<span class="lineNum">     225 </span><span class="lineCov">         10 :                 fileout_open_close(ctx, NULL, NULL, 0, GF_FALSE, NULL);</span>
+<span class="lineNum">     226 </span><span class="lineCov">         10 :                 return GF_OK;</span>
+<span class="lineNum">     227 </span>            :         }
+<span class="lineNum">     228 </span><span class="lineCov">       2876 :         gf_filter_pid_check_caps(pid);</span>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineCov">       2876 :         if (!ctx-&gt;pid) {</span>
+<span class="lineNum">     231 </span>            :                 GF_FilterEvent evt;
+<span class="lineNum">     232 </span><span class="lineCov">       1946 :                 gf_filter_pid_init_play_event(pid, &amp;evt, ctx-&gt;start, ctx-&gt;speed, &quot;FileOut&quot;);</span>
+<span class="lineNum">     233 </span><span class="lineCov">       1946 :                 gf_filter_pid_send_event(pid, &amp;evt);</span>
+<span class="lineNum">     234 </span>            :         }
+<span class="lineNum">     235 </span><span class="lineCov">       2876 :         ctx-&gt;pid = pid;</span>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineCov">       2876 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_DISABLE_PROGRESSIVE);</span>
+<span class="lineNum">     238 </span><span class="lineCov">       2876 :         if (p &amp;&amp; p-&gt;value.uint) ctx-&gt;patch_blocks = GF_TRUE;</span>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">       2876 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_DASH_MODE);</span>
+<span class="lineNum">     241 </span><span class="lineCov">       2876 :         if (p &amp;&amp; p-&gt;value.uint) ctx-&gt;dash_mode = 1;</span>
+<span class="lineNum">     242 </span>            :         return GF_OK;
+<a name="243"><span class="lineNum">     243 </span>            : }</a>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">       2223 : static GF_Err fileout_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     246 </span>            : {
+<span class="lineNum">     247 </span>            :         char *ext=NULL, *sep;
+<span class="lineNum">     248 </span>            :         const char *dst;
+<span class="lineNum">     249 </span><span class="lineCov">       2223 :         GF_FileOutCtx *ctx = (GF_FileOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">       2223 :         if (!ctx || !ctx-&gt;dst) return GF_OK;</span>
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span><span class="lineCov">       2223 :         if (!ctx-&gt;mvbk)</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :                 ctx-&gt;mvbk = 1;</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">       2223 :         if (strnicmp(ctx-&gt;dst, &quot;file:/&quot;, 6) &amp;&amp; strnicmp(ctx-&gt;dst, &quot;gfio:/&quot;, 6) &amp;&amp; strstr(ctx-&gt;dst, &quot;://&quot;))  {</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_NOT_SUPPORTED);</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                 return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     259 </span>            :         }
+<span class="lineNum">     260 </span><span class="lineCov">       2223 :         if (!stricmp(ctx-&gt;dst, &quot;null&quot;) ) {</span>
+<span class="lineNum">     261 </span><span class="lineCov">          3 :                 ctx-&gt;is_null = GF_TRUE;</span>
+<span class="lineNum">     262 </span>            :                 //null and no format specified, we accept any kind
+<span class="lineNum">     263 </span><span class="lineCov">          3 :                 if (!ctx-&gt;ext) {</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :                         ctx-&gt;in_caps[0].code = GF_PROP_PID_STREAM_TYPE;</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :                         ctx-&gt;in_caps[0].val = PROP_UINT(GF_STREAM_UNKNOWN);</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :                         ctx-&gt;in_caps[0].flags = GF_CAPS_INPUT_EXCLUDED;</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :                         gf_filter_override_caps(filter, ctx-&gt;in_caps, 1);</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                         return GF_OK;</span>
+<span class="lineNum">     269 </span>            :                 }
+<span class="lineNum">     270 </span>            :         }
+<span class="lineNum">     271 </span><span class="lineCov">       2223 :         if (!strncmp(ctx-&gt;dst, &quot;gfio://&quot;, 7)) {</span>
+<span class="lineNum">     272 </span>            :                 GF_Err e;
+<span class="lineNum">     273 </span><span class="lineCov">          3 :                 ctx-&gt;gfio_ref = gf_fileio_open_url(gf_fileio_from_url(ctx-&gt;dst), NULL, &quot;ref&quot;, &amp;e);</span>
+<span class="lineNum">     274 </span><span class="lineCov">          3 :                 if (!ctx-&gt;gfio_ref) {</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :                         gf_filter_setup_failure(filter, e);</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">     277 </span>            :                 }
+<span class="lineNum">     278 </span><span class="lineCov">          3 :                 dst = gf_fileio_translate_url(ctx-&gt;dst);</span>
+<span class="lineNum">     279 </span><span class="lineCov">          3 :                 ctx-&gt;original_url = ctx-&gt;dst;</span>
+<span class="lineNum">     280 </span>            :         } else {
+<span class="lineNum">     281 </span>            :                 dst = ctx-&gt;dst;
+<span class="lineNum">     282 </span>            :         }
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span><span class="lineCov">       2223 :         sep = dst ? strchr(dst, '$') : NULL;</span>
+<span class="lineNum">     285 </span><span class="lineCov">       2223 :         if (sep) {</span>
+<span class="lineNum">     286 </span><span class="lineCov">         80 :                 sep = strchr(sep+1, '$');</span>
+<span class="lineNum">     287 </span><span class="lineCov">         80 :                 if (sep) ctx-&gt;use_templates = GF_TRUE;</span>
+<span class="lineNum">     288 </span>            :         }
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span><span class="lineCov">       2223 :         if (ctx-&gt;dynext) return GF_OK;</span>
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineCov">       2166 :         if (ctx-&gt;ext) ext = ctx-&gt;ext;</span>
+<span class="lineNum">     293 </span><span class="lineCov">       2156 :         else if (dst) {</span>
+<span class="lineNum">     294 </span><span class="lineCov">       2156 :                 ext = gf_file_ext_start(dst);</span>
+<span class="lineNum">     295 </span><span class="lineCov">       2156 :                 if (!ext) ext = &quot;.*&quot;;</span>
+<span class="lineNum">     296 </span><span class="lineCov">       2156 :                 ext += 1;</span>
+<span class="lineNum">     297 </span>            :         }
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span><span class="lineCov">       2166 :         if (!ext &amp;&amp; !ctx-&gt;mime) {</span>
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] No extension provided nor mime type for output file %s, cannot infer format\n&quot;, ctx-&gt;dst));</span>
+<span class="lineNum">     301 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     302 </span>            :         }
+<span class="lineNum">     303 </span>            :         //static cap, streamtype = file
+<span class="lineNum">     304 </span><span class="lineCov">       2166 :         ctx-&gt;in_caps[0].code = GF_PROP_PID_STREAM_TYPE;</span>
+<span class="lineNum">     305 </span><span class="lineCov">       2166 :         ctx-&gt;in_caps[0].val = PROP_UINT(GF_STREAM_FILE);</span>
+<span class="lineNum">     306 </span><span class="lineCov">       2166 :         ctx-&gt;in_caps[0].flags = GF_CAPS_INPUT_STATIC;</span>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineCov">       2166 :         if (ctx-&gt;mime) {</span>
+<span class="lineNum">     309 </span><span class="lineCov">        318 :                 ctx-&gt;in_caps[1].code = GF_PROP_PID_MIME;</span>
+<span class="lineNum">     310 </span><span class="lineCov">        318 :                 ctx-&gt;in_caps[1].val = PROP_NAME( ctx-&gt;mime );</span>
+<span class="lineNum">     311 </span><span class="lineCov">        318 :                 ctx-&gt;in_caps[1].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">     312 </span>            :         } else {
+<span class="lineNum">     313 </span><span class="lineCov">       1848 :                 strncpy(ctx-&gt;szExt, ext, 9);</span>
+<span class="lineNum">     314 </span><span class="lineCov">       1848 :                 ctx-&gt;szExt[9] = 0;</span>
+<span class="lineNum">     315 </span><span class="lineCov">       1848 :                 strlwr(ctx-&gt;szExt);</span>
+<span class="lineNum">     316 </span><span class="lineCov">       1848 :                 ctx-&gt;in_caps[1].code = GF_PROP_PID_FILE_EXT;</span>
+<span class="lineNum">     317 </span><span class="lineCov">       1848 :                 ctx-&gt;in_caps[1].val = PROP_NAME( ctx-&gt;szExt );</span>
+<span class="lineNum">     318 </span><span class="lineCov">       1848 :                 ctx-&gt;in_caps[1].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">     319 </span>            :         }
+<span class="lineNum">     320 </span><span class="lineCov">       2166 :         gf_filter_override_caps(filter, ctx-&gt;in_caps, 2);</span>
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">       2166 :         return GF_OK;</span>
+<a name="323"><span class="lineNum">     323 </span>            : }</a>
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineCov">       2223 : static void fileout_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     326 </span>            : {
+<span class="lineNum">     327 </span>            :         GF_Err e;
+<span class="lineNum">     328 </span><span class="lineCov">       2223 :         GF_FileOutCtx *ctx = (GF_FileOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span>            :         fileout_close_hls_chunk(ctx, GF_TRUE);
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineCov">       2223 :         fileout_open_close(ctx, NULL, NULL, 0, GF_FALSE, NULL);</span>
+<span class="lineNum">     333 </span><span class="lineCov">       2223 :         if (ctx-&gt;gfio_ref)</span>
+<span class="lineNum">     334 </span><span class="lineCov">          3 :                 gf_fileio_open_url((GF_FileIO *)ctx-&gt;gfio_ref, NULL, &quot;unref&quot;, &amp;e);</span>
+<a name="335"><span class="lineNum">     335 </span><span class="lineCov">       2223 : }</span></a>
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span><span class="lineCov">     176699 : static GF_Err fileout_process(GF_Filter *filter)</span>
+<span class="lineNum">     338 </span>            : {
+<span class="lineNum">     339 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     340 </span>            :         const GF_PropertyValue *fname, *p;
+<span class="lineNum">     341 </span>            :         Bool start, end;
+<span class="lineNum">     342 </span>            :         const u8 *pck_data;
+<span class="lineNum">     343 </span>            :         u32 pck_size, nb_write;
+<span class="lineNum">     344 </span><span class="lineCov">     176699 :         GF_FileOutCtx *ctx = (GF_FileOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span><span class="lineCov">     176699 :         if (ctx-&gt;is_error) {</span>
+<span class="lineNum">     347 </span>            :                 GF_Err e = ctx-&gt;is_error;
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                 if (e != GF_EOS) {</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_discard(ctx-&gt;pid, GF_TRUE);</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                         ctx-&gt;is_error = GF_EOS;</span>
+<span class="lineNum">     351 </span>            :                 }
+<span class="lineNum">     352 </span>            :                 return e;
+<span class="lineNum">     353 </span>            :         }
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span><span class="lineCov">     176699 :         pck = gf_filter_pid_get_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     356 </span><span class="lineCov">     176699 :         if (!pck) {</span>
+<span class="lineNum">     357 </span><span class="lineCov">      19774 :                 if (gf_filter_pid_is_eos(ctx-&gt;pid)) {</span>
+<span class="lineNum">     358 </span><span class="lineCov">       1869 :                         if (gf_filter_reporting_enabled(filter)) {</span>
+<span class="lineNum">     359 </span>            :                                 char szStatus[1024];
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                                 snprintf(szStatus, 1024, &quot;%s: done - wrote &quot;LLU&quot; bytes&quot;, gf_file_basename(ctx-&gt;szFileName), ctx-&gt;nb_write);</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                                 gf_filter_update_status(filter, 10000, szStatus);</span>
+<span class="lineNum">     362 </span>            :                         }
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineCov">       1869 :                         if (ctx-&gt;dash_mode &amp;&amp; ctx-&gt;file) {</span>
+<span class="lineNum">     365 </span>            :                                 GF_FilterEvent evt;
+<span class="lineNum">     366 </span><span class="lineCov">          6 :                                 GF_FEVT_INIT(evt, GF_FEVT_SEGMENT_SIZE, ctx-&gt;pid);</span>
+<span class="lineNum">     367 </span>            :                                 evt.seg_size.seg_url = NULL;
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span><span class="lineCov">          6 :                                 if (ctx-&gt;dash_mode==1) {</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                                         evt.seg_size.is_init = GF_TRUE;</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :                                         ctx-&gt;dash_mode = 2;</span>
+<span class="lineNum">     372 </span>            :                                         evt.seg_size.media_range_start = 0;
+<span class="lineNum">     373 </span>            :                                         evt.seg_size.media_range_end = 0;
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_send_event(ctx-&gt;pid, &amp;evt);</span>
+<span class="lineNum">     375 </span>            :                                 } else {
+<span class="lineNum">     376 </span>            :                                         evt.seg_size.is_init = GF_FALSE;
+<span class="lineNum">     377 </span><span class="lineCov">          6 :                                         evt.seg_size.media_range_start = ctx-&gt;offset_at_seg_start;</span>
+<span class="lineNum">     378 </span><span class="lineCov">          6 :                                         evt.seg_size.media_range_end = gf_ftell(ctx-&gt;file)-1;</span>
+<span class="lineNum">     379 </span><span class="lineCov">          6 :                                         gf_filter_pid_send_event(ctx-&gt;pid, &amp;evt);</span>
+<span class="lineNum">     380 </span>            :                                 }
+<span class="lineNum">     381 </span>            :                         }
+<span class="lineNum">     382 </span><span class="lineCov">       1869 :                         fileout_open_close(ctx, NULL, NULL, 0, GF_FALSE, NULL);</span>
+<span class="lineNum">     383 </span><span class="lineCov">       1869 :                         return GF_EOS;</span>
+<span class="lineNum">     384 </span>            :                 }
+<span class="lineNum">     385 </span>            :                 return GF_OK;
+<span class="lineNum">     386 </span>            :         }
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span><span class="lineCov">     156925 :         gf_filter_pck_get_framing(pck, &amp;start, &amp;end);</span>
+<span class="lineNum">     389 </span><span class="lineCov">     156925 :         if (!ctx-&gt;redund) {</span>
+<span class="lineNum">     390 </span><span class="lineCov">     156925 :                 u32 dep_flags = gf_filter_pck_get_dependency_flags(pck);</span>
+<span class="lineNum">     391 </span>            :                 //redundant packet, do not store
+<span class="lineNum">     392 </span><span class="lineCov">     156925 :                 if ((dep_flags &amp; 0x3) == 1) {</span>
+<span class="lineNum">     393 </span><span class="lineCov">       1894 :                         gf_filter_pid_drop_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     394 </span><span class="lineCov">       1894 :                         return GF_OK;</span>
+<span class="lineNum">     395 </span>            :                 }
+<span class="lineNum">     396 </span>            :         }
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span><span class="lineCov">     155031 :         if (ctx-&gt;is_null) {</span>
+<span class="lineNum">     399 </span><span class="lineCov">        868 :                 if (start) {</span>
+<span class="lineNum">     400 </span>            :                         u32 fnum=0;
+<span class="lineNum">     401 </span>            :                         const char *filename=NULL;
+<span class="lineNum">     402 </span><span class="lineCov">          3 :                         p = gf_filter_pck_get_property(pck, GF_PROP_PCK_FILENUM);</span>
+<span class="lineNum">     403 </span><span class="lineCov">          3 :                         if (p) fnum = p-&gt;value.uint;</span>
+<span class="lineNum">     404 </span><span class="lineCov">          3 :                         p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_URL);</span>
+<span class="lineNum">     405 </span><span class="lineCov">          3 :                         if (!p) p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_OUTPATH);</span>
+<span class="lineNum">     406 </span><span class="lineCov">          3 :                         if (!p) p = gf_filter_pck_get_property(pck, GF_PROP_PCK_FILENAME);</span>
+<span class="lineNum">     407 </span><span class="lineCov">          3 :                         if (p) filename = p-&gt;value.string;</span>
+<span class="lineNum">     408 </span><span class="lineCov">          3 :                         if (filename) {</span>
+<span class="lineNum">     409 </span><span class="lineCov">          3 :                                 strcpy(ctx-&gt;szFileName, filename);</span>
+<span class="lineNum">     410 </span>            :                         } else {
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :                                 sprintf(ctx-&gt;szFileName, &quot;%d&quot;, fnum);</span>
+<span class="lineNum">     412 </span>            :                         }
+<span class="lineNum">     413 </span><span class="lineCov">          3 :                         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[FileOut] null open (file name is %s)\n&quot;, ctx-&gt;szFileName));</span>
+<span class="lineNum">     414 </span>            :                 }
+<span class="lineNum">     415 </span><span class="lineCov">        868 :                 if (end) {</span>
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[FileOut] null close (file name was %s)\n&quot;, ctx-&gt;szFileName));</span>
+<span class="lineNum">     417 </span>            :                 }
+<span class="lineNum">     418 </span><span class="lineCov">        868 :                 gf_filter_pid_drop_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     419 </span><span class="lineCov">        868 :                 return fileout_process(filter);</span>
+<span class="lineNum">     420 </span>            :         }
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span><span class="lineCov">     154163 :         if (ctx-&gt;file &amp;&amp; start &amp;&amp; (ctx-&gt;cat==FOUT_CAT_ALL))</span>
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :                 start = GF_FALSE;</span>
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span><span class="lineCov">     154163 :         if (ctx-&gt;dash_mode) {</span>
+<span class="lineNum">     426 </span><span class="lineCov">       1645 :                 p = gf_filter_pck_get_property(pck, GF_PROP_PCK_FILENUM);</span>
+<span class="lineNum">     427 </span><span class="lineCov">       1645 :                 if (p) {</span>
+<span class="lineNum">     428 </span>            :                         GF_FilterEvent evt;
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span><span class="lineCov">         66 :                         GF_FEVT_INIT(evt, GF_FEVT_SEGMENT_SIZE, ctx-&gt;pid);</span>
+<span class="lineNum">     431 </span>            :                         evt.seg_size.seg_url = NULL;
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineCov">         66 :                         if (ctx-&gt;dash_mode==1) {</span>
+<span class="lineNum">     434 </span><span class="lineCov">          6 :                                 evt.seg_size.is_init = GF_TRUE;</span>
+<span class="lineNum">     435 </span><span class="lineCov">          6 :                                 ctx-&gt;dash_mode = 2;</span>
+<span class="lineNum">     436 </span>            :                                 evt.seg_size.media_range_start = 0;
+<span class="lineNum">     437 </span>            :                                 evt.seg_size.media_range_end = 0;
+<span class="lineNum">     438 </span><span class="lineCov">          6 :                                 gf_filter_pid_send_event(ctx-&gt;pid, &amp;evt);</span>
+<span class="lineNum">     439 </span>            :                         } else {
+<span class="lineNum">     440 </span>            :                                 evt.seg_size.is_init = GF_FALSE;
+<span class="lineNum">     441 </span><span class="lineCov">         60 :                                 evt.seg_size.media_range_start = ctx-&gt;offset_at_seg_start;</span>
+<span class="lineNum">     442 </span><span class="lineCov">         60 :                                 evt.seg_size.media_range_end = gf_ftell(ctx-&gt;file)-1;</span>
+<span class="lineNum">     443 </span><span class="lineCov">         60 :                                 ctx-&gt;offset_at_seg_start = evt.seg_size.media_range_end+1;</span>
+<span class="lineNum">     444 </span><span class="lineCov">         60 :                                 gf_filter_pid_send_event(ctx-&gt;pid, &amp;evt);</span>
+<span class="lineNum">     445 </span>            :                         }
+<span class="lineNum">     446 </span><span class="lineCov">         66 :                         if ( gf_filter_pck_get_property(pck, GF_PROP_PCK_FILENAME))</span>
+<span class="lineNum">     447 </span><span class="lineCov">         22 :                                 start = GF_TRUE;</span>
+<span class="lineNum">     448 </span>            :                 }
+<span class="lineNum">     449 </span>            :         }
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span><span class="lineCov">     154163 :         if (start) {</span>
+<span class="lineNum">     452 </span>            :                 const GF_PropertyValue *ext, *fnum, *fsuf;
+<span class="lineNum">     453 </span>            :                 Bool explicit_overwrite = GF_FALSE;
+<span class="lineNum">     454 </span>            :                 const char *name = NULL;
+<span class="lineNum">     455 </span>            :                 fname = ext = NULL;
+<span class="lineNum">     456 </span>            :                 //file num increased per packet, open new file
+<span class="lineNum">     457 </span><span class="lineCov">       4979 :                 fnum = gf_filter_pck_get_property(pck, GF_PROP_PCK_FILENUM);</span>
+<span class="lineNum">     458 </span><span class="lineCov">       4979 :                 if (fnum) {</span>
+<span class="lineNum">     459 </span><span class="lineCov">       2883 :                         fname = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_OUTPATH);</span>
+<span class="lineNum">     460 </span><span class="lineCov">       2883 :                         ext = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_FILE_EXT);</span>
+<span class="lineNum">     461 </span><span class="lineCov">       2883 :                         if (!fname) name = ctx-&gt;dst;</span>
+<span class="lineNum">     462 </span>            :                 }
+<span class="lineNum">     463 </span>            :                 //filename change at packet start, open new file
+<span class="lineNum">     464 </span><span class="lineCov">       4979 :                 if (!fname) fname = gf_filter_pck_get_property(pck, GF_PROP_PCK_FILENAME);</span>
+<span class="lineNum">     465 </span><span class="lineCov">       4979 :                 if (!fname) fname = gf_filter_pck_get_property(pck, GF_PROP_PID_OUTPATH);</span>
+<span class="lineNum">     466 </span><span class="lineCov">       4979 :                 if (!ext) ext = gf_filter_pck_get_property(pck, GF_PROP_PID_FILE_EXT);</span>
+<span class="lineNum">     467 </span><span class="lineCov">       4979 :                 if (fname) name = fname-&gt;value.string;</span>
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span><span class="lineCov">       4979 :                 fsuf = gf_filter_pck_get_property(pck, GF_PROP_PCK_FILESUF);</span>
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span><span class="lineCov">       4979 :                 if (end &amp;&amp; gf_filter_pck_get_seek_flag(pck))</span>
+<span class="lineNum">     472 </span>            :                         explicit_overwrite = GF_TRUE;
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span><span class="lineCov">       4979 :                 if (name) {</span>
+<span class="lineNum">     475 </span><span class="lineCov">       3021 :                         fileout_open_close(ctx, name, ext ? ext-&gt;value.string : NULL, fnum ? fnum-&gt;value.uint : 0, explicit_overwrite, fsuf ? fsuf-&gt;value.string : NULL);</span>
+<span class="lineNum">     476 </span><span class="lineCov">       1958 :                 } else if (!ctx-&gt;file) {</span>
+<span class="lineNum">     477 </span><span class="lineCov">       1957 :                         fileout_setup_file(ctx, explicit_overwrite);</span>
+<span class="lineNum">     478 </span>            :                 }
+<span class="lineNum">     479 </span>            :         }
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span><span class="lineCov">     154163 :         p = gf_filter_pck_get_property(pck, GF_PROP_PCK_HLS_FRAG_NUM);</span>
+<span class="lineNum">     482 </span><span class="lineCov">     154163 :         if (p) {</span>
+<span class="lineNum">     483 </span>            :                 char szHLSChunk[GF_MAX_PATH+21];
+<span class="lineNum">     484 </span><span class="lineCov">         40 :                 snprintf(szHLSChunk, GF_MAX_PATH+20, &quot;%s.%d&quot;, ctx-&gt;szFileName, p-&gt;value.uint);</span>
+<span class="lineNum">     485 </span><span class="lineCov">         40 :                 if (ctx-&gt;hls_chunk) gf_fclose(ctx-&gt;hls_chunk);</span>
+<span class="lineNum">     486 </span><span class="lineCov">         40 :                 ctx-&gt;hls_chunk = gf_fopen_ex(szHLSChunk, ctx-&gt;original_url, &quot;w+b&quot;);</span>
+<span class="lineNum">     487 </span>            :         }
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span><span class="lineCov">     154163 :         pck_data = gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     490 </span><span class="lineCov">     154163 :         if (ctx-&gt;file) {</span>
+<span class="lineNum">     491 </span><span class="lineCov">     154163 :                 GF_FilterFrameInterface *hwf = gf_filter_pck_get_frame_interface(pck);</span>
+<span class="lineNum">     492 </span><span class="lineCov">     154163 :                 if (pck_data) {</span>
+<span class="lineNum">     493 </span><span class="lineCov">     146883 :                         if (ctx-&gt;patch_blocks &amp;&amp; gf_filter_pck_get_seek_flag(pck)) {</span>
+<span class="lineNum">     494 </span><span class="lineCov">          4 :                                 u64 bo = gf_filter_pck_get_byte_offset(pck);</span>
+<span class="lineNum">     495 </span><span class="lineCov">          4 :                                 if (ctx-&gt;is_std) {</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Cannot patch file, output is stdout\n&quot;));</span>
+<span class="lineNum">     497 </span><span class="lineCov">          4 :                                 } else if (bo==GF_FILTER_NO_BO) {</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Cannot patch file, wrong byte offset\n&quot;));</span>
+<span class="lineNum">     499 </span>            :                                 } else {
+<span class="lineNum">     500 </span><span class="lineCov">          4 :                                         u32 ilaced = gf_filter_pck_get_interlaced(pck);</span>
+<span class="lineNum">     501 </span><span class="lineCov">          4 :                                         u64 pos = ctx-&gt;nb_write;</span>
+<span class="lineNum">     502 </span><span class="lineCov">          4 :                                         if (ctx-&gt;file) {</span>
+<span class="lineNum">     503 </span>            :                                                 assert( ctx-&gt;nb_write == gf_ftell(ctx-&gt;file) );
+<span class="lineNum">     504 </span>            :                                         }
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            :                                         //we are inserting a block: write dummy bytes at end and move bytes
+<span class="lineNum">     507 </span><span class="lineCov">          4 :                                         if (ilaced) {</span>
+<span class="lineNum">     508 </span>            :                                                 u8 *block;
+<span class="lineNum">     509 </span>            :                                                 u64 cur_r, cur_w;
+<span class="lineNum">     510 </span><span class="lineCov">          1 :                                                 nb_write = (u32) gf_fwrite(pck_data, pck_size, ctx-&gt;file);</span>
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span><span class="lineCov">          1 :                                                 if (nb_write!=pck_size) {</span>
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :                                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Write error, wrote %d bytes but had %d to write\n&quot;, nb_write, pck_size));</span>
+<span class="lineNum">     514 </span>            :                                                 }
+<span class="lineNum">     515 </span><span class="lineCov">          1 :                                                 cur_w = gf_ftell(ctx-&gt;file);</span>
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span><span class="lineCov">          1 :                                                 gf_fseek(ctx-&gt;file, pos, SEEK_SET);</span>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span>            :                                                 cur_r = pos;
+<span class="lineNum">     520 </span>            :                                                 pos = cur_w;
+<span class="lineNum">     521 </span><span class="lineCov">          1 :                                                 block = gf_malloc(ctx-&gt;mvbk);</span>
+<span class="lineNum">     522 </span><span class="lineCov">          1 :                                                 if (!block) {</span>
+<span class="lineNum">     523 </span><span class="lineNoCov">          0 :                                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] unable to allocate block of %d bytes\n&quot;, ctx-&gt;mvbk));</span>
+<span class="lineNum">     524 </span>            :                                                 } else {
+<span class="lineNum">     525 </span><span class="lineCov">         17 :                                                         while (cur_r &gt; bo) {</span>
+<span class="lineNum">     526 </span><span class="lineCov">         16 :                                                                 u32 move_bytes = ctx-&gt;mvbk;</span>
+<span class="lineNum">     527 </span><span class="lineCov">         16 :                                                                 if (cur_r - bo &lt; move_bytes)</span>
+<span class="lineNum">     528 </span><span class="lineCov">          1 :                                                                         move_bytes = (u32) (cur_r - bo);</span>
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span><span class="lineCov">         16 :                                                                 gf_fseek(ctx-&gt;file, cur_r - move_bytes, SEEK_SET);</span>
+<span class="lineNum">     531 </span><span class="lineCov">         16 :                                                                 nb_write = (u32) gf_fread(block, (size_t) move_bytes, ctx-&gt;file);</span>
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span><span class="lineCov">         16 :                                                                 if (nb_write!=move_bytes) {</span>
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :                                                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Read error, got %d bytes but had %d to read\n&quot;, nb_write, move_bytes));</span>
+<span class="lineNum">     535 </span>            :                                                                 }
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span><span class="lineCov">         16 :                                                                 gf_fseek(ctx-&gt;file, cur_w - move_bytes, SEEK_SET);</span>
+<span class="lineNum">     538 </span><span class="lineCov">         16 :                                                                 nb_write = (u32) gf_fwrite(block, (size_t) move_bytes, ctx-&gt;file);</span>
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span><span class="lineCov">         16 :                                                                 if (nb_write!=move_bytes) {</span>
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :                                                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Write error, wrote %d bytes but had %d to write\n&quot;, nb_write, move_bytes));</span>
+<span class="lineNum">     542 </span>            :                                                                 }
+<span class="lineNum">     543 </span>            :                                                                 cur_r -= move_bytes;
+<span class="lineNum">     544 </span>            :                                                                 cur_w -= move_bytes;
+<span class="lineNum">     545 </span>            :                                                         }
+<span class="lineNum">     546 </span><span class="lineCov">          1 :                                                         gf_free(block);</span>
+<span class="lineNum">     547 </span>            :                                                 }
+<span class="lineNum">     548 </span>            :                                         }
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span><span class="lineCov">          4 :                                         gf_fseek(ctx-&gt;file, bo, SEEK_SET);</span>
+<span class="lineNum">     551 </span><span class="lineCov">          4 :                                         nb_write = (u32) gf_fwrite(pck_data, pck_size, ctx-&gt;file);</span>
+<span class="lineNum">     552 </span><span class="lineCov">          4 :                                         gf_fseek(ctx-&gt;file, pos, SEEK_SET);</span>
+<span class="lineNum">     553 </span>            : 
+<span class="lineNum">     554 </span><span class="lineCov">          4 :                                         if (nb_write!=pck_size) {</span>
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :                                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Write error, wrote %d bytes but had %d to write\n&quot;, nb_write, pck_size));</span>
+<span class="lineNum">     556 </span>            :                                         }
+<span class="lineNum">     557 </span>            :                                 }
+<span class="lineNum">     558 </span>            :                         } else {
+<span class="lineNum">     559 </span><span class="lineCov">     146879 :                                 nb_write = (u32) gf_fwrite(pck_data, pck_size, ctx-&gt;file);</span>
+<span class="lineNum">     560 </span><span class="lineCov">     146879 :                                 if (nb_write!=pck_size) {</span>
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Write error, wrote %d bytes but had %d to write\n&quot;, nb_write, pck_size));</span>
+<span class="lineNum">     562 </span>            :                                 }
+<span class="lineNum">     563 </span><span class="lineCov">     146879 :                                 ctx-&gt;nb_write += nb_write;</span>
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span><span class="lineCov">     146879 :                                 if (ctx-&gt;hls_chunk) {</span>
+<span class="lineNum">     566 </span><span class="lineCov">         80 :                                         nb_write = (u32) gf_fwrite(pck_data, pck_size, ctx-&gt;hls_chunk);</span>
+<span class="lineNum">     567 </span><span class="lineCov">         80 :                                         if (nb_write!=pck_size) {</span>
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 :                                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Write error, wrote %d bytes but had %d to write\n&quot;, nb_write, pck_size));</span>
+<span class="lineNum">     569 </span>            :                                         }
+<span class="lineNum">     570 </span>            :                                 }
+<span class="lineNum">     571 </span>            :                         }
+<span class="lineNum">     572 </span><span class="lineCov">       7280 :                 } else if (hwf) {</span>
+<span class="lineNum">     573 </span>            :                         u32 w, h, stride, stride_uv, pf;
+<span class="lineNum">     574 </span>            :                         u32 nb_planes, uv_height;
+<span class="lineNum">     575 </span><span class="lineCov">       7280 :                         p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_WIDTH);</span>
+<span class="lineNum">     576 </span><span class="lineCov">       7280 :                         w = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     577 </span><span class="lineCov">       7280 :                         p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_HEIGHT);</span>
+<span class="lineNum">     578 </span><span class="lineCov">       7280 :                         h = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     579 </span><span class="lineCov">       7280 :                         p = gf_filter_pid_get_property(ctx-&gt;pid, GF_PROP_PID_PIXFMT);</span>
+<span class="lineNum">     580 </span><span class="lineCov">       7280 :                         pf = p ? p-&gt;value.uint : 0;</span>
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span><span class="lineCov">       7280 :                         stride = stride_uv = 0;</span>
+<span class="lineNum">     583 </span>            : 
+<span class="lineNum">     584 </span><span class="lineCov">       7280 :                         if (gf_pixel_get_size_info(pf, w, h, NULL, &amp;stride, &amp;stride_uv, &amp;nb_planes, &amp;uv_height) == GF_TRUE) {</span>
+<span class="lineNum">     585 </span>            :                                 u32 i;
+<span class="lineNum">     586 </span><span class="lineCov">      22596 :                                 for (i=0; i&lt;nb_planes; i++) {</span>
+<span class="lineNum">     587 </span>            :                                         u32 j, write_h, lsize;
+<span class="lineNum">     588 </span>            :                                         const u8 *out_ptr;
+<span class="lineNum">     589 </span><span class="lineCov">       7658 :                                         u32 out_stride = i ? stride_uv : stride;</span>
+<span class="lineNum">     590 </span><span class="lineCov">       7658 :                                         GF_Err e = hwf-&gt;get_plane(hwf, i, &amp;out_ptr, &amp;out_stride);</span>
+<span class="lineNum">     591 </span><span class="lineCov">       7658 :                                         if (e) {</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Failed to fetch plane data from hardware frame, cannot write\n&quot;));</span>
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :                                                 break;</span>
+<span class="lineNum">     594 </span>            :                                         }
+<span class="lineNum">     595 </span><span class="lineCov">       7658 :                                         if (i) {</span>
+<span class="lineNum">     596 </span><span class="lineCov">        378 :                                                 write_h = uv_height;</span>
+<span class="lineNum">     597 </span><span class="lineCov">        378 :                                                 lsize = stride_uv;</span>
+<span class="lineNum">     598 </span>            :                                         } else {
+<span class="lineNum">     599 </span>            :                                                 write_h = h;
+<span class="lineNum">     600 </span><span class="lineCov">       7280 :                                                 lsize = stride;</span>
+<span class="lineNum">     601 </span>            :                                         }
+<span class="lineNum">     602 </span><span class="lineCov">    1353578 :                                         for (j=0; j&lt;write_h; j++) {</span>
+<span class="lineNum">     603 </span><span class="lineCov">    1345920 :                                                 nb_write = (u32) gf_fwrite(out_ptr, lsize, ctx-&gt;file);</span>
+<span class="lineNum">     604 </span><span class="lineCov">    1345920 :                                                 if (nb_write!=lsize) {</span>
+<span class="lineNum">     605 </span><span class="lineNoCov">          0 :                                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] Write error, wrote %d bytes but had %d to write\n&quot;, nb_write, lsize));</span>
+<span class="lineNum">     606 </span>            :                                                 }
+<span class="lineNum">     607 </span><span class="lineCov">    1345920 :                                                 ctx-&gt;nb_write += nb_write;</span>
+<span class="lineNum">     608 </span><span class="lineCov">    1345920 :                                                 out_ptr += out_stride;</span>
+<span class="lineNum">     609 </span>            :                                         }
+<span class="lineNum">     610 </span>            :                                 }
+<span class="lineNum">     611 </span>            :                         }
+<span class="lineNum">     612 </span>            :                 } else {
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[FileOut] No data associated with packet, cannot write\n&quot;));</span>
+<span class="lineNum">     614 </span>            :                 }
+<span class="lineNum">     615 </span>            :         } else {
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[FileOut] output file handle is not opened, discarding %d bytes\n&quot;, pck_size));</span>
+<span class="lineNum">     617 </span>            :         }
+<span class="lineNum">     618 </span><span class="lineCov">     154163 :         gf_filter_pid_drop_packet(ctx-&gt;pid);</span>
+<span class="lineNum">     619 </span><span class="lineCov">     154163 :         if (end &amp;&amp; !ctx-&gt;cat) {</span>
+<span class="lineNum">     620 </span><span class="lineCov">       3457 :                 fileout_open_close(ctx, NULL, NULL, 0, GF_FALSE, NULL);</span>
+<span class="lineNum">     621 </span>            :         }
+<span class="lineNum">     622 </span><span class="lineCov">     154163 :         if (gf_filter_reporting_enabled(filter)) {</span>
+<span class="lineNum">     623 </span>            :                 char szStatus[1024];
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :                 snprintf(szStatus, 1024, &quot;%s: wrote % 16&quot;LLD_SUF&quot; bytes&quot;, gf_file_basename(ctx-&gt;szFileName), (s64) ctx-&gt;nb_write);</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :                 gf_filter_update_status(filter, -1, szStatus);</span>
+<span class="lineNum">     626 </span>            :         }
+<span class="lineNum">     627 </span>            :         return GF_OK;
+<a name="628"><span class="lineNum">     628 </span>            : }</a>
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span><span class="lineCov">      60135 : static Bool fileout_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     631 </span>            : {
+<span class="lineNum">     632 </span><span class="lineCov">      60135 :         if (evt-&gt;base.type==GF_FEVT_FILE_DELETE) {</span>
+<span class="lineNum">     633 </span><span class="lineCov">          1 :                 GF_FileOutCtx *ctx = (GF_FileOutCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     634 </span><span class="lineCov">          1 :                 if (ctx-&gt;is_null) {</span>
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[FileOut] null delete (file name was %s)\n&quot;, evt-&gt;file_del.url));</span>
+<span class="lineNum">     636 </span>            :                 } else {
+<span class="lineNum">     637 </span><span class="lineCov">          1 :                         gf_file_delete(evt-&gt;file_del.url);</span>
+<span class="lineNum">     638 </span>            :                 }
+<span class="lineNum">     639 </span>            :                 return GF_TRUE;
+<span class="lineNum">     640 </span>            :         }
+<a name="641"><span class="lineNum">     641 </span>            :         return GF_FALSE;</a>
+<span class="lineNum">     642 </span>            : }
+<span class="lineNum">     643 </span><span class="lineCov">       2793 : static GF_FilterProbeScore fileout_probe_url(const char *url, const char *mime)</span>
+<span class="lineNum">     644 </span>            : {
+<span class="lineNum">     645 </span><span class="lineCov">       2793 :         if (strstr(url, &quot;://&quot;)) {</span>
+<span class="lineNum">     646 </span>            : 
+<span class="lineNum">     647 </span><span class="lineCov">         84 :                 if (!strnicmp(url, &quot;file://&quot;, 7)) return GF_FPROBE_MAYBE_SUPPORTED;</span>
+<span class="lineNum">     648 </span><span class="lineCov">         84 :                 if (!strnicmp(url, &quot;gfio://&quot;, 7)) {</span>
+<span class="lineNum">     649 </span><span class="lineCov">          6 :                         if (!gf_fileio_write_mode(gf_fileio_from_url(url)))</span>
+<span class="lineNum">     650 </span>            :                                 return GF_FPROBE_NOT_SUPPORTED;
+<span class="lineNum">     651 </span><span class="lineCov">          6 :                         return GF_FPROBE_MAYBE_SUPPORTED;</span>
+<span class="lineNum">     652 </span>            :                 }
+<span class="lineNum">     653 </span>            :                 return GF_FPROBE_NOT_SUPPORTED;
+<span class="lineNum">     654 </span>            :         }
+<span class="lineNum">     655 </span>            :         return GF_FPROBE_MAYBE_SUPPORTED;
+<span class="lineNum">     656 </span>            : }
+<span class="lineNum">     657 </span>            : 
+<span class="lineNum">     658 </span>            : 
+<span class="lineNum">     659 </span>            : #define OFFS(_n)        #_n, offsetof(GF_FileOutCtx, _n)
+<span class="lineNum">     660 </span>            : 
+<span class="lineNum">     661 </span>            : static const GF_FilterArgs FileOutArgs[] =
+<span class="lineNum">     662 </span>            : {
+<span class="lineNum">     663 </span>            :         { OFFS(dst), &quot;location of destination file - see filter help &quot;, GF_PROP_NAME, NULL, NULL, 0},
+<span class="lineNum">     664 </span>            :         { OFFS(append), &quot;open in append mode&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     665 </span>            :         { OFFS(dynext), &quot;indicate the file extension is set by filter chain, not dst&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     666 </span>            :         { OFFS(start), &quot;set playback start offset. Negative value means percent of media duration with -1 equal to duration&quot;, GF_PROP_DOUBLE, &quot;0.0&quot;, NULL, 0},
+<span class="lineNum">     667 </span>            :         { OFFS(speed), &quot;set playback speed when vsync is on. If speed is negative and start is 0, start is set to -1&quot;, GF_PROP_DOUBLE, &quot;1.0&quot;, NULL, 0},
+<span class="lineNum">     668 </span>            :         { OFFS(ext), &quot;set extension for graph resolution, regardless of file extension&quot;, GF_PROP_NAME, NULL, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     669 </span>            :         { OFFS(mime), &quot;set mime type for graph resolution&quot;, GF_PROP_NAME, NULL, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     670 </span>            :         { OFFS(cat), &quot;cat each file of input pid rather than creating one file per filename\n&quot;
+<span class="lineNum">     671 </span>            :                         &quot;- none: never cat files\n&quot;
+<span class="lineNum">     672 </span>            :                         &quot;- auto: only cat if files have same names\n&quot;
+<span class="lineNum">     673 </span>            :                         &quot;- all: always cat regardless of file names&quot;
+<span class="lineNum">     674 </span>            :         , GF_PROP_UINT, &quot;none&quot;, &quot;none|auto|all&quot;, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     675 </span>            :         { OFFS(ow), &quot;overwrite output if existing&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, 0},
+<span class="lineNum">     676 </span>            :         { OFFS(mvbk), &quot;block size used when moving parts of the file around in patch mode&quot;, GF_PROP_UINT, &quot;8192&quot;, NULL, 0},
+<span class="lineNum">     677 </span>            :         { OFFS(redund), &quot;keep redundant packet in output file&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, 0},
+<span class="lineNum">     678 </span>            : 
+<span class="lineNum">     679 </span>            :         {0}
+<span class="lineNum">     680 </span>            : };
+<span class="lineNum">     681 </span>            : 
+<span class="lineNum">     682 </span>            : static const GF_FilterCapability FileOutCaps[] =
+<span class="lineNum">     683 </span>            : {
+<span class="lineNum">     684 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     685 </span>            :         CAP_STRING(GF_CAPS_INPUT,GF_PROP_PID_FILE_EXT, &quot;*&quot;),
+<span class="lineNum">     686 </span>            : };
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span>            : 
+<span class="lineNum">     689 </span>            : GF_FilterRegister FileOutRegister = {
+<span class="lineNum">     690 </span>            :         .name = &quot;fout&quot;,
+<span class="lineNum">     691 </span>            :         GF_FS_SET_DESCRIPTION(&quot;File output&quot;)
+<span class="lineNum">     692 </span>            :         GF_FS_SET_HELP(&quot;The file output filter is used to write output to disk, and does not produce any output PID.\n&quot;
+<span class="lineNum">     693 </span>            :                 &quot;It can work as a null sink when its destination is `null`, dropping all input packets. In this case it accepts ANY type of input pid, not just file ones.\n&quot;
+<span class="lineNum">     694 </span>            :                 &quot;In regular mode, the filter only accept pid of type file. It will dump to file incomming packets (stream type file), starting a new file for each packet having a __frame_start__ flag set, unless operating in [-cat]() mode.\n&quot;
+<span class="lineNum">     695 </span>            :                 &quot;If the output file name is `std` or `stdout`, writes to stdout.\n&quot;
+<span class="lineNum">     696 </span>            :                 &quot;The ouput file name can use gpac templating mechanism, see `gpac -h doc`.&quot;
+<span class="lineNum">     697 </span>            :                 &quot;The filter watches the property `FileNumber` on incoming packets to create new files.\n&quot;
+<span class="lineNum">     698 </span>            :         )
+<span class="lineNum">     699 </span>            :         .private_size = sizeof(GF_FileOutCtx),
+<span class="lineNum">     700 </span>            :         .args = FileOutArgs,
+<span class="lineNum">     701 </span>            :         SETCAPS(FileOutCaps),
+<span class="lineNum">     702 </span>            :         .probe_url = fileout_probe_url,
+<span class="lineNum">     703 </span>            :         .initialize = fileout_initialize,
+<span class="lineNum">     704 </span>            :         .finalize = fileout_finalize,
+<span class="lineNum">     705 </span>            :         .configure_pid = fileout_configure_pid,
+<span class="lineNum">     706 </span>            :         .process = fileout_process,
+<span class="lineNum">     707 </span>            :         .process_event = fileout_process_event
+<span class="lineNum">     708 </span>            : };
+<a name="709"><span class="lineNum">     709 </span>            : </a>
+<span class="lineNum">     710 </span>            : 
+<span class="lineNum">     711 </span><span class="lineCov">       2877 : const GF_FilterRegister *fileout_register(GF_FilterSession *session)</span>
+<span class="lineNum">     712 </span>            : {
+<span class="lineNum">     713 </span><span class="lineCov">       2877 :         return &amp;FileOutRegister;</span>
+<span class="lineNum">     714 </span>            : }
+<span class="lineNum">     715 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

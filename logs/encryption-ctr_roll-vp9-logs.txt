@@ -1,0 +1,60 @@
+*** encryption-ctr_roll-vp9 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:34:54 ***
+
+Computing ./results/temp/ctr_roll-vp9-crypted.mp4  (crypt) hash: 
+File hash (SHA-1): C90FD640CE1A09C4EC6A72E89E9B93672BEA9A37
+Hash OK for ./results/temp/ctr_roll-vp9-crypted.mp4
+
+*** Subtest "Encrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/ctr_roll.xml -out ./results/temp/ctr_roll-vp9-crypted.mp4 ./results/temp/source_media.mp4" ***
+[CENC] VP9 mandates that blockAlign="always". Forcing value.
+
+Computing ./results/temp/ctr_roll-vp9-decrypted.mp4  (decrypt) hash: 
+File hash (SHA-1): D84B337C8B452E4AD42B3982DAABC5E5DE9B7F13
+Hash OK for ./results/temp/ctr_roll-vp9-decrypted.mp4
+
+*** Subtest "Decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/ctr_roll.xml -out ./results/temp/ctr_roll-vp9-decrypted.mp4 ./results/temp/ctr_roll-vp9-crypted.mp4" ***
+
+Same Hash for ./results/temp/source_media.mp4 and ./results/temp/ctr_roll-vp9-decrypted.mp4
+
+*** Subtest "INFO": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/ctr_roll-vp9-crypted.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.080
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 25
+Media Duration 00:00:10.080 
+Media Info: Language "Undetermined (und)" - Type "vide:encv" - 252 samples
+Visual Sample Entry Info: width=1280 height=720 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=1280 height=720
+Unknown track type
+
+	Protected by CENC scheme cenc version 0x00010000
+		KID 279926496A7F5D25DA69F2B3B2799A7F - IV size 39 
+
+	RFC6381 Codec Parameters: vp09.00.00.08.00.255.255.255.00
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 25 samples
+	Max sample duration: 1 / 25
+
+
+Computing ./results/temp/ctr_roll-vp9-crypted_dashinit.mp4  (crypt-dash-init) hash: 
+File hash (SHA-1): 50BD8E4B4A129EB7055511DF88BBA099C56D61FD
+Hash OK for ./results/temp/ctr_roll-vp9-crypted_dashinit.mp4
+Computing ./results/temp/ctr_roll-vp9-crypted_dash1.m4s  (crypt-dash-seg) hash: 
+File hash (SHA-1): 1E0B314BCEEB5D372B17D714458BC9B1D6734096
+Hash OK for ./results/temp/ctr_roll-vp9-crypted_dash1.m4s
+
+*** Subtest "DASH": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/ctr_roll-vp9-crypted.mp4" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 4 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 8 end 3
+[MPD] Generating MPD at time 2021-04-29T23:34:55.281Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 10.08 end 4
+
+

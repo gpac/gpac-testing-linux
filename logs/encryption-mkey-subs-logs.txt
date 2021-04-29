@@ -1,0 +1,33 @@
+*** encryption-mkey-subs logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:46 ***
+
+
+*** Subtest "encrypt": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_1280_720_I_25_tiled_1mb.hevc cecrypt:cfile=./media/encryption/mkey_subs.xml @ -o ./results/temp/crypt.mp4" ***
+
+Computing ./results/temp/crypt.mp4  (encrypt) hash: 
+File hash (SHA-1): 51C3BB007E643BA065F4D31E0FBEC4B6FB170A1C
+Hash fail, ref hash ./hash_refs/encryption-mkey-subs-encrypt.hash was 3539B0EE5363AF05322E58AE2E4BF154119A51A2
+
+*** Subtest "decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./results/temp/crypt.mp4 -out ./results/temp/decrypt.mp4" ***
+
+Computing ./results/temp/decrypt.mp4  (decrypt) hash: 
+File hash (SHA-1): A0CFF5676D84901E2E5EAA8323ED93BC38CB689C
+Hash OK for ./results/temp/decrypt.mp4
+
+*** Subtest "diso": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/decrypt.mp4" ***
+
+Computing ./results/temp/decrypt_info.xml  (diso) hash: 
+File hash (SHA-1): 46110DE893A1C6748D6604281F32B29B03B96526
+Hash OK for ./results/temp/decrypt_info.xml
+
+*** Subtest "iff-mkey-import": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add-image ./results/temp/crypt.mp4:samp=26 -new ./results/temp/crypt.heic" ***
+Adding sample 26 as item 1
+
+Computing ./results/temp/crypt.heic  (iff-mkey-import) hash: 
+File hash (SHA-1): 22BEE413FD583AA1496419F3391E12BA429BEE0D
+Hash fail, ref hash ./hash_refs/encryption-mkey-subs-iff-mkey-import.hash was 98CF42689F709BC4A9A34E4349849930080C79E7
+
+*** Subtest "iff-mkey-decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./results/temp/crypt.heic -out ./results/temp/decrypt.heic" ***
+
+Computing ./results/temp/decrypt.heic  (iff-mkey-decrypt) hash: 
+File hash (SHA-1): BE28943AF0B2F16C62D083E1F398E03A8F1E564B
+Hash OK for ./results/temp/decrypt.heic

@@ -1,0 +1,43 @@
+*** reframer-amrwb logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:55 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/import/obrother_wideband.amr reframer @ -o ./results/temp/obrother_wideband.amr  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -991604864
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/import/obrother_wideband.amr) : 0 input pids 1 output pids 246 tasks 1293 us process time
+		243 packets sent 1212018 bytes sent (187935 pck/sec 7498.95 mbps)
+		* output PID obrother_wideband.amr: 243 packets sent
+	Filter reframer ID _0x5631879f2020_ : 1 input pids 1 output pids 19878 tasks 16681 us process time
+		19869 packets processed 1212009 bytes processed (1.19112e+06 pck/sec 581.264 mbps)
+		19869 packets sent 1212009 bytes sent (1.19112e+06 pck/sec 581.264 mbps)
+		* input PID obrother_wideband.amr: 19869 frames (20107 packets) received
+		* output PID obrother_wideband.amr: 19869 packets sent
+	Filter fout (dst=./results/temp/obrother_wideband.amr) : 1 input pids 0 output pids 19872 tasks 14886 us process time
+		19870 packets processed 1212018 bytes processed (1.33481e+06 pck/sec 651.36 mbps)
+		* input PID obrother_wideband.amr: 19870 packets received
+	Filter rfamr : 1 input pids 1 output pids 19885 tasks 18917 us process time
+		243 packets processed 1212018 bytes processed (12845.6 pck/sec 512.562 mbps)
+		20107 packets sent 1212009 bytes sent (1.06291e+06 pck/sec 512.559 mbps)
+		* input PID obrother_wideband.amr: 243 packets received
+		* output PID obrother_wideband.amr: 20107 packets sent
+	Filter writegen : 1 input pids 1 output pids 20117 tasks 17972 us process time
+		19869 packets processed 1212009 bytes processed (1.10555e+06 pck/sec 539.51 mbps)
+		19870 packets sent 1212018 bytes sent (1.10561e+06 pck/sec 539.514 mbps)
+		* input PID obrother_wideband.amr: 19869 packets received
+		* output PID obrother_wideband.amr: 19870 packets sent
+Session stats - threads 1
+	Thread 1: run_time 90991 us active_time 87651 us nb_tasks 80723
+
+Total: run_time 90991 us active_time 87651 us nb_tasks 80723
+
+Filters connected:
+fin (src=./external_media/import/obrother_wideband.amr) (ptr=0x5631879ef7f0)
+-(PID obrother_wideband.amr) rfamr (ptr=0x5631879f7050)
+--(PID obrother_wideband.amr) reframer (ID=_0x5631879f2020_)
+---(PID obrother_wideband.amr) writegen (ptr=0x563187a05300)
+----(PID obrother_wideband.amr) fout (dst=./results/temp/obrother_wideband.amr) (ptr=0x5631879f3250)
+
+Computing ./results/temp/obrother_wideband.amr  (rewrite) hash: 
+File hash (SHA-1): E6C49E3B71775DEE81130A3234A9F54661FD61EF
+Hash OK for ./results/temp/obrother_wideband.amr

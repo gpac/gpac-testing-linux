@@ -1,0 +1,30 @@
+*** raw-vid-grey logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:47 ***
+
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/vid.mp4 -o ./results/temp/raw.grey -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+Computing ./results/temp/raw.grey  (dump) hash: 
+File hash (SHA-1): 46AC420C46268B99598394D4CFD615153E463A9D
+Hash OK for ./results/temp/raw.grey
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.grey:size=128x128 inspect:fmt=@pn@-@cts@-@bo@@lf@:log=./results/temp/dump.txt" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 41ECEEDC0D4E85D09BB515D84EC81870299F2218
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "gpu_dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.grey:size=128x128 vout:dumpframes=20:out=./results/temp/gpudump.rgb" ***
+Type 'h' in window for command list
+
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.grey:size=128x128 vcrop:wnd=32x10x64x64 @ -o ./results/temp/dumpcrop.grey" ***
+
+Computing ./results/temp/dumpcrop.grey  (crop) hash: 
+File hash (SHA-1): 4DBE04368DE6AAEFF37F2F61E811436DFE019CB6
+Hash OK for ./results/temp/dumpcrop.grey
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.grey:size=128x128 vcrop:copy:wnd=32x10x64x64 @ -o ./results/temp/dumpcropcp.grey" ***
+
+Computing ./results/temp/dumpcropcp.grey  (crop) hash: 
+File hash (SHA-1): 4DBE04368DE6AAEFF37F2F61E811436DFE019CB6
+Hash OK for ./results/temp/dumpcropcp.grey

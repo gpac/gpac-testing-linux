@@ -1,0 +1,69 @@
+*** laser-laser_all logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:37:02 ***
+
+
+*** Subtest "LSR2MP4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -mp4 ./media/laser/laser_all.xml" ***
+[Parser] LASeR Scene Parsing: ./media/laser/laser_all.xml
+[Parser] Scene parsed and Scene Graph built in 4 ms
+[LASeR] Unsupported attributeName choice for animatable type, skipping
+[LASeR] Unsupported attributeName choice for animatable type, skipping
+[LASeR] corrupted font table while encoding anim value
+[LASeR] unsupported anim type 86 (LASeR_Size) - skipping
+[LASeR] unsupported anim type 86 (LASeR_Size) - skipping
+[LASeR] unsupported anim type 86 (LASeR_Size) - skipping
+[LASeR] unsupported anim type 86 (LASeR_Size) - skipping
+[LASeR] Unsupported LASER event 84
+[LASeR] node bar:bar not part of LASeR children nodes - skipping
+[LASeR] Unsupported LASER event 84
+
+Computing ./media/laser/laser_all.mp4  (lsr-to-mp4) hash: 
+File hash (SHA-1): AB7AEE58B403EE87CF46958D13F1D357A60CBA68
+Hash OK for ./media/laser/laser_all.mp4
+
+*** Subtest "LSR2SAF": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -saf ./media/laser/laser_all.xml" ***
+[Parser] LASeR Scene Parsing: ./media/laser/laser_all.xml
+[Parser] Scene parsed and Scene Graph built in 3 ms
+[LASeR] Unsupported attributeName choice for animatable type, skipping
+[LASeR] Unsupported attributeName choice for animatable type, skipping
+[LASeR] corrupted font table while encoding anim value
+[LASeR] unsupported anim type 86 (LASeR_Size) - skipping
+[LASeR] unsupported anim type 86 (LASeR_Size) - skipping
+[LASeR] unsupported anim type 86 (LASeR_Size) - skipping
+[LASeR] unsupported anim type 86 (LASeR_Size) - skipping
+[LASeR] Unsupported LASER event 84
+[LASeR] node bar:bar not part of LASeR children nodes - skipping
+[LASeR] Unsupported LASER event 84
+SAF: Multiplexing 1 tracks
+
+Computing ./media/laser/laser_all.saf  (lsr-to-saf) hash: 
+File hash (SHA-1): 27FAA9DC34CFD1B26AF34000DCE402A95826C810
+Hash OK for ./media/laser/laser_all.saf
+
+*** Subtest "MP42LSR": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -lsr ./media/laser/laser_all.mp4 -out ./results/temp/test1.lsr" ***
+MPEG-4 LASeR Scene Parsing
+Scene loaded - dumping 2 systems streams
+
+Computing ./results/temp/test1.lsr  (mp4-to-lsr) hash: 
+File hash (SHA-1): D13DAF0429976D36A4C56BA95BEAB55127366FC4
+Hash OK for ./results/temp/test1.lsr
+
+*** Subtest "SAF2LSR": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -lsr ./media/laser/laser_all.saf -out ./results/temp/test2.lsr" ***
+Track Importing MPEG-4 LASeR
+MPEG-4 LASeR Scene Parsing
+Scene loaded - dumping 1 systems streams
+
+Computing ./results/temp/test2.lsr  (saf-to-lsr) hash: 
+File hash (SHA-1): B49E978CEB8B8BAF8C8FA643C4D4F85FB4EF11FC
+Hash OK for ./results/temp/test2.lsr
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -blacklist=vtbdec,nvdec -i ./media/laser/laser_all.mp4 compositor:osize=192x192:vfr:dur=5 @ -o ./results/temp/laser_all-dump.rgb" ***
+[SVG Attributes] copy of attributes (null) of type LASeR_Size not supported
+[SMIL Animation] Warning: by-animations cannot use additive="replace"
+[SMIL Animation] Warning: by-animations cannot use additive="replace"
+[SMIL Animation] Warning: by-animations cannot use additive="replace"
+
+Computing ./results/temp/inspect_saf.txt  (inspect-saf) hash: 
+File hash (SHA-1): C1B027718284FB626EB09F87F4FDFCE15FC990C2
+Hash OK for ./results/temp/inspect_saf.txt
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/laser/laser_all.saf inspect:allp:deep:interleave=false:log=./results/temp/inspect_saf.txt" ***
+

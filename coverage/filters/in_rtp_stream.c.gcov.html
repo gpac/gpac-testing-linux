@@ -1,0 +1,844 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/in_rtp_stream.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - in_rtp_stream.c<span style="font-size: 80%;"> (source / <a href="in_rtp_stream.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">302</td>
+            <td class="headerCovTableEntry">385</td>
+            <td class="headerCovTableEntryMed">78.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryHi">93.3 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / RTP/RTSP input filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &quot;in_rtp.h&quot;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : 
+<a name="29"><span class="lineNum">      29 </span>            : #ifndef GPAC_DISABLE_STREAMING</a>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">          6 : void rtpin_stream_ack_connect(GF_RTPInStream *stream, GF_Err e)</span>
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :         /*in case the channel has been disconnected while SETUP was issued&amp;processed. We also could
+<span class="lineNum">      34 </span>            :         clean up the command stack*/
+<span class="lineNum">      35 </span>            :         if (!stream-&gt;opid) return;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :         if (e != GF_OK || !stream-&gt;rtp_ch) return;
+<a name="38"><span class="lineNum">      38 </span>            : }</a>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">         32 : GF_Err rtpin_stream_init(GF_RTPInStream *stream, Bool ResetOnly)</span>
+<span class="lineNum">      41 </span>            : {
+<span class="lineNum">      42 </span><span class="lineCov">         32 :         gf_rtp_depacketizer_reset(stream-&gt;depacketizer, !ResetOnly);</span>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">         32 :         if (!ResetOnly) {</span>
+<span class="lineNum">      45 </span>            :                 GF_Err e;
+<span class="lineNum">      46 </span>            :                 const char *ip_ifce = NULL;
+<span class="lineNum">      47 </span><span class="lineCov">         20 :                 if (!stream-&gt;rtpin-&gt;interleave) {</span>
+<span class="lineNum">      48 </span><span class="lineCov">         19 :                         ip_ifce = stream-&gt;rtpin-&gt;ifce;</span>
+<span class="lineNum">      49 </span>            :                 }
+<span class="lineNum">      50 </span><span class="lineCov">         20 :                 if (stream-&gt;rtp_ch-&gt;rtp)</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :                         gf_sk_group_unregister(stream-&gt;rtpin-&gt;sockgroup, stream-&gt;rtp_ch-&gt;rtp);</span>
+<span class="lineNum">      52 </span><span class="lineCov">         20 :                 if (stream-&gt;rtp_ch-&gt;rtcp)</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :                         gf_sk_group_unregister(stream-&gt;rtpin-&gt;sockgroup, stream-&gt;rtp_ch-&gt;rtcp);</span>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineCov">         20 :                 e = gf_rtp_initialize(stream-&gt;rtp_ch, stream-&gt;rtpin-&gt;block_size, GF_FALSE, 0, stream-&gt;rtpin-&gt;reorder_len, stream-&gt;rtpin-&gt;reorder_delay, (char *)ip_ifce);</span>
+<span class="lineNum">      56 </span><span class="lineCov">         20 :                 if (e) return e;</span>
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">         20 :                 if (stream-&gt;rtp_ch-&gt;rtp)</span>
+<span class="lineNum">      59 </span><span class="lineCov">         19 :                         gf_sk_group_register(stream-&gt;rtpin-&gt;sockgroup, stream-&gt;rtp_ch-&gt;rtp);</span>
+<span class="lineNum">      60 </span><span class="lineCov">         20 :                 if (stream-&gt;rtp_ch-&gt;rtcp)</span>
+<span class="lineNum">      61 </span><span class="lineCov">         19 :                         gf_sk_group_register(stream-&gt;rtpin-&gt;sockgroup, stream-&gt;rtp_ch-&gt;rtcp);</span>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :         }
+<span class="lineNum">      64 </span>            :         //just reset the sockets
+<span class="lineNum">      65 </span><span class="lineCov">         32 :         gf_rtp_reset_buffers(stream-&gt;rtp_ch);</span>
+<span class="lineNum">      66 </span><span class="lineCov">         32 :         return GF_OK;</span>
+<a name="67"><span class="lineNum">      67 </span>            : }</a>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span><span class="lineCov">         14 : void rtpin_stream_reset_queue(GF_RTPInStream *stream)</span>
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span><span class="lineCov">         14 :         if (!stream-&gt;pck_queue) return;</span>
+<span class="lineNum">      72 </span><span class="lineCov">         20 :         while (gf_list_count(stream-&gt;pck_queue)) {</span>
+<span class="lineNum">      73 </span><span class="lineCov">          6 :                 GF_FilterPacket *pck = gf_list_pop_back(stream-&gt;pck_queue);</span>
+<span class="lineNum">      74 </span><span class="lineCov">          6 :                 gf_filter_pck_discard(pck);</span>
+<span class="lineNum">      75 </span>            :         }
+<a name="76"><span class="lineNum">      76 </span>            : }</a>
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineCov">         21 : void rtpin_stream_del(GF_RTPInStream *stream)</span>
+<span class="lineNum">      79 </span>            : {
+<span class="lineNum">      80 </span><span class="lineCov">         21 :         if (stream-&gt;rtsp) {</span>
+<span class="lineNum">      81 </span><span class="lineCov">          6 :                 if (stream-&gt;status == RTP_Running) {</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :                         rtpin_rtsp_teardown(stream-&gt;rtsp, stream);</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                         stream-&gt;status = RTP_Disconnected;</span>
+<span class="lineNum">      84 </span>            :                 }
+<span class="lineNum">      85 </span><span class="lineCov">          6 :                 rtpin_remove_stream(stream-&gt;rtpin, stream);</span>
+<span class="lineNum">      86 </span>            :         } else {
+<span class="lineNum">      87 </span><span class="lineCov">         15 :                 rtpin_find_stream(stream-&gt;rtpin, stream-&gt;opid, 0, NULL, GF_TRUE);</span>
+<span class="lineNum">      88 </span>            :         }
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">         21 :         if (stream-&gt;depacketizer) gf_rtp_depacketizer_del(stream-&gt;depacketizer);</span>
+<span class="lineNum">      91 </span><span class="lineCov">         21 :         if (stream-&gt;rtp_ch) gf_rtp_del(stream-&gt;rtp_ch);</span>
+<span class="lineNum">      92 </span><span class="lineCov">         21 :         if (stream-&gt;control) gf_free(stream-&gt;control);</span>
+<span class="lineNum">      93 </span><span class="lineCov">         21 :         if (stream-&gt;session_id) gf_free(stream-&gt;session_id);</span>
+<span class="lineNum">      94 </span><span class="lineCov">         21 :         if (stream-&gt;buffer) gf_free(stream-&gt;buffer);</span>
+<span class="lineNum">      95 </span><span class="lineCov">         21 :         if (stream-&gt;pck_queue) {</span>
+<span class="lineNum">      96 </span><span class="lineCov">          7 :                 rtpin_stream_reset_queue(stream);</span>
+<span class="lineNum">      97 </span><span class="lineCov">          7 :                 gf_list_del(stream-&gt;pck_queue);</span>
+<span class="lineNum">      98 </span>            :         }
+<span class="lineNum">      99 </span><span class="lineCov">         21 :         gf_free(stream);</span>
+<a name="100"><span class="lineNum">     100 </span><span class="lineCov">         21 : }</span></a>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">        395 : static void rtpin_stream_queue_pck(GF_RTPInStream *stream, GF_FilterPacket *pck, u64 cts)</span>
+<span class="lineNum">     103 </span>            : {
+<span class="lineNum">     104 </span>            :         //get all packets in queue, dispatch all packets with a cts less than the cts of the packet being queued
+<span class="lineNum">     105 </span>            :         //if this is teh first packet in the RTP packet
+<span class="lineNum">     106 </span>            :         //This is only used for MPEG4, and we are sure we only have [AU(n),AU(n+i)..], [AU(n+j), AU(n+k) ...]
+<span class="lineNum">     107 </span>            :         //with i,j,k &gt;0
+<span class="lineNum">     108 </span><span class="lineCov">        746 :         while (stream-&gt;first_in_rtp_pck) {</span>
+<span class="lineNum">     109 </span>            :                 u64 prev_cts;
+<span class="lineNum">     110 </span><span class="lineCov">        426 :                 GF_FilterPacket *prev = gf_list_get(stream-&gt;pck_queue, 0);</span>
+<span class="lineNum">     111 </span><span class="lineCov">        426 :                 if (!prev) break;</span>
+<span class="lineNum">     112 </span><span class="lineCov">        351 :                 prev_cts = gf_filter_pck_get_cts(prev);</span>
+<span class="lineNum">     113 </span><span class="lineCov">        351 :                 if (prev_cts&gt;cts) break;</span>
+<span class="lineNum">     114 </span><span class="lineCov">        351 :                 gf_list_rem(stream-&gt;pck_queue, 0);</span>
+<span class="lineNum">     115 </span><span class="lineCov">        351 :                 gf_filter_pck_send(prev);</span>
+<span class="lineNum">     116 </span>            :         }
+<span class="lineNum">     117 </span><span class="lineCov">        395 :         stream-&gt;first_in_rtp_pck = GF_FALSE;</span>
+<span class="lineNum">     118 </span><span class="lineCov">        395 :         gf_list_add(stream-&gt;pck_queue, pck);</span>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">        395 : }</span></a>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineCov">       1468 : static void rtp_sl_packet_cbk(void *udta, u8 *payload, u32 size, GF_SLHeader *hdr, GF_Err e)</span>
+<span class="lineNum">     122 </span>            : {
+<span class="lineNum">     123 </span>            :         u64 cts, dts;
+<span class="lineNum">     124 </span>            :         s64 diff;
+<span class="lineNum">     125 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     126 </span>            :         u8 *pck_data;
+<span class="lineNum">     127 </span>            :         GF_RTPInStream *stream = (GF_RTPInStream *)udta;
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">       1468 :         if (!stream-&gt;rtcp_init) {</span>
+<span class="lineNum">     131 </span><span class="lineCov">         39 :                 if (!stream-&gt;rtcp_check_start) {</span>
+<span class="lineNum">     132 </span><span class="lineCov">          2 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_RTP, (&quot;[RTP] No RTCP packet received yet, synchronization might be wrong for a while\n&quot;));</span>
+<span class="lineNum">     133 </span><span class="lineCov">          2 :                         stream-&gt;rtcp_check_start = gf_sys_clock();</span>
+<span class="lineNum">     134 </span>            :                 }
+<span class="lineNum">     135 </span><span class="lineCov">         37 :                 else if (gf_sys_clock() - stream-&gt;rtcp_check_start &lt;= stream-&gt;rtpin-&gt;rtcp_timeout) {</span>
+<span class="lineNum">     136 </span><span class="lineCov">         37 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_RTP, (&quot;[RTP] No RTCP packet received yet, synchronization might be wrong for a while\n&quot;));</span>
+<span class="lineNum">     137 </span>            :                 } else {
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_RTP, (&quot;[RTP] Timeout for RTCP: no SR recevied after %d ms - sync may be broken\n&quot;, stream-&gt;rtpin-&gt;rtcp_timeout));</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :                         stream-&gt;rtcp_init = GF_TRUE;</span>
+<span class="lineNum">     140 </span>            :                 }
+<span class="lineNum">     141 </span>            :         }
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span><span class="lineCov">       1468 :         if (stream-&gt;rtpin-&gt;first_packet_drop &amp;&amp; (hdr-&gt;packetSequenceNumber &gt;= stream-&gt;rtpin-&gt;first_packet_drop) ) {</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                 if (! ( (hdr-&gt;packetSequenceNumber - stream-&gt;rtpin-&gt;first_packet_drop) % stream-&gt;rtpin-&gt;frequency_drop) )</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :                         return;</span>
+<span class="lineNum">     146 </span>            :         }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineCov">       1468 :         cts = hdr-&gt;compositionTimeStamp;</span>
+<span class="lineNum">     149 </span><span class="lineCov">       1468 :         dts = hdr-&gt;decodingTimeStamp;</span>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineCov">       1468 :         hdr-&gt;seekFlag = 0;</span>
+<span class="lineNum">     152 </span><span class="lineCov">       1468 :         hdr-&gt;compositionTimeStamp += stream-&gt;ts_adjust;</span>
+<span class="lineNum">     153 </span><span class="lineCov">       1468 :         if (stream-&gt;first_rtp_ts) {</span>
+<span class="lineNum">     154 </span>            :                 assert(hdr-&gt;compositionTimeStamp &gt;= stream-&gt;first_rtp_ts - 1);
+<span class="lineNum">     155 </span><span class="lineCov">       1115 :                 hdr-&gt;compositionTimeStamp -= stream-&gt;first_rtp_ts - 1;</span>
+<span class="lineNum">     156 </span>            :         }
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span><span class="lineCov">       1468 :         if (hdr-&gt;decodingTimeStamp) {</span>
+<span class="lineNum">     159 </span><span class="lineCov">        559 :                 hdr-&gt;decodingTimeStamp += stream-&gt;ts_adjust;</span>
+<span class="lineNum">     160 </span><span class="lineCov">        559 :                 if (stream-&gt;first_rtp_ts) {</span>
+<span class="lineNum">     161 </span>            :                         assert(hdr-&gt;decodingTimeStamp &gt;= stream-&gt;first_rtp_ts - 1);
+<span class="lineNum">     162 </span><span class="lineCov">        258 :                         hdr-&gt;decodingTimeStamp -= stream-&gt;first_rtp_ts - 1;</span>
+<span class="lineNum">     163 </span>            :                 }
+<span class="lineNum">     164 </span>            :         }
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineCov">       1468 :         pck = gf_filter_pck_new_alloc(stream-&gt;opid, size, &amp;pck_data);</span>
+<span class="lineNum">     167 </span><span class="lineCov">       1468 :         if (!pck) return;</span>
+<span class="lineNum">     168 </span>            :         
+<span class="lineNum">     169 </span><span class="lineCov">       1468 :         memcpy(pck_data, payload, size);</span>
+<span class="lineNum">     170 </span><span class="lineCov">       1468 :         if (hdr-&gt;decodingTimeStampFlag)</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_dts(pck, hdr-&gt;decodingTimeStamp);</span>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">       1468 :         gf_filter_pck_set_cts(pck, hdr-&gt;compositionTimeStamp);</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">       1468 :         diff = (s64) hdr-&gt;compositionTimeStamp - (s64) stream-&gt;prev_cts;</span>
+<span class="lineNum">     176 </span><span class="lineCov">       1468 :         if ((stream-&gt;rtpin-&gt;max_sleep&gt;0) &amp;&amp; stream-&gt;prev_cts &amp;&amp; diff) {</span>
+<span class="lineNum">     177 </span><span class="lineCov">        729 :                 if (diff&lt;0) diff = -diff;</span>
+<span class="lineNum">     178 </span><span class="lineCov">        729 :                 if (!stream-&gt;min_dur_rtp || (diff &lt; stream-&gt;min_dur_rtp)) {</span>
+<span class="lineNum">     179 </span><span class="lineCov">         19 :                         u64 dur = diff;</span>
+<span class="lineNum">     180 </span><span class="lineCov">         19 :                         dur *= 1000;</span>
+<span class="lineNum">     181 </span><span class="lineCov">         19 :                         dur /= stream-&gt;rtp_ch-&gt;TimeScale;</span>
+<span class="lineNum">     182 </span><span class="lineCov">         19 :                         stream-&gt;min_dur_rtp = (u32) dur;</span>
+<span class="lineNum">     183 </span><span class="lineCov">         19 :                         if (dur &gt; stream-&gt;rtpin-&gt;max_sleep) dur = stream-&gt;rtpin-&gt;max_sleep;</span>
+<span class="lineNum">     184 </span><span class="lineCov">         19 :                         if (!stream-&gt;rtpin-&gt;min_frame_dur_ms || ( (u32) dur &lt; stream-&gt;rtpin-&gt;min_frame_dur_ms)) {</span>
+<span class="lineNum">     185 </span><span class="lineCov">         19 :                                 stream-&gt;rtpin-&gt;min_frame_dur_ms = (u32) dur;</span>
+<span class="lineNum">     186 </span>            :                         }
+<span class="lineNum">     187 </span>            :                 }
+<span class="lineNum">     188 </span>            :         }
+<span class="lineNum">     189 </span><span class="lineCov">       1468 :         stream-&gt;prev_cts = (u32) hdr-&gt;compositionTimeStamp;</span>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">       1468 :         gf_filter_pck_set_sap(pck, hdr-&gt;randomAccessPointFlag ? GF_FILTER_SAP_1  :GF_FILTER_SAP_NONE);</span>
+<span class="lineNum">     192 </span><span class="lineCov">       1468 :         if (hdr-&gt;au_duration)</span>
+<span class="lineNum">     193 </span><span class="lineCov">         88 :                 gf_filter_pck_set_duration(pck, hdr-&gt;au_duration);</span>
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineCov">       1468 :         if (hdr-&gt;samplerate &amp;&amp; (hdr-&gt;samplerate != stream-&gt;sr)) {</span>
+<span class="lineNum">     196 </span><span class="lineCov">          1 :                 stream-&gt;sr = hdr-&gt;samplerate;</span>
+<span class="lineNum">     197 </span><span class="lineCov">          1 :                 gf_filter_pid_set_property(stream-&gt;opid, GF_PROP_PID_SAMPLE_RATE, &amp;PROP_UINT(stream-&gt;sr));</span>
+<span class="lineNum">     198 </span>            :         }
+<span class="lineNum">     199 </span><span class="lineCov">       1468 :         if (hdr-&gt;channels &amp;&amp; (hdr-&gt;channels != stream-&gt;nb_ch)) {</span>
+<span class="lineNum">     200 </span><span class="lineCov">          1 :                 stream-&gt;nb_ch = hdr-&gt;channels;</span>
+<span class="lineNum">     201 </span><span class="lineCov">          1 :                 gf_filter_pid_set_property(stream-&gt;opid, GF_PROP_PID_NUM_CHANNELS, &amp;PROP_UINT(stream-&gt;nb_ch));</span>
+<span class="lineNum">     202 </span>            :         }
+<span class="lineNum">     203 </span><span class="lineCov">       1468 :         gf_filter_pck_set_framing(pck, hdr-&gt;accessUnitStartFlag, hdr-&gt;accessUnitEndFlag);</span>
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span><span class="lineCov">       1468 :         if (stream-&gt;rtp_ch-&gt;packet_loss)</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_corrupted(pck, 1);</span>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            : #if 0 //not yet implemented
+<span class="lineNum">     209 </span>            :         if (hdr-&gt;seekFlag)
+<span class="lineNum">     210 </span>            :                 gf_filter_pck_set_seek_flag(pck, GF_TRUE);
+<span class="lineNum">     211 </span>            : #endif
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span><span class="lineCov">       1468 :         if (stream-&gt;depacketizer-&gt;sl_map.IndexDeltaLength) {</span>
+<span class="lineNum">     214 </span><span class="lineCov">        395 :                 rtpin_stream_queue_pck(stream, pck, hdr-&gt;compositionTimeStamp);</span>
+<span class="lineNum">     215 </span>            :         } else {
+<span class="lineNum">     216 </span><span class="lineCov">       1073 :                 gf_filter_pck_send(pck);</span>
+<span class="lineNum">     217 </span>            :         }
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">       1468 :         hdr-&gt;compositionTimeStamp = cts;</span>
+<span class="lineNum">     220 </span><span class="lineCov">       1468 :         hdr-&gt;decodingTimeStamp = dts;</span>
+<a name="221"><span class="lineNum">     221 </span>            : }</a>
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 : GF_RTPInStream *rtpin_stream_new_satip(GF_RTPIn *rtp, const char *server_ip)</span>
+<span class="lineNum">     224 </span>            : {
+<span class="lineNum">     225 </span>            :         GF_RTSPTransport trans;
+<span class="lineNum">     226 </span>            :         GF_RTPInStream *tmp;
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :         GF_SAFEALLOC(tmp, GF_RTPInStream);</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :         if (!tmp) return NULL;</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :         tmp-&gt;rtpin = rtp;</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :         tmp-&gt;buffer = gf_malloc(sizeof(char) * rtp-&gt;block_size);</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :         /*create an RTP channel*/
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         tmp-&gt;rtp_ch = gf_rtp_new();</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :         tmp-&gt;control = gf_strdup(&quot;*&quot;);</span>
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            :         memset(&amp;trans, 0, sizeof(GF_RTSPTransport));
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :         trans.Profile = &quot;RTP/AVP&quot;;</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :         trans.source = (char *) server_ip;</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :         trans.IsUnicast = GF_TRUE;</span>
+<span class="lineNum">     240 </span>            :         trans.client_port_first = 0;
+<span class="lineNum">     241 </span>            :         trans.client_port_last = 0;
+<span class="lineNum">     242 </span>            :         trans.port_first = 0;
+<span class="lineNum">     243 </span>            :         trans.port_last = 0;
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :         if (gf_rtp_setup_transport(tmp-&gt;rtp_ch, &amp;trans, NULL) != GF_OK) {</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :                 rtpin_stream_del(tmp);</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     248 </span>            :         }
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :         gf_rtp_setup_payload(tmp-&gt;rtp_ch, 33, 90000);</span>
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :         if (rtp-&gt;disable_rtcp) tmp-&gt;flags |= RTP_ENABLE_RTCP;</span>
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :         /*setup NAT keep-alive*/
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :         gf_rtp_enable_nat_keepalive(tmp-&gt;rtp_ch, rtp-&gt;nat_keepalive ? rtp-&gt;nat_keepalive : 30000);</span>
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :         tmp-&gt;range_start = 0;</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :         tmp-&gt;range_end = 0;</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :         return tmp;</span>
+<a name="261"><span class="lineNum">     261 </span>            : }</a>
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span><span class="lineCov">          1 : GF_RTPInStream *rtpin_stream_new_standalone(GF_RTPIn *rtp, const char *flow_ip, u32 port)</span>
+<span class="lineNum">     264 </span>            : {
+<span class="lineNum">     265 </span>            :         GF_RTSPTransport trans;
+<span class="lineNum">     266 </span>            :         GF_RTPInStream *tmp;
+<span class="lineNum">     267 </span><span class="lineCov">          1 :         GF_SAFEALLOC(tmp, GF_RTPInStream);</span>
+<span class="lineNum">     268 </span><span class="lineCov">          1 :         if (!tmp) return NULL;</span>
+<span class="lineNum">     269 </span><span class="lineCov">          1 :         tmp-&gt;rtpin = rtp;</span>
+<span class="lineNum">     270 </span><span class="lineCov">          1 :         tmp-&gt;buffer = gf_malloc(sizeof(char) * rtp-&gt;block_size);</span>
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :         /*create an RTP channel*/
+<span class="lineNum">     273 </span><span class="lineCov">          1 :         tmp-&gt;rtp_ch = gf_rtp_new();</span>
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            :         memset(&amp;trans, 0, sizeof(GF_RTSPTransport));
+<span class="lineNum">     276 </span><span class="lineCov">          1 :         trans.Profile = &quot;RTP/AVP&quot;;</span>
+<span class="lineNum">     277 </span><span class="lineCov">          1 :         trans.source = (char *) flow_ip;</span>
+<span class="lineNum">     278 </span><span class="lineCov">          1 :         trans.IsUnicast = gf_sk_is_multicast_address(flow_ip);</span>
+<span class="lineNum">     279 </span><span class="lineCov">          1 :         trans.client_port_first = port;</span>
+<span class="lineNum">     280 </span><span class="lineCov">          1 :         trans.client_port_last = port+1;</span>
+<span class="lineNum">     281 </span><span class="lineCov">          1 :         trans.port_first = port;</span>
+<span class="lineNum">     282 </span><span class="lineCov">          1 :         trans.port_last = port+1;</span>
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span><span class="lineCov">          1 :         if (gf_rtp_setup_transport(tmp-&gt;rtp_ch, &amp;trans, NULL) != GF_OK) {</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :                 rtpin_stream_del(tmp);</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     287 </span>            :         }
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : //      gf_rtp_setup_payload(tmp-&gt;rtp_ch, 33, 90000);
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineCov">          1 :         if (rtp-&gt;disable_rtcp) tmp-&gt;flags |= RTP_ENABLE_RTCP;</span>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            :         /*setup NAT keep-alive*/
+<span class="lineNum">     294 </span><span class="lineCov">          1 :         gf_rtp_enable_nat_keepalive(tmp-&gt;rtp_ch, rtp-&gt;nat_keepalive ? rtp-&gt;nat_keepalive : 30000);</span>
+<span class="lineNum">     295 </span><span class="lineCov">          1 :         tmp-&gt;range_start = 0;</span>
+<span class="lineNum">     296 </span><span class="lineCov">          1 :         tmp-&gt;range_end = 0;</span>
+<span class="lineNum">     297 </span><span class="lineCov">          1 :         return tmp;</span>
+<a name="298"><span class="lineNum">     298 </span>            : }</a>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">         20 : GF_RTPInStream *rtpin_stream_new(GF_RTPIn *rtp, GF_SDPMedia *media, GF_SDPInfo *sdp, GF_RTPInStream *input_stream)</span>
+<span class="lineNum">     301 </span>            : {
+<span class="lineNum">     302 </span>            :         GF_RTSPRange *range;
+<span class="lineNum">     303 </span>            :         GF_RTPInStream *tmp;
+<span class="lineNum">     304 </span>            :         GF_RTPMap *map;
+<span class="lineNum">     305 </span>            :         u32 i, ESID, ODID;
+<span class="lineNum">     306 </span>            :         Bool force_bcast = GF_FALSE;
+<span class="lineNum">     307 </span>            :         Double Start, End;
+<span class="lineNum">     308 </span>            :         u16 rvc_predef = 0;
+<span class="lineNum">     309 </span>            :         char *rvc_config_att = NULL;
+<span class="lineNum">     310 </span>            :         GF_X_Attribute *att;
+<span class="lineNum">     311 </span>            :         char *ctrl;
+<span class="lineNum">     312 </span>            :         GF_SDPConnection *conn;
+<span class="lineNum">     313 </span>            :         GF_RTSPTransport trans;
+<span class="lineNum">     314 </span>            :         u32 mid, prev_stream, base_stream;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :         //extract all relevant info from the GF_SDPMedia
+<span class="lineNum">     317 </span>            :         Start = 0.0;
+<span class="lineNum">     318 </span>            :         End = -1.0;
+<span class="lineNum">     319 </span>            :         ODID = 0;
+<span class="lineNum">     320 </span>            :         ESID = 0;
+<span class="lineNum">     321 </span>            :         ctrl = NULL;
+<span class="lineNum">     322 </span>            :         range = NULL;
+<span class="lineNum">     323 </span><span class="lineCov">         20 :         mid = prev_stream = base_stream = 0;</span>
+<span class="lineNum">     324 </span><span class="lineCov">         20 :         i=0;</span>
+<span class="lineNum">     325 </span><span class="lineCov">         70 :         while ((att = (GF_X_Attribute*)gf_list_enum(media-&gt;Attributes, &amp;i))) {</span>
+<span class="lineNum">     326 </span><span class="lineCov">         30 :                 if (!stricmp(att-&gt;Name, &quot;control&quot;)) ctrl = att-&gt;Value;</span>
+<span class="lineNum">     327 </span><span class="lineCov">         24 :                 else if (!stricmp(att-&gt;Name, &quot;gpac-broadcast&quot;)) force_bcast = GF_TRUE;</span>
+<span class="lineNum">     328 </span><span class="lineCov">         39 :                 else if (!stricmp(att-&gt;Name, &quot;mpeg4-esid&quot;) &amp;&amp; att-&gt;Value) ESID = atoi(att-&gt;Value);</span>
+<span class="lineNum">     329 </span><span class="lineCov">          9 :                 else if (!stricmp(att-&gt;Name, &quot;mpeg4-odid&quot;) &amp;&amp; att-&gt;Value) ODID = atoi(att-&gt;Value);</span>
+<span class="lineNum">     330 </span><span class="lineCov">          9 :                 else if (!stricmp(att-&gt;Name, &quot;range&quot;) &amp;&amp; !range) range = gf_rtsp_range_parse(att-&gt;Value);</span>
+<span class="lineNum">     331 </span><span class="lineCov">          9 :                 else if (!stricmp(att-&gt;Name, &quot;rvc-config-predef&quot;) &amp;&amp; att-&gt;Value) {</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :                         rvc_predef = atoi(att-&gt;Value);</span>
+<span class="lineNum">     333 </span><span class="lineCov">          9 :                 } else if (!stricmp(att-&gt;Name, &quot;rvc-config&quot;)) {</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :                         rvc_config_att = att-&gt;Value;</span>
+<span class="lineNum">     335 </span><span class="lineCov">          9 :                 } else if (!stricmp(att-&gt;Name, &quot;mid&quot;)) {</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :                         sscanf(att-&gt;Value, &quot;L%d&quot;, &amp;mid);</span>
+<span class="lineNum">     337 </span><span class="lineCov">          9 :                 } else if (!stricmp(att-&gt;Name, &quot;depend&quot;)) {</span>
+<span class="lineNum">     338 </span>            :                         char buf[3000];
+<span class="lineNum">     339 </span>            :                         memset(buf, 0, 3000);
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :                         sscanf(att-&gt;Value, &quot;%*d lay L%d %*s %2999s&quot;, &amp;base_stream, buf);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                         if (!strlen(buf))</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :                                 sscanf(att-&gt;Value, &quot;%*d lay %2999s&quot;, buf);</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                         sscanf(buf, &quot;L%d&quot;, &amp;prev_stream);</span>
+<span class="lineNum">     344 </span>            :                 }
+<span class="lineNum">     345 </span>            :         }
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span><span class="lineCov">         20 :         if (range) {</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                 Start = range-&gt;start;</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                 End = range-&gt;end;</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                 gf_rtsp_range_del(range);</span>
+<span class="lineNum">     351 </span>            :         }
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :         /*check connection*/
+<span class="lineNum">     354 </span><span class="lineCov">         20 :         conn = sdp-&gt;c_connection;</span>
+<span class="lineNum">     355 </span><span class="lineCov">         20 :         if (conn &amp;&amp; (!conn-&gt;host || !strcmp(conn-&gt;host, &quot;0.0.0.0&quot;))) conn = NULL;</span>
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span><span class="lineCov">         14 :         if (!conn) conn = (GF_SDPConnection*)gf_list_get(media-&gt;Connections, 0);</span>
+<span class="lineNum">     358 </span><span class="lineCov">         20 :         if (conn &amp;&amp; (!conn-&gt;host || !strcmp(conn-&gt;host, &quot;0.0.0.0&quot;))) conn = NULL;</span>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineCov">         20 :         if (!conn) {</span>
+<span class="lineNum">     361 </span>            :                 /*RTSP RFC recommends an empty &quot;c= &quot; line but some server don't send it. Use session info (o=)*/
+<span class="lineNum">     362 </span><span class="lineCov">          6 :                 if (!sdp-&gt;o_net_type || !sdp-&gt;o_add_type || strcmp(sdp-&gt;o_net_type, &quot;IN&quot;)) return NULL;</span>
+<span class="lineNum">     363 </span><span class="lineCov">          6 :                 if (strcmp(sdp-&gt;o_add_type, &quot;IP4&quot;) &amp;&amp; strcmp(sdp-&gt;o_add_type, &quot;IP6&quot;)) return NULL;</span>
+<span class="lineNum">     364 </span>            :         } else {
+<span class="lineNum">     365 </span><span class="lineCov">         14 :                 if (strcmp(conn-&gt;net_type, &quot;IN&quot;)) return NULL;</span>
+<span class="lineNum">     366 </span><span class="lineCov">         14 :                 if (strcmp(conn-&gt;add_type, &quot;IP4&quot;) &amp;&amp; strcmp(conn-&gt;add_type, &quot;IP6&quot;)) return NULL;</span>
+<span class="lineNum">     367 </span>            :         }
+<span class="lineNum">     368 </span>            :         /*do we support transport*/
+<span class="lineNum">     369 </span><span class="lineCov">         20 :         if (strcmp(media-&gt;Profile, &quot;RTP/AVP&quot;) &amp;&amp; strcmp(media-&gt;Profile, &quot;RTP/AVP/TCP&quot;)</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                 &amp;&amp; strcmp(media-&gt;Profile, &quot;RTP/SAVP&quot;) &amp;&amp; strcmp(media-&gt;Profile, &quot;RTP/SAVP/TCP&quot;)</span>
+<span class="lineNum">     371 </span>            :            ) return NULL;
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span>            :         /*check RTP map. For now we only support 1 RTPMap*/
+<span class="lineNum">     374 </span><span class="lineCov">         20 :         if (gf_list_count(media-&gt;RTPMaps) &gt; 1) return NULL;</span>
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :         /*check payload type*/
+<span class="lineNum">     377 </span><span class="lineCov">         20 :         map = (GF_RTPMap*)gf_list_get(media-&gt;RTPMaps, 0);</span>
+<span class="lineNum">     378 </span><span class="lineCov">         20 :         if (!map) {</span>
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :                 if (!media-&gt;fmt_list) return NULL;</span>
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :                 if (strchr(media-&gt;fmt_list, ' ')) return NULL;</span>
+<span class="lineNum">     381 </span>            :         }
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            :         /*this is an ESD-URL setup, we likely have namespace conflicts so overwrite given ES_ID
+<span class="lineNum">     384 </span>            :         by the app one (client side), but keep control (server side) if provided*/
+<span class="lineNum">     385 </span><span class="lineCov">         20 :         if (input_stream) {</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :                 ESID = input_stream-&gt;ES_ID;</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :                 if (!ctrl) ctrl = input_stream-&gt;control;</span>
+<span class="lineNum">     388 </span>            :                 tmp = input_stream;
+<span class="lineNum">     389 </span>            :         } else {
+<span class="lineNum">     390 </span><span class="lineCov">         20 :                 tmp = rtpin_find_stream(rtp, NULL, ESID, NULL, GF_FALSE);</span>
+<span class="lineNum">     391 </span><span class="lineCov">         20 :                 if (tmp) return NULL;</span>
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span><span class="lineCov">         20 :                 GF_SAFEALLOC(tmp, GF_RTPInStream);</span>
+<span class="lineNum">     394 </span><span class="lineCov">         20 :                 if (!tmp) return NULL;</span>
+<span class="lineNum">     395 </span><span class="lineCov">         20 :                 tmp-&gt;rtpin = rtp;</span>
+<span class="lineNum">     396 </span><span class="lineCov">         20 :                 tmp-&gt;buffer = gf_malloc(sizeof(char) * rtp-&gt;block_size);</span>
+<span class="lineNum">     397 </span>            :         }
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :         /*create an RTP channel*/
+<span class="lineNum">     400 </span><span class="lineCov">         20 :         tmp-&gt;rtp_ch = gf_rtp_new();</span>
+<span class="lineNum">     401 </span><span class="lineCov">         20 :         if (ctrl) tmp-&gt;control = gf_strdup(ctrl);</span>
+<span class="lineNum">     402 </span><span class="lineCov">         20 :         tmp-&gt;ES_ID = ESID;</span>
+<span class="lineNum">     403 </span><span class="lineCov">         20 :         tmp-&gt;OD_ID = ODID;</span>
+<span class="lineNum">     404 </span><span class="lineCov">         20 :         tmp-&gt;mid = mid;</span>
+<span class="lineNum">     405 </span><span class="lineCov">         20 :         tmp-&gt;prev_stream = prev_stream;</span>
+<span class="lineNum">     406 </span><span class="lineCov">         20 :         tmp-&gt;base_stream = base_stream;</span>
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span>            :         memset(&amp;trans, 0, sizeof(GF_RTSPTransport));
+<span class="lineNum">     409 </span><span class="lineCov">         20 :         trans.Profile = media-&gt;Profile;</span>
+<span class="lineNum">     410 </span><span class="lineCov">         20 :         trans.source = conn ? conn-&gt;host : sdp-&gt;o_address;</span>
+<span class="lineNum">     411 </span><span class="lineCov">         20 :         trans.IsUnicast = gf_sk_is_multicast_address(trans.source) ? GF_FALSE : GF_TRUE;</span>
+<span class="lineNum">     412 </span><span class="lineCov">         20 :         if (!trans.IsUnicast) {</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :                 trans.port_first = media-&gt;PortNumber;</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :                 trans.port_last = media-&gt;PortNumber + 1;</span>
+<span class="lineNum">     415 </span><span class="lineNoCov">          0 :                 trans.TTL = conn ? conn-&gt;TTL : 0;</span>
+<span class="lineNum">     416 </span>            :         } else {
+<span class="lineNum">     417 </span><span class="lineCov">         20 :                 trans.client_port_first = media-&gt;PortNumber;</span>
+<span class="lineNum">     418 </span><span class="lineCov">         20 :                 trans.client_port_last = media-&gt;PortNumber + 1;</span>
+<span class="lineNum">     419 </span><span class="lineCov">         20 :                 trans.port_first = trans.client_port_first;</span>
+<span class="lineNum">     420 </span><span class="lineCov">         20 :                 trans.port_last = trans.client_port_last;</span>
+<span class="lineNum">     421 </span>            :         }
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span><span class="lineCov">         20 :         if (gf_rtp_setup_transport(tmp-&gt;rtp_ch, &amp;trans, NULL) != GF_OK) {</span>
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :                 rtpin_stream_del(tmp);</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     426 </span>            :         }
+<span class="lineNum">     427 </span>            :         /*setup depacketizer*/
+<span class="lineNum">     428 </span><span class="lineCov">         20 :         tmp-&gt;depacketizer = gf_rtp_depacketizer_new(media, 0, rtp_sl_packet_cbk, tmp);</span>
+<span class="lineNum">     429 </span><span class="lineCov">         20 :         if (!tmp-&gt;depacketizer) {</span>
+<span class="lineNum">     430 </span><span class="lineCov">          1 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_RTP, (&quot;[RTP] Failed to create RTP depacketizer for payload type %d/%s - ignoring stream)\n&quot;, map ? map-&gt;PayloadType : 0, media-&gt;fmt_list ? media-&gt;fmt_list : &quot;&quot;));</span>
+<span class="lineNum">     431 </span><span class="lineCov">          1 :                 rtpin_stream_del(tmp);</span>
+<span class="lineNum">     432 </span><span class="lineCov">          1 :                 return NULL;</span>
+<span class="lineNum">     433 </span>            :         }
+<span class="lineNum">     434 </span>            :         /*setup channel*/
+<span class="lineNum">     435 </span><span class="lineCov">         19 :         gf_rtp_setup_payload(tmp-&gt;rtp_ch, map ? map-&gt;PayloadType : tmp-&gt;depacketizer-&gt;payt, tmp-&gt;depacketizer-&gt;clock_rate);</span>
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span><span class="lineCov">         19 :         if (tmp-&gt;depacketizer-&gt;sl_map.IndexDeltaLength) {</span>
+<span class="lineNum">     438 </span><span class="lineCov">          7 :                 tmp-&gt;pck_queue = gf_list_new();</span>
+<span class="lineNum">     439 </span>            :         }
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            : //      tmp-&gt;status = NM_Disconnected;
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span><span class="lineCov">         19 :         if (!rtp-&gt;disable_rtcp) tmp-&gt;flags |= RTP_ENABLE_RTCP;</span>
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span>            :         /*setup NAT keep-alive*/
+<span class="lineNum">     446 </span><span class="lineCov">         19 :         if (rtp-&gt;nat_keepalive) gf_rtp_enable_nat_keepalive(tmp-&gt;rtp_ch, rtp-&gt;nat_keepalive);</span>
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span><span class="lineCov">         19 :         tmp-&gt;range_start = Start;</span>
+<span class="lineNum">     449 </span><span class="lineCov">         19 :         tmp-&gt;range_end = End;</span>
+<span class="lineNum">     450 </span><span class="lineCov">         19 :         if (End != -1.0) tmp-&gt;flags |= RTP_HAS_RANGE;</span>
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span><span class="lineCov">         19 :         if (force_bcast) tmp-&gt;flags |= RTP_FORCE_BROADCAST;</span>
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span><span class="lineCov">         19 :         if (rvc_predef) {</span>
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :                 tmp-&gt;depacketizer-&gt;sl_map.rvc_predef = rvc_predef ;</span>
+<span class="lineNum">     456 </span><span class="lineCov">         19 :         } else if (rvc_config_att) {</span>
+<span class="lineNum">     457 </span>            :                 char *rvc_data=NULL;
+<span class="lineNum">     458 </span>            :                 u32 rvc_size=0;
+<span class="lineNum">     459 </span>            :                 Bool is_gz = GF_FALSE;
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :                 if (!strncmp(rvc_config_att, &quot;data:application/rvc-config+xml&quot;, 32) &amp;&amp; strstr(rvc_config_att, &quot;base64&quot;) ) {</span>
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :                         char *data = strchr(rvc_config_att, ',');</span>
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :                         if (data) {</span>
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :                                 rvc_size = (u32) strlen(data) * 3 / 4 + 1;</span>
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :                                 rvc_data = (char*)gf_malloc(sizeof(char) * rvc_size);</span>
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :                                 rvc_size = gf_base64_decode(data, (u32) strlen(data), rvc_data, rvc_size);</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :                                 rvc_data[rvc_size] = 0;</span>
+<span class="lineNum">     467 </span>            :                         }
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :                         if (!strncmp(rvc_config_att, &quot;data:application/rvc-config+xml+gz&quot;, 35)) is_gz = GF_TRUE;</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :                 } else if (!strnicmp(rvc_config_att, &quot;http://&quot;, 7) || !strnicmp(rvc_config_att, &quot;https://&quot;, 8) ) {</span>
+<span class="lineNum">     470 </span>            :                         return NULL;
+<span class="lineNum">     471 </span>            :                 }
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :                 if (rvc_data) {</span>
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :                         if (is_gz) {</span>
+<span class="lineNum">     474 </span>            : #ifdef GPAC_DISABLE_ZLIB
+<span class="lineNum">     475 </span>            :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_MEDIA, (&quot;Error: no zlib support - RVC not supported in RTP\n&quot;));
+<span class="lineNum">     476 </span>            :                                 gf_free(rvc_data);
+<span class="lineNum">     477 </span>            :                                 return NULL;
+<span class="lineNum">     478 </span>            : #else
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :                                 gf_gz_decompress_payload(rvc_data, rvc_size, &amp;tmp-&gt;depacketizer-&gt;sl_map.rvc_config, &amp;tmp-&gt;depacketizer-&gt;sl_map.rvc_config_size);</span>
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :                                 gf_free(rvc_data);</span>
+<span class="lineNum">     481 </span>            : #endif
+<span class="lineNum">     482 </span>            :                         } else {
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :                                 tmp-&gt;depacketizer-&gt;sl_map.rvc_config = rvc_data;</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :                                 tmp-&gt;depacketizer-&gt;sl_map.rvc_config_size = rvc_size;</span>
+<span class="lineNum">     485 </span>            :                         }
+<span class="lineNum">     486 </span>            :                 }
+<span class="lineNum">     487 </span>            :         }
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            :         return tmp;
+<a name="490"><span class="lineNum">     490 </span>            : }</a>
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span><span class="lineCov">         52 : static void rtpin_stream_update_stats(GF_RTPInStream *stream)</span>
+<span class="lineNum">     493 </span>            : {
+<span class="lineNum">     494 </span>            :         u32 time;
+<span class="lineNum">     495 </span>            :         Float bps;
+<span class="lineNum">     496 </span><span class="lineCov">         52 :         if (!stream-&gt;rtp_ch) return;</span>
+<span class="lineNum">     497 </span>            : 
+<span class="lineNum">     498 </span><span class="lineCov">         52 :         gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:loss&quot;, &amp;PROP_FLOAT( gf_rtp_get_loss(stream-&gt;rtp_ch) ) );</span>
+<span class="lineNum">     499 </span><span class="lineCov">         52 :         if (stream-&gt;rtsp &amp;&amp; (stream-&gt;flags &amp; RTP_INTERLEAVED)) {</span>
+<span class="lineNum">     500 </span><span class="lineCov">          3 :                 gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:interleaved&quot;, &amp;PROP_UINT( gf_rtsp_get_session_port(stream-&gt;rtsp-&gt;session) ) );</span>
+<span class="lineNum">     501 </span><span class="lineCov">          3 :                 gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:rtpid&quot;, &amp;PROP_UINT( gf_rtp_get_low_interleave_id(stream-&gt;rtp_ch) ) );</span>
+<span class="lineNum">     502 </span><span class="lineCov">          3 :                 gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:rctpid&quot;, &amp;PROP_UINT( gf_rtp_get_hight_interleave_id(stream-&gt;rtp_ch) ) );</span>
+<span class="lineNum">     503 </span>            : 
+<span class="lineNum">     504 </span>            :         } else {
+<span class="lineNum">     505 </span><span class="lineCov">         49 :                 gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:rtpp&quot;, &amp;PROP_UINT( stream-&gt;rtp_ch-&gt;net_info.client_port_first ) );</span>
+<span class="lineNum">     506 </span><span class="lineCov">         49 :                 gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:rtcpp&quot;, &amp;PROP_UINT( stream-&gt;rtp_ch-&gt;net_info.client_port_last ) );</span>
+<span class="lineNum">     507 </span>            :         }
+<span class="lineNum">     508 </span><span class="lineCov">         52 :         if (stream-&gt;stat_stop_time) {</span>
+<span class="lineNum">     509 </span><span class="lineCov">          1 :                 time = stream-&gt;stat_stop_time - stream-&gt;stat_start_time;</span>
+<span class="lineNum">     510 </span>            :         } else {
+<span class="lineNum">     511 </span><span class="lineCov">         51 :                 time = gf_sys_clock() - stream-&gt;stat_start_time;</span>
+<span class="lineNum">     512 </span>            :         }
+<span class="lineNum">     513 </span><span class="lineCov">         52 :         if (!time) return;</span>
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span><span class="lineCov">         52 :         bps = 8.0f * stream-&gt;rtp_bytes;</span>
+<span class="lineNum">     516 </span><span class="lineCov">         52 :         bps *= 1000;</span>
+<span class="lineNum">     517 </span><span class="lineCov">         52 :         bps /= time;</span>
+<span class="lineNum">     518 </span><span class="lineCov">         52 :         gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:bw_down&quot;, &amp;PROP_UINT( (u32) bps ) );</span>
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span><span class="lineCov">         52 :         bps = 8.0f * stream-&gt;rtcp_bytes;</span>
+<span class="lineNum">     521 </span><span class="lineCov">         52 :         bps *= 1000;</span>
+<span class="lineNum">     522 </span><span class="lineCov">         52 :         bps /= time;</span>
+<span class="lineNum">     523 </span><span class="lineCov">         52 :         gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:ctrl_bw_down&quot;, &amp;PROP_UINT( (u32) bps ) );</span>
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span><span class="lineCov">         52 :         bps = 8.0f * gf_rtp_get_tcp_bytes_sent(stream-&gt;rtp_ch);</span>
+<span class="lineNum">     526 </span><span class="lineCov">         52 :         bps *= 1000;</span>
+<span class="lineNum">     527 </span><span class="lineCov">         52 :         bps /= time;</span>
+<span class="lineNum">     528 </span><span class="lineCov">         52 :         gf_filter_pid_set_info_str(stream-&gt;opid, &quot;nets:ctrl_bw_up&quot;, &amp;PROP_UINT( (u32) bps ) );</span>
+<span class="lineNum">     529 </span>            : }
+<a name="530"><span class="lineNum">     530 </span>            : </a>
+<span class="lineNum">     531 </span>            : 
+<span class="lineNum">     532 </span><span class="lineCov">        755 : void rtpin_stream_on_rtp_pck(GF_RTPInStream *stream, char *pck, u32 size)</span>
+<span class="lineNum">     533 </span>            : {
+<span class="lineNum">     534 </span>            :         GF_Err e;
+<span class="lineNum">     535 </span>            :         GF_RTPHeader hdr;
+<span class="lineNum">     536 </span>            :         u32 PayloadStart;
+<span class="lineNum">     537 </span><span class="lineCov">        755 :         stream-&gt;rtp_bytes += size;</span>
+<span class="lineNum">     538 </span><span class="lineCov">        755 :         stream-&gt;first_in_rtp_pck = GF_TRUE;</span>
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span>            :         /*first decode RTP*/
+<span class="lineNum">     541 </span><span class="lineCov">        755 :         e = gf_rtp_decode_rtp(stream-&gt;rtp_ch, pck, size, &amp;hdr, &amp;PayloadStart);</span>
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span>            :         /*corrupted or NULL data*/
+<span class="lineNum">     544 </span><span class="lineCov">        755 :         if (e || (PayloadStart &gt;= size)) {</span>
+<span class="lineNum">     545 </span>            :                 //gf_service_send_packet(stream-&gt;rtpin-&gt;service, stream-&gt;opid, NULL, 0, NULL, GF_CORRUPTED_DATA);
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 :                 return;</span>
+<span class="lineNum">     547 </span>            :         }
+<span class="lineNum">     548 </span><span class="lineCov">        755 :         if (!stream-&gt;opid &amp;&amp; !stream-&gt;depacketizer) {</span>
+<span class="lineNum">     549 </span><span class="lineCov">          1 :                 stream-&gt;depacketizer = gf_rtp_depacketizer_new(NULL, hdr.PayloadType, rtp_sl_packet_cbk, stream);</span>
+<span class="lineNum">     550 </span><span class="lineCov">          1 :                 if (!stream-&gt;depacketizer) {</span>
+<span class="lineNum">     551 </span>            :                         return;
+<span class="lineNum">     552 </span>            :                 }
+<span class="lineNum">     553 </span><span class="lineCov">          1 :                 stream-&gt;rtp_ch-&gt;PayloadType = hdr.PayloadType;</span>
+<span class="lineNum">     554 </span><span class="lineCov">          1 :                 stream-&gt;rtp_ch-&gt;TimeScale = stream-&gt;depacketizer-&gt;clock_rate;</span>
+<span class="lineNum">     555 </span><span class="lineCov">          1 :                 rtpin_declare_pid(stream, GF_FALSE, 0, NULL);</span>
+<span class="lineNum">     556 </span>            :         }
+<span class="lineNum">     557 </span><span class="lineCov">        755 :         if (!stream-&gt;depacketizer) {</span>
+<span class="lineNum">     558 </span>            :                 return;
+<span class="lineNum">     559 </span>            :         }
+<span class="lineNum">     560 </span>            : 
+<span class="lineNum">     561 </span>            :         /*first we only work with one payload type...*/
+<span class="lineNum">     562 </span><span class="lineCov">        755 :         if (hdr.PayloadType != stream-&gt;rtp_ch-&gt;PayloadType) {</span>
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_RTP, (&quot;[RTP] Mismatched in packet payload type %d vs channel payload type %d, only one payload type per channel is currently supported\n&quot;, hdr.PayloadType, stream-&gt;rtp_ch-&gt;PayloadType));</span>
+<span class="lineNum">     564 </span>            :         }
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span>            :         //pure RTP, remap all streams to 0, adjust sync later
+<span class="lineNum">     567 </span><span class="lineCov">        755 :         if (!stream-&gt;rtsp) {</span>
+<span class="lineNum">     568 </span><span class="lineCov">        671 :                 if (!stream-&gt;first_rtp_ts || (hdr.TimeStamp &lt; stream-&gt;first_rtp_ts-1) )</span>
+<span class="lineNum">     569 </span><span class="lineCov">         14 :                         stream-&gt;first_rtp_ts = 1 + hdr.TimeStamp;</span>
+<span class="lineNum">     570 </span>            :         }
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span>            :         /*if we must notify some timing, do it now. */
+<span class="lineNum">     573 </span><span class="lineCov">        755 :         if (stream-&gt;check_rtp_time) {</span>
+<span class="lineNum">     574 </span>            :                 Double ch_time;
+<span class="lineNum">     575 </span>            : 
+<span class="lineNum">     576 </span>            :                 /*it may happen that we still receive packets from a previous &quot;play&quot; request. If this is the case,
+<span class="lineNum">     577 </span>            :                 filter until we reach the indicated rtptime*/
+<span class="lineNum">     578 </span><span class="lineCov">          6 :                 if (stream-&gt;rtp_ch-&gt;rtp_time</span>
+<span class="lineNum">     579 </span><span class="lineCov">          6 :                         &amp;&amp; (stream-&gt;rtp_ch-&gt;rtp_first_SN &gt; hdr.SequenceNumber)</span>
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :                         &amp;&amp; (stream-&gt;rtp_ch-&gt;rtp_time &gt; hdr.TimeStamp)</span>
+<span class="lineNum">     581 </span>            :                    ) {
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_RTP, (&quot;[RTP] Rejecting too early packet (TS %d vs signaled rtp time %d - diff %d ms)\n&quot;,</span>
+<span class="lineNum">     583 </span>            :                                                             hdr.TimeStamp, stream-&gt;rtp_ch-&gt;rtp_time, ((hdr.TimeStamp - stream-&gt;rtp_ch-&gt;rtp_time)*1000) / stream-&gt;rtp_ch-&gt;TimeScale));
+<span class="lineNum">     584 </span>            :                         return;
+<span class="lineNum">     585 </span>            :                 }
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineCov">          6 :                 ch_time = gf_rtp_get_current_time(stream-&gt;rtp_ch);</span>
+<span class="lineNum">     588 </span>            : 
+<span class="lineNum">     589 </span>            :                 /*this is the first packet on the channel (no PAUSE)*/
+<span class="lineNum">     590 </span><span class="lineCov">          6 :                 if (stream-&gt;check_rtp_time == RTP_SET_TIME_RTP) {</span>
+<span class="lineNum">     591 </span>            :                         Double media_time = 0;
+<span class="lineNum">     592 </span><span class="lineCov">          6 :                         if (stream-&gt;rtsp) {</span>
+<span class="lineNum">     593 </span><span class="lineCov">          6 :                                 media_time = stream-&gt;current_start + ch_time;</span>
+<span class="lineNum">     594 </span>            :                         }
+<span class="lineNum">     595 </span><span class="lineCov">          6 :                         gf_filter_pid_set_property_str(stream-&gt;opid, &quot;time:timestamp&quot;, &amp;PROP_LONGUINT(hdr.TimeStamp) );</span>
+<span class="lineNum">     596 </span><span class="lineCov">          6 :                         gf_filter_pid_set_property_str(stream-&gt;opid, &quot;time:media&quot;, &amp;PROP_DOUBLE(media_time) );</span>
+<span class="lineNum">     597 </span>            : 
+<span class="lineNum">     598 </span><span class="lineCov">          6 :                         GF_LOG(GF_LOG_INFO, GF_LOG_RTP, (&quot;[RTP] Mapping RTP Time seq %d TS %d Media Time %g - rtp info seq %d TS %d\n&quot;,</span>
+<span class="lineNum">     599 </span>            :                                                          hdr.SequenceNumber, hdr.TimeStamp, stream-&gt;current_start + ch_time, stream-&gt;rtp_ch-&gt;rtp_first_SN, stream-&gt;rtp_ch-&gt;rtp_time
+<span class="lineNum">     600 </span>            :                                                         ));
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            :                         /*skip RTCP clock init when RTSP is used*/
+<span class="lineNum">     603 </span><span class="lineCov">          6 :                         if (stream-&gt;rtsp) stream-&gt;rtcp_init = GF_TRUE;</span>
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span><span class="lineCov">          6 :                         if (stream-&gt;depacketizer-&gt;payt==GF_RTP_PAYT_H264_AVC) stream-&gt;depacketizer-&gt;flags |= GF_RTP_AVC_WAIT_RAP;</span>
+<span class="lineNum">     606 </span>            :                 }
+<span class="lineNum">     607 </span>            :                 /*this is RESUME on channel, filter packet based on time (darwin seems to send
+<span class="lineNum">     608 </span>            :                 couple of packet before)
+<span class="lineNum">     609 </span>            :                 do not fetch if we're below 10 ms or &lt;0, because this means we already have
+<span class="lineNum">     610 </span>            :                 this packet - as the PAUSE is issued with the RTP currentTime*/
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :                 else if (ch_time &lt;= 0.021) {</span>
+<span class="lineNum">     612 </span>            :                         return;
+<span class="lineNum">     613 </span>            :                 }
+<span class="lineNum">     614 </span><span class="lineCov">          6 :                 stream-&gt;check_rtp_time = RTP_SET_TIME_NONE;</span>
+<span class="lineNum">     615 </span>            :         }
+<span class="lineNum">     616 </span>            : 
+<span class="lineNum">     617 </span><span class="lineCov">        755 :         gf_rtp_depacketizer_process(stream-&gt;depacketizer, &amp;hdr, pck + PayloadStart, size - PayloadStart);</span>
+<span class="lineNum">     618 </span>            : 
+<span class="lineNum">     619 </span>            :         /*last check: signal EOS if we're close to end range in case the server do not send RTCP BYE*/
+<span class="lineNum">     620 </span><span class="lineCov">        755 :         if ((stream-&gt;flags &amp; RTP_HAS_RANGE) &amp;&amp; !(stream-&gt;flags &amp; RTP_EOS) ) {</span>
+<span class="lineNum">     621 </span>            :                 /*also check last CTS*/
+<span class="lineNum">     622 </span><span class="lineCov">         81 :                 Double ts = (Double) ((u32) stream-&gt;depacketizer-&gt;sl_hdr.compositionTimeStamp - hdr.TimeStamp);</span>
+<span class="lineNum">     623 </span><span class="lineCov">         81 :                 ts /= gf_rtp_get_clockrate(stream-&gt;rtp_ch);</span>
+<span class="lineNum">     624 </span><span class="lineCov">         81 :                 if (ABSDIFF(stream-&gt;range_end, (ts + stream-&gt;current_start + gf_rtp_get_current_time(stream-&gt;rtp_ch)) ) &lt; 0.2) {</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :                         stream-&gt;flags |= RTP_EOS;</span>
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 :                         stream-&gt;stat_stop_time = gf_sys_clock();</span>
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_eos(stream-&gt;opid);</span>
+<span class="lineNum">     628 </span>            :                 }
+<span class="lineNum">     629 </span>            :         }
+<span class="lineNum">     630 </span>            : 
+<span class="lineNum">     631 </span><span class="lineCov">        755 :         if (stream-&gt;rtpin-&gt;stats) {</span>
+<span class="lineNum">     632 </span><span class="lineCov">        755 :                 u32 now = gf_sys_clock();</span>
+<span class="lineNum">     633 </span><span class="lineCov">        755 :                 if (stream-&gt;last_stats_time + stream-&gt;rtpin-&gt;stats &lt; now) {</span>
+<span class="lineNum">     634 </span><span class="lineCov">         52 :                         stream-&gt;last_stats_time = now;</span>
+<span class="lineNum">     635 </span><span class="lineCov">         52 :                         rtpin_stream_update_stats(stream);</span>
+<span class="lineNum">     636 </span>            :                 }
+<span class="lineNum">     637 </span>            :         }
+<a name="638"><span class="lineNum">     638 </span>            : }</a>
+<span class="lineNum">     639 </span>            : 
+<span class="lineNum">     640 </span><span class="lineCov">         18 : static void rtpin_adjust_sync(GF_RTPIn *ctx)</span>
+<span class="lineNum">     641 </span>            : {
+<span class="lineNum">     642 </span><span class="lineCov">         18 :         u32 i, count = gf_list_count(ctx-&gt;streams);</span>
+<span class="lineNum">     643 </span>            :         u64 max_ntp_us = 0;
+<span class="lineNum">     644 </span>            : 
+<span class="lineNum">     645 </span><span class="lineCov">         18 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     646 </span><span class="lineCov">         19 :                 GF_RTPInStream *stream = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     647 </span><span class="lineCov">         19 :                 if (!stream-&gt;rtcp_init) return;</span>
+<span class="lineNum">     648 </span>            : 
+<span class="lineNum">     649 </span><span class="lineCov">         18 :                 if (max_ntp_us &lt; stream-&gt;init_ntp_us) {</span>
+<span class="lineNum">     650 </span>            :                         max_ntp_us = stream-&gt;init_ntp_us;
+<span class="lineNum">     651 </span>            :                 }
+<span class="lineNum">     652 </span>            :         }
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span><span class="lineCov">         17 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     655 </span>            :                 s64 ntp_diff_us;
+<span class="lineNum">     656 </span><span class="lineCov">         17 :                 GF_RTPInStream *stream = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     657 </span>            : 
+<span class="lineNum">     658 </span>            :                 ntp_diff_us = max_ntp_us;
+<span class="lineNum">     659 </span><span class="lineCov">         17 :                 ntp_diff_us -= stream-&gt;init_ntp_us;</span>
+<span class="lineNum">     660 </span><span class="lineCov">         17 :                 ntp_diff_us *= stream-&gt;rtp_ch-&gt;TimeScale;</span>
+<span class="lineNum">     661 </span><span class="lineCov">         17 :                 ntp_diff_us /= 1000000;</span>
+<span class="lineNum">     662 </span><span class="lineCov">         17 :                 stream-&gt;ts_adjust = ntp_diff_us;</span>
+<span class="lineNum">     663 </span>            :         }
+<a name="664"><span class="lineNum">     664 </span>            : }</a>
+<span class="lineNum">     665 </span>            : 
+<span class="lineNum">     666 </span><span class="lineCov">         32 : static void rtpin_stream_on_rtcp_pck(GF_RTPInStream *stream, char *pck, u32 size)</span>
+<span class="lineNum">     667 </span>            : {
+<span class="lineNum">     668 </span>            :         Bool has_sr;
+<span class="lineNum">     669 </span>            :         GF_Err e;
+<span class="lineNum">     670 </span>            : 
+<span class="lineNum">     671 </span><span class="lineCov">         33 :         if (stream-&gt;status == RTP_Connected) return;</span>
+<span class="lineNum">     672 </span>            :         //not configured yes
+<span class="lineNum">     673 </span><span class="lineCov">         32 :         if (!stream-&gt;rtp_ch-&gt;TimeScale) return;</span>
+<span class="lineNum">     674 </span><span class="lineCov">         31 :         stream-&gt;rtcp_bytes += size;</span>
+<span class="lineNum">     675 </span>            : 
+<span class="lineNum">     676 </span><span class="lineCov">         31 :         e = gf_rtp_decode_rtcp(stream-&gt;rtp_ch, pck, size, &amp;has_sr);</span>
+<span class="lineNum">     677 </span><span class="lineCov">         31 :         if (e&lt;0) return;</span>
+<span class="lineNum">     678 </span>            : 
+<span class="lineNum">     679 </span>            :         /*update sync if on pure RTP*/
+<span class="lineNum">     680 </span><span class="lineCov">         31 :         if (!stream-&gt;rtcp_init &amp;&amp; has_sr) {</span>
+<span class="lineNum">     681 </span>            :                 u64 ntp_clock_us, rtp_diff_us;
+<span class="lineNum">     682 </span>            : 
+<span class="lineNum">     683 </span><span class="lineCov">         18 :                 ntp_clock_us = stream-&gt;rtp_ch-&gt;last_SR_NTP_frac;</span>
+<span class="lineNum">     684 </span><span class="lineCov">         18 :                 ntp_clock_us *= 1000000;</span>
+<span class="lineNum">     685 </span><span class="lineCov">         18 :                 ntp_clock_us /= 0xFFFFFFFF;</span>
+<span class="lineNum">     686 </span><span class="lineCov">         18 :                 ntp_clock_us += 1000000 * (u64) stream-&gt;rtp_ch-&gt;last_SR_NTP_sec;</span>
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span>            :                 //ntp time at origin: ntp(now) - ntp(first_pck) = rtpts(now) - rtpts(orig) -&gt; ntp_first = ntp - rtp_diff
+<span class="lineNum">     689 </span><span class="lineCov">         18 :                 rtp_diff_us = stream-&gt;rtp_ch-&gt;last_SR_rtp_time - (stream-&gt;first_rtp_ts - 1);</span>
+<span class="lineNum">     690 </span><span class="lineCov">         18 :                 rtp_diff_us *= 1000000;</span>
+<span class="lineNum">     691 </span><span class="lineCov">         18 :                 rtp_diff_us /= stream-&gt;rtp_ch-&gt;TimeScale;</span>
+<span class="lineNum">     692 </span>            : 
+<span class="lineNum">     693 </span><span class="lineCov">         18 :                 stream-&gt;init_ntp_us = ntp_clock_us - rtp_diff_us;</span>
+<span class="lineNum">     694 </span>            : 
+<span class="lineNum">     695 </span>            : 
+<span class="lineNum">     696 </span><span class="lineCov">         18 :                 GF_LOG(GF_LOG_INFO, GF_LOG_RTP, (&quot;[RTCP] At %d Using Sender Report to map RTP TS %d to NTP clock &quot;LLU&quot; us - NTP origin &quot;LLU&quot;\n&quot;, gf_sys_clock(), stream-&gt;rtp_ch-&gt;last_SR_rtp_time, ntp_clock_us, stream-&gt;init_ntp_us));</span>
+<span class="lineNum">     697 </span>            : 
+<span class="lineNum">     698 </span><span class="lineCov">         18 :                 stream-&gt;rtcp_init = GF_TRUE;</span>
+<span class="lineNum">     699 </span>            : 
+<span class="lineNum">     700 </span><span class="lineCov">         18 :                 if (stream-&gt;rtpin-&gt;rtcpsync)</span>
+<span class="lineNum">     701 </span><span class="lineCov">         18 :                         rtpin_adjust_sync(stream-&gt;rtpin);</span>
+<span class="lineNum">     702 </span>            :         }
+<span class="lineNum">     703 </span>            : 
+<span class="lineNum">     704 </span><span class="lineCov">         31 :         if (e == GF_EOS) {</span>
+<span class="lineNum">     705 </span><span class="lineCov">         13 :                 stream-&gt;flags |= RTP_EOS;</span>
+<span class="lineNum">     706 </span>            :         }
+<a name="707"><span class="lineNum">     707 </span>            : }</a>
+<span class="lineNum">     708 </span>            : 
+<span class="lineNum">     709 </span><span class="lineCov">         14 : GF_Err rtpin_rtsp_data_cbk(GF_RTSPSession *sess, void *cbk, u8 *buffer, u32 bufferSize, Bool IsRTCP)</span>
+<span class="lineNum">     710 </span>            : {
+<span class="lineNum">     711 </span>            :         GF_RTPInStream *stream = (GF_RTPInStream *) cbk;
+<span class="lineNum">     712 </span><span class="lineCov">         14 :         if (!stream || stream-&gt;rtpin-&gt;done) return GF_OK;</span>
+<span class="lineNum">     713 </span><span class="lineCov">         14 :         if (IsRTCP) {</span>
+<span class="lineNum">     714 </span><span class="lineCov">          1 :                 rtpin_stream_on_rtcp_pck(stream, buffer, bufferSize);</span>
+<span class="lineNum">     715 </span>            :         } else {
+<span class="lineNum">     716 </span><span class="lineCov">         13 :                 rtpin_stream_on_rtp_pck(stream, buffer, bufferSize);</span>
+<span class="lineNum">     717 </span>            :         }
+<span class="lineNum">     718 </span>            :         return GF_OK;
+<span class="lineNum">     719 </span>            : }
+<span class="lineNum">     720 </span>            : 
+<a name="721"><span class="lineNum">     721 </span>            : </a>
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span><span class="lineCov">    5794080 : u32 rtpin_stream_read(GF_RTPInStream *stream)</span>
+<span class="lineNum">     724 </span>            : {
+<span class="lineNum">     725 </span>            :         u32 size, tot_size = 0;
+<span class="lineNum">     726 </span>            : 
+<span class="lineNum">     727 </span><span class="lineCov">    5794080 :         if (!stream-&gt;rtp_ch) return 0;</span>
+<span class="lineNum">     728 </span><span class="lineCov">    5794080 :         if (gf_sk_group_sock_is_set(stream-&gt;rtpin-&gt;sockgroup, stream-&gt;rtp_ch-&gt;rtcp, GF_SK_SELECT_READ)) {</span>
+<span class="lineNum">     729 </span><span class="lineCov">         31 :                 size = gf_rtp_read_rtcp(stream-&gt;rtp_ch, stream-&gt;buffer, stream-&gt;rtpin-&gt;block_size);</span>
+<span class="lineNum">     730 </span><span class="lineCov">         31 :                 if (size) {</span>
+<span class="lineNum">     731 </span>            :                         tot_size += size;
+<span class="lineNum">     732 </span><span class="lineCov">         31 :                         rtpin_stream_on_rtcp_pck(stream, stream-&gt;buffer, size);</span>
+<span class="lineNum">     733 </span>            :                 }
+<span class="lineNum">     734 </span>            :         }
+<span class="lineNum">     735 </span>            : 
+<span class="lineNum">     736 </span><span class="lineCov">    5794080 :         if (gf_sk_group_sock_is_set(stream-&gt;rtpin-&gt;sockgroup, stream-&gt;rtp_ch-&gt;rtp, GF_SK_SELECT_READ)) {</span>
+<span class="lineNum">     737 </span><span class="lineCov">        742 :                 size = gf_rtp_read_rtp(stream-&gt;rtp_ch, stream-&gt;buffer, stream-&gt;rtpin-&gt;block_size);</span>
+<span class="lineNum">     738 </span><span class="lineCov">        742 :                 if (size) {</span>
+<span class="lineNum">     739 </span><span class="lineCov">        723 :                         tot_size += size;</span>
+<span class="lineNum">     740 </span><span class="lineCov">        723 :                         stream-&gt;rtpin-&gt;udp_timeout = 0;</span>
+<span class="lineNum">     741 </span><span class="lineCov">        723 :                         rtpin_stream_on_rtp_pck(stream, stream-&gt;buffer, size);</span>
+<span class="lineNum">     742 </span>            :                 }
+<span class="lineNum">     743 </span>            :         }
+<span class="lineNum">     744 </span><span class="lineCov">    5794080 :         if (!tot_size) return 0;</span>
+<span class="lineNum">     745 </span>            : 
+<span class="lineNum">     746 </span>            :         /*and send the report*/
+<span class="lineNum">     747 </span><span class="lineCov">        742 :         if (stream-&gt;flags &amp; RTP_ENABLE_RTCP) gf_rtp_send_rtcp_report(stream-&gt;rtp_ch);</span>
+<span class="lineNum">     748 </span>            : 
+<span class="lineNum">     749 </span>            :         /*detect timeout*/
+<span class="lineNum">     750 </span><span class="lineCov">        742 :         if (stream-&gt;rtpin-&gt;udp_timeout) {</span>
+<span class="lineNum">     751 </span><span class="lineCov">         18 :                 if (!stream-&gt;last_udp_time) {</span>
+<span class="lineNum">     752 </span><span class="lineCov">         18 :                         stream-&gt;last_udp_time = gf_sys_clock();</span>
+<span class="lineNum">     753 </span><span class="lineNoCov">          0 :                 } else if (stream-&gt;rtp_ch-&gt;net_info.IsUnicast) {</span>
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :                         u32 diff = gf_sys_clock() - stream-&gt;last_udp_time;</span>
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :                         if (diff &gt;= stream-&gt;rtpin-&gt;udp_timeout) {</span>
+<span class="lineNum">     756 </span>            :                                 char szMessage[1024];
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_RTP, (&quot;[RTP] UDP Timeout after %d ms\n&quot;, diff));</span>
+<span class="lineNum">     758 </span><span class="lineNoCov">          0 :                                 sprintf(szMessage, &quot;No data received in %d ms%s&quot;, diff, stream-&gt;rtpin-&gt;autortsp ? &quot;, retrying using TCP&quot; : &quot;&quot;);</span>
+<span class="lineNum">     759 </span><span class="lineNoCov">          0 :                                 rtpin_send_message(stream-&gt;rtpin, GF_IP_UDP_TIMEOUT, szMessage);</span>
+<span class="lineNum">     760 </span><span class="lineNoCov">          0 :                                 if (stream-&gt;rtpin-&gt;autortsp)</span>
+<span class="lineNum">     761 </span><span class="lineNoCov">          0 :                                         stream-&gt;rtpin-&gt;retry_tcp = GF_TRUE;</span>
+<span class="lineNum">     762 </span>            :                         }
+<span class="lineNum">     763 </span>            :                 }
+<span class="lineNum">     764 </span>            :         }
+<span class="lineNum">     765 </span>            :         return tot_size;
+<span class="lineNum">     766 </span>            : }
+<span class="lineNum">     767 </span>            : 
+<span class="lineNum">     768 </span>            : #endif /*GPAC_DISABLE_STREAMING*/
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

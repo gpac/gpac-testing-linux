@@ -1,0 +1,26 @@
+*** softstretch-yuv2 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:46:11 ***
+
+
+*** Subtest "dump-yuv2": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.jpg compositor:opfmt=yuv2 @ -o ./results/temp/raw.yuv2 -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+Computing ./results/temp/raw.yuv2  (dump-yuv2) hash: 
+File hash (SHA-1): 8E447B015C6EAB3EDCE4F1EB43673466FFDEC005
+Hash OK for ./results/temp/raw.yuv2
+
+*** Subtest "blit-alpha-yuv2": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.png compositor:opfmt=yuv2 @ -o ./results/temp/dump_alpha.yuv2" ***
+
+Computing ./results/temp/dump_alpha.yuv2  (dump-alpha-yuv2) hash: 
+File hash (SHA-1): ADC9CF34A4F5259BA988300DB04675ED842CD277
+Hash OK for ./results/temp/dump_alpha.yuv2
+
+*** Subtest "blit-rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv2:size=128x128 compositor:opfmt=rgb @ -o ./results/temp/dump.rgb" ***
+
+Computing ./results/temp/dump.rgb  (blit-yuv2-to-rgb) hash: 
+File hash (SHA-1): 14F56F42D0CE15A213042C2F0EA5B215EDB9ED73
+Hash OK for ./results/temp/dump.rgb
+
+*** Subtest "dump-yuv2-yuv": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv2:size=128x128 compositor:opfmt=yuv @ -o ./results/temp/dump_yuv.yuv" ***
+
+Computing ./results/temp/dump_yuv.yuv  (dump-yuv2-yuv) hash: 
+File hash (SHA-1): 6F1AB8AA7970CACC7536951A24CF5AA13BDD13E1
+Hash OK for ./results/temp/dump_yuv.yuv

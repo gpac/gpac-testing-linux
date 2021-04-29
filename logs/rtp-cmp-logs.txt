@@ -1,0 +1,134 @@
+*** rtp-cmp logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:45:19 ***
+
+
+*** Subtest "init": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/cmp.mp4 -o ./results/temp/session.sdp:runfor=0:ip=127.0.0.1" ***
+
+Computing ./results/temp/session.sdp  (init) hash: 
+File hash (SHA-1): 80085261C10E6AF71FD90962472726F8C2C1CF55
+Hash OK for ./results/temp/session.sdp
+Computing ./results/temp/session_dashinit.mp4  (dump-dash-init) hash: 
+File hash (SHA-1): 3B51AD9F9B975207F958C88AB95BBA02F2A32817
+Hash OK for ./results/temp/session_dashinit.mp4
+Computing ./results/temp/dump.mpd  (dump-dash-mpd) hash: 
+File hash (SHA-1): DA78F21553B06989211F13E6DA6CFDB0CABE98A2
+Hash fail, ref hash ./hash_refs/rtp-cmp-dump-dash-mpd.hash was 03389F38962ECCC85F2C3E5A64D5461C71DFF752
+Computing ./results/temp/session_dash1.m4s  (dump-dash-seg) hash: 
+File hash (SHA-1): 5CF33ACDF6EF18AE0A5908A95FD4572EF27ED191
+Hash OK for ./results/temp/session_dash1.m4s
+Computing ./results/temp/dump.mp4  (dump-mp4) hash: 
+File hash (SHA-1): 946FF7C654EF29B78A34AE09A615AEF5E5EFE157
+Hash OK for ./results/temp/dump.mp4
+Computing ./results/temp/dump.cmp  (dump-native) hash: 
+File hash (SHA-1): 56353922D233A9997BF5F977E83EB44F01F15AAA
+Hash OK for ./results/temp/dump.cmp
+Computing ./results/temp/dump.ts  (dump-ts) hash: 
+File hash (SHA-1): D07CF03B208F17E4DD13F06B1C771B95ED25F398
+Hash OK for ./results/temp/dump.ts
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -for-test -runfor=2000 -i ./results/temp/session.sdp:ifce=127.0.0.1 -o ./results/temp/dump.cmp -o ./results/temp/dump.mp4 -o ./results/temp/dump.ts:pcr_init=0:pes_pack=none -o ./results/temp/dump.mpd -stats -graph" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -9494656
+[MP4Mux] PID session.sdp ID 1 Sample 3 with DTS 3600 less than previous sample DTS 10800, adjusting prev sample duration
+[MP4Mux] PID session.sdp ID 1 Sample 3 with DTS 3600 less than previous sample DTS 10800, adjusting prev sample duration
+[MP4Mux] Indicated profile doesn't include B-VOPs - forcing Advanced Simple Profile @ Level 5
+
+Filter stats - 13 filters
+	Filter fin (src=./results/temp/session.sdp:ifce=127.0.0.1) : 0 input pids 1 output pids 4 tasks 1272 us process time
+		1 packets sent 391 bytes sent (786.164 pck/sec 2.45912 mbps)
+		* output PID session.sdp: 1 packets sent
+	Filter fout (dst=./results/temp/dump.cmp) : 1 input pids 0 output pids 29 tasks 191 us process time
+		27 packets processed 12048 bytes processed (141361 pck/sec 504.628 mbps)
+		* input PID session.sdp: 27 packets received
+	Filter fout (dst=./results/temp/dump.mp4) : 1 input pids 0 output pids 5 tasks 108 us process time
+		3 packets processed 13039 bytes processed (27777.8 pck/sec 965.852 mbps)
+		* input PID session.sdp: 3 packets received
+	Filter fout (dst=./results/temp/dump.ts:pcr_init=0:pes_pack=none) : 1 input pids 0 output pids 39 tasks 175 us process time
+		37 packets processed 17860 bytes processed (211429 pck/sec 816.457 mbps)
+		* input PID ts_mux: 37 packets received
+	Filter fout (dst=./results/temp/dump.mpd) : 1 input pids 0 output pids 3 tasks 175 us process time
+		1 packets processed 750 bytes processed (5714.29 pck/sec 34.2857 mbps)
+		* input PID manifest_mpd: 1 packets received
+	Filter rtpin : 1 input pids 1 output pids 148592 tasks 170539 us process time
+		1 packets processed 391 bytes processed (5.86376 pck/sec 0.0183418 mbps)
+		29 packets sent 11934 bytes sent (170.049 pck/sec 0.559825 mbps)
+		* input PID session.sdp: 1 packets received
+		* output PID session.sdp: 29 packets sent
+	Filter ufm4v : 1 input pids 1 output pids 48 tasks 464 us process time
+		27 packets processed 11934 bytes processed (58189.7 pck/sec 205.759 mbps)
+		27 packets sent 12048 bytes sent (58189.7 pck/sec 207.724 mbps)
+		* input PID session.sdp: 27 frames (29 packets) received
+		* output PID session.sdp: 27 packets sent
+	Filter writegen : 1 input pids 1 output pids 59 tasks 151 us process time
+		27 packets processed 12048 bytes processed (178808 pck/sec 638.305 mbps)
+		27 packets sent 12048 bytes sent (178808 pck/sec 638.305 mbps)
+		* input PID session.sdp: 27 packets received
+		* output PID session.sdp: 27 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 44 tasks 1022 us process time
+		27 packets processed 11934 bytes processed (26418.8 pck/sec 93.4168 mbps)
+		3 packets sent 13039 bytes sent (2935.42 pck/sec 102.067 mbps)
+		* input PID session.sdp: 27 frames (29 packets) received
+		* output PID session.sdp: 3 packets sent
+	Filter dasher ID _0x564e5094b670_ : 1 input pids 2 output pids 41854 tasks 11757 us process time
+		27 packets processed 11934 bytes processed (2296.5 pck/sec 8.12044 mbps)
+		28 packets sent 12684 bytes sent (2381.56 pck/sec 8.63077 mbps)
+		* input PID session.sdp: 27 frames (29 packets) received
+		* output PID manifest_mpd: 1 packets sent
+		* output PID session.sdp: 27 packets sent
+	Filter m2tsmx : 1 input pids 1 output pids 57 tasks 539 us process time
+		27 packets processed 12048 bytes processed (50092.8 pck/sec 178.82 mbps)
+		37 packets sent 17860 bytes sent (68645.6 pck/sec 265.083 mbps)
+		* input PID session.sdp: 27 packets received
+		* output PID ts_mux: 37 packets sent
+	Filter fout (dst=./results/temp/session_dashinit.mp4:gfopt:frag:xps_inband=no:psshs=moov:mime=video/mp4) : 1 input pids 0 output pids 7 tasks 386 us process time
+		5 packets processed 13266 bytes processed (12953.4 pck/sec 274.943 mbps)
+		* input PID session.sdp: 5 packets received
+	Filter mp4mx : 1 input pids 1 output pids 35 tasks 584 us process time
+		27 packets processed 11934 bytes processed (46232.9 pck/sec 163.479 mbps)
+		5 packets sent 13266 bytes sent (8561.64 pck/sec 181.726 mbps)
+		* input PID session.sdp: 27 packets received
+		* output PID session.sdp: 5 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2095676 us active_time 239235 us nb_tasks 190818
+
+Total: run_time 2095676 us active_time 239235 us nb_tasks 190818
+
+Filters connected:
+fin (src=./results/temp/session.sdp:ifce=127.0.0.1) (ptr=0x564e5092c850)
+-(PID session.sdp) rtpin (ptr=0x564e5093b220)
+--(PID session.sdp) ufm4v (ptr=0x564e50943ab0)
+---(PID session.sdp) writegen (ptr=0x564e50944ba0)
+----(PID session.sdp) fout (dst=./results/temp/dump.cmp) (ptr=0x564e5092f3e0)
+---(PID session.sdp) m2tsmx (ptr=0x564e5094eb90)
+----(PID ts_mux) fout (dst=./results/temp/dump.ts:pcr_init=0:pes_pack=none) (ptr=0x564e50933bb0)
+--(PID session.sdp) mp4mx (ptr=0x564e50946900)
+---(PID session.sdp) fout (dst=./results/temp/dump.mp4) (ptr=0x564e50931810)
+--(PID session.sdp) dasher (ID=_0x564e5094b670_)
+---(PID manifest_mpd) fout (dst=./results/temp/dump.mpd) (ptr=0x564e50936110)
+---(PID session.sdp) mp4mx (ptr=0x564e509692f0)
+----(PID session.sdp) fout (dst=./results/temp/session_dashinit.mp4:gfopt:frag:xps_inband=no:psshs=moov:mime=video/mp4) (ptr=0x564e50964eb0)
+
+
+*** Subtest "stream": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/cmp.mp4 -o ./results/temp/session.sdp:loop=no:ip=127.0.0.1:ifce=127.0.0.1:tso=100000 -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1620103296
+
+Filter stats - 4 filters
+	Filter fin (src=./results/temp/cmp.mp4) : 0 input pids 1 output pids 6 tasks 1228 us process time
+		1 packets sent 5000 bytes sent (814.332 pck/sec 32.5733 mbps)
+		* output PID cmp.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/session.sdp:loop=no:ip=127.0.0.1:ifce=127.0.0.1:tso=100000) : 1 input pids 0 output pids 2 tasks 184 us process time
+		1 packets processed 391 bytes processed (5434.78 pck/sec 17 mbps)
+		* input PID SDP: 1 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 34 tasks 1694 us process time
+		2 packets processed 5000 bytes processed (1180.64 pck/sec 23.6128 mbps)
+		27 packets sent 11934 bytes sent (15938.6 pck/sec 56.3589 mbps)
+		* input PID cmp.mp4: 2 packets received
+		* output PID cmp.mp4: 27 packets sent
+	Filter rtpout : 1 input pids 1 output pids 78160 tasks 13416 us process time
+		27 packets processed 11934 bytes processed (2012.52 pck/sec 7.11628 mbps)
+		1 packets sent 391 bytes sent (74.5379 pck/sec 0.233154 mbps)
+		* input PID cmp.mp4: 27 packets received
+		* output PID SDP: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 1042041 us active_time 38213 us nb_tasks 78231
+
+Total: run_time 1042041 us active_time 38213 us nb_tasks 78231
+

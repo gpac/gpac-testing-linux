@@ -1,0 +1,170 @@
+*** http-dashpush-vod logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:42:38 ***
+
+
+*** Subtest "dash_push": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -profile onDemand ./results/temp/source.mp4 -out http://127.0.0.1:8080/live.mpd:hmode=push:vodcache=false -logs=http@debug" ***
+[Dasher] No template assigned, using $File$$FS$_dash
+Wrong argument value false for unsigned int arg vodcache enum on|insert|replace - using 0
+Wrong argument value false for unsigned int arg vodcache enum on|insert|replace - using 0
+[HTTPOut] Opening output file http://127.0.0.1:8080/source_dashinit.mp4
+[HTTP] Connecting to 127.0.0.1:8080
+[HTTP] Connected to 127.0.0.1:8080
+[HTTP] Sending request at UTC 1619739758676 PUT /source_dashinit.mp4 HTTP/1.1
+Host: 127.0.0.1
+Content-Type: *
+User-Agent: GPAC/1.1.0-DEV-revUNKNOWN-HEAD
+Connection: Keep-Alive
+Transfer-Encoding: chunked
+
+
+
+[HTTPOut] Writing 657 bytes to output file /source_dashinit.mp4
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 0.981333 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.984 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.98667 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4.01067 end 5
+[MPD] Generating MPD at time 2021-04-29T23:42:38.677Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[HTTPOut] Opening output file http://127.0.0.1:8080/live.mpd
+[HTTP] Connecting to 127.0.0.1:8080
+[HTTP] Connected to 127.0.0.1:8080
+[HTTP] Sending request at UTC 1619739758678 PUT /live.mpd HTTP/1.1
+Host: 127.0.0.1
+Content-Type: application/dash+xml
+User-Agent: GPAC/1.1.0-DEV-revUNKNOWN-HEAD
+Connection: Keep-Alive
+Transfer-Encoding: chunked
+
+
+
+[HTTPOut] Writing 963 bytes to output file /live.mpd
+[HTTPOut] Closing output /live.mpd
+[HTTP] HTTP/1.1 200 OK
+Server: GPAC 1.1.0-DEV
+Date: Thu, 29 Apr 2021 23:42:38 GMT
+Connection: keep-alive
+Content-Location: /live.mpd
+
+
+[HTTP] Reply processed from 127.0.0.1
+[HTTPOut] Writing 80 bytes to output file /source_dashinit.mp4
+[HTTPOut] Writing 10000 bytes to output file /source_dashinit.mp4
+[HTTPOut] Writing 10000 bytes to output file /source_dashinit.mp4
+[HTTPOut] Writing 10000 bytes to output file /source_dashinit.mp4
+[HTTPOut] Writing 10000 bytes to output file /source_dashinit.mp4
+[HTTPOut] Writing 7983 bytes to output file /source_dashinit.mp4
+[HTTPOut] Closing output /source_dashinit.mp4
+[HTTP] HTTP/1.1 200 OK
+Server: GPAC 1.1.0-DEV
+Date: Thu, 29 Apr 2021 23:42:39 GMT
+Connection: keep-alive
+Content-Location: /source_dashinit.mp4
+
+
+[HTTP] Reply processed from 127.0.0.1
+
+[Downloader] Destroy session URL http://127.0.0.1:8080/source_dashinit.mp4
+[Downloader] closing socket
+[Downloader] Destroy session URL http://127.0.0.1:8080/live.mpd
+[Downloader] closing socket
+
+Computing ./results/temp/source_dashinit.mp4  (dash-vod) hash: 
+File hash (SHA-1): 21B45070DD6E5B502F3984715742116A5EE138AA
+Hash OK for ./results/temp/source_dashinit.mp4
+
+*** Subtest "http-server": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0  -runfor=6000 httpout:port=8080:wdir=./results/temp -logs=http@debug" ***
+[HTTPOut] Server running on port 8080
+[HTTPOut] Accepting new connection from 127.0.0.1
+[HTTPOut] Accepting new connection from 127.0.0.1
+[HTTP] PUT /source_dashinit.mp4 HTTP/1.1
+Host: 127.0.0.1
+Content-Type: *
+User-Agent: GPAC/1.1.0-DEV-revUNKNOWN-HEAD
+Connection: Keep-Alive
+Transfer-Encoding: chunked
+
+
+[HTTP] Chunk Start: Header "291" - header size 5 - payload size 657 (bytes done 0) at UTC 1619739758714
+[HTTP] bandwidth estimation: download time 559577 us - bytes 657 - rate 9 kbps
+[HTTP] url /source_dashinit.mp4 received 657 new bytes (9 kbps)
+[HTTP] PUT /live.mpd HTTP/1.1
+Host: 127.0.0.1
+Content-Type: application/dash+xml
+User-Agent: GPAC/1.1.0-DEV-revUNKNOWN-HEAD
+Connection: Keep-Alive
+Transfer-Encoding: chunked
+
+
+[HTTP] Chunk Start: Header "3C3" - header size 5 - payload size 963 (bytes done 0) at UTC 1619739758764
+[HTTP] bandwidth estimation: download time 609772 us - bytes 963 - rate 12 kbps
+[HTTP] url /live.mpd received 963 new bytes (12 kbps)
+[HTTP] Chunk Start: Header "0" - header size 3 - payload size 0 (bytes done 963) at UTC 1619739758764
+[HTTP] (null) (963 bytes) downloaded in 85 us (12 kbps) (609780 us since request - got response in 609735 us)
+[HTTPOut] Sending PUT response to 127.0.0.1 - reply 200
+[HTTP] send reply for /live.mpd: HTTP/1.1 200 OK
+Server: GPAC 1.1.0-DEV
+Date: Thu, 29 Apr 2021 23:42:38 GMT
+Connection: keep-alive
+Content-Location: /live.mpd
+
+
+[HTTP] Chunk Start: Header "50" - header size 4 - payload size 80 (bytes done 657) at UTC 1619739758813
+[HTTP] bandwidth estimation: download time 99643 us - bytes 737 - rate 59 kbps
+[HTTP] url /source_dashinit.mp4 received 80 new bytes (59 kbps)
+[HTTP] Chunk Start: Header "2710" - header size 6 - payload size 10000 (bytes done 737) at UTC 1619739758813
+[HTTP] bandwidth estimation: download time 99650 us - bytes 10643 - rate 854 kbps
+[HTTP] url /source_dashinit.mp4 received 9906 new bytes (854 kbps)
+[HTTP] Chunk encoding: still 80 bytes to get
+[HTTP] bandwidth estimation: download time 99658 us - bytes 10657 - rate 855 kbps
+[HTTP] url /source_dashinit.mp4 received 14 new bytes (855 kbps)
+[HTTP] Chunk encoding: last bytes in chunk received
+[HTTP] bandwidth estimation: download time 148848 us - bytes 10737 - chunk rate 1496 kbps (overall rate rate 578 kbps)
+[HTTP] url /source_dashinit.mp4 received 80 new bytes (1496 kbps)
+[HTTP] Chunk Start: Header "2710" - header size 6 - payload size 10000 (bytes done 10737) at UTC 1619739758863
+[HTTP] bandwidth estimation: download time 148867 us - bytes 20649 - chunk rate 778 kbps (overall rate rate 1110 kbps)
+[HTTP] url /source_dashinit.mp4 received 9912 new bytes (778 kbps)
+[HTTP] Chunk encoding: still 80 bytes to get
+[HTTP] bandwidth estimation: download time 148878 us - bytes 20657 - chunk rate 778 kbps (overall rate rate 1111 kbps)
+[HTTP] url /source_dashinit.mp4 received 8 new bytes (778 kbps)
+[HTTP] Chunk encoding: last bytes in chunk received
+[HTTP] bandwidth estimation: download time 198094 us - bytes 20737 - chunk rate 1559 kbps (overall rate rate 838 kbps)
+[HTTP] url /source_dashinit.mp4 received 80 new bytes (1559 kbps)
+[HTTP] Chunk Start: Header "2710" - header size 6 - payload size 10000 (bytes done 20737) at UTC 1619739758912
+[HTTP] bandwidth estimation: download time 198109 us - bytes 30649 - chunk rate 1055 kbps (overall rate rate 1238 kbps)
+[HTTP] url /source_dashinit.mp4 received 9912 new bytes (1055 kbps)
+[HTTP] Chunk encoding: still 80 bytes to get
+[HTTP] bandwidth estimation: download time 198116 us - bytes 30657 - chunk rate 1055 kbps (overall rate rate 1239 kbps)
+[HTTP] url /source_dashinit.mp4 received 8 new bytes (1055 kbps)
+[HTTP] Chunk encoding: last bytes in chunk received
+[HTTP] bandwidth estimation: download time 247322 us - bytes 30737 - chunk rate 1580 kbps (overall rate rate 995 kbps)
+[HTTP] url /source_dashinit.mp4 received 80 new bytes (1580 kbps)
+[HTTP] Chunk Start: Header "2710" - header size 6 - payload size 10000 (bytes done 30737) at UTC 1619739758961
+[HTTP] bandwidth estimation: download time 247352 us - bytes 40649 - chunk rate 1195 kbps (overall rate rate 1315 kbps)
+[HTTP] url /source_dashinit.mp4 received 9912 new bytes (1195 kbps)
+[HTTP] Chunk encoding: still 80 bytes to get
+[HTTP] bandwidth estimation: download time 247360 us - bytes 40657 - chunk rate 1195 kbps (overall rate rate 1316 kbps)
+[HTTP] url /source_dashinit.mp4 received 8 new bytes (1195 kbps)
+[HTTP] Chunk encoding: last bytes in chunk received
+[HTTP] bandwidth estimation: download time 296559 us - bytes 40737 - chunk rate 1592 kbps (overall rate rate 1100 kbps)
+[HTTP] url /source_dashinit.mp4 received 80 new bytes (1592 kbps)
+[HTTP] Chunk Start: Header "1F2F" - header size 6 - payload size 7983 (bytes done 40737) at UTC 1619739759010
+[HTTP] bandwidth estimation: download time 296574 us - bytes 48720 - chunk rate 1331 kbps (overall rate rate 1315 kbps)
+[HTTP] url /source_dashinit.mp4 received 7983 new bytes (1331 kbps)
+[HTTP] Chunk Start: Header "0" - header size 3 - payload size 0 (bytes done 48720) at UTC 1619739759010
+[HTTP] (null) (48720 bytes) downloaded in 296639 us (1331 kbps) (296580 us since request - got response in 559553 us)
+[HTTP] bandwidth estimation: download time 297169 us - bytes 48720 - chunk rate 1545 kbps (overall rate rate 1313 kbps)
+[HTTPOut] Sending PUT response to 127.0.0.1 - reply 200
+[HTTP] send reply for /source_dashinit.mp4: HTTP/1.1 200 OK
+Server: GPAC 1.1.0-DEV
+Date: Thu, 29 Apr 2021 23:42:39 GMT
+Connection: keep-alive
+Content-Location: /source_dashinit.mp4
+
+
+[HTTPOut] Connection to 127.0.0.1 closed: Connection to server closed
+[Downloader] Destroy session URL /source_dashinit.mp4
+[Downloader] closing socket
+[HTTPOut] Connection to 127.0.0.1 closed: Connection to server closed
+[Downloader] Destroy session URL /live.mpd
+[Downloader] closing socket
+

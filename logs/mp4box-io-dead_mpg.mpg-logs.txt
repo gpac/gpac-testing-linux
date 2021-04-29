@@ -1,0 +1,82 @@
+*** mp4box-io-dead_mpg.mpg logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:56 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/dead_mpg.mpg" ***
+Import probing results for ./external_media/import/dead_mpg.mpg:
+File has 2 tracks
+Duration: 40.738 s
+- Track 480 type: Video - Codec MPEG-1 Video
+	Size 320x240 @ 25 FPS
+- Track 448 type: Audio - Codec MPEG-1 Audio
+	SampleRate 44100 - 1 channels
+
+For more details, use `gpac -i dead_mpg.mpg inspect[:deep][:analyze=on|bs]`
+
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/dead_mpg.mpg -new ./results/temp/dead_mpg.mpg.mp4" ***
+Track Importing MPEG-2 Video - Width 320 Height 240 FPS 25000/1000
+Track Importing MP3 - SampleRate 44100 Num Channels 1
+MPEG-1/2 Import results: 1017 VOPs (69 Is - 294 Ps - 654 Bs)
+	2 max consecutive B-frames
+
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/dead_mpg.mpg.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 2 tracks - TimeScale 600
+Duration 00:00:40.685
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: No visual capability required (0xff)
+Audio PL: No audio capability required (0xff)
+No streams included in root OD
+
+# Track 1 Info - ID 480 - TimeScale 90000
+Media Duration 00:00:40.651 
+Track has 1 edits: track duration is 00:00:40.640
+Media Info: Language "Undetermined (und)" - Type "vide:mp4v" - 1017 samples
+Visual Sample Entry Info: width=320 height=240 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=320 height=240
+MPEG-1 Video - Visual Size 320 x 240
+[RFC6381-M4V] Cannot find M4V config, using default mp4v.6A
+	RFC6381 Codec Parameters: mp4v.6A
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 14 samples
+	Max sample duration: 3600 / 90000
+
+# Track 2 Info - ID 448 - TimeScale 90000
+Media Duration 00:00:40.685 
+Media Info: Language "Undetermined (und)" - Type "soun:.mp3" - 1558 samples
+	MPEG 1/2 Audio stream - Sample Rate 44100 - 1 channel(s) 16 bps
+	RFC6381 Codec Parameters: mp4a.6B
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 2351 / 90000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/dead_mpg.mpg.mp4 -out ./results/temp/dead_mpg.mpg.1.tmp" ***
+
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/dead_mpg.mpg.mp4 -out ./results/temp/dead_mpg.mpg.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dead_mpg.mpg.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 1A642C20C2898692CA4DD945F268994A5BCDB115
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/dead_mpg.mpg.mp4 -out ./results/temp/dead_mpg.mpg.mp4.hint" ***
+Hinting track ID 480 - Type "mp4v:mp4v" (MPV) - BW 550 kbps
+Hinting track ID 448 - Type ".mp3:.mp3" (MPA) - BW 96 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/dead_mpg.mpg.mp4.hint" ***
+Removing hint track ID 66015
+Removing hint track ID 65983
+

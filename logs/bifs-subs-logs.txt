@@ -1,0 +1,30 @@
+*** bifs-subs logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:29:06 ***
+
+
+*** Subtest "bt2mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -mp4 ./media/bifs/bifs_subs.bt -out ./results/temp/test.mp4" ***
+BT: MPEG-4 Scene Parsing
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+Arg mpeg4 set but not used
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+Track Importing Timed Text - Text track 128 x 128 font Serif (size 18) layer 0
+Arg mpeg4 set but not used
+
+Computing ./results/temp/test.mp4  (bt2mp4) hash: 
+File hash (SHA-1): 2BE0CDF811CB13168D65D189FB192292F12F9FCC
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "mp42bt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -bt ./results/temp/test.mp4" ***
+MPEG-4 BIFS Scene Parsing
+Scene loaded - dumping 2 systems streams
+
+Computing ./results/temp/test.mp4  (mp42bt) hash: 
+File hash (SHA-1): 2BE0CDF811CB13168D65D189FB192292F12F9FCC
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "strtxt": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.mp4:strtxt reframer @ -o ./results/temp/test_strtxt.mp4" ***
+
+Computing ./results/temp/test_strtxt.mp4  (strtxt) hash: 
+File hash (SHA-1): 9E0B8FF1DAA3A1154E7F8D3A4B4AE0B0C077F64E
+Hash OK for ./results/temp/test_strtxt.mp4

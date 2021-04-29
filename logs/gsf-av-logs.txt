@@ -1,0 +1,28 @@
+*** gsf-av logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:42 ***
+
+
+*** Subtest "gsf-mux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264 -i ./media/auxiliary_files/enst_audio.aac reframer @ -o ./results/temp/dump.gsf -graph -logs=container@debug" ***
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_video.h264) (ptr=0x55c5ec034e90)
+-(PID enst_video.h264) rfnalu (ptr=0x55c5ec041490)
+--(PID enst_video.h264) reframer (ID=_0x55c5ec03b230_)
+---(PID enst_video.h264) gsfmx (ptr=0x55c5ec05c800)
+----(PID enst_video.h264) fout (dst=./results/temp/dump.gsf) (ptr=0x55c5ec03c440)
+---(PID enst_audio.aac) gsfmx (ptr=0x55c5ec05c800)
+fin (src=./media/auxiliary_files/enst_audio.aac) (ptr=0x55c5ec037830)
+-(PID enst_audio.aac) rfadts (ptr=0x55c5ec046380)
+--(PID enst_audio.aac) reframer (ID=_0x55c5ec03b230_)
+
+
+*** Subtest "gsf-demux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -strict-error -i ./results/temp/dump.gsf inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph" ***
+
+Filters connected:
+fin (src=./results/temp/dump.gsf) (ptr=0x55ba5e80cec0)
+-(PID dump.gsf) gsfdmx (ptr=0x55ba5e8128f0)
+--(PID dump.gsf) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55ba5e80f770)
+--(PID dump.gsf) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55ba5e80f770)
+
+Computing ./results/temp/inspect.txt  (gsf-demux) hash: 
+File hash (SHA-1): E24E15FA4F5B6FC2C7D63AD53E0366BF459E2E50
+Hash OK for ./results/temp/inspect.txt

@@ -1,0 +1,62 @@
+*** mp4box-io-alsa-6ch.opus logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:42 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/alsa-6ch.opus" ***
+Import probing results for ./external_media/import/alsa-6ch.opus:
+File has 1 tracks
+- Track 1 type: Audio - Codec Opus Audio
+	SampleRate 48000 - 6 channels
+
+For more details, use `gpac -i alsa-6ch.opus inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/alsa-6ch.opus.mp4  (add) hash: 
+File hash (SHA-1): 134B515DB2CE310DBAF5C9E81A457CEB872EBA0F
+Hash OK for ./results/temp/alsa-6ch.opus.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/alsa-6ch.opus -new ./results/temp/alsa-6ch.opus.mp4" ***
+Track Importing Opus - SampleRate 48000 Num Channels 6
+
+Computing ./results/temp/alsa-6ch.opus.1.tmp  (diso) hash: 
+File hash (SHA-1): 9F888D82092BA0EC7023F6B1B03C05280E7E3E21
+Hash OK for ./results/temp/alsa-6ch.opus.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/alsa-6ch.opus.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:08.700
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: No visual capability required (0xff)
+Audio PL: Not part of MPEG-4 audio profiles (0xfe)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 48000
+Media Duration 00:00:08.700 
+Media Info: Language "Undetermined (und)" - Type "soun:Opus" - 435 samples
+Unknown track type
+	RFC6381 Codec Parameters: Opus
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 960 / 48000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/alsa-6ch.opus.mp4 -out ./results/temp/alsa-6ch.opus.1.tmp" ***
+
+Computing ./results/temp/alsa-6ch.opus.2.tmp  (dts) hash: 
+File hash (SHA-1): EF24158087C5ADB52CF79089F7C874ADA901CF31
+Hash OK for ./results/temp/alsa-6ch.opus.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/alsa-6ch.opus.mp4 -out ./results/temp/alsa-6ch.opus.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/alsa-6ch.opus.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 2590B667E3166564B9CBED4493CA42041FE2B113
+Hash OK for ./results/temp/inspect.txt

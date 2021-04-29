@@ -1,0 +1,54 @@
+ <test name="mp4box-base-dump" result="OK" date="29/04/2021 23:38:06">
+
+  <stat subtest="InfoTk2" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45556" cpu_percent="98%" cpu_elapsed_time="0:00.05" cpu_user_time="0.05" cpu_kernel_time="0.00" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info 2 ./results/temp/test.mp4</command_line>
+  </stat>
+  <stat subtest="InfoTk3" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45080" cpu_percent="98%" cpu_elapsed_time="0:00.05" cpu_user_time="0.04" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info 3 ./results/temp/test.mp4</command_line>
+  </stat>
+  <stat subtest="raw-sample" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50924" cpu_percent="100%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raws 1:1 ./results/temp/test.mp4 -out ./results/temp/test.tmp</command_line>
+  </stat>
+  <stat subtest="flat-storage" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45564" cpu_percent="98%" cpu_elapsed_time="0:00.06" cpu_user_time="0.04" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -flat ./results/temp/test.mp4</command_line>
+  </stat>
+  <stat subtest="interleave-250ms" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45008" cpu_percent="100%" cpu_elapsed_time="0:00.06" cpu_user_time="0.05" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -brand MP4V:1 -ab iso6 -inter 250 ./results/temp/test.mp4</command_line>
+  </stat>
+  <stat subtest="single" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45308" cpu_percent="98%" cpu_elapsed_time="0:00.05" cpu_user_time="0.04" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -single 1 ./results/temp/test.mp4 -out ./results/temp/single.mp4</command_line>
+  </stat>
+  <stat subtest="frag-1s" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51728" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.06" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -rb iso6 -frag 1000 ./results/temp/test.mp4 -out ./results/temp/frag-1s.mp4</command_line>
+  </stat>
+  <stat subtest="frag-1s-mfra" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51428" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -rb iso6 -mfra -frag 1000 ./results/temp/test.mp4 -out ./results/temp/frag-1s-mfra.mp4</command_line>
+  </stat>
+  <stat subtest="create-mp4" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51960" cpu_percent="99%" cpu_elapsed_time="0:00.11" cpu_user_time="0.08" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264 -add ./media/auxiliary_files/enst_audio.aac -add ./media/auxiliary_files/subtitle_fr.srt:lang=fra -new ./results/temp/test.mp4</command_line>
+  </stat>
+  <stat subtest="create-dref-mp4" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45540" cpu_percent="100%" cpu_elapsed_time="0:00.06" cpu_user_time="0.04" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/test.mp4 -dref -new ./results/temp/dref.mp4</command_line>
+  </stat>
+  <stat subtest="raw-264" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51368" cpu_percent="100%" cpu_elapsed_time="0:00.08" cpu_user_time="0.06" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -raw 1 ./results/temp/test.mp4 -out ./results/temp/test.tmp</command_line>
+  </stat>
+  <stat subtest="raw-aac" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="51156" cpu_percent="98%" cpu_elapsed_time="0:00.08" cpu_user_time="0.06" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -raw 2 ./results/temp/test.mp4 -out ./results/temp/test.tmp</command_line>
+  </stat>
+  <stat subtest="raw-text" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50800" cpu_percent="98%" cpu_elapsed_time="0:00.07" cpu_user_time="0.04" cpu_kernel_time="0.03" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -raw 3 ./results/temp/test.mp4 -out ./results/temp/test.tmp</command_line>
+  </stat>
+  <stat subtest="srt-text" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45720" cpu_percent="98%" cpu_elapsed_time="0:00.05" cpu_user_time="0.04" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -srt 3 ./results/temp/test.mp4 -out ./results/temp/test.tmp</command_line>
+  </stat>
+  <stat subtest="ttxt-text" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45564" cpu_percent="98%" cpu_elapsed_time="0:00.05" cpu_user_time="0.04" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -ttxt 3 ./results/temp/test.mp4 -out ./results/temp/test.tmp</command_line>
+  </stat>
+  <stat subtest="raw-samples" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50920" cpu_percent="100%" cpu_elapsed_time="0:00.08" cpu_user_time="0.07" cpu_kernel_time="0.00" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raws 1 ./results/temp/test.mp4</command_line>
+  </stat>
+  <stat subtest="InfoTk1" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45672" cpu_percent="100%" cpu_elapsed_time="0:00.05" cpu_user_time="0.03" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info 1 ./results/temp/test.mp4</command_line>
+  </stat>
+ </test>

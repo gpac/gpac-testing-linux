@@ -1,0 +1,82 @@
+*** dash-descriptor logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:30:40 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264:dur=1 -new ./results/temp/file.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+[MP4Mux] Imported 27 frames - media duration 1.08 - track duration 1.08
+AVC|H264 duration specified at import time, may have parsed more frames than imported
+AVC|H264 parsed 33 samples (39 NALUs) - Slices: 2 I 31 P 0 B - 1 SEI - 2 IDR
+AVC|H264 Max NALU size is 24398 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "desc_rep": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -rap ./results/temp/file.mp4:desc_rep=<foo>bar</foo> -out ./results/temp/file_rep.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.08 end 3
+[MPD] Generating MPD at time 2021-04-29T23:30:40.852Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/file_rep.mpd  (desc_rep) hash: 
+File hash (SHA-1): 93690A4CD674632E90AC423D3D72DD3B89A18864
+Hash OK for ./results/temp/file_rep.mpd
+
+*** Subtest "desc_as": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -rap ./results/temp/file.mp4:desc_as=<foo>bar</foo> ./results/temp/file.mp4:desc_as=<foo>bar2</foo> -out ./results/temp/file_as.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.08 end 3
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.08 end 3
+[MPD] Generating MPD at time 2021-04-29T23:30:41.010Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/file_as.mpd  (desc_as) hash: 
+File hash (SHA-1): 95619B08FA10E3E616D5BAC8B61CA75AFC7CC3B0
+Hash fail, ref hash ./hash_refs/dash-descriptor-desc_as.hash was F444B81FCD01C5639FD9D0C5B08B04B9E4655E1A
+
+*** Subtest "desc_as_same": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -rap ./results/temp/file.mp4:desc_as=<foo>bar</foo> ./results/temp/file.mp4:desc_as=<foo>bar</foo> -out ./results/temp/file_as_same.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.08 end 3
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.08 end 3
+[MPD] Generating MPD at time 2021-04-29T23:30:41.172Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/file_as_same.mpd  (desc_as_same) hash: 
+File hash (SHA-1): 924DD352885C9D38A788A0A0432478A241892070
+Hash OK for ./results/temp/file_as_same.mpd
+
+*** Subtest "desc_as_c": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -rap ./results/temp/file.mp4:desc_as=<foo>bar</foo> ./results/temp/file.mp4:desc_as=<foo>bar</foo> -out ./results/temp/file_as_c.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.08 end 3
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.08 end 3
+[MPD] Generating MPD at time 2021-04-29T23:30:41.328Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/file_as_c.mpd  (desc_as_c) hash: 
+File hash (SHA-1): D5466C07EFD79F71C7A2B3EEAD2598BE2F034945
+Hash OK for ./results/temp/file_as_c.mpd
+
+*** Subtest "desc_p": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -rap ./results/temp/file.mp4:desc_p=<foo>bar</foo> -out ./results/temp/file_p.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.08 end 3
+[MPD] Generating MPD at time 2021-04-29T23:30:41.484Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/file_p.mpd  (desc_p) hash: 
+File hash (SHA-1): 238FED7A12BBBD2ED78B707BAD6B48EB3FD515EC
+Hash OK for ./results/temp/file_p.mpd

@@ -1,0 +1,34 @@
+*** gf-fileio logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:15 ***
+
+
+*** Subtest "fio-dash": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -ib ./media/auxiliary_files/enst_video.h264 -ob ./results/temp/file.mpd" ***
+[Dasher] Segment 1 duration 6.48 more than 3/2 DASH duration, consider reencoding or using segment timeline
+[Dasher] First CTS 25920000 in segment 2 drifting by 5.48 (more than half a segment duration) from segment time, consider reencoding or using segment timeline
+
+Computing ./results/temp/enst_video_dashinit.mp4  (init) hash: 
+File hash (SHA-1): 29FB4D61DE9A7AC8F97682C991EFF4186D0A2A71
+Hash OK for ./results/temp/enst_video_dashinit.mp4
+Computing ./results/temp/file.mpd  (mpd) hash: 
+File hash (SHA-1): FD5567EBEC8E463370968460D4E8C454116C4F2C
+Hash fail, ref hash ./hash_refs/gf-fileio-mpd.hash was 05D45A7342878082A4E4B54234AC5CE46416C6B4
+Computing ./results/temp/enst_video_dash1.m4s  (seg1) hash: 
+File hash (SHA-1): C805EA93762DE29ADF91B8DB09E9A909ED4942C5
+Hash OK for ./results/temp/enst_video_dash1.m4s
+
+*** Subtest "fio-read": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -ib ./results/temp/file.mpd inspect:deep:log=@gfo://./results/temp/inspect.txt" ***
+FileIO enst_video_dash3.m4s open in mode rb failed: I/O Error
+[FileIn] Failed to open enst_video_dash3.m4s
+[FileIn] Failed to open enst_video_dash3.m4s
+[FileIn] Failed to open enst_video_dash3.m4s
+[FileIn] Failed to open enst_video_dash3.m4s
+[DASH] Error in downloading new segment enst_video_dash3.m4s: Requested URL is not valid or cannot be found - waited 1498 ms but segment still not available, checking next one ...
+[DASH] Error in downloading new segment enst_video_dash3.m4s: Requested URL is not valid or cannot be found
+[FileIn] Failed to open enst_video_dash4.m4s
+[DASH] Error in downloading new segment enst_video_dash4.m4s: Requested URL is not valid or cannot be found
+[FileIn] Failed to open enst_video_dash5.m4s
+[DASH] Error in downloading new segment enst_video_dash5.m4s: Requested URL is not valid or cannot be found
+[FileIn] Failed to open enst_video_dash6.m4s
+
+Computing ./results/temp/inspect.txt  (play) hash: 
+File hash (SHA-1): 4351473338A8B44FEFA1B71E5C32296669288F81
+Hash OK for ./results/temp/inspect.txt

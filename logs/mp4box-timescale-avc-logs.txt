@@ -1,0 +1,32 @@
+*** mp4box-timescale-avc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:43 ***
+
+
+*** Subtest "moovts-from-raw": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264:moovts=-1 -new ./results/temp/test.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test.mp4  (moovts-from-raw) hash: 
+File hash (SHA-1): 6FAC32B6C605B5CC3C911AC020CB5386B54D064F
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "moovts-from-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/src.mp4:moovts=-1 -new ./results/temp/test2.mp4" ***
+IsoMedia import src.mp4 - track ID 1 - Video (size 128 x 128)
+
+Computing ./results/temp/test2.mp4  (moovts-from-mp4) hash: 
+File hash (SHA-1): D4D4C772D03AF4C15158370D0669BFA7CC853809
+Hash OK for ./results/temp/test2.mp4
+Computing ./results/temp/src_dashinit.mp4  (dash-sscale-init) hash: 
+File hash (SHA-1): C21D7B1679AC5D4FEAE81BAB68F3062C8EDAF800
+Hash OK for ./results/temp/src_dashinit.mp4
+
+*** Subtest "dash-sscale": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 ./results/temp/src.mp4:sscale -bound -profile onDemand -out ./results/temp/test.mpd" ***
+[Dasher] No template assigned, using $File$$FS$_dash
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 6.52 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 7 end 3
+[MPD] Generating MPD at time 2021-04-29T23:39:43.776Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+

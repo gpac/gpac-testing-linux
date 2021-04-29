@@ -1,0 +1,392 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dec_theora.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dec_theora.c<span style="font-size: 80%;"> (source / <a href="dec_theora.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">103</td>
+            <td class="headerCovTableEntry">140</td>
+            <td class="headerCovTableEntryLo">73.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / XIPH Theora decoder filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #ifdef GPAC_HAS_THEORA
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &lt;theora/theora.h&gt;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #if !defined(__GNUC__)
+<span class="lineNum">      36 </span>            : # if defined(_WIN32_WCE) || defined (WIN32)
+<span class="lineNum">      37 </span>            : #  pragma comment(lib, &quot;libtheora_static&quot;)
+<span class="lineNum">      38 </span>            : # endif
+<span class="lineNum">      39 </span>            : #endif
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : typedef struct
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span>            :         GF_FilterPid *ipid, *opid;
+<span class="lineNum">      44 </span>            :         theora_info ti, the_ti;
+<span class="lineNum">      45 </span>            :         theora_state td;
+<span class="lineNum">      46 </span>            :         theora_comment tc;
+<span class="lineNum">      47 </span>            :         ogg_packet op;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :         u32 cfg_crc;
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :         GF_List *src_packets;
+<span class="lineNum">      52 </span>            :         u64 next_cts;
+<span class="lineNum">      53 </span>            :         Bool has_reconfigured;
+<a name="54"><span class="lineNum">      54 </span>            : } GF_TheoraDecCtx;</a>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">          1 : static GF_Err theoradec_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      57 </span>            : {
+<span class="lineNum">      58 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">      59 </span>            :         ogg_packet oggpacket;
+<span class="lineNum">      60 </span>            :         GF_BitStream *bs;
+<span class="lineNum">      61 </span><span class="lineCov">          1 :         GF_TheoraDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineCov">          1 :         if (is_remove) {</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">      68 </span>            :                 }
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">      71 </span>            :         }
+<span class="lineNum">      72 </span><span class="lineCov">          1 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">      73 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">          1 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">      76 </span><span class="lineCov">          1 :         if (p &amp;&amp; p-&gt;value.data.ptr &amp;&amp; p-&gt;value.data.size) {</span>
+<span class="lineNum">      77 </span>            :                 u32 ex_crc;
+<span class="lineNum">      78 </span><span class="lineCov">          1 :                 if (strncmp(&amp;p-&gt;value.data.ptr[3], &quot;theora&quot;, 6)) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">      79 </span><span class="lineCov">          1 :                 ex_crc = gf_crc_32(p-&gt;value.data.ptr, p-&gt;value.data.size);</span>
+<span class="lineNum">      80 </span><span class="lineCov">          1 :                 if (ctx-&gt;cfg_crc == ex_crc) return GF_OK;</span>
+<span class="lineNum">      81 </span><span class="lineCov">          1 :                 ctx-&gt;cfg_crc = ex_crc;</span>
+<span class="lineNum">      82 </span>            :         } else {
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[Theora] Reconfiguring without DSI not yet supported\n&quot;));</span>
+<span class="lineNum">      84 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      85 </span>            :         }
+<span class="lineNum">      86 </span><span class="lineCov">          1 :         if (!ctx-&gt;opid) {</span>
+<span class="lineNum">      87 </span><span class="lineCov">          1 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">      88 </span>            :         }
+<span class="lineNum">      89 </span>            :         //copy properties at init or reconfig
+<span class="lineNum">      90 </span><span class="lineCov">          1 :         gf_filter_pid_copy_properties(ctx-&gt;opid, pid);</span>
+<span class="lineNum">      91 </span><span class="lineCov">          1 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_RAW) );</span>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span><span class="lineCov">          1 :         if (ctx-&gt;ipid) {</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :                 theora_clear(&amp;ctx-&gt;td);</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :                 theora_info_clear(&amp;ctx-&gt;ti);</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :                 theora_comment_clear(&amp;ctx-&gt;tc);</span>
+<span class="lineNum">      97 </span>            :         }
+<span class="lineNum">      98 </span><span class="lineCov">          1 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">      99 </span><span class="lineCov">          1 :         gf_filter_pid_set_framing_mode(ctx-&gt;ipid, GF_TRUE);</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">          1 :         oggpacket.granulepos = -1;</span>
+<span class="lineNum">     102 </span><span class="lineCov">          1 :         oggpacket.b_o_s = 1;</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :         oggpacket.e_o_s = 0;</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :         oggpacket.packetno = 0;</span>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">          1 :         theora_info_init(&amp;ctx-&gt;ti);</span>
+<span class="lineNum">     107 </span><span class="lineCov">          1 :         theora_comment_init(&amp;ctx-&gt;tc);</span>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineCov">          1 :         bs = gf_bs_new(p-&gt;value.data.ptr, p-&gt;value.data.size, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :         while (gf_bs_available(bs)) {</span>
+<span class="lineNum">     111 </span>            :                 GF_Err e = GF_OK;
+<span class="lineNum">     112 </span><span class="lineCov">          3 :                 oggpacket.bytes = gf_bs_read_u16(bs);</span>
+<span class="lineNum">     113 </span><span class="lineCov">          3 :                 oggpacket.packet = gf_malloc(sizeof(char) * oggpacket.bytes);</span>
+<span class="lineNum">     114 </span><span class="lineCov">          3 :                 gf_bs_read_data(bs, oggpacket.packet, oggpacket.bytes);</span>
+<span class="lineNum">     115 </span><span class="lineCov">          3 :                 if (theora_decode_header(&amp;ctx-&gt;ti, &amp;ctx-&gt;tc, &amp;oggpacket) &lt; 0 ) {</span>
+<span class="lineNum">     116 </span>            :                         e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     117 </span>            :                 }
+<span class="lineNum">     118 </span><span class="lineCov">          3 :                 gf_free(oggpacket.packet);</span>
+<span class="lineNum">     119 </span><span class="lineCov">          3 :                 if (e)  {</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :                         gf_bs_del(bs);</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">     122 </span>            :                 }
+<span class="lineNum">     123 </span>            :         }
+<span class="lineNum">     124 </span><span class="lineCov">          1 :         theora_decode_init(&amp;ctx-&gt;td, &amp;ctx-&gt;ti);</span>
+<span class="lineNum">     125 </span><span class="lineCov">          1 :         gf_bs_del(bs);</span>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">          1 :         return GF_OK;</span>
+<a name="128"><span class="lineNum">     128 </span>            : }</a>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">         13 : static GF_Err theoradec_process(GF_Filter *filter)</span>
+<span class="lineNum">     131 </span>            : {
+<span class="lineNum">     132 </span>            :         ogg_packet op;
+<span class="lineNum">     133 </span>            :         yuv_buffer yuv;
+<span class="lineNum">     134 </span>            :         u32 i, count;
+<span class="lineNum">     135 </span>            :         u8 *buffer;
+<span class="lineNum">     136 </span>            :         u8 *pYO, *pUO, *pVO;
+<span class="lineNum">     137 </span>            :         u8 *pYD, *pUD, *pVD;
+<span class="lineNum">     138 </span><span class="lineCov">         13 :         GF_TheoraDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     139 </span>            :         GF_FilterPacket *pck, *dst_pck, *src_pck, *pck_ref;
+<span class="lineNum">     140 </span>            :         Bool is_seek;
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">         13 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     143 </span><span class="lineCov">         13 :         if (!pck &amp;&amp; !gf_filter_pid_is_eos(ctx-&gt;ipid))</span>
+<span class="lineNum">     144 </span>            :                 return GF_OK;
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :         memset(&amp;yuv, 0, sizeof(yuv_buffer));
+<span class="lineNum">     147 </span>            :         memset(&amp;op, 0, sizeof(ogg_packet));
+<span class="lineNum">     148 </span><span class="lineCov">         13 :         op.granulepos = -1;</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineCov">         13 :         if (pck) {</span>
+<span class="lineNum">     151 </span><span class="lineCov">         12 :                 u64 cts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     152 </span>            :                 u32 psize;
+<span class="lineNum">     153 </span><span class="lineCov">         12 :                 op.packet = (char *) gf_filter_pck_get_data(pck, &amp;psize);</span>
+<span class="lineNum">     154 </span><span class="lineCov">         12 :                 op.bytes = psize;</span>
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :                 //append in cts order since we get output frames in cts order
+<span class="lineNum">     158 </span><span class="lineCov">         12 :                 pck_ref = pck;</span>
+<span class="lineNum">     159 </span><span class="lineCov">         12 :                 gf_filter_pck_ref_props(&amp;pck_ref);</span>
+<span class="lineNum">     160 </span><span class="lineCov">         12 :                 count = gf_list_count(ctx-&gt;src_packets);</span>
+<span class="lineNum">     161 </span>            :                 src_pck = NULL;
+<span class="lineNum">     162 </span><span class="lineCov">         12 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     163 </span>            :                         u64 acts;
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                         src_pck = gf_list_get(ctx-&gt;src_packets, i);</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                         acts = gf_filter_pck_get_cts(src_pck);</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :                         if (acts==cts) {</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_unref(pck_ref);</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     169 </span>            :                         }
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                         if (acts&gt;cts) {</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :                                 gf_list_insert(ctx-&gt;src_packets, pck_ref, i);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     173 </span>            :                         }
+<span class="lineNum">     174 </span>            :                         src_pck = NULL;
+<span class="lineNum">     175 </span>            :                 }
+<span class="lineNum">     176 </span><span class="lineCov">         12 :                 if (!src_pck)</span>
+<span class="lineNum">     177 </span><span class="lineCov">         12 :                         gf_list_add(ctx-&gt;src_packets, pck_ref);</span>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :         } else {
+<span class="lineNum">     180 </span>            :                 //weird bug in theora dec: even though we feed empty packets, we still keep getting frames !
+<span class="lineNum">     181 </span><span class="lineCov">          1 :                 if (!gf_list_count(ctx-&gt;src_packets)) {</span>
+<span class="lineNum">     182 </span><span class="lineCov">          1 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     183 </span><span class="lineCov">          1 :                         return GF_EOS;</span>
+<span class="lineNum">     184 </span>            :                 }
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                 op.packet = NULL;</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                 op.bytes = 0;</span>
+<span class="lineNum">     187 </span>            :         }
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">         12 :         if (theora_decode_packetin(&amp;ctx-&gt;td, &amp;op) != 0) {</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :                 src_pck = gf_list_pop_front(ctx-&gt;src_packets);</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :                 gf_filter_pck_unref(src_pck);</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                 if (pck) {</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                         return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     195 </span>            :                 }
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :                 return GF_EOS;</span>
+<span class="lineNum">     198 </span>            :         }
+<span class="lineNum">     199 </span>            :         //no frame
+<span class="lineNum">     200 </span><span class="lineCov">         12 :         if (theora_decode_YUVout(&amp;ctx-&gt;td, &amp;yuv) != 0) {</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                 if (pck) {</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                         return GF_OK;</span>
+<span class="lineNum">     204 </span>            :                 }
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :                 return GF_EOS;</span>
+<span class="lineNum">     207 </span>            :         }
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span><span class="lineCov">         12 :         if (memcmp(&amp;ctx-&gt;ti, &amp;ctx-&gt;the_ti, sizeof(theora_info))) {</span>
+<span class="lineNum">     210 </span>            :                 memcpy(&amp;ctx-&gt;the_ti, &amp;ctx-&gt;ti, sizeof(theora_info));
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineCov">          1 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_WIDTH, &amp;PROP_UINT(ctx-&gt;ti.width));</span>
+<span class="lineNum">     213 </span><span class="lineCov">          1 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(ctx-&gt;ti.height));</span>
+<span class="lineNum">     214 </span><span class="lineCov">          1 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STRIDE, &amp;PROP_UINT(ctx-&gt;ti.width));</span>
+<span class="lineNum">     215 </span><span class="lineCov">          1 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_FPS, &amp;PROP_FRAC_INT(ctx-&gt;ti.fps_numerator, ctx-&gt;ti.fps_denominator) );</span>
+<span class="lineNum">     216 </span><span class="lineCov">          1 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_PIXFMT, &amp;PROP_UINT(GF_PIXEL_YUV) );</span>
+<span class="lineNum">     217 </span>            :         }
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">         12 :         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, ctx-&gt;ti.width*ctx-&gt;ti.height * 3 / 2, &amp;buffer);</span>
+<span class="lineNum">     220 </span><span class="lineCov">         12 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">         12 :         pYO = yuv.y;</span>
+<span class="lineNum">     223 </span><span class="lineCov">         12 :         pUO = yuv.u;</span>
+<span class="lineNum">     224 </span><span class="lineCov">         12 :         pVO = yuv.v;</span>
+<span class="lineNum">     225 </span><span class="lineCov">         12 :         pYD = buffer;</span>
+<span class="lineNum">     226 </span><span class="lineCov">         12 :         pUD = buffer + ctx-&gt;ti.width * ctx-&gt;ti.height;</span>
+<span class="lineNum">     227 </span><span class="lineCov">         12 :         pVD = buffer + 5 * ctx-&gt;ti.width * ctx-&gt;ti.height / 4;</span>
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span><span class="lineCov">       2892 :         for (i=0; i&lt;(u32)yuv.y_height; i++) {</span>
+<span class="lineNum">     230 </span><span class="lineCov">       2880 :                 memcpy(pYD, pYO, sizeof(char) * yuv.y_width);</span>
+<span class="lineNum">     231 </span><span class="lineCov">       2880 :                 pYD += ctx-&gt;ti.width;</span>
+<span class="lineNum">     232 </span><span class="lineCov">       2880 :                 pYO += yuv.y_stride;</span>
+<span class="lineNum">     233 </span><span class="lineCov">       2880 :                 if (i%2) continue;</span>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">       1440 :                 memcpy(pUD, pUO, sizeof(char) * yuv.uv_width);</span>
+<span class="lineNum">     236 </span><span class="lineCov">       1440 :                 memcpy(pVD, pVO, sizeof(char) * yuv.uv_width);</span>
+<span class="lineNum">     237 </span><span class="lineCov">       1440 :                 pUD += ctx-&gt;ti.width/2;</span>
+<span class="lineNum">     238 </span><span class="lineCov">       1440 :                 pVD += ctx-&gt;ti.width/2;</span>
+<span class="lineNum">     239 </span><span class="lineCov">       1440 :                 pUO += yuv.uv_stride;</span>
+<span class="lineNum">     240 </span><span class="lineCov">       1440 :                 pVO += yuv.uv_stride;</span>
+<span class="lineNum">     241 </span>            :         }
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineCov">         12 :         src_pck = gf_list_pop_front(ctx-&gt;src_packets);</span>
+<span class="lineNum">     244 </span><span class="lineCov">         12 :         if (src_pck) {</span>
+<span class="lineNum">     245 </span><span class="lineCov">         12 :                 gf_filter_pck_merge_properties(src_pck, dst_pck);</span>
+<span class="lineNum">     246 </span><span class="lineCov">         12 :                 is_seek = gf_filter_pck_get_seek_flag(src_pck);</span>
+<span class="lineNum">     247 </span><span class="lineCov">         12 :                 ctx-&gt;next_cts = gf_filter_pck_get_cts(src_pck);</span>
+<span class="lineNum">     248 </span><span class="lineCov">         12 :                 ctx-&gt;next_cts += gf_filter_pck_get_duration(src_pck);</span>
+<span class="lineNum">     249 </span><span class="lineCov">         12 :                 gf_filter_pck_unref(src_pck);</span>
+<span class="lineNum">     250 </span>            :         } else {
+<span class="lineNum">     251 </span>            :                 is_seek = 0;
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_cts(dst_pck, ctx-&gt;next_cts);</span>
+<span class="lineNum">     253 </span>            :         }
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineCov">         12 :         if (!pck || !is_seek )</span>
+<span class="lineNum">     256 </span><span class="lineCov">         12 :                 gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     257 </span>            :         else
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                 gf_filter_pck_discard(dst_pck);</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineCov">         12 :         if (pck) gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     261 </span>            :         return GF_OK;
+<a name="262"><span class="lineNum">     262 </span>            : }</a>
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">          1 : static GF_Err theoradec_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     265 </span>            : {
+<span class="lineNum">     266 </span><span class="lineCov">          1 :         GF_TheoraDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     267 </span><span class="lineCov">          1 :         ctx-&gt;src_packets = gf_list_new();</span>
+<a name="268"><span class="lineNum">     268 </span><span class="lineCov">          1 :         return GF_OK;</span></a>
+<span class="lineNum">     269 </span>            : }
+<span class="lineNum">     270 </span><span class="lineCov">          1 : static void theoradec_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     271 </span>            : {
+<span class="lineNum">     272 </span><span class="lineCov">          1 :         GF_TheoraDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineCov">          1 :         theora_clear(&amp;ctx-&gt;td);</span>
+<span class="lineNum">     275 </span><span class="lineCov">          1 :         theora_info_clear(&amp;ctx-&gt;ti);</span>
+<span class="lineNum">     276 </span><span class="lineCov">          1 :         theora_comment_clear(&amp;ctx-&gt;tc);</span>
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span><span class="lineCov">          2 :         while (gf_list_count(ctx-&gt;src_packets)) {</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                 GF_FilterPacket *pck = gf_list_pop_back(ctx-&gt;src_packets);</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                 gf_filter_pck_unref(pck);</span>
+<span class="lineNum">     281 </span>            :         }
+<span class="lineNum">     282 </span><span class="lineCov">          1 :         gf_list_del(ctx-&gt;src_packets);</span>
+<span class="lineNum">     283 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : static const GF_FilterCapability TheoraDecCaps[] =
+<span class="lineNum">     286 </span>            : {
+<span class="lineNum">     287 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     288 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     289 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_CODECID, GF_CODECID_THEORA),
+<span class="lineNum">     290 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_RAW),
+<span class="lineNum">     291 </span>            : };
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            : GF_FilterRegister TheoraDecRegister = {
+<span class="lineNum">     294 </span>            :         .name = &quot;theoradec&quot;,
+<span class="lineNum">     295 </span>            :         GF_FS_SET_DESCRIPTION(&quot;Theora decoder&quot;)
+<span class="lineNum">     296 </span>            :         GF_FS_SET_HELP(&quot;This filter decodes Theora streams through libtheora library.&quot;)
+<span class="lineNum">     297 </span>            :         .private_size = sizeof(GF_TheoraDecCtx),
+<span class="lineNum">     298 </span>            :         .priority = 1,
+<span class="lineNum">     299 </span>            :         SETCAPS(TheoraDecCaps),
+<span class="lineNum">     300 </span>            :         .initialize = theoradec_initialize,
+<span class="lineNum">     301 </span>            :         .finalize = theoradec_finalize,
+<span class="lineNum">     302 </span>            :         .configure_pid = theoradec_configure_pid,
+<span class="lineNum">     303 </span>            :         .process = theoradec_process,
+<span class="lineNum">     304 </span>            : };
+<span class="lineNum">     305 </span>            : 
+<a name="306"><span class="lineNum">     306 </span>            : #endif</a>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineCov">       2877 : const GF_FilterRegister *theoradec_register(GF_FilterSession *session)</span>
+<span class="lineNum">     309 </span>            : {
+<span class="lineNum">     310 </span>            : #ifdef GPAC_HAS_THEORA
+<span class="lineNum">     311 </span><span class="lineCov">       2877 :         return &amp;TheoraDecRegister;</span>
+<span class="lineNum">     312 </span>            : #else
+<span class="lineNum">     313 </span>            :         return NULL;
+<span class="lineNum">     314 </span>            : #endif
+<span class="lineNum">     315 </span>            : }
+<span class="lineNum">     316 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

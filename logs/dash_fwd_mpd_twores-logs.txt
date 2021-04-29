@@ -1,0 +1,70 @@
+*** dash_fwd_mpd_twores logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:28 ***
+
+
+*** Subtest "dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 2000 -frag 1000 -profile live -out ./results/temp/orig/file.mpd ./external_media/counter/counter_30s_I25_baseline_320x180_128kbps.264:bandwidth=128000:dur=4 ./external_media/counter/counter_30s_I25_baseline_640x360_192kbps.264:bandwidth=200000:dur=4:desc_p=<somedesc/> ./external_media/counter/counter_30s_audio.aac:bandwidth=64000:dur=4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.99692 end 3
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 3.99383 end 5
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 2 end 3
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 2 end 3
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 4 end 5
+[MPD] Generating MPD at time 2021-04-29T23:31:28.768Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 4 end 5
+
+
+Computing ./results/temp/orig/file.mpd  (mpd-orig) hash: 
+File hash (SHA-1): 8334E9C69ECDDF11D4806E9E24D661BBF07ABBC8
+Hash OK for ./results/temp/orig/file.mpd
+Computing ./results/temp/mani/counter_30s_I25_baseline_320x180_128kbps_dash2.m4s  (encrypt_mani_seg2) hash: 
+File hash (SHA-1): B2DA185C5C4C3A642866E88962BDF640EB98F945
+Hash OK for ./results/temp/mani/counter_30s_I25_baseline_320x180_128kbps_dash2.m4s
+
+*** Subtest "encrypt_mani": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/orig/file.mpd:forward=mani cecrypt:cfile=./media/encryption/ctr.xml @ -o ./results/temp/mani/live.mpd" ***
+
+Computing ./results/temp/mani/live.mpd  (encrypt_mani) hash: 
+File hash (SHA-1): 2A94975E2A9F2EF5801DAE73C4F90C63FC61B334
+Hash OK for ./results/temp/mani/live.mpd
+
+*** Subtest "inspect_mani": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 --auto_switch=1 -i ./results/temp/mani/live.mpd inspect:deep:interleave=false:log=./results/temp/mani/inspect.txt" ***
+
+Computing ./results/temp/mani/inspect.txt  (inspect_mani) hash: 
+File hash (SHA-1): A60D8713AC42E4BF77D1755DD5ED9E9059F20D02
+Hash fail, ref hash ./hash_refs/dash_fwd_mpd_twores-inspect_mani.hash was 2A9C24E20CFEBD2E983F0912BA1B06D730E3CA7B
+Computing ./results/temp/segb_mpd/counter_30s_I25_baseline_320x180_128kbps_dash2.m4s  (encrypt_segb_mpd_seg2) hash: 
+File hash (SHA-1): B2DA185C5C4C3A642866E88962BDF640EB98F945
+Hash OK for ./results/temp/segb_mpd/counter_30s_I25_baseline_320x180_128kbps_dash2.m4s
+
+*** Subtest "encrypt_segb_mpd": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/orig/file.mpd:forward=segb cecrypt:cfile=./media/encryption/ctr.xml @ -o ./results/temp/segb_mpd/live.mpd" ***
+
+Computing ./results/temp/segb_mpd/live.mpd  (encrypt_segb_mpd) hash: 
+File hash (SHA-1): 93083788EC737980272606F42DF7511F0A1AA3C0
+Hash OK for ./results/temp/segb_mpd/live.mpd
+
+*** Subtest "inspect_segb_mpd": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 --auto_switch=1 -i ./results/temp/segb_mpd/live.mpd inspect:deep:interleave=false:log=./results/temp/segb_mpd/inspect.txt" ***
+
+Computing ./results/temp/segb_mpd/inspect.txt  (inspect_segb_mpd) hash: 
+File hash (SHA-1): A60D8713AC42E4BF77D1755DD5ED9E9059F20D02
+Hash fail, ref hash ./hash_refs/dash_fwd_mpd_twores-inspect_segb_mpd.hash was 2A9C24E20CFEBD2E983F0912BA1B06D730E3CA7B
+Computing ./results/temp/segb_hls/live_1.m3u8  (encrypt_segb_hls_c1) hash: 
+File hash (SHA-1): 6D33C6662BCD032037C7BD23EA1F8235A8F18446
+Hash OK for ./results/temp/segb_hls/live_1.m3u8
+Computing ./results/temp/segb_hls/counter_30s_I25_baseline_320x180_128kbps_dash2.m4s  (encrypt_segb_hls_seg2) hash: 
+File hash (SHA-1): B2DA185C5C4C3A642866E88962BDF640EB98F945
+Hash OK for ./results/temp/segb_hls/counter_30s_I25_baseline_320x180_128kbps_dash2.m4s
+
+*** Subtest "encrypt_segb_hls": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/orig/file.mpd:forward=segb cecrypt:cfile=./media/encryption/ctr.xml @ -o ./results/temp/segb_hls/live.m3u8" ***
+
+Computing ./results/temp/segb_hls/live.m3u8  (encrypt_segb_hls) hash: 
+File hash (SHA-1): 86F546B61A642DA81B1FEB141BE025F6A8401120
+Hash OK for ./results/temp/segb_hls/live.m3u8
+
+*** Subtest "inspect_segb_hls": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 --auto_switch=1 -i ./results/temp/segb_hls/live.m3u8 inspect:deep:interleave=false:log=./results/temp/segb_hls/inspect.txt" ***
+[DASH] next media segment 3 not found in new variant stream (min 1 - max 2), aborting
+
+Computing ./results/temp/segb_hls/inspect.txt  (inspect_segb_hls) hash: 
+File hash (SHA-1): 1B0BF408EE712A2EE40E2A9A2EDD70D29BFAC84F
+Hash fail, ref hash ./hash_refs/dash_fwd_mpd_twores-inspect_segb_hls.hash was 94F48ABB7EEAB06A9065F62DDB1C7DB6AD028C9F

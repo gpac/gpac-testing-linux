@@ -1,0 +1,29 @@
+*** gpac-filter-1source-2sink-2pid-1th-locksched logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:37 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -logs=strict -ltf -stats UTSource:FID=1:max_pck=4:nb_pids=2 UTSink:SID=1#PID=1: UTSink:SID=1#PID=2 -threads=1 -sched=lock" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1964441728
+
+Filter stats - 3 filters
+	Filter UTSource ID 1 (FID=1:max_pck=4:nb_pids=2) : 0 input pids 2 output pids 13 tasks 191 us process time
+		8 packets sent 96 bytes sent (41884.8 pck/sec 4.02094 mbps)
+		* output PID PID1: 4 packets sent
+		* output PID PID2: 4 packets sent
+	Filter UTSink (SID=1#PID=1:) : 2 input pids 0 output pids 10 tasks 81 us process time
+		8 packets processed 96 bytes processed (98765.4 pck/sec 9.48148 mbps)
+		* input PID PID1: 4 packets received
+		* input PID PID2: 4 packets received
+	Filter UTSink (SID=1#PID=2) : 2 input pids 0 output pids 10 tasks 143 us process time
+		8 packets processed 96 bytes processed (55944.1 pck/sec 5.37063 mbps)
+		* input PID PID1: 4 packets received
+		* input PID PID2: 4 packets received
+Session stats - threads 2
+	Thread 1: run_time 365 us active_time 170 us nb_tasks 12
+	Thread 2: run_time 391 us active_time 289 us nb_tasks 23
+
+Total: run_time 756 us active_time 459 us nb_tasks 35
+[UTSink] Pid 1 hash OK after execution
+[UTSink] Pid 2 hash OK after execution
+[UTSink] Pid 1 hash OK after execution
+[UTSink] Pid 2 hash OK after execution
+

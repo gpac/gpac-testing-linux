@@ -1,0 +1,38 @@
+*** filelist-codecs logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:13 ***
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 flist:fdur=1/1:srcs=./media/auxiliary_files/logo.jpg,./media/auxiliary_files/logo.png inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats -logs=app@debug" ***
+GPAC args: -mem-track -noprog -for-test -old-arch -no-reassign -p=0 flist:fdur=1/1:srcs=./media/auxiliary_files/logo.jpg,./media/auxiliary_files/logo.png inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats -logs=app@debug 
+System info: 7961 MB RAM - 2 cores - main thread ID 1013202816
+
+Filter stats - 4 filters
+	Filter flist (fdur=1/1:srcs=./media/auxiliary_files/logo.jpg,./media/auxiliary_files/logo.png) : 1 input pids 1 output pids 15 tasks 237 us process time
+		2 packets processed 29462 bytes processed (8438.82 pck/sec 994.498 mbps)
+		2 packets sent 29462 bytes sent (8438.82 pck/sec 994.498 mbps)
+		* input PID logo.png: 1 packets received
+		* output PID logo.png: 2 packets sent
+	Filter inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 4 tasks 195 us process time
+		2 packets processed 29462 bytes processed (10256.4 pck/sec 1208.7 mbps)
+		* input PID logo.png: 2 packets received
+	Filter fin (src=./media/auxiliary_files/logo.png) : 0 input pids 1 output pids 6 tasks 530 us process time
+		4 packets sent 15681 bytes sent (7547.17 pck/sec 236.694 mbps)
+		* output PID logo.png: 4 packets sent
+	Filter rfimg : 1 input pids 1 output pids 6 tasks 32 us process time
+		1 packets processed 15681 bytes processed (31250 pck/sec 3920.25 mbps)
+		1 packets sent 15681 bytes sent (31250 pck/sec 3920.25 mbps)
+		* input PID logo.png: 1 frames (4 packets) received
+		* output PID logo.png: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 1983 us active_time 1962 us nb_tasks 54
+
+Total: run_time 1983 us active_time 1962 us nb_tasks 54
+
+Filters connected:
+fin (src=./media/auxiliary_files/logo.png) (ptr=0x5623b6208260)
+-(PID logo.png) rfimg (ptr=0x5623b620ee70)
+--(PID logo.png) flist (fdur=1/1:srcs=./media/auxiliary_files/logo.jpg,./media/auxiliary_files/logo.png) (ptr=0x5623b61f3840)
+---(PID logo.png) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x5623b61f42f0)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 1BCE1C25D2E231795A9F410C6653FEF82B45B45A
+Hash OK for ./results/temp/inspect.txt

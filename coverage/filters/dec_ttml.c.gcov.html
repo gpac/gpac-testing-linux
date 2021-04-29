@@ -1,0 +1,622 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dec_ttml.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dec_ttml.c<span style="font-size: 80%;"> (source / <a href="dec_ttml.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">177</td>
+            <td class="headerCovTableEntry">221</td>
+            <td class="headerCovTableEntryMed">80.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryHi">90.9 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                                      GPAC Multimedia Framework
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2020-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / TTML decoder filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #if !defined(GPAC_DISABLE_SVG) &amp;&amp; defined(GPAC_HAS_QJS)
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;gpac/internal/scenegraph_dev.h&gt;
+<span class="lineNum">      33 </span>            : #include &lt;gpac/internal/compositor_dev.h&gt;
+<span class="lineNum">      34 </span>            : #include &lt;gpac/nodes_svg.h&gt;
+<span class="lineNum">      35 </span>            : #include &lt;gpac/xml.h&gt;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #include &quot;../scenegraph/qjs_common.h&quot;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : typedef struct
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span>            :         //opts
+<span class="lineNum">      42 </span>            :         char *script;
+<span class="lineNum">      43 </span>            :         char *color, *font;
+<span class="lineNum">      44 </span>            :         Float fontSize, lineSpacing, txtx, txty;
+<span class="lineNum">      45 </span>            :         u32 txtw, txth, valign;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :         GF_FilterPid *ipid, *opid;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :         /* Boolean indicating the internal graph is registered with the compositor */
+<span class="lineNum">      50 </span>            :         Bool graph_registered;
+<span class="lineNum">      51 </span>            :         /* Boolean indicating the stream is playing */
+<span class="lineNum">      52 </span>            :         Bool is_playing;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :         /* Parent scene to which this TTML stream is linked */
+<span class="lineNum">      55 </span>            :         GF_Scene *scene;
+<span class="lineNum">      56 </span>            :         /* root object manager of parent scene (used to get clock info)*/
+<span class="lineNum">      57 </span>            :         GF_ObjectManager *odm;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :         /* Scene graph for the subtitle content */
+<span class="lineNum">      60 </span>            :         GF_SceneGraph *scenegraph;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :         Bool update_args;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :         GF_BitStream *subs_bs;
+<span class="lineNum">      65 </span>            :         s32 notify_clock;
+<span class="lineNum">      66 </span>            : 
+<a name="67"><span class="lineNum">      67 </span>            : } GF_TTMLDec;</a>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span><span class="lineCov">          2 : void ttmldec_update_size_info(GF_TTMLDec *ctx)</span>
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :         u32 w, h;
+<span class="lineNum">      72 </span>            :         GF_FieldInfo info;
+<span class="lineNum">      73 </span>            :         Bool has_size;
+<span class="lineNum">      74 </span>            :         char szVB[100];
+<span class="lineNum">      75 </span><span class="lineCov">          2 :         GF_Node *root = gf_sg_get_root_node(ctx-&gt;scenegraph);</span>
+<span class="lineNum">      76 </span><span class="lineCov">          2 :         if (!root) return;</span>
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineCov">          2 :         has_size = gf_sg_get_scene_size_info(ctx-&gt;scene-&gt;graph, &amp;w, &amp;h);</span>
+<span class="lineNum">      79 </span>            :         /*no size info is given in main scene, override by associated video size if any, or by text track size*/
+<span class="lineNum">      80 </span><span class="lineCov">          2 :         if (!has_size) {</span>
+<span class="lineNum">      81 </span>            :                 const GF_PropertyValue *p;
+<span class="lineNum">      82 </span><span class="lineCov">          1 :                 p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_WIDTH);</span>
+<span class="lineNum">      83 </span><span class="lineCov">          1 :                 if (p) w = p-&gt;value.uint;</span>
+<span class="lineNum">      84 </span><span class="lineCov">          1 :                 p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_HEIGHT);</span>
+<span class="lineNum">      85 </span><span class="lineCov">          1 :                 if (p) h = p-&gt;value.uint;</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineCov">          1 :                 if (!w) w = ctx-&gt;txtw;</span>
+<span class="lineNum">      88 </span><span class="lineCov">          1 :                 if (!h) h = ctx-&gt;txth;</span>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">          1 :                 gf_sg_set_scene_size_info(ctx-&gt;scenegraph, w, h, GF_TRUE);</span>
+<span class="lineNum">      91 </span><span class="lineCov">          1 :                 gf_scene_force_size(ctx-&gt;scene, w, h);</span>
+<span class="lineNum">      92 </span>            :         }
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">          2 :         gf_sg_set_scene_size_info(ctx-&gt;scenegraph, w, h, GF_TRUE);</span>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">          2 :         sprintf(szVB, &quot;0 0 %d %d&quot;, w, h);</span>
+<span class="lineNum">      97 </span><span class="lineCov">          2 :         gf_node_get_attribute_by_tag(root, TAG_SVG_ATT_viewBox, GF_TRUE, GF_FALSE, &amp;info);</span>
+<span class="lineNum">      98 </span><span class="lineCov">          2 :         gf_svg_parse_attribute(root, &amp;info, szVB, 0);</span>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :         /*apply*/
+<span class="lineNum">     101 </span><span class="lineCov">          2 :         gf_sg_set_scene_size_info(ctx-&gt;scenegraph, w, h, GF_TRUE);</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineCov">          2 :         sprintf(szVB, &quot;0 0 %d %d&quot;, w, h);</span>
+<span class="lineNum">     104 </span><span class="lineCov">          2 :         gf_node_get_attribute_by_tag(root, TAG_SVG_ATT_viewBox, GF_TRUE, GF_FALSE, &amp;info);</span>
+<span class="lineNum">     105 </span><span class="lineCov">          2 :         gf_svg_parse_attribute(root, &amp;info, szVB, 0);</span>
+<span class="lineNum">     106 </span>            : 
+<a name="107"><span class="lineNum">     107 </span>            : }</a>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineCov">          1 : void ttmldec_setup_scene(GF_TTMLDec *ctx)</span>
+<span class="lineNum">     110 </span>            : {
+<span class="lineNum">     111 </span>            :         GF_Node *n, *root;
+<span class="lineNum">     112 </span>            :         GF_FieldInfo info;
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">          1 :         ctx-&gt;scenegraph = gf_sg_new_subscene(ctx-&gt;scene-&gt;graph);</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">          1 :         if (!ctx-&gt;scenegraph) return;</span>
+<span class="lineNum">     117 </span><span class="lineCov">          1 :         gf_sg_add_namespace(ctx-&gt;scenegraph, &quot;http://www.w3.org/2000/svg&quot;, NULL);</span>
+<span class="lineNum">     118 </span><span class="lineCov">          1 :         gf_sg_add_namespace(ctx-&gt;scenegraph, &quot;http://www.w3.org/1999/xlink&quot;, &quot;xlink&quot;);</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :         gf_sg_add_namespace(ctx-&gt;scenegraph, &quot;http://www.w3.org/2001/xml-events&quot;, &quot;ev&quot;);</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :         gf_sg_set_scene_size_info(ctx-&gt;scenegraph, 800, 600, GF_TRUE);</span>
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            :         /* modify the scene with an Inline/Animation pointing to the TTML Renderer */
+<span class="lineNum">     123 </span><span class="lineCov">          1 :         n = root = gf_node_new(ctx-&gt;scenegraph, TAG_SVG_svg);</span>
+<span class="lineNum">     124 </span><span class="lineCov">          1 :         gf_node_register(root, NULL);</span>
+<span class="lineNum">     125 </span><span class="lineCov">          1 :         gf_sg_set_root_node(ctx-&gt;scenegraph, root);</span>
+<span class="lineNum">     126 </span><span class="lineCov">          1 :         gf_node_get_attribute_by_name(n, &quot;xmlns&quot;, 0, GF_TRUE, GF_FALSE, &amp;info);</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :         gf_svg_parse_attribute(n, &amp;info, &quot;http://www.w3.org/2000/svg&quot;, 0);</span>
+<span class="lineNum">     128 </span><span class="lineCov">          1 :         ttmldec_update_size_info(ctx);</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :         gf_node_init(n);</span>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineCov">          1 :         n = gf_node_new(ctx-&gt;scenegraph, TAG_SVG_script);</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :         gf_node_register(n, root);</span>
+<span class="lineNum">     133 </span><span class="lineCov">          1 :         gf_node_list_add_child(&amp;((GF_ParentNode *)root)-&gt;children, n);</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">          1 :         gf_node_get_attribute_by_tag(n, TAG_XLINK_ATT_href, GF_TRUE, GF_FALSE, &amp;info);</span>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :         if (strstr(ctx-&gt;script, &quot;:\\&quot;)) {</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :                 gf_svg_parse_attribute(n, &amp;info, (char *) ctx-&gt;script, 0);</span>
+<span class="lineNum">     138 </span>            :         } else {
+<span class="lineNum">     139 </span>            :                 char szPath[GF_MAX_PATH];
+<span class="lineNum">     140 </span>            :                 strcpy(szPath, &quot;file://&quot;);
+<span class="lineNum">     141 </span>            :                 strcat(szPath, ctx-&gt;script);
+<span class="lineNum">     142 </span><span class="lineCov">          1 :                 gf_svg_parse_attribute(n, &amp;info, (char *) szPath, 0);</span>
+<span class="lineNum">     143 </span>            :         }
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span><span class="lineCov">          1 :         gf_node_init(n);</span>
+<span class="lineNum">     146 </span>            : 
+<a name="147"><span class="lineNum">     147 </span>            : }</a>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineCov">          1 : static GF_Err ttmldec_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     150 </span>            : {
+<span class="lineNum">     151 </span><span class="lineCov">          1 :         GF_TTMLDec *ctx = (GF_TTMLDec *)gf_filter_get_udta(filter);</span>
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span><span class="lineCov">          1 :         if (is_remove) {</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">     157 </span>            :                 }
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     160 </span>            :         }
+<span class="lineNum">     161 </span>            :         //TODO: we need to cleanup cap checking upon reconfigure
+<span class="lineNum">     162 </span><span class="lineCov">          1 :         if (ctx-&gt;ipid &amp;&amp; !gf_filter_pid_check_caps(pid)) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     163 </span>            :         assert(!ctx-&gt;ipid || (ctx-&gt;ipid == pid));
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineCov">          1 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     166 </span><span class="lineCov">          1 :         if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     167 </span><span class="lineCov">          1 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     168 </span>            :         }
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :         //copy properties at init or reconfig
+<span class="lineNum">     171 </span><span class="lineCov">          1 :         gf_filter_pid_copy_properties(ctx-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">     172 </span><span class="lineCov">          1 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_TEXT));</span>
+<span class="lineNum">     173 </span><span class="lineCov">          1 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_RAW));</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">          1 :         return GF_OK;</span>
+<span class="lineNum">     176 </span>            : }
+<a name="177"><span class="lineNum">     177 </span>            : </a>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineCov">          3 : static void ttmldec_toggle_display(GF_TTMLDec *ctx)</span>
+<span class="lineNum">     180 </span>            : {
+<span class="lineNum">     181 </span><span class="lineCov">          3 :         if (!ctx-&gt;scenegraph) return;</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">          3 :         if (ctx-&gt;is_playing) {</span>
+<span class="lineNum">     184 </span><span class="lineCov">          1 :                 if (!ctx-&gt;graph_registered) {</span>
+<span class="lineNum">     185 </span><span class="lineCov">          1 :                         ttmldec_update_size_info(ctx);</span>
+<span class="lineNum">     186 </span><span class="lineCov">          1 :                         gf_scene_register_extra_graph(ctx-&gt;scene, ctx-&gt;scenegraph, GF_FALSE);</span>
+<span class="lineNum">     187 </span><span class="lineCov">          1 :                         ctx-&gt;graph_registered = GF_TRUE;</span>
+<span class="lineNum">     188 </span>            :                 }
+<span class="lineNum">     189 </span>            :          } else {
+<span class="lineNum">     190 </span><span class="lineCov">          2 :                 if (ctx-&gt;graph_registered) {</span>
+<span class="lineNum">     191 </span><span class="lineCov">          1 :                         gf_scene_register_extra_graph(ctx-&gt;scene, ctx-&gt;scenegraph, GF_TRUE);</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :                         ctx-&gt;graph_registered = GF_FALSE;</span>
+<span class="lineNum">     193 </span>            :                 }
+<span class="lineNum">     194 </span>            :         }
+<a name="195"><span class="lineNum">     195 </span>            : }</a>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineCov">        627 : static Bool ttmldec_process_event(GF_Filter *filter, const GF_FilterEvent *com)</span>
+<span class="lineNum">     198 </span>            : {
+<span class="lineNum">     199 </span><span class="lineCov">        627 :         GF_TTMLDec *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :         //check for scene attach
+<span class="lineNum">     202 </span><span class="lineCov">        627 :         switch (com-&gt;base.type) {</span>
+<span class="lineNum">     203 </span>            :         case GF_FEVT_ATTACH_SCENE:
+<span class="lineNum">     204 </span>            :                 break;
+<span class="lineNum">     205 </span><span class="lineCov">          1 :         case GF_FEVT_RESET_SCENE:</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :                 if (ctx-&gt;opid != com-&gt;attach_scene.on_pid) return GF_TRUE;</span>
+<span class="lineNum">     207 </span><span class="lineCov">          1 :                 ctx-&gt;is_playing = GF_FALSE;</span>
+<span class="lineNum">     208 </span><span class="lineCov">          1 :                 ttmldec_toggle_display(ctx);</span>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineCov">          1 :                 gf_sg_del(ctx-&gt;scenegraph);</span>
+<span class="lineNum">     211 </span><span class="lineCov">          1 :                 ctx-&gt;scenegraph = NULL;</span>
+<span class="lineNum">     212 </span><span class="lineCov">          1 :                 ctx-&gt;scene = NULL;</span>
+<span class="lineNum">     213 </span><span class="lineCov">          1 :                 return GF_TRUE;</span>
+<span class="lineNum">     214 </span><span class="lineCov">          1 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     215 </span><span class="lineCov">          1 :                 ctx-&gt;is_playing = GF_TRUE;</span>
+<span class="lineNum">     216 </span><span class="lineCov">          1 :                 ttmldec_toggle_display(ctx);</span>
+<span class="lineNum">     217 </span><span class="lineCov">          1 :                 return GF_FALSE;</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :                 ctx-&gt;is_playing = GF_FALSE;</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                 ttmldec_toggle_display(ctx);</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                 return GF_FALSE;</span>
+<span class="lineNum">     222 </span>            :         default:
+<span class="lineNum">     223 </span>            :                 return GF_FALSE;
+<span class="lineNum">     224 </span>            :         }
+<span class="lineNum">     225 </span><span class="lineCov">          1 :         if (ctx-&gt;opid != com-&gt;attach_scene.on_pid) return GF_TRUE;</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">          1 :         ctx-&gt;odm = com-&gt;attach_scene.object_manager;</span>
+<span class="lineNum">     228 </span><span class="lineCov">          1 :         ctx-&gt;scene = ctx-&gt;odm-&gt;subscene ? ctx-&gt;odm-&gt;subscene : ctx-&gt;odm-&gt;parentscene;</span>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            :         /*timedtext cannot be a root scene object*/
+<span class="lineNum">     231 </span><span class="lineCov">          1 :         if (ctx-&gt;odm-&gt;subscene) {</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :                 ctx-&gt;odm = NULL;</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :                 ctx-&gt;scene = NULL;</span>
+<span class="lineNum">     234 </span>            :          } else {
+<span class="lineNum">     235 </span><span class="lineCov">          1 :                  ttmldec_setup_scene(ctx);</span>
+<span class="lineNum">     236 </span><span class="lineCov">          1 :                  ttmldec_toggle_display(ctx);</span>
+<span class="lineNum">     237 </span>            :          }
+<span class="lineNum">     238 </span>            :          return GF_TRUE;
+<span class="lineNum">     239 </span>            : }
+<span class="lineNum">     240 </span>            : 
+<a name="241"><span class="lineNum">     241 </span>            : void js_dump_error(JSContext *ctx);</a>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineCov">        311 : JSContext *ttmldec_get_js_context(GF_TTMLDec *ctx)</span>
+<span class="lineNum">     244 </span>            : {
+<span class="lineNum">     245 </span><span class="lineCov">        311 :         GF_SceneGraph *sg = ctx-&gt;scenegraph-&gt;RootNode-&gt;sgprivate-&gt;scenegraph;</span>
+<span class="lineNum">     246 </span>            :         JSContext *svg_script_get_context(GF_SceneGraph *sg);
+<span class="lineNum">     247 </span><span class="lineCov">        311 :         JSContext *c = svg_script_get_context(sg);</span>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineCov">        311 :         if (ctx-&gt;update_args) {</span>
+<span class="lineNum">     250 </span><span class="lineCov">          1 :                 JSValue global = JS_GetGlobalObject(c);</span>
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineCov">          2 :                 JS_SetPropertyStr(c, global, &quot;fontSize&quot;, JS_NewFloat64(c, ctx-&gt;fontSize));</span>
+<span class="lineNum">     253 </span><span class="lineCov">          1 :                 JS_SetPropertyStr(c, global, &quot;fontFamily&quot;, JS_NewString(c, ctx-&gt;font));</span>
+<span class="lineNum">     254 </span><span class="lineCov">          1 :                 JS_SetPropertyStr(c, global, &quot;textColor&quot;, JS_NewString(c, ctx-&gt;color));</span>
+<span class="lineNum">     255 </span><span class="lineCov">          2 :                 JS_SetPropertyStr(c, global, &quot;lineSpaceFactor&quot;, JS_NewFloat64(c, ctx-&gt;lineSpacing));</span>
+<span class="lineNum">     256 </span><span class="lineCov">          2 :                 JS_SetPropertyStr(c, global, &quot;xOffset&quot;, JS_NewFloat64(c, ctx-&gt;txtx));</span>
+<span class="lineNum">     257 </span><span class="lineCov">          2 :                 JS_SetPropertyStr(c, global, &quot;yOffset&quot;, JS_NewFloat64(c, ctx-&gt;txty));</span>
+<span class="lineNum">     258 </span><span class="lineCov">          2 :                 JS_SetPropertyStr(c, global, &quot;v_align&quot;, JS_NewInt32(c, ctx-&gt;valign));</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            :                 JS_FreeValue(c, global);
+<span class="lineNum">     261 </span><span class="lineCov">          1 :                 ctx-&gt;update_args = GF_FALSE;</span>
+<span class="lineNum">     262 </span>            :         }
+<span class="lineNum">     263 </span><span class="lineCov">        311 :         return c;</span>
+<span class="lineNum">     264 </span>            : }
+<span class="lineNum">     265 </span>            : 
+<a name="266"><span class="lineNum">     266 </span>            : </a>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">        312 : static GF_Err ttmldec_process(GF_Filter *filter)</span>
+<span class="lineNum">     269 </span>            : {
+<span class="lineNum">     270 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">     271 </span>            :         const GF_PropertyValue *subs;
+<span class="lineNum">     272 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     273 </span>            :         const u8 *pck_data;
+<span class="lineNum">     274 </span>            :         char *pck_alloc=NULL, *ttml_doc;
+<span class="lineNum">     275 </span>            :         u64 cts;
+<span class="lineNum">     276 </span>            :         u32 timescale, obj_time;
+<span class="lineNum">     277 </span>            :         u32 pck_size;
+<span class="lineNum">     278 </span>            :         JSValue fun_val;
+<span class="lineNum">     279 </span>            :         JSValue global;
+<span class="lineNum">     280 </span>            :         JSContext *c;
+<span class="lineNum">     281 </span><span class="lineCov">        312 :         GF_TTMLDec *ctx = (GF_TTMLDec *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineCov">        312 :         if (!ctx-&gt;scene) {</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;is_playing) {</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :                         return GF_EOS;</span>
+<span class="lineNum">     287 </span>            :                 }
+<span class="lineNum">     288 </span>            :                 return GF_OK;
+<span class="lineNum">     289 </span>            :         }
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineCov">        312 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     292 </span><span class="lineCov">        312 :         if (!pck) {</span>
+<span class="lineNum">     293 </span><span class="lineCov">          1 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     294 </span><span class="lineCov">          1 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     295 </span><span class="lineCov">          1 :                         return GF_EOS;</span>
+<span class="lineNum">     296 </span>            :                 }
+<span class="lineNum">     297 </span>            :                 return GF_OK;
+<span class="lineNum">     298 </span>            :         }
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">        311 :         c = ttmldec_get_js_context(ctx);</span>
+<span class="lineNum">     301 </span><span class="lineCov">        311 :         if (!c) {</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :                 return GF_SERVICE_ERROR;</span>
+<span class="lineNum">     304 </span>            :         }
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :         //object clock shall be valid
+<span class="lineNum">     307 </span><span class="lineCov">        311 :         if (!ctx-&gt;odm-&gt;ck)</span>
+<span class="lineNum">     308 </span>            :                 return GF_OK;
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span><span class="lineCov">        311 :         cts = gf_filter_pck_get_cts( pck );</span>
+<span class="lineNum">     311 </span><span class="lineCov">        311 :         timescale = gf_filter_pck_get_timescale(pck);</span>
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span><span class="lineCov">        311 :         gf_odm_check_buffering(ctx-&gt;odm, ctx-&gt;ipid);</span>
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span>            :         //we still process any frame before our clock time even when buffering
+<span class="lineNum">     316 </span><span class="lineCov">        311 :         obj_time = gf_clock_time(ctx-&gt;odm-&gt;ck);</span>
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span><span class="lineCov">        311 :         if (ctx-&gt;notify_clock&gt;0) {</span>
+<span class="lineNum">     319 </span><span class="lineCov">        155 :                 gf_js_lock(c, GF_TRUE);</span>
+<span class="lineNum">     320 </span><span class="lineCov">        155 :                 global = JS_GetGlobalObject(c);</span>
+<span class="lineNum">     321 </span><span class="lineCov">        155 :                 fun_val = JS_GetPropertyStr(c, global, &quot;on_ttml_clock&quot;);</span>
+<span class="lineNum">     322 </span><span class="lineCov">        155 :                 if (JS_IsFunction(c, fun_val) ) {</span>
+<span class="lineNum">     323 </span>            :                         JSValue ret, argv[1];
+<span class="lineNum">     324 </span><span class="lineCov">        310 :                         argv[0] = JS_NewInt64(c, obj_time);</span>
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span><span class="lineCov">        155 :                         ret = JS_Call(c, fun_val, global, 1, argv);</span>
+<span class="lineNum">     327 </span><span class="lineCov">        155 :                         if (JS_IsException(ret)) {</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :                                 js_dump_error(c);</span>
+<span class="lineNum">     329 </span>            :                                 e = GF_BAD_PARAM;
+<span class="lineNum">     330 </span>            :                         }
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineCov">        155 :                         if (JS_IsNumber(ret)) {</span>
+<span class="lineNum">     333 </span><span class="lineCov">        155 :                                 JS_ToInt32(c, &amp;ctx-&gt;notify_clock, ret);</span>
+<span class="lineNum">     334 </span>            :                         } else {
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :                                 ctx-&gt;notify_clock = 0;</span>
+<span class="lineNum">     336 </span>            :                         }
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :                         JS_FreeValue(c, ret);
+<span class="lineNum">     339 </span>            :                         JS_FreeValue(c, argv[0]);
+<span class="lineNum">     340 </span>            :                 }
+<span class="lineNum">     341 </span>            :                 JS_FreeValue(c, global);
+<span class="lineNum">     342 </span>            :                 JS_FreeValue(c, fun_val);
+<span class="lineNum">     343 </span><span class="lineCov">        155 :                 gf_js_lock(c, GF_FALSE);</span>
+<span class="lineNum">     344 </span><span class="lineCov">        155 :                 if (e) return e;</span>
+<span class="lineNum">     345 </span>            :         }
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span><span class="lineCov">        311 :         if (cts * 1000 &gt; obj_time * timescale) {</span>
+<span class="lineNum">     348 </span><span class="lineCov">        305 :                 gf_sc_sys_frame_pending(ctx-&gt;scene-&gt;compositor, ((Double) cts / timescale), obj_time, filter);</span>
+<span class="lineNum">     349 </span><span class="lineCov">        305 :                 return GF_OK;</span>
+<span class="lineNum">     350 </span>            :         }
+<span class="lineNum">     351 </span><span class="lineCov">          6 :         pck_data = gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     352 </span><span class="lineCov">          6 :         subs = gf_filter_pck_get_property(pck, GF_PROP_PCK_SUBS);</span>
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            :         ttml_doc = (char *) pck_data;
+<span class="lineNum">     355 </span><span class="lineCov">          6 :         if (subs) {</span>
+<span class="lineNum">     356 </span>            :                 Bool first = GF_TRUE;
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                 gf_bs_reassign_buffer(ctx-&gt;subs_bs, subs-&gt;value.data.ptr, subs-&gt;value.data.size);</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :                 while (gf_bs_available(ctx-&gt;subs_bs)) {</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :                         /*u32 flags = */gf_bs_read_u32(ctx-&gt;subs_bs);</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                         u32 subs_size = gf_bs_read_u32(ctx-&gt;subs_bs);</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                         /*u32 reserved = */gf_bs_read_u32(ctx-&gt;subs_bs);</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :                         /*u8 priority = */gf_bs_read_u8(ctx-&gt;subs_bs);</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :                         /*u8 discardable = */gf_bs_read_u8(ctx-&gt;subs_bs);</span>
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :                         if (first) {</span>
+<span class="lineNum">     366 </span>            :                                 first = GF_FALSE;
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                                 if (subs_size&gt;pck_size) {</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MEDIA, (&quot;[TTMLDec] Invalid subsample size %d for packet size %d\n&quot;, subs_size, pck_size));</span>
+<span class="lineNum">     370 </span>            :                                         return GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     371 </span>            :                                 }
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :                                 pck_alloc = gf_malloc(sizeof(char)*(subs_size+2));</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :                                 memcpy(pck_alloc, pck_data, sizeof(char)*subs_size);</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :                                 pck_alloc[subs_size] = 0;</span>
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :                                 pck_alloc[subs_size+1] = 0;</span>
+<span class="lineNum">     376 </span>            :                                 ttml_doc = pck_alloc;
+<span class="lineNum">     377 </span>            :                         }
+<span class="lineNum">     378 </span>            :                 }
+<span class="lineNum">     379 </span>            :         } else {
+<span class="lineNum">     380 </span>            :                 //we cannot assume the doc ends with 0
+<span class="lineNum">     381 </span><span class="lineCov">          6 :                 pck_alloc = gf_malloc(sizeof(char)*(pck_size+2));</span>
+<span class="lineNum">     382 </span><span class="lineCov">          6 :                 memcpy(pck_alloc, ttml_doc, sizeof(char)*pck_size);</span>
+<span class="lineNum">     383 </span><span class="lineCov">          6 :                 pck_alloc[pck_size] = 0;</span>
+<span class="lineNum">     384 </span><span class="lineCov">          6 :                 pck_alloc[pck_size+1] = 0;</span>
+<span class="lineNum">     385 </span>            :                 ttml_doc = pck_alloc;
+<span class="lineNum">     386 </span>            :         }
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span><span class="lineCov">          6 :         GF_DOMParser *dom = gf_xml_dom_new();</span>
+<span class="lineNum">     389 </span><span class="lineCov">          6 :         gf_xml_dom_parse_string(dom, ttml_doc);</span>
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span><span class="lineCov">          6 :         gf_js_lock(c, GF_TRUE);</span>
+<span class="lineNum">     393 </span><span class="lineCov">          6 :         global = JS_GetGlobalObject(c);</span>
+<span class="lineNum">     394 </span><span class="lineCov">          6 :         fun_val = JS_GetPropertyStr(c, global, &quot;on_ttml_sample&quot;);</span>
+<span class="lineNum">     395 </span><span class="lineCov">          6 :         if (!JS_IsFunction(c, fun_val) ) {</span>
+<span class="lineNum">     396 </span>            :                 e = GF_BAD_PARAM;
+<span class="lineNum">     397 </span>            :         } else {
+<span class="lineNum">     398 </span>            :                 JSValue ret, argv[3];
+<span class="lineNum">     399 </span>            :                 Double scene_ck;
+<span class="lineNum">     400 </span>            :                 GF_SceneGraph *doc;
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span><span class="lineCov">          6 :                 doc = gf_sg_new();</span>
+<span class="lineNum">     403 </span><span class="lineCov">          6 :                 doc-&gt;reference_count = 1;</span>
+<span class="lineNum">     404 </span><span class="lineCov">          6 :                 e = gf_sg_init_from_xml_node(doc, gf_xml_dom_get_root(dom));</span>
+<span class="lineNum">     405 </span><span class="lineCov">          6 :                 argv[0] = dom_document_construct_external(c, doc);</span>
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span><span class="lineCov">         12 :                 argv[1] = JS_NewInt64(c, obj_time);</span>
+<span class="lineNum">     408 </span><span class="lineCov">          6 :                 scene_ck = gf_filter_pck_get_duration(pck);</span>
+<span class="lineNum">     409 </span><span class="lineCov">          6 :                 scene_ck /= timescale;</span>
+<span class="lineNum">     410 </span><span class="lineCov">          6 :                 argv[2] = JS_NewFloat64(c, scene_ck);</span>
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span><span class="lineCov">          6 :                 ret = JS_Call(c, fun_val, global, 3, argv);</span>
+<span class="lineNum">     413 </span><span class="lineCov">          6 :                 if (JS_IsException(ret)) {</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :                         js_dump_error(c);</span>
+<span class="lineNum">     415 </span>            :                         e = GF_BAD_PARAM;
+<span class="lineNum">     416 </span>            :                 }
+<span class="lineNum">     417 </span><span class="lineCov">          6 :                 if (JS_IsNumber(ret)) {</span>
+<span class="lineNum">     418 </span><span class="lineCov">          6 :                         JS_ToInt32(c, &amp;ctx-&gt;notify_clock, ret);</span>
+<span class="lineNum">     419 </span>            :                 } else {
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :                         ctx-&gt;notify_clock = 0;</span>
+<span class="lineNum">     421 </span>            :                 }
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span><span class="lineCov">          6 :                 doc-&gt;reference_count --;</span>
+<span class="lineNum">     424 </span>            :                 JS_FreeValue(c, ret);
+<span class="lineNum">     425 </span>            :                 JS_FreeValue(c, argv[0]);
+<span class="lineNum">     426 </span>            :                 JS_FreeValue(c, argv[1]);
+<span class="lineNum">     427 </span>            :                 JS_FreeValue(c, argv[2]);
+<span class="lineNum">     428 </span>            :         }
+<span class="lineNum">     429 </span>            :         JS_FreeValue(c, global);
+<span class="lineNum">     430 </span>            :         JS_FreeValue(c, fun_val);
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span><span class="lineCov">          6 :         gf_js_lock(c, GF_FALSE);</span>
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span><span class="lineCov">          6 :         gf_xml_dom_del(dom);</span>
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span><span class="lineCov">          6 :         if (pck_alloc) gf_free(pck_alloc);</span>
+<span class="lineNum">     438 </span><span class="lineCov">          6 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span><span class="lineCov">          6 :         if (ctx-&gt;notify_clock&gt;0) {</span>
+<span class="lineNum">     441 </span><span class="lineCov">          6 :                 if (ctx-&gt;scene &amp;&amp; ctx-&gt;scene-&gt;compositor-&gt;player)</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :                         gf_filter_ask_rt_reschedule(filter, ctx-&gt;notify_clock*1000);</span>
+<span class="lineNum">     443 </span>            :                 else
+<span class="lineNum">     444 </span><span class="lineCov">          6 :                         gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     445 </span>            :         }
+<span class="lineNum">     446 </span>            :         return e;
+<a name="447"><span class="lineNum">     447 </span>            : }</a>
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 : static GF_Err ttmldec_update_arg(GF_Filter *filter, const char *arg_name, const GF_PropertyValue *new_val)</span>
+<span class="lineNum">     450 </span>            : {
+<span class="lineNum">     451 </span><span class="lineCov">          1 :         GF_TTMLDec *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     452 </span><span class="lineCov">          1 :         ctx-&gt;update_args = GF_TRUE;</span>
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<a name="454"><span class="lineNum">     454 </span>            : }</a>
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span><span class="lineCov">          1 : static GF_Err ttmldec_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     457 </span>            : {
+<span class="lineNum">     458 </span><span class="lineCov">          1 :         GF_TTMLDec *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     459 </span>            : 
+<span class="lineNum">     460 </span><span class="lineCov">          1 :         if (!ctx-&gt;script) {</span>
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[TTMLDec] TTML JS renderer script not set\n&quot;));</span>
+<span class="lineNum">     462 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     463 </span><span class="lineCov">          1 :         } else if (!gf_file_exists(ctx-&gt;script)) {</span>
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[TTMLDec] TTML JS renderer script %s not found\n&quot;, ctx-&gt;script));</span>
+<span class="lineNum">     465 </span>            :                 return GF_URL_ERROR;
+<span class="lineNum">     466 </span>            :         }
+<span class="lineNum">     467 </span><span class="lineCov">          1 :         ctx-&gt;subs_bs = gf_bs_new((u8 *)ctx, 1, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span><span class="lineCov">          1 :         ctx-&gt;update_args = GF_TRUE;</span>
+<span class="lineNum">     470 </span>            : #ifdef GPAC_ENABLE_COVERAGE
+<span class="lineNum">     471 </span>            :         ttmldec_update_arg(filter, NULL, NULL);
+<span class="lineNum">     472 </span>            : #endif
+<span class="lineNum">     473 </span><span class="lineCov">          1 :         return GF_OK;</span>
+<a name="474"><span class="lineNum">     474 </span>            : }</a>
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span><span class="lineCov">          1 : void ttmldec_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     477 </span>            : {
+<span class="lineNum">     478 </span><span class="lineCov">          1 :         GF_TTMLDec *ctx = (GF_TTMLDec *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     479 </span>            : 
+<span class="lineNum">     480 </span><span class="lineCov">          1 :         if (ctx-&gt;scenegraph) {</span>
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :                 ctx-&gt;is_playing = GF_FALSE;</span>
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :                 ttmldec_toggle_display(ctx);</span>
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :                 gf_sg_del(ctx-&gt;scenegraph);</span>
+<span class="lineNum">     484 </span>            :         }
+<span class="lineNum">     485 </span><span class="lineCov">          1 :         gf_bs_del(ctx-&gt;subs_bs);</span>
+<span class="lineNum">     486 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span>            : #define OFFS(_n)        #_n, offsetof(GF_TTMLDec, _n)
+<span class="lineNum">     489 </span>            : static const GF_FilterArgs TTMLDecArgs[] =
+<span class="lineNum">     490 </span>            : {
+<span class="lineNum">     491 </span>            :         { OFFS(script), &quot;location of TTML SVG JS renderer&quot;, GF_PROP_STRING, &quot;$GSHARE/scripts/ttml-renderer.js&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">     492 </span>            :         { OFFS(font), &quot;font to use&quot;, GF_PROP_STRING, &quot;SANS&quot;, NULL, GF_FS_ARG_HINT_ADVANCED|GF_FS_ARG_UPDATE},
+<span class="lineNum">     493 </span>            :         { OFFS(fontSize), &quot;font size to use&quot;, GF_PROP_FLOAT, &quot;20&quot;, NULL, GF_FS_ARG_HINT_ADVANCED|GF_FS_ARG_UPDATE},
+<span class="lineNum">     494 </span>            :         { OFFS(color), &quot;color to use&quot;, GF_PROP_STRING, &quot;white&quot;, NULL, GF_FS_ARG_HINT_ADVANCED|GF_FS_ARG_UPDATE},
+<span class="lineNum">     495 </span>            :         { OFFS(valign), &quot;vertical alignment\n&quot;
+<span class="lineNum">     496 </span>            :         &quot;- bottom: align text at bottom of text area\n&quot;
+<span class="lineNum">     497 </span>            :         &quot;- center: align text at center of text area\n&quot;
+<span class="lineNum">     498 </span>            :         &quot;- top: align text at top of text area&quot;, GF_PROP_UINT, &quot;bottom&quot;, &quot;bottom|center|top&quot;, GF_FS_ARG_HINT_ADVANCED|GF_FS_ARG_UPDATE},
+<span class="lineNum">     499 </span>            :         { OFFS(lineSpacing), &quot;line spacing as scaling factor to font size&quot;, GF_PROP_FLOAT, &quot;1.0&quot;, NULL, GF_FS_ARG_HINT_ADVANCED|GF_FS_ARG_UPDATE},
+<span class="lineNum">     500 </span>            :         { OFFS(txtx), &quot;horizontal offset&quot;, GF_PROP_FLOAT, &quot;5&quot;, NULL, GF_FS_ARG_HINT_ADVANCED|GF_FS_ARG_UPDATE},
+<span class="lineNum">     501 </span>            :         { OFFS(txty), &quot;vertical offset&quot;, GF_PROP_FLOAT, &quot;5&quot;, NULL, GF_FS_ARG_HINT_ADVANCED|GF_FS_ARG_UPDATE},
+<span class="lineNum">     502 </span>            :         { OFFS(txtw), &quot;default width in standalone rendering&quot;, GF_PROP_UINT, &quot;400&quot;, NULL, 0},
+<span class="lineNum">     503 </span>            :         { OFFS(txth), &quot;default height in standalone rendering&quot;, GF_PROP_UINT, &quot;200&quot;, NULL, 0},
+<span class="lineNum">     504 </span>            :         {0}
+<span class="lineNum">     505 </span>            : };
+<span class="lineNum">     506 </span>            : 
+<span class="lineNum">     507 </span>            : static const GF_FilterCapability TTMLDecCaps[] =
+<span class="lineNum">     508 </span>            : {
+<span class="lineNum">     509 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_TEXT),
+<span class="lineNum">     510 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     511 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_CODECID, GF_CODECID_SUBS_XML),
+<span class="lineNum">     512 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_TEXT),
+<span class="lineNum">     513 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_RAW),
+<span class="lineNum">     514 </span>            : };
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span>            : GF_FilterRegister TTMLDecRegister = {
+<span class="lineNum">     517 </span>            :         .name = &quot;ttmldec&quot;,
+<span class="lineNum">     518 </span>            :         GF_FS_SET_DESCRIPTION(&quot;TTML decoder&quot;)
+<span class="lineNum">     519 </span>            :         GF_FS_SET_HELP(&quot;This filter decodes TTML streams into a SVG scene graph of the compositor filter.\n&quot;
+<span class="lineNum">     520 </span>            :                 &quot;The scene graph creation is done through JavaScript.\n&quot;
+<span class="lineNum">     521 </span>            :                 &quot;The filter options are used to override the JS global variables of the TTML renderer.&quot;)
+<span class="lineNum">     522 </span>            :         .private_size = sizeof(GF_TTMLDec),
+<span class="lineNum">     523 </span>            :         .flags = GF_FS_REG_MAIN_THREAD,
+<span class="lineNum">     524 </span>            :         .args = TTMLDecArgs,
+<span class="lineNum">     525 </span>            :         .priority = 1,
+<span class="lineNum">     526 </span>            :         SETCAPS(TTMLDecCaps),
+<span class="lineNum">     527 </span>            :         .initialize = ttmldec_initialize,
+<span class="lineNum">     528 </span>            :         .finalize = ttmldec_finalize,
+<span class="lineNum">     529 </span>            :         .process = ttmldec_process,
+<span class="lineNum">     530 </span>            :         .configure_pid = ttmldec_configure_pid,
+<span class="lineNum">     531 </span>            :         .process_event = ttmldec_process_event,
+<span class="lineNum">     532 </span>            :         .update_arg = ttmldec_update_arg
+<span class="lineNum">     533 </span>            : };
+<span class="lineNum">     534 </span>            : 
+<a name="535"><span class="lineNum">     535 </span>            : #endif</a>
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span><span class="lineCov">       2877 : const GF_FilterRegister *ttmldec_register(GF_FilterSession *session)</span>
+<span class="lineNum">     538 </span>            : {
+<span class="lineNum">     539 </span>            : #if !defined(GPAC_DISABLE_SVG) &amp;&amp; defined(GPAC_HAS_QJS)
+<span class="lineNum">     540 </span><span class="lineCov">       2877 :         return &amp;TTMLDecRegister;</span>
+<span class="lineNum">     541 </span>            : #else
+<span class="lineNum">     542 </span>            :         return NULL;
+<span class="lineNum">     543 </span>            : #endif
+<span class="lineNum">     544 </span>            : }
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

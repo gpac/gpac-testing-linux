@@ -1,0 +1,39 @@
+*** mp4box-comp logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:12 ***
+
+
+*** Subtest "add": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_320x180_128kbps.264:dur=10 -add ./external_media/counter/counter_30s_audio.aac:dur=10 -new -frag 1000 ./results/temp/base.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 320 Height 180 FPS 100/4
+[MP4Mux] Imported 252 frames - media duration 10.08 - track duration 10.08
+AVC|H264 duration specified at import time, may have parsed more frames than imported
+AVC|H264 parsed 256 samples (290 NALUs) - Slices: 12 I 245 P 0 B - 1 SEI - 11 IDR
+AVC|H264 Max NALU size is 6956 - stream could be optimized by setting nal_length=2
+Track Importing AAC  - SampleRate 44100 Num Channels 1
+[MP4Mux] Imported 431 frames - media duration 10.0078 - track duration 10.0067
+Fragmenting file (1.000 seconds fragments)
+[MP4Mux] Done writing fragment - next fragment start time 2
+[MP4Mux] Done writing fragment - next fragment start time 3
+[MP4Mux] Done writing fragment - next fragment start time 4
+[MP4Mux] Done writing fragment - next fragment start time 5
+[MP4Mux] Done writing fragment - next fragment start time 6
+[MP4Mux] Done writing fragment - next fragment start time 7
+[MP4Mux] Done writing fragment - next fragment start time 8
+[MP4Mux] Done writing fragment - next fragment start time 9
+[MP4Mux] Done writing fragment - next fragment start time 10
+[MP4Mux] Done writing fragment - next fragment start time 11
+[MP4Mux] Done writing fragment - next fragment start time 12
+
+Computing ./results/temp/base.mp4  (add) hash: 
+File hash (SHA-1): E4A2CEDA506EDB2FA0F901945EDBE82B516FB057
+Hash OK for ./results/temp/base.mp4
+
+*** Subtest "comp": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -comp moof=cmof ./results/temp/base.mp4 -out ./results/temp/comp.mp4" ***
+Log format:
+name	orig	comp	gain	added_bytes	orate	crate	samples	duration	obbps	cbbps
+./results/temp/base.mp4 Compressing top-level boxes saved 1700 bytes out of 4000 (reduced by 42.5 %) additional bytes 0 original rate 27.6041 kbps new rate 27.4354 kbps, orig 5.98536 box bytes/sample final 3.49634 bytes/sample
+./results/temp/base.mp4	4000	2300	42.5	0	27.6041	27.4354	683	10.08	5.98536	3.49634
+
+
+*** Subtest "comp": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -topsize moof ./results/temp/base.mp4" ***
+4088
+

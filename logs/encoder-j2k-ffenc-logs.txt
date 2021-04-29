@@ -1,0 +1,102 @@
+*** encoder-j2k-ffenc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:40 ***
+
+
+*** Subtest "encoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/count_video.cmp enc:c=j2k @ -o ./results/temp/test.mj2 -graph -stats -blacklist=vtbdec,nvdec,ohevcdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 782536576
+
+Filter stats - 6 filters
+	Filter fin (src=./media/auxiliary_files/count_video.cmp) : 0 input pids 1 output pids 33 tasks 928 us process time
+		30 packets sent 146688 bytes sent (32327.6 pck/sec 1264.55 mbps)
+		* output PID count_video.cmp: 30 packets sent
+	Filter ffenc "ffenc:jpeg2000" ID _0x56158a777200_ (c=j2k) : 1 input pids 1 output pids 254 tasks 426688 us process time
+		250 packets processed 4320000 bytes processed (585.908 pck/sec 80.996 mbps)
+		250 packets sent 1033169 bytes sent (585.908 pck/sec 19.371 mbps)
+		* input PID count_video.cmp: 250 packets received
+		* output PID count_video.cmp: 250 packets sent
+	Filter fout (dst=./results/temp/test.mj2) : 1 input pids 0 output pids 169 tasks 1217 us process time
+		167 packets processed 1034977 bytes processed (137223 pck/sec 6803.46 mbps)
+		* input PID count_video.cmp: 167 packets received
+	Filter rfmpgvid : 1 input pids 1 output pids 44 tasks 3015 us process time
+		30 packets processed 146688 bytes processed (9950.25 pck/sec 389.222 mbps)
+		280 packets sent 146631 bytes sent (92869 pck/sec 389.071 mbps)
+		* input PID count_video.cmp: 30 packets received
+		* output PID count_video.cmp: 280 packets sent
+	Filter xviddec : 1 input pids 1 output pids 255 tasks 7879 us process time
+		250 packets processed 146631 bytes processed (31729.9 pck/sec 148.883 mbps)
+		250 packets sent 4320000 bytes sent (31729.9 pck/sec 4386.34 mbps)
+		* input PID count_video.cmp: 250 frames (280 packets) received
+		* output PID count_video.cmp: 250 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 254 tasks 5229 us process time
+		250 packets processed 1033169 bytes processed (47810.3 pck/sec 1580.68 mbps)
+		167 packets sent 1034977 bytes sent (31937.3 pck/sec 1583.44 mbps)
+		* input PID count_video.cmp: 250 packets received
+		* output PID count_video.cmp: 167 packets sent
+Session stats - threads 1
+	Thread 1: run_time 444083 us active_time 444026 us nb_tasks 900
+
+Total: run_time 444083 us active_time 444026 us nb_tasks 900
+
+Filters connected:
+fin (src=./media/auxiliary_files/count_video.cmp) (ptr=0x56158a7749b0)
+-(PID count_video.cmp) rfmpgvid (ptr=0x56158a77d3b0)
+--(PID count_video.cmp) xviddec (ptr=0x56158a781e40)
+---(PID count_video.cmp) ffenc "ffenc:jpeg2000" (c=j2k) (ID=_0x56158a777200_)
+----(PID count_video.cmp) mp4mx (ptr=0x56158a90d810)
+-----(PID count_video.cmp) fout (dst=./results/temp/test.mj2) (ptr=0x56158a778850)
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.mj2 inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump.txt:test=encx" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 798ED3C7ECDE6787196B378289835F6D59051974
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "encoder-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4 enc:c=j2k @ -o ./results/temp/mp4-test.mj2 -graph -stats -blacklist=vtbdec,nvdec,ohevcdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1635573888
+
+Filter stats - 6 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 6 tasks 665 us process time
+		1 packets sent 5000 bytes sent (1503.76 pck/sec 60.1504 mbps)
+		* output PID in.mp4: 2 packets sent
+	Filter ffenc "ffenc:jpeg2000" ID _0x56218d8c21c0_ (c=j2k) : 1 input pids 1 output pids 16 tasks 21932 us process time
+		12 packets processed 207360 bytes processed (547.146 pck/sec 75.6374 mbps)
+		12 packets sent 50570 bytes sent (547.146 pck/sec 18.4461 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter fout (dst=./results/temp/mp4-test.mj2) : 1 input pids 0 output pids 11 tasks 169 us process time
+		9 packets processed 51416 bytes processed (53254.4 pck/sec 2433.89 mbps)
+		* input PID in.mp4: 9 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 9 tasks 1049 us process time
+		2 packets processed 5000 bytes processed (1906.58 pck/sec 38.1316 mbps)
+		12 packets sent 5137 bytes sent (11439.5 pck/sec 39.1764 mbps)
+		* input PID in.mp4: 2 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter xviddec : 1 input pids 1 output pids 17 tasks 1320 us process time
+		12 packets processed 5137 bytes processed (9090.91 pck/sec 31.1333 mbps)
+		12 packets sent 207360 bytes sent (9090.91 pck/sec 1256.73 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 16 tasks 839 us process time
+		12 packets processed 50570 bytes processed (14302.7 pck/sec 482.193 mbps)
+		9 packets sent 51416 bytes sent (10727.1 pck/sec 490.26 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 9 packets sent
+Session stats - threads 1
+	Thread 1: run_time 25859 us active_time 25840 us nb_tasks 70
+
+Total: run_time 25859 us active_time 25840 us nb_tasks 70
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x56218d8bf9b0)
+-(PID in.mp4) mp4dmx (ptr=0x56218d8c7140)
+--(PID in.mp4) xviddec (ptr=0x56218d8d24d0)
+---(PID in.mp4) ffenc "ffenc:jpeg2000" (c=j2k) (ID=_0x56218d8c21c0_)
+----(PID in.mp4) mp4mx (ptr=0x56218da5fb50)
+-----(PID in.mp4) fout (dst=./results/temp/mp4-test.mj2) (ptr=0x56218d8c3820)
+
+
+*** Subtest "inspect-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/mp4-test.mj2 inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump2.txt:test=encx" ***
+
+Computing ./results/temp/dump2.txt  (inspect-mp4) hash: 
+File hash (SHA-1): A4D9F664CCBAD895F4853C39D0F25EF90402777B
+Hash fail, ref hash ./hash_refs/encoder-j2k-ffenc-inspect-mp4.hash was 3FD4E8CA2DD5E8C0B62715A6254DD074FC6520ED

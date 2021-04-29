@@ -1,0 +1,32 @@
+*** m2ts-paff logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:42:04 ***
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/m2ts/paff.ts inspect:interleave=false:deep:log=./results/temp/dump.txt" ***
+[M2TSDmx] Stream type 0x152 not supported - ignoring pid
+[MPEG-2 TS] PID 920 PES payload size 3840 but received 2008 bytes
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 6F85CD535683ED4BA0584E7D49D15AF4DC9D6F0F
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "import-gpac": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/m2ts/paff.ts -o ./results/temp/test-gpac.mp4" ***
+[M2TSDmx] Stream type 0x152 not supported - ignoring pid
+[MPEG-2 TS] PID 920 PES payload size 3840 but received 2008 bytes
+[MP3Dmx] truncated frame!
+
+Computing ./results/temp/test-gpac.mp4  (import-gpac) hash: 
+File hash (SHA-1): BE0191C486E2DBAE076533D647B54004F552C764
+Hash OK for ./results/temp/test-gpac.mp4
+
+*** Subtest "import-mp4box": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/m2ts/paff.ts -new ./results/temp/test-mp4box.mp4" ***
+[M2TSDmx] Stream type 0x152 not supported - ignoring pid
+Track Importing MP3
+Track Importing MPEG-4 AVC - Width 1920 Height 1080 FPS 90000/3600 SAR 1/1
+[MPEG-2 TS] PID 920 PES payload size 3840 but received 2008 bytes
+[MP3Dmx] truncated frame!
+OpenGOP detected - adjusting file brand
+AVC|H264 Import results: 1881529 samples (818 NALUs) - Slices: 10 I 67 P 189 B - 266 SEI - 0 IDR
+
+Computing ./results/temp/test-mp4box.mp4  (import-mp4box) hash: 
+File hash (SHA-1): 448728971098A2C48CE282FA537B00C0E662B841
+Hash OK for ./results/temp/test-mp4box.mp4

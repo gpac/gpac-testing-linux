@@ -1,0 +1,1343 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - media_tools/m3u8.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">media_tools</a> - m3u8.c<span style="font-size: 80%;"> (source / <a href="m3u8.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">526</td>
+            <td class="headerCovTableEntry">660</td>
+            <td class="headerCovTableEntryMed">79.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /**</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Pierre Souchay, Jean Le Feuvre, Romain Bouqueau
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2010-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #define _GNU_SOURCE
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &lt;gpac/internal/m3u8.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : /********** accumulated_attributes **********/
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : typedef struct _s_accumulated_attributes {
+<span class="lineNum">      34 </span>            :         //TODO: store as a structure with: { attribute, version, mandatory }
+<span class="lineNum">      35 </span>            :         char *title;
+<span class="lineNum">      36 </span>            :         char *mediaURL;
+<span class="lineNum">      37 </span>            :         double duration_in_seconds;
+<span class="lineNum">      38 </span>            :         int bandwidth;
+<span class="lineNum">      39 </span>            :         int width, height;
+<span class="lineNum">      40 </span>            :         int stream_id;
+<span class="lineNum">      41 </span>            :         char *codecs;
+<span class="lineNum">      42 </span>            :         char *language;
+<span class="lineNum">      43 </span>            :         MediaType type;
+<span class="lineNum">      44 </span>            :         union {
+<span class="lineNum">      45 </span>            :                 char *audio;
+<span class="lineNum">      46 </span>            :                 char *video;
+<span class="lineNum">      47 </span>            :                 char *subtitle;
+<span class="lineNum">      48 </span>            :                 char *closed_captions;
+<span class="lineNum">      49 </span>            :         } group;
+<span class="lineNum">      50 </span>            :         int target_duration_in_seconds;
+<span class="lineNum">      51 </span>            :         int min_media_sequence;
+<span class="lineNum">      52 </span>            :         int current_media_seq;
+<span class="lineNum">      53 </span>            :         int version;
+<span class="lineNum">      54 </span>            :         int compatibility_version; /*compute version required by the M3U8 content*/
+<span class="lineNum">      55 </span>            :         Bool is_master_playlist;
+<span class="lineNum">      56 </span>            :         Bool is_media_segment;
+<span class="lineNum">      57 </span>            :         Bool is_playlist_ended;
+<span class="lineNum">      58 </span>            :         u64 playlist_utc_timestamp;
+<span class="lineNum">      59 </span>            :         u64 byte_range_start, byte_range_end;
+<span class="lineNum">      60 </span>            :         u64 init_byte_range_start, init_byte_range_end;
+<span class="lineNum">      61 </span>            :         PlaylistElementDRMMethod key_method;
+<span class="lineNum">      62 </span>            :         char *init_url;
+<span class="lineNum">      63 </span>            :         char *key_url;
+<span class="lineNum">      64 </span>            :         bin128 key_iv;
+<span class="lineNum">      65 </span>            :         Bool independent_segments;
+<span class="lineNum">      66 </span>            :         Bool low_latency, independent_part;
+<span class="lineNum">      67 </span>            :         u32 discontinuity;
+<span class="lineNum">      68 </span>            : } s_accumulated_attributes;
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            : /********** playlist_element **********/
+<span class="lineNum">      72 </span>            : 
+<a name="73"><span class="lineNum">      73 </span>            : GF_Err playlist_element_del(PlaylistElement * e);</a>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">        155 : static GF_Err cleanup_list_of_elements(GF_List *list) {</span>
+<span class="lineNum">      76 </span>            :         GF_Err result = GF_OK;
+<span class="lineNum">      77 </span><span class="lineCov">        155 :         if (list == NULL)</span>
+<span class="lineNum">      78 </span>            :                 return result;
+<span class="lineNum">      79 </span><span class="lineCov">       1768 :         while (gf_list_count(list)) {</span>
+<span class="lineNum">      80 </span><span class="lineCov">       1613 :                 PlaylistElement *pl = (PlaylistElement *) gf_list_get(list, 0);</span>
+<span class="lineNum">      81 </span><span class="lineCov">       1613 :                 if (pl)</span>
+<span class="lineNum">      82 </span><span class="lineCov">       1613 :                         result |= playlist_element_del(pl);</span>
+<span class="lineNum">      83 </span><span class="lineCov">       1613 :                 gf_list_rem(list, 0);</span>
+<span class="lineNum">      84 </span>            :         }
+<span class="lineNum">      85 </span><span class="lineCov">        155 :         gf_list_del(list);</span>
+<span class="lineNum">      86 </span><span class="lineCov">        155 :         return result;</span>
+<span class="lineNum">      87 </span>            : }
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : /**
+<a name="90"><span class="lineNum">      90 </span>            :  * Deletes an Playlist element</a>
+<span class="lineNum">      91 </span>            :  */
+<span class="lineNum">      92 </span><span class="lineCov">       1768 : GF_Err playlist_element_del(PlaylistElement * e) {</span>
+<span class="lineNum">      93 </span>            :         GF_Err result = GF_OK;
+<span class="lineNum">      94 </span><span class="lineCov">       1768 :         if (e == NULL)</span>
+<span class="lineNum">      95 </span>            :                 return result;
+<span class="lineNum">      96 </span><span class="lineCov">       1768 :         if (e-&gt;title) {</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :                 gf_free(e-&gt;title);</span>
+<span class="lineNum">      98 </span>            :         }
+<span class="lineNum">      99 </span><span class="lineCov">       1768 :         if (e-&gt;codecs) {</span>
+<span class="lineNum">     100 </span><span class="lineCov">         42 :                 gf_free(e-&gt;codecs);</span>
+<span class="lineNum">     101 </span>            :         }
+<span class="lineNum">     102 </span><span class="lineCov">       1768 :         if (e-&gt;language) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">         13 :                 gf_free(e-&gt;language);</span>
+<span class="lineNum">     104 </span>            :         }
+<span class="lineNum">     105 </span><span class="lineCov">       1768 :         if (e-&gt;audio_group) {</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :                 gf_free(e-&gt;audio_group);</span>
+<span class="lineNum">     107 </span>            :         }
+<span class="lineNum">     108 </span><span class="lineCov">       1768 :         if (e-&gt;video_group) {</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                 gf_free(e-&gt;video_group);</span>
+<span class="lineNum">     110 </span>            :         }
+<span class="lineNum">     111 </span><span class="lineCov">       1768 :         if (e-&gt;key_uri) {</span>
+<span class="lineNum">     112 </span><span class="lineCov">          9 :                 gf_free(e-&gt;key_uri);</span>
+<span class="lineNum">     113 </span>            :         }
+<span class="lineNum">     114 </span><span class="lineCov">       1768 :         if (e-&gt;init_segment_url) {</span>
+<span class="lineNum">     115 </span><span class="lineCov">        444 :                 gf_free(e-&gt;init_segment_url);</span>
+<span class="lineNum">     116 </span>            :         }
+<span class="lineNum">     117 </span><span class="lineCov">       1768 :         memset(e-&gt;key_iv, 0, sizeof(bin128) );</span>
+<span class="lineNum">     118 </span><span class="lineCov">       1768 :         if (e-&gt;url) </span>
+<span class="lineNum">     119 </span><span class="lineCov">       1716 :                 gf_free(e-&gt;url);</span>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineCov">       1768 :         switch (e-&gt;element_type) {</span>
+<span class="lineNum">     122 </span>            :         case TYPE_UNKNOWN:
+<span class="lineNum">     123 </span>            :         case TYPE_MEDIA:
+<span class="lineNum">     124 </span>            :                 break;
+<span class="lineNum">     125 </span><span class="lineCov">        155 :         case TYPE_PLAYLIST:</span>
+<span class="lineNum">     126 </span>            :                 assert(e-&gt;element.playlist.elements);
+<span class="lineNum">     127 </span><span class="lineCov">        155 :                 result |= cleanup_list_of_elements(e-&gt;element.playlist.elements);</span>
+<span class="lineNum">     128 </span>            :         default:
+<span class="lineNum">     129 </span>            :                 break;
+<span class="lineNum">     130 </span>            :         }
+<span class="lineNum">     131 </span><span class="lineCov">       1768 :         gf_free(e);</span>
+<span class="lineNum">     132 </span><span class="lineCov">       1768 :         return result;</span>
+<span class="lineNum">     133 </span>            : }
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : /**
+<span class="lineNum">     136 </span>            :  * Creates an Playlist element.
+<span class="lineNum">     137 </span>            :  * This element can be either a playlist of a stream according to first parameter.
+<a name="138"><span class="lineNum">     138 </span>            : \param NULL if element could not be created. Elements will be deleted recursively.</a>
+<span class="lineNum">     139 </span>            :  */
+<span class="lineNum">     140 </span><span class="lineCov">       1768 : static PlaylistElement* playlist_element_new(PlaylistElementType element_type, const char *url, s_accumulated_attributes *attribs)</span>
+<span class="lineNum">     141 </span>            : {
+<span class="lineNum">     142 </span>            :         PlaylistElement *e;
+<span class="lineNum">     143 </span><span class="lineCov">       1768 :         GF_SAFEALLOC(e, PlaylistElement);</span>
+<span class="lineNum">     144 </span><span class="lineCov">       1768 :         if (e == NULL)</span>
+<span class="lineNum">     145 </span>            :                 return NULL;
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">       1768 :         e-&gt;media_type = attribs-&gt;type;</span>
+<span class="lineNum">     148 </span><span class="lineCov">       1768 :         e-&gt;duration_info = attribs-&gt;duration_in_seconds;</span>
+<span class="lineNum">     149 </span><span class="lineCov">       1768 :         e-&gt;byte_range_start = attribs-&gt;byte_range_start;</span>
+<span class="lineNum">     150 </span><span class="lineCov">       1768 :         e-&gt;byte_range_end = attribs-&gt;byte_range_end;</span>
+<span class="lineNum">     151 </span><span class="lineCov">       1768 :         e-&gt;low_lat_chunk = attribs-&gt;low_latency;</span>
+<span class="lineNum">     152 </span><span class="lineCov">       1768 :         e-&gt;independent_chunk = attribs-&gt;independent_part;</span>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineCov">       1768 :         e-&gt;title = (attribs-&gt;title ? gf_strdup(attribs-&gt;title) : NULL);</span>
+<span class="lineNum">     155 </span><span class="lineCov">       1768 :         e-&gt;codecs = (attribs-&gt;codecs ? gf_strdup(attribs-&gt;codecs) : NULL);</span>
+<span class="lineNum">     156 </span><span class="lineCov">       1768 :         e-&gt;language = (attribs-&gt;language ? gf_strdup(attribs-&gt;language) : NULL);</span>
+<span class="lineNum">     157 </span><span class="lineCov">       1768 :         e-&gt;drm_method = attribs-&gt;key_method;</span>
+<span class="lineNum">     158 </span><span class="lineCov">       1768 :         e-&gt;init_segment_url = attribs-&gt;init_url ? gf_strdup(attribs-&gt;init_url) : NULL;</span>
+<span class="lineNum">     159 </span><span class="lineCov">       1768 :         e-&gt;init_byte_range_start = attribs-&gt;init_byte_range_start;</span>
+<span class="lineNum">     160 </span><span class="lineCov">       1768 :         e-&gt;init_byte_range_end = attribs-&gt;init_byte_range_end;</span>
+<span class="lineNum">     161 </span><span class="lineCov">       1768 :         e-&gt;key_uri = (attribs-&gt;key_url ? gf_strdup(attribs-&gt;key_url) : NULL);</span>
+<span class="lineNum">     162 </span><span class="lineCov">       1768 :         memcpy(e-&gt;key_iv, attribs-&gt;key_iv, sizeof(bin128));</span>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">       1768 :         e-&gt;utc_start_time = attribs-&gt;playlist_utc_timestamp;</span>
+<span class="lineNum">     165 </span><span class="lineCov">       1768 :         e-&gt;discontinuity = attribs-&gt;discontinuity;</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :         assert(url);
+<span class="lineNum">     168 </span><span class="lineCov">       1768 :         e-&gt;url = gf_strdup(url);</span>
+<span class="lineNum">     169 </span><span class="lineCov">       1768 :         e-&gt;bandwidth = 0;</span>
+<span class="lineNum">     170 </span><span class="lineCov">       1768 :         e-&gt;element_type = element_type;</span>
+<span class="lineNum">     171 </span><span class="lineCov">       1768 :         if (element_type == TYPE_PLAYLIST) {</span>
+<span class="lineNum">     172 </span><span class="lineCov">        155 :                 e-&gt;element.playlist.is_ended = GF_FALSE;</span>
+<span class="lineNum">     173 </span><span class="lineCov">        155 :                 e-&gt;element.playlist.target_duration = attribs-&gt;duration_in_seconds;</span>
+<span class="lineNum">     174 </span><span class="lineCov">        155 :                 e-&gt;element.playlist.current_media_seq = 0;</span>
+<span class="lineNum">     175 </span><span class="lineCov">        155 :                 e-&gt;element.playlist.media_seq_min = 0;</span>
+<span class="lineNum">     176 </span><span class="lineCov">        155 :                 e-&gt;element.playlist.media_seq_max = 0;</span>
+<span class="lineNum">     177 </span><span class="lineCov">        155 :                 e-&gt;element.playlist.elements = gf_list_new();</span>
+<span class="lineNum">     178 </span><span class="lineCov">        155 :                 if (NULL == (e-&gt;element.playlist.elements)) {</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :                         if (e-&gt;title)</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                                 gf_free(e-&gt;title);</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :                         if (e-&gt;codecs)</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :                                 gf_free(e-&gt;codecs);</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                         if (e-&gt;language)</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                                 gf_free(e-&gt;language);</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                         if (e-&gt;audio_group)</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                                 gf_free(e-&gt;audio_group);</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :                         if (e-&gt;video_group)</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                                 gf_free(e-&gt;video_group);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                         if (e-&gt;url)</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :                                 gf_free(e-&gt;url);</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :                         if (e-&gt;init_segment_url)</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                                 gf_free(e-&gt;init_segment_url);</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :                         if (e-&gt;key_uri)</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                                 gf_free(e-&gt;key_uri);</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :                         e-&gt;url = NULL;</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :                         e-&gt;title = NULL;</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :                         e-&gt;codecs = NULL;</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :                         e-&gt;language = NULL;</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :                         e-&gt;audio_group = NULL;</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                         e-&gt;video_group = NULL;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                         e-&gt;key_uri = NULL;</span>
+<span class="lineNum">     202 </span>            :                         memset(e-&gt;key_iv, 0, sizeof(bin128));
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                         gf_free(e);</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :                         return NULL;</span>
+<span class="lineNum">     205 </span>            :                 }
+<span class="lineNum">     206 </span>            :         } else {
+<span class="lineNum">     207 </span>            :                 /* Nothing to do, media is an empty structure */
+<span class="lineNum">     208 </span>            :         }
+<span class="lineNum">     209 </span>            :         assert(e-&gt;bandwidth == 0);
+<span class="lineNum">     210 </span>            :         assert(e-&gt;url);
+<span class="lineNum">     211 </span>            :         return e;
+<span class="lineNum">     212 </span>            : }
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : /********** stream **********/
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            : /**
+<a name="218"><span class="lineNum">     218 </span>            :  * Creates a new stream properly initialized</a>
+<span class="lineNum">     219 </span>            :  */
+<span class="lineNum">     220 </span><span class="lineCov">        137 : static Stream* stream_new(int stream_id) {</span>
+<span class="lineNum">     221 </span><span class="lineCov">        137 :         Stream *program = (Stream *) gf_malloc(sizeof(Stream));</span>
+<span class="lineNum">     222 </span><span class="lineCov">        137 :         if (program == NULL) {</span>
+<span class="lineNum">     223 </span>            :                 return NULL;
+<span class="lineNum">     224 </span>            :         }
+<span class="lineNum">     225 </span><span class="lineCov">        137 :         program-&gt;stream_id = stream_id;</span>
+<span class="lineNum">     226 </span><span class="lineCov">        137 :         program-&gt;variants = gf_list_new();</span>
+<span class="lineNum">     227 </span><span class="lineCov">        137 :         if (program-&gt;variants == NULL) {</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :                 gf_free(program);</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     230 </span>            :         }
+<span class="lineNum">     231 </span>            :         return program;
+<span class="lineNum">     232 </span>            : }
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            : /**
+<a name="235"><span class="lineNum">     235 </span>            :  * Deletes the specified stream</a>
+<span class="lineNum">     236 </span>            :  */
+<span class="lineNum">     237 </span><span class="lineCov">        137 : static GF_Err stream_del(Stream *stream) {</span>
+<span class="lineNum">     238 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">     239 </span><span class="lineCov">        137 :         if (stream == NULL)</span>
+<span class="lineNum">     240 </span>            :                 return e;
+<span class="lineNum">     241 </span><span class="lineCov">        137 :         if (stream-&gt;variants) {</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :                 while (gf_list_count(stream-&gt;variants)) {</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :                         GF_List *l = gf_list_get(stream-&gt;variants, 0);</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :                         cleanup_list_of_elements(l);</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :                         gf_list_rem(stream-&gt;variants, 0);</span>
+<span class="lineNum">     246 </span>            :                 }
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :                 gf_list_del(stream-&gt;variants);</span>
+<span class="lineNum">     248 </span>            :         }
+<span class="lineNum">     249 </span><span class="lineCov">        137 :         stream-&gt;variants = NULL;</span>
+<span class="lineNum">     250 </span><span class="lineCov">        137 :         gf_free(stream);</span>
+<span class="lineNum">     251 </span><span class="lineCov">        137 :         return e;</span>
+<span class="lineNum">     252 </span>            : }
+<span class="lineNum">     253 </span>            : 
+<a name="254"><span class="lineNum">     254 </span>            : </a>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">        138 : static GFINLINE int string2num(const char *s) {</span>
+<span class="lineNum">     257 </span>            :         u64 ret=0, i, shift=2;
+<span class="lineNum">     258 </span>            :         u8 hash[GF_SHA1_DIGEST_SIZE];
+<span class="lineNum">     259 </span><span class="lineCov">        138 :         gf_sha1_csum((u8*)s, (u32)strlen(s), hash);</span>
+<span class="lineNum">     260 </span>            :         assert(shift*GF_SHA1_DIGEST_SIZE &lt; 64);
+<span class="lineNum">     261 </span><span class="lineCov">       2898 :         for (i=0; i&lt;GF_SHA1_DIGEST_SIZE; ++i)</span>
+<span class="lineNum">     262 </span><span class="lineCov">       2760 :                 ret += (ret &lt;&lt; shift) + hash[i];</span>
+<span class="lineNum">     263 </span><span class="lineCov">        138 :         return (int)(ret % MEDIA_TYPE_AUDIO);</span>
+<span class="lineNum">     264 </span>            : }
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            : #define GROUP_ID_TO_PROGRAM_ID(type, group_id) (\
+<span class="lineNum">     268 </span>            :         MEDIA_TYPE_##type + \
+<span class="lineNum">     269 </span>            :         string2num(group_id) \
+<a name="270"><span class="lineNum">     270 </span>            :         ) \</a>
+<span class="lineNum">     271 </span>            :  
+<span class="lineNum">     272 </span><span class="lineCov">      19966 : static Bool safe_start_equals(const char *attribute, const char *line) {</span>
+<span class="lineNum">     273 </span>            :         size_t len, atlen;
+<span class="lineNum">     274 </span><span class="lineCov">      19966 :         if (line == NULL)</span>
+<span class="lineNum">     275 </span>            :                 return GF_FALSE;
+<span class="lineNum">     276 </span><span class="lineCov">      19966 :         len = strlen(line);</span>
+<span class="lineNum">     277 </span><span class="lineCov">      19966 :         atlen = strlen(attribute);</span>
+<span class="lineNum">     278 </span><span class="lineCov">      19966 :         if (len &lt; atlen)</span>
+<span class="lineNum">     279 </span>            :                 return GF_FALSE;
+<span class="lineNum">     280 </span><span class="lineCov">      19684 :         return (0 == strncmp(attribute, line, atlen));</span>
+<span class="lineNum">     281 </span>            : }
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            : static void reset_attributes(s_accumulated_attributes *attributes)
+<span class="lineNum">     285 </span>            : {
+<span class="lineNum">     286 </span>            :         memset(attributes, 0, sizeof(s_accumulated_attributes));
+<span class="lineNum">     287 </span>            :         attributes-&gt;type = MEDIA_TYPE_UNKNOWN;
+<span class="lineNum">     288 </span><span class="lineCov">        124 :         attributes-&gt;min_media_sequence = 1;</span>
+<span class="lineNum">     289 </span><span class="lineCov">        124 :         attributes-&gt;version = 1;</span>
+<span class="lineNum">     290 </span>            :         attributes-&gt;compatibility_version = 0;
+<span class="lineNum">     291 </span>            :         attributes-&gt;key_method = DRM_NONE;
+<a name="292"><span class="lineNum">     292 </span>            : }</a>
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span><span class="lineCov">      16129 : static char** extract_attributes(const char *name, const char *line, const int num_attributes) {</span>
+<span class="lineNum">     295 </span>            :         int sz, i, curr_attribute, start;
+<span class="lineNum">     296 </span>            :         char **ret;
+<span class="lineNum">     297 </span>            :         u8 quote = 0;
+<span class="lineNum">     298 </span><span class="lineCov">      16129 :         int len = (u32) strlen(line);</span>
+<span class="lineNum">     299 </span><span class="lineCov">      16129 :         start = (u32) strlen(name);</span>
+<span class="lineNum">     300 </span><span class="lineCov">      16129 :         if (len &lt;= start)</span>
+<span class="lineNum">     301 </span>            :                 return NULL;
+<span class="lineNum">     302 </span><span class="lineCov">      13560 :         if (!safe_start_equals(name, line))</span>
+<span class="lineNum">     303 </span>            :                 return NULL;
+<span class="lineNum">     304 </span><span class="lineCov">       2016 :         ret = gf_calloc((num_attributes + 1), sizeof(char*));</span>
+<span class="lineNum">     305 </span>            :         curr_attribute = 0;
+<span class="lineNum">     306 </span><span class="lineCov">      31814 :         for (i=start; i&lt;=len; i++) {</span>
+<span class="lineNum">     307 </span><span class="lineCov">      30242 :                 if (line[i] == '\0' || (!quote &amp;&amp; line[i] == ',')  || (line[i] == quote)) {</span>
+<span class="lineNum">     308 </span>            :                         u32 spaces = 0;
+<span class="lineNum">     309 </span><span class="lineCov">       3168 :                         sz = i - start;</span>
+<span class="lineNum">     310 </span><span class="lineCov">       3168 :                         if (quote &amp;&amp; (line[i] == quote))</span>
+<span class="lineNum">     311 </span><span class="lineCov">        352 :                                 sz++;</span>
+<span class="lineNum">     312 </span>            :                         
+<span class="lineNum">     313 </span><span class="lineCov">       3188 :                         while (line[start+spaces] == ' ')</span>
+<span class="lineNum">     314 </span><span class="lineCov">         20 :                                 spaces++;</span>
+<span class="lineNum">     315 </span><span class="lineCov">       3168 :                         if ((sz-spaces&lt;=1) &amp;&amp; (line[start+spaces]==',')) {</span>
+<span class="lineNum">     316 </span>            :                                 //start = i+1;
+<span class="lineNum">     317 </span>            :                         } else {
+<span class="lineNum">     318 </span><span class="lineCov">       2994 :                                 if (!strncmp(&amp;line[start+spaces], &quot;\t&quot;, sz-spaces) || !strncmp(&amp;line[start+spaces], &quot;\n&quot;, sz-spaces)) {</span>
+<span class="lineNum">     319 </span>            :                                 } else {
+<span class="lineNum">     320 </span><span class="lineCov">       2391 :                                         ret[curr_attribute] = gf_calloc( (1+sz-spaces), sizeof(char));</span>
+<span class="lineNum">     321 </span>            :                                         strncpy(ret[curr_attribute], &amp;(line[start+spaces]), sz-spaces);
+<span class="lineNum">     322 </span><span class="lineCov">       2391 :                                         curr_attribute++;</span>
+<span class="lineNum">     323 </span>            :                                 }
+<span class="lineNum">     324 </span>            :                         }
+<span class="lineNum">     325 </span><span class="lineCov">       3168 :                         start = i+1;</span>
+<span class="lineNum">     326 </span>            :                         
+<span class="lineNum">     327 </span><span class="lineCov">       3168 :                         if (start == len) {</span>
+<span class="lineNum">     328 </span>            :                                 return ret;
+<span class="lineNum">     329 </span>            :                         }
+<span class="lineNum">     330 </span>            :                 }
+<span class="lineNum">     331 </span><span class="lineCov">      29798 :                 if ((line[i] == '\'') || (line[i] == '&quot;'))  {</span>
+<span class="lineNum">     332 </span><span class="lineCov">        526 :                         if (quote) {</span>
+<span class="lineNum">     333 </span>            :                                 quote = 0;
+<span class="lineNum">     334 </span>            :                         } else {
+<span class="lineNum">     335 </span><span class="lineCov">        352 :                                 quote = line[i];</span>
+<span class="lineNum">     336 </span>            :                         }
+<span class="lineNum">     337 </span>            :                 }
+<span class="lineNum">     338 </span>            :         }
+<span class="lineNum">     339 </span><span class="lineCov">       1572 :         if (curr_attribute == 0) {</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :                 gf_free(ret);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     342 </span>            :         }
+<span class="lineNum">     343 </span>            :         return ret;
+<span class="lineNum">     344 </span>            : }
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span>            : #define M3U8_COMPATIBILITY_VERSION(v) \
+<span class="lineNum">     347 </span>            :         if (v &gt; attributes-&gt;compatibility_version) \
+<span class="lineNum">     348 </span>            :                 attributes-&gt;compatibility_version = v;
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            : /**
+<a name="351"><span class="lineNum">     351 </span>            :  * Parses the attributes and accumulate into the attributes structure</a>
+<span class="lineNum">     352 </span>            :  */
+<span class="lineNum">     353 </span><span class="lineCov">       2237 : static char** parse_attributes(const char *line, s_accumulated_attributes *attributes) {</span>
+<span class="lineNum">     354 </span>            :         int int_value, i;
+<span class="lineNum">     355 </span>            :         char **ret;
+<span class="lineNum">     356 </span>            :         char *end_ptr;
+<span class="lineNum">     357 </span><span class="lineCov">       2237 :         if (line == NULL)</span>
+<span class="lineNum">     358 </span>            :                 return NULL;
+<span class="lineNum">     359 </span><span class="lineCov">       2237 :         if (!safe_start_equals(&quot;#EXT&quot;, line))</span>
+<span class="lineNum">     360 </span>            :                 return NULL;
+<span class="lineNum">     361 </span><span class="lineCov">       2237 :         if (safe_start_equals(&quot;#EXT-X-ENDLIST&quot;, line)) {</span>
+<span class="lineNum">     362 </span><span class="lineCov">         33 :                 attributes-&gt;is_playlist_ended = GF_TRUE;</span>
+<span class="lineNum">     363 </span><span class="lineCov">         33 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     364 </span>            :                 return NULL;
+<span class="lineNum">     365 </span>            :         }
+<span class="lineNum">     366 </span>            :         /* reset not accumated attributes */
+<span class="lineNum">     367 </span><span class="lineCov">       2204 :         attributes-&gt;type = MEDIA_TYPE_UNKNOWN;</span>
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span><span class="lineCov">       2204 :         ret = extract_attributes(&quot;#EXT-X-TARGETDURATION:&quot;, line, 1);</span>
+<span class="lineNum">     370 </span><span class="lineCov">       2204 :         if (ret) {</span>
+<span class="lineNum">     371 </span>            :                 /* #EXT-X-TARGETDURATION:&lt;seconds&gt; */
+<span class="lineNum">     372 </span><span class="lineCov">        103 :                 if (ret[0]) {</span>
+<span class="lineNum">     373 </span><span class="lineCov">        103 :                         int_value = (s32) strtol(ret[0], &amp;end_ptr, 10);</span>
+<span class="lineNum">     374 </span><span class="lineCov">        103 :                         if (end_ptr != ret[0]) {</span>
+<span class="lineNum">     375 </span><span class="lineCov">        103 :                                 attributes-&gt;target_duration_in_seconds = int_value;</span>
+<span class="lineNum">     376 </span>            :                         }
+<span class="lineNum">     377 </span>            :                 }
+<span class="lineNum">     378 </span><span class="lineCov">        103 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     379 </span>            :                 return ret;
+<span class="lineNum">     380 </span>            :         }
+<span class="lineNum">     381 </span><span class="lineCov">       2101 :         ret = extract_attributes(&quot;#EXT-X-MEDIA-SEQUENCE:&quot;, line, 1);</span>
+<span class="lineNum">     382 </span><span class="lineCov">       2101 :         if (ret) {</span>
+<span class="lineNum">     383 </span>            :                 /* #EXT-X-MEDIA-SEQUENCE:&lt;number&gt; */
+<span class="lineNum">     384 </span><span class="lineCov">        103 :                 if (ret[0]) {</span>
+<span class="lineNum">     385 </span><span class="lineCov">        103 :                         int_value = (s32)strtol(ret[0], &amp;end_ptr, 10);</span>
+<span class="lineNum">     386 </span><span class="lineCov">        103 :                         if (end_ptr != ret[0]) {</span>
+<span class="lineNum">     387 </span><span class="lineCov">        103 :                                 attributes-&gt;min_media_sequence = int_value;</span>
+<span class="lineNum">     388 </span><span class="lineCov">        103 :                                 attributes-&gt;current_media_seq = int_value;</span>
+<span class="lineNum">     389 </span>            :                         }
+<span class="lineNum">     390 </span>            :                 }
+<span class="lineNum">     391 </span><span class="lineCov">        103 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     392 </span>            :                 return ret;
+<span class="lineNum">     393 </span>            :         }
+<span class="lineNum">     394 </span><span class="lineCov">       1998 :         ret = extract_attributes(&quot;#EXT-X-VERSION:&quot;, line, 1);</span>
+<span class="lineNum">     395 </span><span class="lineCov">       1998 :         if (ret) {</span>
+<span class="lineNum">     396 </span>            :                 /* #EXT-X-VERSION:&lt;number&gt; */
+<span class="lineNum">     397 </span><span class="lineCov">        122 :                 if (ret[0]) {</span>
+<span class="lineNum">     398 </span><span class="lineCov">        122 :                         int_value = (s32)strtol(ret[0], &amp;end_ptr, 10);</span>
+<span class="lineNum">     399 </span><span class="lineCov">        122 :                         if (end_ptr != ret[0]) {</span>
+<span class="lineNum">     400 </span><span class="lineCov">        122 :                                 attributes-&gt;version = int_value;</span>
+<span class="lineNum">     401 </span>            :                         }
+<span class="lineNum">     402 </span>            :                         //although technically it is mandated for v2 or more, don't complain if set for v1
+<span class="lineNum">     403 </span><span class="lineCov">        122 :                         M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     404 </span>            :                 }
+<span class="lineNum">     405 </span>            :                 return ret;
+<span class="lineNum">     406 </span>            :         }
+<span class="lineNum">     407 </span><span class="lineCov">       1876 :         ret = extract_attributes(&quot;#EXTINF:&quot;, line, 2);</span>
+<span class="lineNum">     408 </span><span class="lineCov">       1876 :         if (ret) {</span>
+<span class="lineNum">     409 </span><span class="lineCov">        941 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     410 </span>            :                 /* #EXTINF:&lt;duration&gt;,&lt;title&gt; */
+<span class="lineNum">     411 </span><span class="lineCov">        941 :                 attributes-&gt;is_media_segment = GF_TRUE;</span>
+<span class="lineNum">     412 </span><span class="lineCov">        941 :                 if (ret[0]) {</span>
+<span class="lineNum">     413 </span><span class="lineCov">        941 :                         double double_value = strtod(ret[0], &amp;end_ptr);</span>
+<span class="lineNum">     414 </span><span class="lineCov">        941 :                         if (end_ptr != ret[0]) {</span>
+<span class="lineNum">     415 </span><span class="lineCov">        941 :                                 attributes-&gt;duration_in_seconds = double_value;</span>
+<span class="lineNum">     416 </span>            :                         }
+<span class="lineNum">     417 </span><span class="lineCov">        941 :                         if (strstr(ret[0], &quot;.&quot;) || (double_value &gt; (int)double_value)) {</span>
+<span class="lineNum">     418 </span><span class="lineCov">        677 :                                 M3U8_COMPATIBILITY_VERSION(3);</span>
+<span class="lineNum">     419 </span>            :                         }
+<span class="lineNum">     420 </span>            :                 }
+<span class="lineNum">     421 </span><span class="lineCov">        941 :                 if (ret[1]) {</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :                         if (attributes-&gt;title) gf_free(attributes-&gt;title);</span>
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :                         attributes-&gt;title = gf_strdup(ret[1]);</span>
+<span class="lineNum">     424 </span>            :                 }
+<span class="lineNum">     425 </span>            :                 return ret;
+<span class="lineNum">     426 </span>            :         }
+<span class="lineNum">     427 </span><span class="lineCov">        935 :         ret = extract_attributes(&quot;#EXT-X-KEY:&quot;, line, 4);</span>
+<span class="lineNum">     428 </span><span class="lineCov">        935 :         if (ret) {</span>
+<span class="lineNum">     429 </span>            :                 /* #EXT-X-KEY:METHOD=&lt;method&gt;[,URI=&quot;&lt;URI&gt;&quot;] */
+<span class="lineNum">     430 </span>            :                 const char *method = &quot;METHOD=&quot;;
+<span class="lineNum">     431 </span>            :                 const size_t method_len = strlen(method);
+<span class="lineNum">     432 </span><span class="lineCov">          9 :                 if (safe_start_equals(method, ret[0])) {</span>
+<span class="lineNum">     433 </span><span class="lineCov">          9 :                         if (!strncmp(ret[0]+method_len, &quot;NONE&quot;, 4)) {</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :                                 attributes-&gt;key_method = DRM_NONE;</span>
+<span class="lineNum">     435 </span><span class="lineCov">          9 :                         } else if (!strncmp(ret[0]+method_len, &quot;AES-128&quot;, 7)) {</span>
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :                                 attributes-&gt;key_method = DRM_AES_128;</span>
+<span class="lineNum">     437 </span><span class="lineCov">          9 :                         } else if (!strncmp(ret[0]+method_len, &quot;SAMPLE-AES&quot;, 10)) {</span>
+<span class="lineNum">     438 </span><span class="lineCov">          9 :                                 attributes-&gt;key_method = DRM_CENC;</span>
+<span class="lineNum">     439 </span>            :                         } else {
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH,(&quot;[M3U8] EXT-X-KEY method not recognized.\n&quot;));</span>
+<span class="lineNum">     441 </span>            :                         }
+<span class="lineNum">     442 </span><span class="lineCov">          9 :                         if (ret[1] != NULL &amp;&amp; safe_start_equals(&quot;URI=\&quot;&quot;, ret[1])) {</span>
+<span class="lineNum">     443 </span><span class="lineCov">          9 :                                 int_value = (u32) strlen(ret[1]);</span>
+<span class="lineNum">     444 </span><span class="lineCov">          9 :                                 if (ret[1][int_value-1] == '&quot;') {</span>
+<span class="lineNum">     445 </span><span class="lineCov">          9 :                                         if (attributes-&gt;key_url) gf_free(attributes-&gt;key_url);</span>
+<span class="lineNum">     446 </span><span class="lineCov">          9 :                                         attributes-&gt;key_url = gf_strdup(&amp;(ret[1][5]));</span>
+<span class="lineNum">     447 </span><span class="lineCov">          9 :                                         if (attributes-&gt;key_url) {</span>
+<span class="lineNum">     448 </span><span class="lineCov">          9 :                                                 u32 klen = (u32) strlen(attributes-&gt;key_url);</span>
+<span class="lineNum">     449 </span><span class="lineCov">          9 :                                                 attributes-&gt;key_url[klen-1] = 0;</span>
+<span class="lineNum">     450 </span>            :                                         }
+<span class="lineNum">     451 </span>            :                                 }
+<span class="lineNum">     452 </span>            :                         }
+<span class="lineNum">     453 </span><span class="lineCov">          9 :                         if (ret[2] != NULL &amp;&amp; safe_start_equals(&quot;IV=&quot;, ret[2])) {</span>
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :                                 char *IV = ret[2] + 3;</span>
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :                                 if (!strncmp(IV, &quot;0x&quot;, 2)) IV+=2;</span>
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :                                 if (strlen(IV) != 32) {</span>
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_DASH,(&quot;[M3U8] EXT-X-KEY wrong IV len\n&quot;));</span>
+<span class="lineNum">     458 </span>            :                                 } else {
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :                                         for (i=0; i&lt;16; i++) {</span>
+<span class="lineNum">     460 </span>            :                                                 char szV[3];
+<span class="lineNum">     461 </span>            :                                                 u32 v;
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :                                                 szV[0] = IV[2*i];</span>
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :                                                 szV[1] = IV[2*i + 1];</span>
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :                                                 szV[2] = 0;</span>
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :                                                 sscanf(szV, &quot;%X&quot;, &amp;v);</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :                                                 attributes-&gt;key_iv[i] = v;</span>
+<span class="lineNum">     467 </span>            :                                         }
+<span class="lineNum">     468 </span>            :                                 }
+<span class="lineNum">     469 </span>            :                         } else {
+<span class="lineNum">     470 </span><span class="lineCov">          9 :                                 u32 iv = gf_htonl(attributes-&gt;current_media_seq);</span>
+<span class="lineNum">     471 </span><span class="lineCov">          9 :                                 memset(attributes-&gt;key_iv, 0, sizeof(bin128) );</span>
+<span class="lineNum">     472 </span><span class="lineCov">          9 :                                 memcpy(attributes-&gt;key_iv + 12, (const void *) &amp;iv, sizeof(iv));</span>
+<span class="lineNum">     473 </span>            :                         }
+<span class="lineNum">     474 </span>            :                 }
+<span class="lineNum">     475 </span><span class="lineCov">          9 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     476 </span>            :                 return ret;
+<span class="lineNum">     477 </span>            :         }
+<span class="lineNum">     478 </span><span class="lineCov">        926 :         ret = extract_attributes(&quot;#EXT-X-PROGRAM-DATE-TIME:&quot;, line, 1);</span>
+<span class="lineNum">     479 </span><span class="lineCov">        926 :         if (ret) {</span>
+<span class="lineNum">     480 </span>            :                 /* #EXT-X-PROGRAM-DATE-TIME:&lt;YYYY-MM-DDThh:mm:ssZ&gt; */
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :                 if (ret[0]) attributes-&gt;playlist_utc_timestamp = gf_net_parse_date(ret[0]);</span>
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     483 </span>            :                 return ret;
+<span class="lineNum">     484 </span>            :         }
+<span class="lineNum">     485 </span><span class="lineCov">        926 :         ret = extract_attributes(&quot;#EXT-X-ALLOW-CACHE:&quot;, line, 1);</span>
+<span class="lineNum">     486 </span><span class="lineCov">        926 :         if (ret) {</span>
+<span class="lineNum">     487 </span>            :                 /* #EXT-X-ALLOW-CACHE:&lt;YES|NO&gt; */
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_DASH,(&quot;[M3U8] EXT-X-ALLOW-CACHE not supported.\n&quot;, line));</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     490 </span>            :                 return ret;
+<span class="lineNum">     491 </span>            :         }
+<span class="lineNum">     492 </span><span class="lineCov">        926 :         ret = extract_attributes(&quot;#EXT-X-PLAYLIST-TYPE&quot;, line, 1);</span>
+<span class="lineNum">     493 </span><span class="lineCov">        926 :         if (ret) {</span>
+<span class="lineNum">     494 </span><span class="lineCov">          6 :                 if (ret[0] &amp;&amp; !strcmp(ret[0], &quot;VOD&quot;)) attributes-&gt;is_playlist_ended = GF_TRUE;</span>
+<span class="lineNum">     495 </span><span class="lineCov">          6 :                 M3U8_COMPATIBILITY_VERSION(3);</span>
+<span class="lineNum">     496 </span>            :                 return ret;
+<span class="lineNum">     497 </span>            :         }
+<span class="lineNum">     498 </span><span class="lineCov">        920 :         ret = extract_attributes(&quot;#EXT-X-MAP&quot;, line, 4);</span>
+<span class="lineNum">     499 </span><span class="lineCov">        920 :         if (ret) {</span>
+<span class="lineNum">     500 </span>            :                 /* #EXT-X-MAP:URI=&quot;&lt;URI&gt;&quot;] */
+<span class="lineNum">     501 </span>            :                 i=0;
+<span class="lineNum">     502 </span><span class="lineCov">        207 :                 while (ret[i] != NULL) {</span>
+<span class="lineNum">     503 </span>            :                         char *val = ret[i];
+<span class="lineNum">     504 </span><span class="lineCov">        107 :                         if (val[0]==':') val++;</span>
+<span class="lineNum">     505 </span><span class="lineCov">        107 :                         if (safe_start_equals(&quot;URI=\&quot;&quot;, val)) {</span>
+<span class="lineNum">     506 </span><span class="lineCov">        100 :                                 char *uri = val + 5;</span>
+<span class="lineNum">     507 </span><span class="lineCov">        100 :                                 int_value = (u32) strlen(uri);</span>
+<span class="lineNum">     508 </span><span class="lineCov">        100 :                                 if (uri[int_value-1] == '&quot;') {</span>
+<span class="lineNum">     509 </span><span class="lineCov">        100 :                                         if (attributes-&gt;init_url) gf_free(attributes-&gt;init_url);</span>
+<span class="lineNum">     510 </span><span class="lineCov">        100 :                                         attributes-&gt;init_url = gf_strdup(uri);</span>
+<span class="lineNum">     511 </span><span class="lineCov">        100 :                                         attributes-&gt;init_url[int_value-1]=0;</span>
+<span class="lineNum">     512 </span>            :                                 }
+<span class="lineNum">     513 </span>            :                         }
+<span class="lineNum">     514 </span><span class="lineCov">          7 :                         else if (safe_start_equals(&quot;BYTERANGE=\&quot;&quot;, val)) {</span>
+<span class="lineNum">     515 </span>            :                                 u64 begin, size;
+<span class="lineNum">     516 </span><span class="lineCov">          7 :                                 val+=10;</span>
+<span class="lineNum">     517 </span><span class="lineCov">          7 :                                 if (sscanf(val, &quot;\&quot;&quot;LLU&quot;@&quot;LLU&quot;\&quot;&quot;, &amp;size, &amp;begin) == 2) {</span>
+<span class="lineNum">     518 </span><span class="lineCov">          7 :                                         if (size) {</span>
+<span class="lineNum">     519 </span><span class="lineCov">          7 :                                                 attributes-&gt;init_byte_range_start = begin;</span>
+<span class="lineNum">     520 </span><span class="lineCov">          7 :                                                 attributes-&gt;init_byte_range_end = begin + size - 1;</span>
+<span class="lineNum">     521 </span>            :                                         } else {
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :                                                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH,(&quot;[M3U8] Invalid byte range %s\n&quot;, val));</span>
+<span class="lineNum">     523 </span>            :                                         }
+<span class="lineNum">     524 </span>            :                                 }
+<span class="lineNum">     525 </span>            :                         }
+<span class="lineNum">     526 </span><span class="lineCov">        107 :                         i++;</span>
+<span class="lineNum">     527 </span>            :                 }
+<span class="lineNum">     528 </span><span class="lineCov">        100 :                 M3U8_COMPATIBILITY_VERSION(3);</span>
+<span class="lineNum">     529 </span>            :                 return ret;
+<span class="lineNum">     530 </span>            :         }
+<span class="lineNum">     531 </span><span class="lineCov">        820 :         ret = extract_attributes(&quot;#EXT-X-STREAM-INF:&quot;, line, 10);</span>
+<span class="lineNum">     532 </span><span class="lineCov">        820 :         if (ret) {</span>
+<span class="lineNum">     533 </span>            :                 /* #EXT-X-STREAM-INF:[attribute=value][,attribute=value]* */
+<span class="lineNum">     534 </span>            :                 i = 0;
+<span class="lineNum">     535 </span><span class="lineCov">         55 :                 attributes-&gt;is_master_playlist = GF_TRUE;</span>
+<span class="lineNum">     536 </span><span class="lineCov">         55 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     537 </span><span class="lineCov">        381 :                 while (ret[i] != NULL) {</span>
+<span class="lineNum">     538 </span>            :                         char *utility;
+<span class="lineNum">     539 </span><span class="lineCov">        326 :                         if (safe_start_equals(&quot;BANDWIDTH=&quot;, ret[i])) {</span>
+<span class="lineNum">     540 </span><span class="lineCov">         55 :                                 utility = &amp;(ret[i][10]);</span>
+<span class="lineNum">     541 </span><span class="lineCov">         55 :                                 int_value = (s32) strtol(utility, &amp;end_ptr, 10);</span>
+<span class="lineNum">     542 </span><span class="lineCov">         55 :                                 if (end_ptr != utility)</span>
+<span class="lineNum">     543 </span><span class="lineCov">         55 :                                         attributes-&gt;bandwidth = int_value;</span>
+<span class="lineNum">     544 </span><span class="lineCov">        271 :                         } else if (safe_start_equals(&quot;PROGRAM-ID=&quot;, ret[i])) {</span>
+<span class="lineNum">     545 </span><span class="lineNoCov">          0 :                                 utility = &amp;(ret[i][11]);</span>
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 :                                 int_value = (s32) strtol(utility, &amp;end_ptr, 10);</span>
+<span class="lineNum">     547 </span><span class="lineNoCov">          0 :                                 if (end_ptr != utility)</span>
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :                                         attributes-&gt;stream_id = int_value;</span>
+<span class="lineNum">     549 </span><span class="lineCov">        271 :                         } else if (safe_start_equals(&quot;CODECS=\&quot;&quot;, ret[i])) {</span>
+<span class="lineNum">     550 </span><span class="lineCov">         55 :                                 int_value = (u32) strlen(ret[i]);</span>
+<span class="lineNum">     551 </span><span class="lineCov">         55 :                                 if (ret[i][int_value-1] == '&quot;') {</span>
+<span class="lineNum">     552 </span><span class="lineCov">         55 :                                         if (attributes-&gt;codecs) gf_free(attributes-&gt;codecs);</span>
+<span class="lineNum">     553 </span><span class="lineCov">         55 :                                         attributes-&gt;codecs = gf_strdup(&amp;(ret[i][7]));</span>
+<span class="lineNum">     554 </span>            :                                 }
+<span class="lineNum">     555 </span><span class="lineCov">        216 :                         } else if (safe_start_equals(&quot;RESOLUTION=&quot;, ret[i])) {</span>
+<span class="lineNum">     556 </span>            :                                 u32 w, h;
+<span class="lineNum">     557 </span><span class="lineCov">         55 :                                 utility = &amp;(ret[i][11]);</span>
+<span class="lineNum">     558 </span><span class="lineCov">         55 :                                 if ((sscanf(utility, &quot;%dx%d&quot;, &amp;w, &amp;h)==2) || (sscanf(utility, &quot;%dx%d,&quot;, &amp;w, &amp;h)==2)) {</span>
+<span class="lineNum">     559 </span><span class="lineCov">         55 :                                         attributes-&gt;width = w;</span>
+<span class="lineNum">     560 </span><span class="lineCov">         55 :                                         attributes-&gt;height = h;</span>
+<span class="lineNum">     561 </span>            :                                 }
+<span class="lineNum">     562 </span><span class="lineCov">         55 :                                 M3U8_COMPATIBILITY_VERSION(2);</span>
+<span class="lineNum">     563 </span><span class="lineCov">        161 :                         } else if (safe_start_equals(&quot;AUDIO=&quot;, ret[i])) {</span>
+<span class="lineNum">     564 </span>            :                                 assert(attributes-&gt;type == MEDIA_TYPE_UNKNOWN);
+<span class="lineNum">     565 </span><span class="lineCov">         40 :                                 attributes-&gt;type = MEDIA_TYPE_AUDIO;</span>
+<span class="lineNum">     566 </span><span class="lineCov">         40 :                                 if (attributes-&gt;group.audio) gf_free(attributes-&gt;group.audio);</span>
+<span class="lineNum">     567 </span><span class="lineCov">         40 :                                 attributes-&gt;group.audio = gf_strdup(ret[i] + 6);</span>
+<span class="lineNum">     568 </span><span class="lineCov">         40 :                                 M3U8_COMPATIBILITY_VERSION(4);</span>
+<span class="lineNum">     569 </span><span class="lineCov">        121 :                         } else if (safe_start_equals(&quot;VIDEO=&quot;, ret[i])) {</span>
+<span class="lineNum">     570 </span>            :                                 assert(attributes-&gt;type == MEDIA_TYPE_UNKNOWN);
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :                                 attributes-&gt;type = MEDIA_TYPE_VIDEO;</span>
+<span class="lineNum">     572 </span><span class="lineNoCov">          0 :                                 if (attributes-&gt;group.video) gf_free(attributes-&gt;group.video);</span>
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :                                 attributes-&gt;group.video = gf_strdup(ret[i] + 6);</span>
+<span class="lineNum">     574 </span><span class="lineNoCov">          0 :                                 M3U8_COMPATIBILITY_VERSION(4);</span>
+<span class="lineNum">     575 </span>            :                         }
+<span class="lineNum">     576 </span><span class="lineCov">        326 :                         i++;</span>
+<span class="lineNum">     577 </span>            :                 }
+<span class="lineNum">     578 </span><span class="lineCov">         55 :                 if (!attributes-&gt;bandwidth) {</span>
+<span class="lineNum">     579 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Invalid #EXT-X-STREAM-INF: no BANDWIDTH found. Ignoring the line.\n&quot;));</span>
+<span class="lineNum">     580 </span>            :                         return NULL;
+<span class="lineNum">     581 </span>            :                 }
+<span class="lineNum">     582 </span>            :                 return ret;
+<span class="lineNum">     583 </span>            :         }
+<span class="lineNum">     584 </span><span class="lineCov">        765 :         ret = extract_attributes(&quot;#EXT-X-DISCONTINUITY&quot;, line, 0);</span>
+<span class="lineNum">     585 </span><span class="lineCov">        765 :         if (ret) {</span>
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :                 attributes-&gt;discontinuity = 1;</span>
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     588 </span>            :                 return ret;
+<span class="lineNum">     589 </span>            :         }
+<span class="lineNum">     590 </span><span class="lineCov">        765 :         ret = extract_attributes(&quot;#EXT-X-DISCONTINUITY-SEQUENCE&quot;, line, 0);</span>
+<span class="lineNum">     591 </span><span class="lineCov">        765 :         if (ret) {</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                 if (ret[0]) {</span>
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :                         int_value = (s32)strtol(ret[0], &amp;end_ptr, 10);</span>
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 :                         if (end_ptr != ret[0]) {</span>
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 :                                 attributes-&gt;discontinuity = int_value;</span>
+<span class="lineNum">     596 </span>            :                         }
+<span class="lineNum">     597 </span>            :                 }
+<span class="lineNum">     598 </span><span class="lineNoCov">          0 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     599 </span>            :                 return ret;
+<span class="lineNum">     600 </span>            :         }
+<span class="lineNum">     601 </span><span class="lineCov">        765 :         ret = extract_attributes(&quot;#EXT-X-BYTERANGE:&quot;, line, 1);</span>
+<span class="lineNum">     602 </span><span class="lineCov">        765 :         if (ret) {</span>
+<span class="lineNum">     603 </span>            :                 /* #EXT-X-BYTERANGE:&lt;begin@end&gt; */
+<span class="lineNum">     604 </span><span class="lineCov">        563 :                 if (ret[0]) {</span>
+<span class="lineNum">     605 </span>            :                         u64 begin, size;
+<span class="lineNum">     606 </span><span class="lineCov">        563 :                         if (sscanf(ret[0], LLU&quot;@&quot;LLU, &amp;size, &amp;begin) == 2) {</span>
+<span class="lineNum">     607 </span><span class="lineCov">        563 :                                 if (size) {</span>
+<span class="lineNum">     608 </span><span class="lineCov">        563 :                                         attributes-&gt;byte_range_start = begin;</span>
+<span class="lineNum">     609 </span><span class="lineCov">        563 :                                         attributes-&gt;byte_range_end = begin + size - 1;</span>
+<span class="lineNum">     610 </span>            :                                 } else {
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_DASH,(&quot;[M3U8] Invalid byte range %s\n&quot;, ret[0]));</span>
+<span class="lineNum">     612 </span>            :                                 }
+<span class="lineNum">     613 </span>            :                         }
+<span class="lineNum">     614 </span>            :                 }
+<span class="lineNum">     615 </span><span class="lineCov">        563 :                 M3U8_COMPATIBILITY_VERSION(4);</span>
+<span class="lineNum">     616 </span>            :                 return ret;
+<span class="lineNum">     617 </span>            :         }
+<span class="lineNum">     618 </span><span class="lineCov">        202 :         ret = extract_attributes(&quot;#EXT-X-MEDIA:&quot;, line, 14);</span>
+<span class="lineNum">     619 </span><span class="lineCov">        202 :         if (ret) {</span>
+<span class="lineNum">     620 </span>            :                 /* #EXT-X-MEDIA:[TYPE={AUDIO,VIDEO}],[URI],[GROUP-ID],[LANGUAGE],[NAME],[DEFAULT={YES,NO}],[AUTOSELECT={YES,NO}] */
+<span class="lineNum">     621 </span><span class="lineCov">         14 :                 M3U8_COMPATIBILITY_VERSION(4);</span>
+<span class="lineNum">     622 </span><span class="lineCov">         14 :                 attributes-&gt;is_master_playlist = GF_TRUE;</span>
+<span class="lineNum">     623 </span>            :                 i = 0;
+<span class="lineNum">     624 </span><span class="lineCov">        130 :                 while (ret[i] != NULL) {</span>
+<span class="lineNum">     625 </span><span class="lineCov">        102 :                         if (safe_start_equals(&quot;TYPE=&quot;, ret[i])) {</span>
+<span class="lineNum">     626 </span><span class="lineCov">         14 :                                 if (!strncmp(ret[i]+5, &quot;AUDIO&quot;, 5)) {</span>
+<span class="lineNum">     627 </span><span class="lineCov">         12 :                                         attributes-&gt;type = MEDIA_TYPE_AUDIO;</span>
+<span class="lineNum">     628 </span><span class="lineCov">          2 :                                 } else if (!strncmp(ret[i]+5, &quot;VIDEO&quot;, 5)) {</span>
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 :                                         attributes-&gt;type = MEDIA_TYPE_VIDEO;</span>
+<span class="lineNum">     630 </span><span class="lineCov">          2 :                                 } else if (!strncmp(ret[i]+5, &quot;SUBTITLES&quot;, 9)) {</span>
+<span class="lineNum">     631 </span><span class="lineCov">          1 :                                         attributes-&gt;type = MEDIA_TYPE_SUBTITLES;</span>
+<span class="lineNum">     632 </span><span class="lineCov">          1 :                                 } else if (!strncmp(ret[i]+5, &quot;CLOSED-CAPTIONS&quot;, 15)) {</span>
+<span class="lineNum">     633 </span><span class="lineCov">          1 :                                         attributes-&gt;type = MEDIA_TYPE_CLOSED_CAPTIONS;</span>
+<span class="lineNum">     634 </span>            :                                 } else {
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Unsupported #EXT-X-MEDIA:TYPE=%s\n&quot;, ret[i]+5));</span>
+<span class="lineNum">     636 </span>            :                                 }
+<span class="lineNum">     637 </span><span class="lineCov">         88 :                         } else if (safe_start_equals(&quot;URI=\&quot;&quot;, ret[i])) {</span>
+<span class="lineNum">     638 </span>            :                                 size_t len;
+<span class="lineNum">     639 </span><span class="lineCov">         13 :                                 if (attributes-&gt;mediaURL) gf_free(attributes-&gt;mediaURL);</span>
+<span class="lineNum">     640 </span><span class="lineCov">         13 :                                 attributes-&gt;mediaURL = gf_strdup(ret[i]+5);</span>
+<span class="lineNum">     641 </span><span class="lineCov">         13 :                                 len = strlen(attributes-&gt;mediaURL);</span>
+<span class="lineNum">     642 </span><span class="lineCov">         13 :                                 if (len &amp;&amp; (attributes-&gt;mediaURL[len-1] == '&quot;')) {</span>
+<span class="lineNum">     643 </span><span class="lineCov">         13 :                                         attributes-&gt;mediaURL[len-1] = '\0';</span>
+<span class="lineNum">     644 </span>            :                                 } else {
+<span class="lineNum">     645 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Misformed #EXT-X-MEDIA:URI=%s. Quotes are incorrect.\n&quot;, ret[i]+5));</span>
+<span class="lineNum">     646 </span>            :                                 }
+<span class="lineNum">     647 </span><span class="lineCov">         75 :                         } else if (safe_start_equals(&quot;GROUP-ID=&quot;, ret[i])) {</span>
+<span class="lineNum">     648 </span><span class="lineCov">         14 :                                 if (attributes-&gt;type == MEDIA_TYPE_AUDIO) {</span>
+<span class="lineNum">     649 </span><span class="lineCov">         12 :                                         if (attributes-&gt;group.audio) gf_free(attributes-&gt;group.audio);</span>
+<span class="lineNum">     650 </span><span class="lineCov">         12 :                                         attributes-&gt;group.audio = gf_strdup(ret[i]+9);</span>
+<span class="lineNum">     651 </span><span class="lineCov">         12 :                                         attributes-&gt;stream_id = GROUP_ID_TO_PROGRAM_ID(AUDIO, attributes-&gt;group.audio);</span>
+<span class="lineNum">     652 </span><span class="lineCov">          2 :                                 } else if (attributes-&gt;type == MEDIA_TYPE_VIDEO) {</span>
+<span class="lineNum">     653 </span><span class="lineNoCov">          0 :                                         if (attributes-&gt;group.video) gf_free(attributes-&gt;group.video);</span>
+<span class="lineNum">     654 </span><span class="lineNoCov">          0 :                                         attributes-&gt;group.video = gf_strdup(ret[i]+9);</span>
+<span class="lineNum">     655 </span><span class="lineNoCov">          0 :                                         attributes-&gt;stream_id = GROUP_ID_TO_PROGRAM_ID(VIDEO, attributes-&gt;group.video);</span>
+<span class="lineNum">     656 </span><span class="lineCov">          2 :                                 } else if (attributes-&gt;type == MEDIA_TYPE_SUBTITLES) {</span>
+<span class="lineNum">     657 </span><span class="lineCov">          1 :                                         if (attributes-&gt;group.subtitle) gf_free(attributes-&gt;group.subtitle);</span>
+<span class="lineNum">     658 </span><span class="lineCov">          1 :                                         attributes-&gt;group.subtitle = gf_strdup(ret[i]+9);</span>
+<span class="lineNum">     659 </span><span class="lineCov">          1 :                                         attributes-&gt;stream_id = GROUP_ID_TO_PROGRAM_ID(SUBTITLES, attributes-&gt;group.subtitle);</span>
+<span class="lineNum">     660 </span><span class="lineCov">          1 :                                 } else if (attributes-&gt;type == MEDIA_TYPE_CLOSED_CAPTIONS) {</span>
+<span class="lineNum">     661 </span><span class="lineCov">          1 :                                         if (attributes-&gt;group.closed_captions) gf_free(attributes-&gt;group.closed_captions);</span>
+<span class="lineNum">     662 </span><span class="lineCov">          1 :                                         attributes-&gt;group.closed_captions = gf_strdup(ret[i]+9);</span>
+<span class="lineNum">     663 </span><span class="lineCov">          1 :                                         attributes-&gt;stream_id = GROUP_ID_TO_PROGRAM_ID(CLOSED_CAPTIONS, attributes-&gt;group.closed_captions);</span>
+<span class="lineNum">     664 </span><span class="lineNoCov">          0 :                                 } else if (attributes-&gt;type == MEDIA_TYPE_UNKNOWN) {</span>
+<span class="lineNum">     665 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_DASH,(&quot;[M3U8] Invalid #EXT-X-MEDIA:GROUP-ID=%s. Ignoring the line.\n&quot;, ret[i]+9));</span>
+<span class="lineNum">     666 </span>            :                                         return NULL;
+<span class="lineNum">     667 </span>            :                                 }
+<span class="lineNum">     668 </span><span class="lineCov">         61 :                         } else if (safe_start_equals(&quot;LANGUAGE=\&quot;&quot;, ret[i])) {</span>
+<span class="lineNum">     669 </span>            :                                 size_t len;
+<span class="lineNum">     670 </span><span class="lineCov">         14 :                                 if (attributes-&gt;language) gf_free(attributes-&gt;language);</span>
+<span class="lineNum">     671 </span><span class="lineCov">         14 :                                 attributes-&gt;language = gf_strdup(ret[i]+9);</span>
+<span class="lineNum">     672 </span><span class="lineCov">         14 :                                 len = strlen(attributes-&gt;language);</span>
+<span class="lineNum">     673 </span><span class="lineCov">         14 :                                 if (len &amp;&amp; (attributes-&gt;language[len-1] == '&quot;')) {</span>
+<span class="lineNum">     674 </span><span class="lineCov">         14 :                                         attributes-&gt;language[len-1] = '\0';</span>
+<span class="lineNum">     675 </span>            :                                 } else {
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Misformed #EXT-X-MEDIA:LANGUAGE=%s. Quotes are incorrect.\n&quot;, ret[i]+5));</span>
+<span class="lineNum">     677 </span>            :                                 }
+<span class="lineNum">     678 </span><span class="lineCov">         47 :                         } else if (safe_start_equals(&quot;NAME=&quot;, ret[i])) {</span>
+<span class="lineNum">     679 </span><span class="lineCov">         14 :                                 GF_LOG(GF_LOG_INFO, GF_LOG_DASH,(&quot;[M3U8] EXT-X-MEDIA:NAME not supported\n&quot;));</span>
+<span class="lineNum">     680 </span>            :                                 //attributes-&gt;name = gf_strdup(ret[i]+5);
+<span class="lineNum">     681 </span><span class="lineCov">         33 :                         } else if (safe_start_equals(&quot;DEFAULT=&quot;, ret[i])) {</span>
+<span class="lineNum">     682 </span><span class="lineCov">          5 :                                 GF_LOG(GF_LOG_INFO, GF_LOG_DASH,(&quot;[M3U8] EXT-X-MEDIA:DEFAULT not supported\n&quot;));</span>
+<span class="lineNum">     683 </span><span class="lineCov">          5 :                                 if (!strncmp(ret[i]+8, &quot;YES&quot;, 3)) {</span>
+<span class="lineNum">     684 </span>            :                                         //TODO
+<span class="lineNum">     685 </span><span class="lineNoCov">          0 :                                 } else if (!strncmp(ret[i]+8, &quot;NO&quot;, 2)) {</span>
+<span class="lineNum">     686 </span>            :                                         //TODO
+<span class="lineNum">     687 </span>            :                                 } else {
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Invalid #EXT-X-MEDIA:DEFAULT=%s\n&quot;, ret[i]+8));</span>
+<span class="lineNum">     689 </span>            :                                 }
+<span class="lineNum">     690 </span><span class="lineCov">         28 :                         } else if (safe_start_equals(&quot;AUTOSELECT=&quot;, ret[i])) {</span>
+<span class="lineNum">     691 </span><span class="lineCov">         14 :                                 GF_LOG(GF_LOG_INFO, GF_LOG_DASH,(&quot;[M3U8] EXT-X-MEDIA:AUTOSELECT not supported\n&quot;));</span>
+<span class="lineNum">     692 </span><span class="lineCov">         14 :                                 if (!strncmp(ret[i]+11, &quot;YES&quot;, 3)) {</span>
+<span class="lineNum">     693 </span>            :                                         //TODO
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 :                                 } else if (!strncmp(ret[i]+11, &quot;NO&quot;, 2)) {</span>
+<span class="lineNum">     695 </span>            :                                         //TODO
+<span class="lineNum">     696 </span>            :                                 } else {
+<span class="lineNum">     697 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Invalid #EXT-X-MEDIA:AUTOSELECT=%s\n&quot;, ret[i]+11));</span>
+<span class="lineNum">     698 </span>            :                                 }
+<span class="lineNum">     699 </span>            :                         }
+<span class="lineNum">     700 </span>            : 
+<span class="lineNum">     701 </span><span class="lineCov">        102 :                         i++;</span>
+<span class="lineNum">     702 </span>            :                 }
+<span class="lineNum">     703 </span>            : 
+<span class="lineNum">     704 </span><span class="lineCov">         14 :                 if (attributes-&gt;type == MEDIA_TYPE_UNKNOWN) {</span>
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Invalid #EXT-X-MEDIA: TYPE is missing. Ignoring the line.\n&quot;));</span>
+<span class="lineNum">     706 </span>            :                         return NULL;
+<span class="lineNum">     707 </span>            :                 }
+<span class="lineNum">     708 </span><span class="lineCov">         14 :                 if (attributes-&gt;type == MEDIA_TYPE_CLOSED_CAPTIONS &amp;&amp; attributes-&gt;mediaURL) {</span>
+<span class="lineNum">     709 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Invalid #EXT-X-MEDIA: TYPE is CLOSED-CAPTIONS but URI is present. Ignoring the URI.\n&quot;));</span>
+<span class="lineNum">     710 </span><span class="lineNoCov">          0 :                         gf_free(attributes-&gt;mediaURL);</span>
+<span class="lineNum">     711 </span><span class="lineNoCov">          0 :                         attributes-&gt;mediaURL = NULL;</span>
+<span class="lineNum">     712 </span>            :                 }
+<span class="lineNum">     713 </span><span class="lineCov">         14 :                 if ((attributes-&gt;type == MEDIA_TYPE_AUDIO &amp;&amp; !attributes-&gt;group.audio)</span>
+<span class="lineNum">     714 </span><span class="lineCov">         14 :                         || (attributes-&gt;type == MEDIA_TYPE_VIDEO &amp;&amp; !attributes-&gt;group.video)) {</span>
+<span class="lineNum">     715 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Invalid #EXT-X-MEDIA: missing GROUP-ID attribute. Ignoring the line.\n&quot;));</span>
+<span class="lineNum">     716 </span>            :                         return NULL;
+<span class="lineNum">     717 </span>            :                 }
+<span class="lineNum">     718 </span><span class="lineCov">         14 :                 if (!attributes-&gt;stream_id) {</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Invalid #EXT-X-MEDIA: no ID was computed. Check previous errors. Ignoring the line.\n&quot;));</span>
+<span class="lineNum">     720 </span>            :                         return NULL;
+<span class="lineNum">     721 </span>            :                 }
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span>            :                 return ret;
+<span class="lineNum">     724 </span>            :         }
+<span class="lineNum">     725 </span><span class="lineCov">        188 :         if (!strncmp(line, &quot;#EXT-X-INDEPENDENT-SEGMENTS&quot;, strlen(&quot;#EXT-X-INDEPENDENT-SEGMENTS&quot;) )) {</span>
+<span class="lineNum">     726 </span><span class="lineCov">        121 :                 attributes-&gt;independent_segments = GF_TRUE;</span>
+<span class="lineNum">     727 </span><span class="lineCov">        121 :                 M3U8_COMPATIBILITY_VERSION(1);</span>
+<span class="lineNum">     728 </span>            :                 return NULL;
+<span class="lineNum">     729 </span>            :         }
+<span class="lineNum">     730 </span><span class="lineCov">         67 :         if (!strncmp(line, &quot;#EXT-X-I-FRAME-STREAM-INF&quot;, strlen(&quot;#EXT-X-I-FRAME-STREAM-INF&quot;) )) {</span>
+<span class="lineNum">     731 </span>            :                 //todo extract I/intra rate for speed adaptation
+<span class="lineNum">     732 </span>            :                 return NULL;
+<span class="lineNum">     733 </span>            :         }
+<span class="lineNum">     734 </span><span class="lineCov">         61 :         if (!strncmp(line, &quot;#EXT-X-PART-INF&quot;, strlen(&quot;#EXT-X-PART-INF&quot;) )) {</span>
+<span class="lineNum">     735 </span><span class="lineCov">         61 :                 attributes-&gt;low_latency = GF_TRUE;</span>
+<span class="lineNum">     736 </span><span class="lineCov">         61 :                 return NULL;</span>
+<span class="lineNum">     737 </span>            :         }
+<span class="lineNum">     738 </span>            :         //TODO for now we don't use preload hint
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :         if (!strncmp(line, &quot;#EXT-X-SERVER-CONTROL&quot;, strlen(&quot;#EXT-X-SERVER-CONTROL&quot;) )) {</span>
+<span class="lineNum">     740 </span>            :                 return NULL;
+<span class="lineNum">     741 </span>            :         }
+<span class="lineNum">     742 </span>            :         //TODO for now we don't use preload hint
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 :         if (!strncmp(line, &quot;#EXT-X-PRELOAD-HINT&quot;, strlen(&quot;#EXT-X-PRELOAD-HINT&quot;) )) {</span>
+<span class="lineNum">     744 </span>            :                 return NULL;
+<span class="lineNum">     745 </span>            :         }
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_WARNING, GF_LOG_DASH,(&quot;[M3U8] Unsupported directive %s\n&quot;, line));</span>
+<span class="lineNum">     747 </span>            :         return NULL;
+<span class="lineNum">     748 </span>            : }
+<span class="lineNum">     749 </span>            : 
+<span class="lineNum">     750 </span>            : /**
+<span class="lineNum">     751 </span>            :  * Creates a new MasterPlaylist
+<a name="752"><span class="lineNum">     752 </span>            : \param NULL if MasterPlaylist element could not be allocated</a>
+<span class="lineNum">     753 </span>            :  */
+<span class="lineNum">     754 </span><span class="lineCov">        124 : MasterPlaylist* master_playlist_new()</span>
+<span class="lineNum">     755 </span>            : {
+<span class="lineNum">     756 </span>            :         MasterPlaylist *pl;
+<span class="lineNum">     757 </span><span class="lineCov">        124 :         GF_SAFEALLOC(pl, MasterPlaylist);</span>
+<span class="lineNum">     758 </span>            : 
+<span class="lineNum">     759 </span><span class="lineCov">        124 :         if (pl == NULL)</span>
+<span class="lineNum">     760 </span>            :                 return NULL;
+<span class="lineNum">     761 </span><span class="lineCov">        124 :         pl-&gt;streams = gf_list_new();</span>
+<span class="lineNum">     762 </span><span class="lineCov">        124 :         if (!pl-&gt;streams) {</span>
+<span class="lineNum">     763 </span><span class="lineNoCov">          0 :                 gf_free(pl);</span>
+<span class="lineNum">     764 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     765 </span>            :         }
+<span class="lineNum">     766 </span><span class="lineCov">        124 :         pl-&gt;current_stream = -1;</span>
+<span class="lineNum">     767 </span><span class="lineCov">        124 :         pl-&gt;playlist_needs_refresh = GF_TRUE;</span>
+<span class="lineNum">     768 </span><span class="lineCov">        124 :         return pl;</span>
+<span class="lineNum">     769 </span>            : }
+<span class="lineNum">     770 </span>            : 
+<span class="lineNum">     771 </span>            : 
+<a name="772"><span class="lineNum">     772 </span>            : /********** master_playlist **********/</a>
+<span class="lineNum">     773 </span>            : 
+<span class="lineNum">     774 </span><span class="lineCov">        124 : GF_Err gf_m3u8_master_playlist_del(MasterPlaylist **playlist) {</span>
+<span class="lineNum">     775 </span><span class="lineCov">        124 :         if ((playlist == NULL) || (*playlist == NULL))</span>
+<span class="lineNum">     776 </span>            :                 return GF_OK;
+<span class="lineNum">     777 </span>            :         assert((*playlist)-&gt;streams);
+<span class="lineNum">     778 </span><span class="lineCov">        261 :         while (gf_list_count((*playlist)-&gt;streams)) {</span>
+<span class="lineNum">     779 </span><span class="lineCov">        137 :                 Stream *p = gf_list_get((*playlist)-&gt;streams, 0);</span>
+<span class="lineNum">     780 </span>            :                 assert(p);
+<span class="lineNum">     781 </span><span class="lineCov">        429 :                 while (gf_list_count(p-&gt;variants)) {</span>
+<span class="lineNum">     782 </span><span class="lineCov">        155 :                         PlaylistElement *pl = gf_list_get(p-&gt;variants, 0);</span>
+<span class="lineNum">     783 </span>            :                         assert(pl);
+<span class="lineNum">     784 </span><span class="lineCov">        155 :                         playlist_element_del(pl);</span>
+<span class="lineNum">     785 </span><span class="lineCov">        155 :                         gf_list_rem(p-&gt;variants, 0);</span>
+<span class="lineNum">     786 </span>            :                 }
+<span class="lineNum">     787 </span><span class="lineCov">        137 :                 gf_list_del(p-&gt;variants);</span>
+<span class="lineNum">     788 </span><span class="lineCov">        137 :                 p-&gt;variants = NULL;</span>
+<span class="lineNum">     789 </span><span class="lineCov">        137 :                 stream_del(p);</span>
+<span class="lineNum">     790 </span><span class="lineCov">        137 :                 gf_list_rem((*playlist)-&gt;streams, 0);</span>
+<span class="lineNum">     791 </span>            :         }
+<span class="lineNum">     792 </span><span class="lineCov">        124 :         gf_list_del((*playlist)-&gt;streams);</span>
+<span class="lineNum">     793 </span><span class="lineCov">        124 :         (*playlist)-&gt;streams = NULL;</span>
+<span class="lineNum">     794 </span><span class="lineCov">        124 :         gf_free(*playlist);</span>
+<span class="lineNum">     795 </span><span class="lineCov">        124 :         *playlist = NULL;</span>
+<span class="lineNum">     796 </span>            : 
+<span class="lineNum">     797 </span><span class="lineCov">        124 :         return GF_OK;</span>
+<a name="798"><span class="lineNum">     798 </span>            : }</a>
+<span class="lineNum">     799 </span>            : 
+<span class="lineNum">     800 </span><span class="lineCov">       1681 : static Stream* master_playlist_find_matching_stream(const MasterPlaylist *pl, const u32 stream_id) {</span>
+<span class="lineNum">     801 </span>            :         u32 count, i;
+<span class="lineNum">     802 </span>            :         assert(pl);
+<span class="lineNum">     803 </span>            :         assert(pl-&gt;streams);
+<span class="lineNum">     804 </span>            :         assert(stream_id &gt;= 0);
+<span class="lineNum">     805 </span><span class="lineCov">       1681 :         count = gf_list_count(pl-&gt;streams);</span>
+<span class="lineNum">     806 </span><span class="lineCov">         19 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     807 </span><span class="lineCov">       1563 :                 Stream *cur = gf_list_get(pl-&gt;streams, i);</span>
+<span class="lineNum">     808 </span>            :                 assert(cur);
+<span class="lineNum">     809 </span><span class="lineCov">       1563 :                 if (stream_id == cur-&gt;stream_id) {</span>
+<span class="lineNum">     810 </span>            :                         /* We found the program */
+<span class="lineNum">     811 </span>            :                         return cur;
+<span class="lineNum">     812 </span>            :                 }
+<span class="lineNum">     813 </span>            :         }
+<span class="lineNum">     814 </span>            :         return NULL;
+<span class="lineNum">     815 </span>            : }
+<span class="lineNum">     816 </span>            : 
+<span class="lineNum">     817 </span>            : 
+<span class="lineNum">     818 </span>            : /********** sub_playlist **********/
+<span class="lineNum">     819 </span>            : 
+<span class="lineNum">     820 </span>            : #define M3U8_BUF_SIZE 2048
+<a name="821"><span class="lineNum">     821 </span>            : </a>
+<span class="lineNum">     822 </span>            : GF_EXPORT
+<span class="lineNum">     823 </span><span class="lineCov">        124 : GF_Err gf_m3u8_parse_master_playlist(const char *file, MasterPlaylist **playlist, const char *baseURL)</span>
+<span class="lineNum">     824 </span>            : {
+<span class="lineNum">     825 </span>            : #ifdef GPAC_ENABLE_COVERAGE
+<span class="lineNum">     826 </span><span class="lineCov">        124 :         if (gf_sys_is_cov_mode()) {</span>
+<span class="lineNum">     827 </span><span class="lineCov">        124 :                 string2num(&quot;coverage&quot;);</span>
+<span class="lineNum">     828 </span>            :         }
+<span class="lineNum">     829 </span>            : #endif
+<span class="lineNum">     830 </span><span class="lineCov">        124 :         return gf_m3u8_parse_sub_playlist(file, playlist, baseURL, NULL, NULL);</span>
+<a name="831"><span class="lineNum">     831 </span>            : }</a>
+<span class="lineNum">     832 </span>            : 
+<span class="lineNum">     833 </span><span class="lineCov">       1681 : GF_Err declare_sub_playlist(char *currentLine, const char *baseURL, s_accumulated_attributes *attribs, PlaylistElement *sub_playlist, MasterPlaylist **playlist, Stream *in_stream)</span>
+<span class="lineNum">     834 </span>            : {
+<span class="lineNum">     835 </span>            :         u32 i, count;
+<span class="lineNum">     836 </span>            : 
+<span class="lineNum">     837 </span>            :         char *fullURL = currentLine;
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span><span class="lineCov">       1681 :         if (attribs-&gt;is_master_playlist &amp;&amp; attribs-&gt;is_media_segment) {</span>
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[M3U8] Media segment tag MUST NOT appear in a Master Playlist\n&quot;));</span>
+<span class="lineNum">     841 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     842 </span>            :         }
+<span class="lineNum">     843 </span>            : 
+<span class="lineNum">     844 </span><span class="lineCov">       1681 :         if (gf_url_is_local(fullURL)) {</span>
+<span class="lineNum">     845 </span><span class="lineCov">       1681 :                 fullURL = gf_url_concatenate(baseURL, fullURL);</span>
+<span class="lineNum">     846 </span>            :                 assert(fullURL);
+<span class="lineNum">     847 </span>            :         }
+<span class="lineNum">     848 </span>            : 
+<span class="lineNum">     849 </span><span class="lineCov">       1681 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, (&quot;[M3U8] declaring %s %s\n&quot;, attribs-&gt;is_master_playlist ? &quot;sub-playlist&quot; : &quot;media segment&quot;, fullURL));</span>
+<span class="lineNum">     850 </span>            : 
+<span class="lineNum">     851 </span>            :         {
+<span class="lineNum">     852 </span>            :                 PlaylistElement *curr_playlist = sub_playlist;
+<span class="lineNum">     853 </span>            :                 /* First, we have to find the matching stream */
+<span class="lineNum">     854 </span>            :                 Stream *stream = in_stream;
+<span class="lineNum">     855 </span><span class="lineCov">       1681 :                 if (!in_stream)</span>
+<span class="lineNum">     856 </span><span class="lineCov">       1681 :                         stream = master_playlist_find_matching_stream(*playlist, attribs-&gt;stream_id);</span>
+<span class="lineNum">     857 </span>            :                 /* We did not found the stream, we create it */
+<span class="lineNum">     858 </span><span class="lineCov">       1681 :                 if (stream == NULL) {</span>
+<span class="lineNum">     859 </span><span class="lineCov">        137 :                         stream = stream_new(attribs-&gt;stream_id);</span>
+<span class="lineNum">     860 </span><span class="lineCov">        137 :                         if (stream == NULL) {</span>
+<span class="lineNum">     861 </span>            :                                 /* out of memory */
+<span class="lineNum">     862 </span><span class="lineNoCov">          0 :                                 gf_m3u8_master_playlist_del(playlist);</span>
+<span class="lineNum">     863 </span><span class="lineNoCov">          0 :                                 return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     864 </span>            :                         }
+<span class="lineNum">     865 </span><span class="lineCov">        137 :                         gf_list_add((*playlist)-&gt;streams, stream);</span>
+<span class="lineNum">     866 </span>            :                         /* take the first regular variant stream */
+<span class="lineNum">     867 </span><span class="lineCov">        137 :                         if ((*playlist)-&gt;current_stream &lt; 0 &amp;&amp; stream-&gt;stream_id &lt; MEDIA_TYPE_AUDIO)</span>
+<span class="lineNum">     868 </span><span class="lineCov">        124 :                                 (*playlist)-&gt;current_stream = stream-&gt;stream_id;</span>
+<span class="lineNum">     869 </span>            :                 }
+<span class="lineNum">     870 </span>            : 
+<span class="lineNum">     871 </span>            :                 /* OK, we have a stream, we have to choose the elements within the same stream variant */
+<span class="lineNum">     872 </span>            :                 assert(stream);
+<span class="lineNum">     873 </span>            :                 assert(stream-&gt;variants);
+<span class="lineNum">     874 </span><span class="lineCov">       1681 :                 count = gf_list_count(stream-&gt;variants);</span>
+<span class="lineNum">     875 </span>            : 
+<span class="lineNum">     876 </span><span class="lineCov">       1681 :                 if (!curr_playlist) {</span>
+<span class="lineNum">     877 </span><span class="lineCov">         95 :                         for (i=0; i&lt;(s32)count; i++) {</span>
+<span class="lineNum">     878 </span><span class="lineCov">       1621 :                                 PlaylistElement *i_playlist_element = gf_list_get(stream-&gt;variants, i);</span>
+<span class="lineNum">     879 </span>            :                                 assert(i_playlist_element);
+<span class="lineNum">     880 </span><span class="lineCov">       1621 :                                 if (stream-&gt;stream_id &lt; MEDIA_TYPE_AUDIO) {</span>
+<span class="lineNum">     881 </span>            :                                         /* regular stream (EXT-X-STREAM-INF) */
+<span class="lineNum">     882 </span>            :                                         // Two stream are identical only if they have the same URL
+<span class="lineNum">     883 </span><span class="lineCov">       1621 :                                         if (attribs-&gt;is_media_segment || !strcmp(i_playlist_element-&gt;url, fullURL)) {</span>
+<span class="lineNum">     884 </span>            :                                                 curr_playlist = i_playlist_element;
+<span class="lineNum">     885 </span>            :                                                 break;
+<span class="lineNum">     886 </span>            :                                         }
+<span class="lineNum">     887 </span>            :                                 } else {
+<span class="lineNum">     888 </span>            :                                         /* group streams (EXT-X-MEDIA) */
+<span class="lineNum">     889 </span>            :                                         //TODO: add renditions and compare depending on context parameters
+<span class="lineNum">     890 </span>            :                                 }
+<span class="lineNum">     891 </span>            :                         }
+<span class="lineNum">     892 </span>            :                 }
+<span class="lineNum">     893 </span>            : 
+<span class="lineNum">     894 </span>            :                 /* We are the Master Playlist */
+<span class="lineNum">     895 </span><span class="lineCov">       1681 :                 if (attribs-&gt;is_master_playlist) {</span>
+<span class="lineNum">     896 </span><span class="lineCov">         68 :                         if (curr_playlist != NULL) {</span>
+<span class="lineNum">     897 </span>            :                                 //playlist has already been defined - this happens when the same video playlist is defined several times with different audio codecs ...
+<span class="lineNum">     898 </span><span class="lineCov">         16 :                                 gf_free(fullURL);</span>
+<span class="lineNum">     899 </span><span class="lineCov">         16 :                                 return GF_OK;</span>
+<span class="lineNum">     900 </span>            :                         }
+<span class="lineNum">     901 </span><span class="lineCov">         52 :                         curr_playlist = playlist_element_new(TYPE_PLAYLIST, fullURL, attribs);</span>
+<span class="lineNum">     902 </span><span class="lineCov">         52 :                         if (curr_playlist == NULL) {</span>
+<span class="lineNum">     903 </span>            :                                 /* out of memory */
+<span class="lineNum">     904 </span><span class="lineNoCov">          0 :                                 gf_m3u8_master_playlist_del(playlist);</span>
+<span class="lineNum">     905 </span><span class="lineNoCov">          0 :                                 return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     906 </span>            :                         }
+<span class="lineNum">     907 </span>            :                         assert(fullURL);
+<span class="lineNum">     908 </span><span class="lineCov">         52 :                         if (curr_playlist-&gt;url)</span>
+<span class="lineNum">     909 </span><span class="lineCov">         52 :                                 gf_free(curr_playlist-&gt;url);</span>
+<span class="lineNum">     910 </span><span class="lineCov">         52 :                         curr_playlist-&gt;url = gf_strdup(fullURL);</span>
+<span class="lineNum">     911 </span><span class="lineCov">         52 :                         if (curr_playlist-&gt;title)</span>
+<span class="lineNum">     912 </span><span class="lineNoCov">          0 :                                 gf_free(curr_playlist-&gt;title);</span>
+<span class="lineNum">     913 </span><span class="lineCov">         52 :                         curr_playlist-&gt;title = attribs-&gt;title ? gf_strdup(attribs-&gt;title) : NULL;</span>
+<span class="lineNum">     914 </span><span class="lineCov">         52 :                         if (curr_playlist-&gt;codecs)</span>
+<span class="lineNum">     915 </span><span class="lineCov">         39 :                                 gf_free(curr_playlist-&gt;codecs);</span>
+<span class="lineNum">     916 </span><span class="lineCov">         52 :                         curr_playlist-&gt;codecs = attribs-&gt;codecs ? gf_strdup(attribs-&gt;codecs) : NULL;</span>
+<span class="lineNum">     917 </span><span class="lineCov">         52 :                         if (curr_playlist-&gt;audio_group) {</span>
+<span class="lineNum">     918 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_DASH, (&quot;[M3U8] Warning: found an AUDIO group in the master playlist.&quot;));</span>
+<span class="lineNum">     919 </span>            :                         }
+<span class="lineNum">     920 </span><span class="lineCov">         52 :                         if (curr_playlist-&gt;video_group) {</span>
+<span class="lineNum">     921 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_DASH, (&quot;[M3U8] Warning: found an VIDEO group in the master playlist.&quot;));</span>
+<span class="lineNum">     922 </span>            :                         }
+<span class="lineNum">     923 </span><span class="lineCov">         52 :                         gf_list_add(stream-&gt;variants, curr_playlist);</span>
+<span class="lineNum">     924 </span><span class="lineCov">         52 :                         curr_playlist-&gt;width = attribs-&gt;width;</span>
+<span class="lineNum">     925 </span><span class="lineCov">         52 :                         curr_playlist-&gt;height = attribs-&gt;height;</span>
+<span class="lineNum">     926 </span>            :                 } else {
+<span class="lineNum">     927 </span>            :                         /* Normal Playlist */
+<span class="lineNum">     928 </span>            :                         assert((*playlist)-&gt;streams);
+<span class="lineNum">     929 </span><span class="lineCov">       1613 :                         if (curr_playlist == NULL) {</span>
+<span class="lineNum">     930 </span>            : 
+<span class="lineNum">     931 </span>            :                                 /* This is a &quot;normal&quot; playlist without any element in it */
+<span class="lineNum">     932 </span>            :                                 PlaylistElement *subElement;
+<span class="lineNum">     933 </span>            :                                 assert(baseURL);
+<span class="lineNum">     934 </span><span class="lineCov">        103 :                                 curr_playlist = playlist_element_new(TYPE_PLAYLIST, baseURL, attribs);</span>
+<span class="lineNum">     935 </span><span class="lineCov">        103 :                                 if (curr_playlist == NULL) {</span>
+<span class="lineNum">     936 </span>            :                                         /* out of memory */
+<span class="lineNum">     937 </span><span class="lineNoCov">          0 :                                         gf_m3u8_master_playlist_del(playlist);</span>
+<span class="lineNum">     938 </span><span class="lineNoCov">          0 :                                         return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     939 </span>            :                                 }
+<span class="lineNum">     940 </span>            :                                 assert(curr_playlist-&gt;element.playlist.elements);
+<span class="lineNum">     941 </span>            :                                 assert(fullURL);
+<span class="lineNum">     942 </span>            :                                 assert(curr_playlist-&gt;url &amp;&amp; !curr_playlist-&gt;codecs);
+<span class="lineNum">     943 </span><span class="lineCov">        103 :                                 curr_playlist-&gt;codecs = NULL;</span>
+<span class="lineNum">     944 </span><span class="lineCov">        103 :                                 subElement = playlist_element_new(TYPE_UNKNOWN, fullURL, attribs);</span>
+<span class="lineNum">     945 </span><span class="lineCov">        103 :                                 if (subElement == NULL) {</span>
+<span class="lineNum">     946 </span><span class="lineNoCov">          0 :                                         gf_m3u8_master_playlist_del(playlist);</span>
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 :                                         playlist_element_del(curr_playlist);</span>
+<span class="lineNum">     948 </span><span class="lineNoCov">          0 :                                         return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     949 </span>            :                                 }
+<span class="lineNum">     950 </span><span class="lineCov">        103 :                                 gf_list_add(curr_playlist-&gt;element.playlist.elements, subElement);</span>
+<span class="lineNum">     951 </span><span class="lineCov">        103 :                                 gf_list_add(stream-&gt;variants, curr_playlist);</span>
+<span class="lineNum">     952 </span><span class="lineCov">        103 :                                 curr_playlist-&gt;element.playlist.computed_duration += subElement-&gt;duration_info;</span>
+<span class="lineNum">     953 </span>            :                                 assert(stream);
+<span class="lineNum">     954 </span>            :                                 assert(stream-&gt;variants);
+<span class="lineNum">     955 </span>            :                                 assert(curr_playlist);
+<span class="lineNum">     956 </span>            :                         } else {
+<span class="lineNum">     957 </span><span class="lineCov">       1510 :                                 PlaylistElement *subElement = playlist_element_new(TYPE_UNKNOWN, fullURL, attribs);</span>
+<span class="lineNum">     958 </span><span class="lineCov">       1510 :                                 if (curr_playlist-&gt;element_type != TYPE_PLAYLIST) {</span>
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :                                         curr_playlist-&gt;element_type = TYPE_PLAYLIST;</span>
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 :                                         if (!curr_playlist-&gt;element.playlist.elements)</span>
+<span class="lineNum">     961 </span><span class="lineNoCov">          0 :                                                 curr_playlist-&gt;element.playlist.elements = gf_list_new();</span>
+<span class="lineNum">     962 </span>            :                                 }
+<span class="lineNum">     963 </span><span class="lineCov">       1510 :                                 if (subElement == NULL) {</span>
+<span class="lineNum">     964 </span><span class="lineNoCov">          0 :                                         gf_m3u8_master_playlist_del(playlist);</span>
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :                                         playlist_element_del(curr_playlist);</span>
+<span class="lineNum">     966 </span><span class="lineNoCov">          0 :                                         return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     967 </span>            :                                 }
+<span class="lineNum">     968 </span><span class="lineCov">       1510 :                                 gf_list_add(curr_playlist-&gt;element.playlist.elements, subElement);</span>
+<span class="lineNum">     969 </span><span class="lineCov">       1510 :                                 curr_playlist-&gt;element.playlist.computed_duration += subElement-&gt;duration_info;</span>
+<span class="lineNum">     970 </span>            :                         }
+<span class="lineNum">     971 </span>            :                 }
+<span class="lineNum">     972 </span>            : 
+<span class="lineNum">     973 </span><span class="lineCov">       1665 :                 curr_playlist-&gt;element.playlist.current_media_seq = attribs-&gt;current_media_seq;</span>
+<span class="lineNum">     974 </span>            :                 /* We first set the default duration for element, aka targetDuration */
+<span class="lineNum">     975 </span><span class="lineCov">       1665 :                 if (attribs-&gt;target_duration_in_seconds &gt; 0) {</span>
+<span class="lineNum">     976 </span><span class="lineCov">       1613 :                         curr_playlist-&gt;element.playlist.target_duration = attribs-&gt;target_duration_in_seconds;</span>
+<span class="lineNum">     977 </span><span class="lineCov">       1613 :                         curr_playlist-&gt;duration_info = attribs-&gt;target_duration_in_seconds;</span>
+<span class="lineNum">     978 </span>            :                 }
+<span class="lineNum">     979 </span><span class="lineCov">       1665 :                 if (attribs-&gt;duration_in_seconds) {</span>
+<span class="lineNum">     980 </span><span class="lineCov">       1567 :                         if (curr_playlist-&gt;duration_info == 0) {</span>
+<span class="lineNum">     981 </span>            :                                 /* we set the playlist duration info as the duration of a segment, only if it's not set
+<span class="lineNum">     982 </span>            :                                 There are cases of playlist with the last segment with a duration different from the others
+<span class="lineNum">     983 </span>            :                                 (example: Apple bipbop test)*/
+<span class="lineNum">     984 </span><span class="lineNoCov">          0 :                                 curr_playlist-&gt;duration_info = attribs-&gt;duration_in_seconds;</span>
+<span class="lineNum">     985 </span>            :                         }
+<span class="lineNum">     986 </span>            :                 }
+<span class="lineNum">     987 </span><span class="lineCov">       1665 :                 curr_playlist-&gt;element.playlist.media_seq_min = attribs-&gt;min_media_sequence;</span>
+<span class="lineNum">     988 </span><span class="lineCov">       1665 :                 curr_playlist-&gt;element.playlist.media_seq_max = attribs-&gt;current_media_seq;</span>
+<span class="lineNum">     989 </span><span class="lineCov">       1665 :                 curr_playlist-&gt;element.playlist.discontinuity = attribs-&gt;discontinuity;</span>
+<span class="lineNum">     990 </span><span class="lineCov">       1665 :                 if (attribs-&gt;bandwidth &gt; 1)</span>
+<span class="lineNum">     991 </span><span class="lineCov">         40 :                         curr_playlist-&gt;bandwidth = attribs-&gt;bandwidth;</span>
+<span class="lineNum">     992 </span><span class="lineCov">       1665 :                 if (attribs-&gt;is_playlist_ended)</span>
+<span class="lineNum">     993 </span><span class="lineNoCov">          0 :                         curr_playlist-&gt;element.playlist.is_ended = GF_TRUE;</span>
+<span class="lineNum">     994 </span>            :         }
+<span class="lineNum">     995 </span>            :         /* Cleanup all line-specific fields */
+<span class="lineNum">     996 </span><span class="lineCov">       1665 :         if (attribs-&gt;title) {</span>
+<span class="lineNum">     997 </span><span class="lineNoCov">          0 :                 gf_free(attribs-&gt;title);</span>
+<span class="lineNum">     998 </span><span class="lineNoCov">          0 :                 attribs-&gt;title = NULL;</span>
+<span class="lineNum">     999 </span>            :         }
+<span class="lineNum">    1000 </span><span class="lineCov">       1665 :         attribs-&gt;duration_in_seconds = 0;</span>
+<span class="lineNum">    1001 </span><span class="lineCov">       1665 :         attribs-&gt;playlist_utc_timestamp = 0;</span>
+<span class="lineNum">    1002 </span><span class="lineCov">       1665 :         attribs-&gt;bandwidth = 0;</span>
+<span class="lineNum">    1003 </span><span class="lineCov">       1665 :         attribs-&gt;stream_id = 0;</span>
+<span class="lineNum">    1004 </span><span class="lineCov">       1665 :         if (attribs-&gt;codecs != NULL) {</span>
+<span class="lineNum">    1005 </span><span class="lineCov">         39 :                 gf_free(attribs-&gt;codecs);</span>
+<span class="lineNum">    1006 </span><span class="lineCov">         39 :                 attribs-&gt;codecs = NULL;</span>
+<span class="lineNum">    1007 </span>            :         }
+<span class="lineNum">    1008 </span><span class="lineCov">       1665 :         if (attribs-&gt;language != NULL) {</span>
+<span class="lineNum">    1009 </span><span class="lineCov">         13 :                 gf_free(attribs-&gt;language);</span>
+<span class="lineNum">    1010 </span><span class="lineCov">         13 :                 attribs-&gt;language = NULL;</span>
+<span class="lineNum">    1011 </span>            :         }
+<span class="lineNum">    1012 </span><span class="lineCov">       1665 :         if (attribs-&gt;group.audio != NULL) {</span>
+<span class="lineNum">    1013 </span><span class="lineCov">         37 :                 gf_free(attribs-&gt;group.audio);</span>
+<span class="lineNum">    1014 </span><span class="lineCov">         37 :                 attribs-&gt;group.audio = NULL;</span>
+<span class="lineNum">    1015 </span>            :         }
+<span class="lineNum">    1016 </span><span class="lineCov">       1665 :         if (attribs-&gt;group.video != NULL) {</span>
+<span class="lineNum">    1017 </span><span class="lineNoCov">          0 :                 gf_free(attribs-&gt;group.video);</span>
+<span class="lineNum">    1018 </span><span class="lineNoCov">          0 :                 attribs-&gt;group.video = NULL;</span>
+<span class="lineNum">    1019 </span>            :         }
+<span class="lineNum">    1020 </span><span class="lineCov">       1665 :         if (fullURL != currentLine) {</span>
+<span class="lineNum">    1021 </span><span class="lineCov">       1665 :                 gf_free(fullURL);</span>
+<span class="lineNum">    1022 </span>            :         }
+<span class="lineNum">    1023 </span>            :         return GF_OK;
+<span class="lineNum">    1024 </span>            : }
+<span class="lineNum">    1025 </span>            : 
+<span class="lineNum">    1026 </span>            : typedef struct
+<span class="lineNum">    1027 </span>            : {
+<span class="lineNum">    1028 </span>            :         char *name;
+<span class="lineNum">    1029 </span>            :         u64 start;
+<span class="lineNum">    1030 </span>            :         u32 size;
+<span class="lineNum">    1031 </span>            :         Double duration;
+<a name="1032"><span class="lineNum">    1032 </span>            : } HLS_LLChunk;</a>
+<span class="lineNum">    1033 </span>            : 
+<span class="lineNum">    1034 </span><span class="lineCov">       1120 : static void reset_attribs(s_accumulated_attributes *attribs)</span>
+<span class="lineNum">    1035 </span>            : {
+<span class="lineNum">    1036 </span><span class="lineCov">       1120 :         attribs-&gt;width = attribs-&gt;height = 0;</span>
+<span class="lineNum">    1037 </span>            : #define RST_ATTR(_name) if (attribs-&gt;_name) { gf_free(attribs-&gt;_name); attribs-&gt;_name = NULL; }
+<span class="lineNum">    1038 </span>            : 
+<span class="lineNum">    1039 </span><span class="lineCov">       1120 :         RST_ATTR(codecs)</span>
+<span class="lineNum">    1040 </span><span class="lineCov">       1120 :         RST_ATTR(group.audio)</span>
+<span class="lineNum">    1041 </span><span class="lineCov">       1120 :         RST_ATTR(language)</span>
+<span class="lineNum">    1042 </span><span class="lineCov">       1120 :         RST_ATTR(title)</span>
+<span class="lineNum">    1043 </span><span class="lineCov">       1120 :         RST_ATTR(key_url)</span>
+<span class="lineNum">    1044 </span><span class="lineCov">       1120 :         RST_ATTR(init_url)</span>
+<span class="lineNum">    1045 </span><span class="lineCov">       1120 :         RST_ATTR(mediaURL)</span>
+<span class="lineNum">    1046 </span><span class="lineCov">       1120 : }</span>
+<a name="1047"><span class="lineNum">    1047 </span>            : </a>
+<span class="lineNum">    1048 </span>            : 
+<span class="lineNum">    1049 </span><span class="lineCov">        124 : GF_Err gf_m3u8_parse_sub_playlist(const char *m3u8_file, MasterPlaylist **playlist, const char *baseURL, Stream *in_stream, PlaylistElement *sub_playlist)</span>
+<span class="lineNum">    1050 </span>            : {
+<span class="lineNum">    1051 </span>            :         int i, currentLineNumber;
+<span class="lineNum">    1052 </span>            :         FILE *f = NULL;
+<span class="lineNum">    1053 </span>            :         u8 *m3u8_payload;
+<span class="lineNum">    1054 </span>            :         u32 m3u8_size, m3u8pos;
+<span class="lineNum">    1055 </span>            :         char currentLine[M3U8_BUF_SIZE];
+<span class="lineNum">    1056 </span>            :         char **attributes = NULL;
+<span class="lineNum">    1057 </span>            :         Bool release_blob = GF_FALSE;
+<span class="lineNum">    1058 </span>            :         s_accumulated_attributes attribs;
+<span class="lineNum">    1059 </span>            : 
+<span class="lineNum">    1060 </span><span class="lineCov">        124 :         if (!strncmp(m3u8_file, &quot;gmem://&quot;, 7)) {</span>
+<span class="lineNum">    1061 </span><span class="lineCov">         72 :                 GF_Err e = gf_blob_get(m3u8_file, &amp;m3u8_payload,  &amp;m3u8_size, NULL);</span>
+<span class="lineNum">    1062 </span><span class="lineCov">         72 :                 if (e) {</span>
+<span class="lineNum">    1063 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_DASH,(&quot;[M3U8] Cannot Open m3u8 source %s for reading\n&quot;, m3u8_file));</span>
+<span class="lineNum">    1064 </span>            :                         return e;
+<span class="lineNum">    1065 </span>            :                 }
+<span class="lineNum">    1066 </span>            :                 release_blob = GF_TRUE;
+<span class="lineNum">    1067 </span>            :         } else {
+<span class="lineNum">    1068 </span><span class="lineCov">         52 :                 f = gf_fopen(m3u8_file, &quot;rt&quot;);</span>
+<span class="lineNum">    1069 </span><span class="lineCov">         52 :                 if (!f) {</span>
+<span class="lineNum">    1070 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_DASH,(&quot;[M3U8] Cannot open m3u8 file %s for reading\n&quot;, m3u8_file));</span>
+<span class="lineNum">    1071 </span>            :                         return GF_URL_ERROR;
+<span class="lineNum">    1072 </span>            :                 }
+<span class="lineNum">    1073 </span>            :         }
+<span class="lineNum">    1074 </span>            : 
+<span class="lineNum">    1075 </span>            :         memset(&amp;attribs, 0, sizeof(s_accumulated_attributes));
+<span class="lineNum">    1076 </span>            : 
+<span class="lineNum">    1077 </span>            : #define _CLEANUP \
+<span class="lineNum">    1078 </span>            :         reset_attribs(&amp;attribs);\
+<span class="lineNum">    1079 </span>            :         if (f) gf_fclose(f); \
+<span class="lineNum">    1080 </span>            :         else if (release_blob) gf_blob_release(m3u8_file);
+<span class="lineNum">    1081 </span>            : 
+<span class="lineNum">    1082 </span>            : 
+<span class="lineNum">    1083 </span><span class="lineCov">        124 :         if (*playlist == NULL) {</span>
+<span class="lineNum">    1084 </span><span class="lineCov">        124 :                 *playlist = master_playlist_new();</span>
+<span class="lineNum">    1085 </span><span class="lineCov">        124 :                 if (!(*playlist)) {</span>
+<span class="lineNum">    1086 </span><span class="lineNoCov">          0 :                         _CLEANUP</span>
+<span class="lineNum">    1087 </span>            :                         return GF_OUT_OF_MEM;
+<span class="lineNum">    1088 </span>            :                 }
+<span class="lineNum">    1089 </span>            :         }
+<span class="lineNum">    1090 </span>            :         currentLineNumber = 0;
+<span class="lineNum">    1091 </span>            :         reset_attributes(&amp;attribs);
+<span class="lineNum">    1092 </span>            :         m3u8pos = 0;
+<span class="lineNum">    1093 </span>            :         while (1) {
+<span class="lineNum">    1094 </span>            :                 char *eof;
+<span class="lineNum">    1095 </span>            :                 int len;
+<span class="lineNum">    1096 </span><span class="lineCov">       4247 :                 if (f) {</span>
+<span class="lineNum">    1097 </span><span class="lineCov">       1063 :                         if (!gf_fgets(currentLine, sizeof(currentLine), f))</span>
+<span class="lineNum">    1098 </span>            :                                 break;
+<span class="lineNum">    1099 </span>            :                 } else {
+<span class="lineNum">    1100 </span>            :                         u32 __idx = 0;
+<span class="lineNum">    1101 </span><span class="lineCov">       3184 :                         if (m3u8pos &gt;= m3u8_size)</span>
+<span class="lineNum">    1102 </span>            :                                 break;
+<span class="lineNum">    1103 </span>            :                         while (1) {
+<span class="lineNum">    1104 </span>            :                                 assert(__idx &lt; M3U8_BUF_SIZE);
+<span class="lineNum">    1105 </span>            : 
+<span class="lineNum">    1106 </span><span class="lineCov">     117929 :                                 currentLine[__idx] = m3u8_payload[m3u8pos];</span>
+<span class="lineNum">    1107 </span><span class="lineCov">     117929 :                                 __idx++;</span>
+<span class="lineNum">    1108 </span><span class="lineCov">     117929 :                                 m3u8pos++;</span>
+<span class="lineNum">    1109 </span><span class="lineCov">     117929 :                                 if ((currentLine[__idx-1]=='\n') || (currentLine[__idx-1]=='\r') || (m3u8pos &gt;= m3u8_size)) {</span>
+<span class="lineNum">    1110 </span><span class="lineCov">       3112 :                                         currentLine[__idx]=0;</span>
+<span class="lineNum">    1111 </span><span class="lineCov">       3112 :                                         break;</span>
+<span class="lineNum">    1112 </span>            :                                 }
+<span class="lineNum">    1113 </span>            :                         }
+<span class="lineNum">    1114 </span>            :                 }
+<span class="lineNum">    1115 </span><span class="lineCov">       4123 :                 currentLineNumber++;</span>
+<span class="lineNum">    1116 </span><span class="lineCov">       4123 :                 eof = strchr(currentLine, '\r');</span>
+<span class="lineNum">    1117 </span><span class="lineCov">       4123 :                 if (eof)</span>
+<span class="lineNum">    1118 </span><span class="lineNoCov">          0 :                         eof[0] = '\0';</span>
+<span class="lineNum">    1119 </span><span class="lineCov">       4123 :                 eof = strchr(currentLine, '\n');</span>
+<span class="lineNum">    1120 </span><span class="lineCov">       4123 :                 if (eof)</span>
+<span class="lineNum">    1121 </span><span class="lineCov">       4117 :                         eof[0] = '\0';</span>
+<span class="lineNum">    1122 </span><span class="lineCov">       4123 :                 len = (u32) strlen(currentLine);</span>
+<span class="lineNum">    1123 </span><span class="lineCov">       4123 :                 if (len &lt; 1)</span>
+<span class="lineNum">    1124 </span><span class="lineCov">         94 :                         continue;</span>
+<span class="lineNum">    1125 </span><span class="lineCov">       4029 :                 if (currentLineNumber == 1) {</span>
+<span class="lineNum">    1126 </span>            :                         /* Playlist MUST start with #EXTM3U */
+<span class="lineNum">    1127 </span><span class="lineCov">        124 :                         if (len &lt; 7 || (strncmp(&quot;#EXTM3U&quot;, currentLine, 7) != 0)) {</span>
+<span class="lineNum">    1128 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;Failed to parse M3U8 File, it should start with #EXTM3U, but was : %s\n&quot;, currentLine));</span>
+<span class="lineNum">    1129 </span><span class="lineNoCov">          0 :                                 _CLEANUP</span>
+<span class="lineNum">    1130 </span>            :                                 return GF_STREAM_NOT_FOUND;
+<span class="lineNum">    1131 </span>            :                         }
+<span class="lineNum">    1132 </span><span class="lineCov">        124 :                         continue;</span>
+<span class="lineNum">    1133 </span>            :                 }
+<span class="lineNum">    1134 </span><span class="lineCov">       3905 :                 if (currentLine[0] == '#') {</span>
+<span class="lineNum">    1135 </span>            :                         /* chunk */
+<span class="lineNum">    1136 </span><span class="lineCov">       2909 :                         if (!strncmp(&quot;#EXT-X-PART:&quot;, currentLine, 12)) {</span>
+<span class="lineNum">    1137 </span>            :                                 GF_Err e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">    1138 </span>            :                                 char *sep;
+<span class="lineNum">    1139 </span><span class="lineCov">        672 :                                 char *file = strstr(currentLine, &quot;URI=\&quot;&quot;);</span>
+<span class="lineNum">    1140 </span><span class="lineCov">        672 :                                 char *dur = strstr(currentLine, &quot;DURATION=&quot;);</span>
+<span class="lineNum">    1141 </span><span class="lineCov">        672 :                                 char *br = strstr(currentLine, &quot;BYTERANGE=&quot;);</span>
+<span class="lineNum">    1142 </span>            : 
+<span class="lineNum">    1143 </span><span class="lineCov">        672 :                                 if (strstr(currentLine, &quot;INDEPENDENT=YES&quot;)) {</span>
+<span class="lineNum">    1144 </span><span class="lineCov">        160 :                                         attribs.independent_part = GF_TRUE;</span>
+<span class="lineNum">    1145 </span>            :                                 }
+<span class="lineNum">    1146 </span><span class="lineCov">        672 :                                 if (br) {</span>
+<span class="lineNum">    1147 </span><span class="lineCov">        443 :                                         u64 start=0;</span>
+<span class="lineNum">    1148 </span><span class="lineCov">        443 :                                         u32 size=0;</span>
+<span class="lineNum">    1149 </span><span class="lineCov">        443 :                                         sep = strchr(br, ',');</span>
+<span class="lineNum">    1150 </span><span class="lineCov">        443 :                                         if (sep) sep[0] = 0;</span>
+<span class="lineNum">    1151 </span><span class="lineCov">        443 :                                         if (sscanf(br+10, &quot;\&quot;%u@&quot;LLU&quot;\&quot;&quot;, &amp;size, &amp;start) != 2)</span>
+<span class="lineNum">    1152 </span>            :                                                 file = NULL;
+<span class="lineNum">    1153 </span><span class="lineCov">        443 :                                         attribs.byte_range_start = start;</span>
+<span class="lineNum">    1154 </span><span class="lineCov">        443 :                                         attribs.byte_range_end = start + size - 1;</span>
+<span class="lineNum">    1155 </span>            :                                 }
+<span class="lineNum">    1156 </span><span class="lineCov">        672 :                                 if (dur) {</span>
+<span class="lineNum">    1157 </span><span class="lineCov">        672 :                                         sep = strchr(dur, ',');</span>
+<span class="lineNum">    1158 </span><span class="lineCov">        672 :                                         if (sep) sep[0] = 0;</span>
+<span class="lineNum">    1159 </span><span class="lineCov">       1344 :                                         attribs.duration_in_seconds = atof(dur+9);</span>
+<span class="lineNum">    1160 </span>            :                                 }
+<span class="lineNum">    1161 </span>            : 
+<span class="lineNum">    1162 </span><span class="lineCov">        672 :                                 if (file &amp;&amp; dur) {</span>
+<span class="lineNum">    1163 </span><span class="lineCov">        672 :                                         file += 5; // file starts with `URI:&quot;`, move to start of URL</span>
+<span class="lineNum">    1164 </span>            :                                         //find end quote
+<span class="lineNum">    1165 </span><span class="lineCov">        672 :                                         sep = strchr(file, '&quot;');</span>
+<span class="lineNum">    1166 </span><span class="lineCov">        672 :                                         if (!sep) {</span>
+<span class="lineNum">    1167 </span>            :                                                 e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">    1168 </span><span class="lineNoCov">          0 :                                                 _CLEANUP</span>
+<span class="lineNum">    1169 </span>            :                                                 return e;
+<span class="lineNum">    1170 </span>            :                                         }
+<span class="lineNum">    1171 </span><span class="lineCov">        672 :                                         sep[0] = 0;</span>
+<span class="lineNum">    1172 </span>            : 
+<span class="lineNum">    1173 </span><span class="lineCov">        672 :                                         attribs.low_latency = GF_TRUE;</span>
+<span class="lineNum">    1174 </span><span class="lineCov">        672 :                                         attribs.is_media_segment = GF_TRUE;</span>
+<span class="lineNum">    1175 </span><span class="lineCov">        672 :                                         e = declare_sub_playlist(file, baseURL, &amp;attribs, sub_playlist, playlist, in_stream);</span>
+<span class="lineNum">    1176 </span>            : 
+<span class="lineNum">    1177 </span><span class="lineCov">        672 :                                         (*playlist)-&gt;low_latency = GF_TRUE;</span>
+<span class="lineNum">    1178 </span><span class="lineCov">        672 :                                         sep[0] = '&quot;';</span>
+<span class="lineNum">    1179 </span>            :                                 }
+<span class="lineNum">    1180 </span><span class="lineCov">        672 :                                 attribs.is_media_segment = GF_FALSE;</span>
+<span class="lineNum">    1181 </span><span class="lineCov">        672 :                                 attribs.low_latency = GF_FALSE;</span>
+<span class="lineNum">    1182 </span><span class="lineCov">        672 :                                 attribs.independent_part = GF_FALSE;</span>
+<span class="lineNum">    1183 </span><span class="lineCov">        672 :                                 attribs.byte_range_start = attribs.byte_range_end = 0;</span>
+<span class="lineNum">    1184 </span><span class="lineCov">        672 :                                 attribs.duration_in_seconds = 0;</span>
+<span class="lineNum">    1185 </span><span class="lineCov">        672 :                                 if (e != GF_OK) {</span>
+<span class="lineNum">    1186 </span><span class="lineNoCov">          0 :                                         _CLEANUP</span>
+<span class="lineNum">    1187 </span>            :                                         return e;
+<span class="lineNum">    1188 </span>            :                                 }
+<span class="lineNum">    1189 </span>            :                         }
+<span class="lineNum">    1190 </span>            :                         /* A comment or a directive */
+<span class="lineNum">    1191 </span><span class="lineCov">       2237 :                         else if (!strncmp(&quot;#EXT&quot;, currentLine, 4)) {</span>
+<span class="lineNum">    1192 </span><span class="lineCov">       2237 :                                 attributes = parse_attributes(currentLine, &amp;attribs);</span>
+<span class="lineNum">    1193 </span><span class="lineCov">       2237 :                                 if (attributes == NULL) {</span>
+<span class="lineNum">    1194 </span><span class="lineCov">        221 :                                         GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, (&quot;[M3U8]Comment at line %d : %s\n&quot;, currentLineNumber, currentLine));</span>
+<span class="lineNum">    1195 </span>            :                                 } else {
+<span class="lineNum">    1196 </span><span class="lineCov">       2016 :                                         GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, (&quot;[M3U8] Directive at line %d: \&quot;%s\&quot;, attributes=&quot;, currentLineNumber, currentLine));</span>
+<span class="lineNum">    1197 </span>            :                                         i = 0;
+<span class="lineNum">    1198 </span><span class="lineCov">       4407 :                                         while (attributes[i] != NULL) {</span>
+<span class="lineNum">    1199 </span><span class="lineCov">       2391 :                                                 GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, (&quot; [%d]='%s'&quot;, i, attributes[i]));</span>
+<span class="lineNum">    1200 </span><span class="lineCov">       2391 :                                                 gf_free(attributes[i]);</span>
+<span class="lineNum">    1201 </span><span class="lineCov">       2391 :                                                 attributes[i] = NULL;</span>
+<span class="lineNum">    1202 </span><span class="lineCov">       2391 :                                                 i++;</span>
+<span class="lineNum">    1203 </span>            :                                         }
+<span class="lineNum">    1204 </span><span class="lineCov">       2016 :                                         GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, (&quot;\n&quot;));</span>
+<span class="lineNum">    1205 </span><span class="lineCov">       2016 :                                         gf_free(attributes);</span>
+<span class="lineNum">    1206 </span>            :                                         attributes = NULL;
+<span class="lineNum">    1207 </span>            :                                 }
+<span class="lineNum">    1208 </span><span class="lineCov">       2237 :                                 if (attribs.is_playlist_ended) {</span>
+<span class="lineNum">    1209 </span><span class="lineCov">         33 :                                         (*playlist)-&gt;playlist_needs_refresh = GF_FALSE;</span>
+<span class="lineNum">    1210 </span>            :                                 }
+<span class="lineNum">    1211 </span><span class="lineCov">       2237 :                                 if (attribs.independent_segments) {</span>
+<span class="lineNum">    1212 </span><span class="lineCov">       1727 :                                         (*playlist)-&gt;independent_segments = GF_TRUE;</span>
+<span class="lineNum">    1213 </span>            :                                 }
+<span class="lineNum">    1214 </span><span class="lineCov">       2237 :                                 if (attribs.low_latency) {</span>
+<span class="lineNum">    1215 </span><span class="lineCov">         61 :                                         (*playlist)-&gt;low_latency = GF_TRUE;</span>
+<span class="lineNum">    1216 </span><span class="lineCov">         61 :                                         attribs.low_latency = GF_FALSE;</span>
+<span class="lineNum">    1217 </span>            :                                 }
+<span class="lineNum">    1218 </span><span class="lineCov">       2237 :                                 if (attribs.mediaURL) {</span>
+<span class="lineNum">    1219 </span><span class="lineCov">         13 :                                         GF_Err e = declare_sub_playlist(attribs.mediaURL, baseURL, &amp;attribs, sub_playlist, playlist, in_stream);</span>
+<span class="lineNum">    1220 </span><span class="lineCov">         13 :                                         gf_free(attribs.mediaURL);</span>
+<span class="lineNum">    1221 </span><span class="lineCov">         13 :                                         attribs.mediaURL = NULL;</span>
+<span class="lineNum">    1222 </span><span class="lineCov">         13 :                                         if (e != GF_OK) {</span>
+<span class="lineNum">    1223 </span><span class="lineNoCov">          0 :                                                 _CLEANUP</span>
+<span class="lineNum">    1224 </span>            :                                                 return e;
+<span class="lineNum">    1225 </span>            :                                         }
+<span class="lineNum">    1226 </span>            :                                 }
+<span class="lineNum">    1227 </span>            :                         }
+<span class="lineNum">    1228 </span>            :                 } else {
+<span class="lineNum">    1229 </span>            : 
+<span class="lineNum">    1230 </span>            :                         /*file encountered: sub-playlist or segment*/
+<span class="lineNum">    1231 </span><span class="lineCov">        996 :                         GF_Err e = declare_sub_playlist(currentLine, baseURL, &amp;attribs, sub_playlist, playlist, in_stream);</span>
+<span class="lineNum">    1232 </span><span class="lineCov">        996 :                         attribs.current_media_seq += 1;</span>
+<span class="lineNum">    1233 </span><span class="lineCov">        996 :                         if (e != GF_OK) {</span>
+<span class="lineNum">    1234 </span><span class="lineNoCov">          0 :                                 _CLEANUP</span>
+<span class="lineNum">    1235 </span>            :                                 return e;
+<span class="lineNum">    1236 </span>            :                         }
+<span class="lineNum">    1237 </span>            : 
+<span class="lineNum">    1238 </span>            :                         //do not reset all attributes but at least set width/height/codecs to NULL, otherwise we may miss detection
+<span class="lineNum">    1239 </span>            :                         //of audio-only playlists in av sequences
+<span class="lineNum">    1240 </span>            : 
+<span class="lineNum">    1241 </span><span class="lineCov">        996 :                         reset_attribs(&amp;attribs);</span>
+<span class="lineNum">    1242 </span>            :                 }
+<span class="lineNum">    1243 </span>            :         }
+<span class="lineNum">    1244 </span>            : 
+<span class="lineNum">    1245 </span><span class="lineCov">        124 :         _CLEANUP</span>
+<span class="lineNum">    1246 </span>            : 
+<span class="lineNum">    1247 </span>            : #undef _CLEANUP
+<span class="lineNum">    1248 </span>            : 
+<span class="lineNum">    1249 </span><span class="lineCov">        137 :         for (i=0; i&lt;(int)gf_list_count((*playlist)-&gt;streams); i++) {</span>
+<span class="lineNum">    1250 </span>            :                 u32 j;
+<span class="lineNum">    1251 </span><span class="lineCov">        137 :                 Stream *prog = gf_list_get((*playlist)-&gt;streams, i);</span>
+<span class="lineNum">    1252 </span><span class="lineCov">        137 :                 prog-&gt;computed_duration = 0;</span>
+<span class="lineNum">    1253 </span><span class="lineCov">        292 :                 for (j=0; j&lt;gf_list_count(prog-&gt;variants); j++) {</span>
+<span class="lineNum">    1254 </span><span class="lineCov">        155 :                         PlaylistElement *ple = gf_list_get(prog-&gt;variants, j);</span>
+<span class="lineNum">    1255 </span><span class="lineCov">        155 :                         if (ple-&gt;element_type == TYPE_PLAYLIST) {</span>
+<span class="lineNum">    1256 </span><span class="lineCov">        155 :                                 if (ple-&gt;element.playlist.computed_duration &gt; prog-&gt;computed_duration)</span>
+<span class="lineNum">    1257 </span><span class="lineCov">        102 :                                         prog-&gt;computed_duration = ple-&gt;element.playlist.computed_duration;</span>
+<span class="lineNum">    1258 </span>            :                         }
+<span class="lineNum">    1259 </span>            :                 }
+<span class="lineNum">    1260 </span>            : 
+<span class="lineNum">    1261 </span>            :         }
+<span class="lineNum">    1262 </span>            : 
+<span class="lineNum">    1263 </span><span class="lineCov">        124 :         if (attribs.version &lt; attribs.compatibility_version) {</span>
+<span class="lineNum">    1264 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, (&quot;[M3U8] Version %d specified but tags from version %d detected\n&quot;, attribs.version, attribs.compatibility_version));</span>
+<span class="lineNum">    1265 </span>            :         }
+<span class="lineNum">    1266 </span>            :         return GF_OK;
+<span class="lineNum">    1267 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

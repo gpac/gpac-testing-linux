@@ -1,0 +1,61 @@
+*** svc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:46:01 ***
+
+Computing ./results/temp/svc-split.mp4  (split) hash: 
+File hash (SHA-1): A80FC7BBB4B2928F8B38C80B8B796C875ECD7198
+Hash fail, ref hash ./hash_refs/svc-split.hash was 4DFA00F00F38DF5BD99BEC9EEA0FBFCD3A78684B
+
+*** Subtest "Split": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/scalable/svc.264:svcmode=split -new ./results/temp/svc-split.mp4" ***
+Track Importing MPEG-4 AVC - Width 176 Height 144 FPS 25000/1000
+SVC Detected - SSPS ID 0 - frame size 352 x 288
+SVC Detected - SSPS ID 1 - frame size 704 x 576
+AVC|H264 Import results: 250 samples (1037 NALUs) - Slices: 10 I 30 P 210 B - 0 SEI - 5 IDR
+AVC|H264 SVC (SSPS ID 0, 352x288) Import results: Slices: 9 I 30 P 209 B
+AVC|H264 SVC (SSPS ID 1, 704x576) Import results: Slices: 10 I 30 P 210 B
+AVC|H264 Stream uses forward prediction - stream CTS offset: 7 frames
+AVC|H264 Max NALU size is 57193 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "dnal": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 2 ./results/temp/svc-split.mp4" ***
+
+Computing ./results/temp/svc-merge.mp4  (merge) hash: 
+File hash (SHA-1): 8E3843BF980359DEA948F21E0BBC3159F0F17C2A
+Hash OK for ./results/temp/svc-merge.mp4
+
+*** Subtest "Merge": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/svc-split.mp4:svcmode=merge -new ./results/temp/svc-merge.mp4" ***
+IsoMedia import svc-split.mp4 - track ID 1 - Video (size 176 x 144)
+IsoMedia import svc-split.mp4 - track ID 2 - Video (size 352 x 288)
+IsoMedia import svc-split.mp4 - track ID 3 - Video (size 704 x 576)
+
+Same Hash for ./results/temp/svc.mp4 and ./results/temp/svc-merge.mp4
+
+*** Subtest "decode": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -blacklist=nvdec,vtbdec,ffdec,ohevcdec -i ./results/temp/svc-split.mp4 -o ./results/temp/svc-split.yuv:sstart=8:send=9" ***
+No filter chain found for PID V1 in filter mp4dmx to any loaded filters - NOT CONNECTED
+No filter chain found for PID V2 in filter mp4dmx to any loaded filters - NOT CONNECTED
+No filter chain found for PID V3 in filter mp4dmx to any loaded filters - NOT CONNECTED
+Filters not connected:
+fout (dst=./results/temp/svc-split.yuv:sstart=8:send=9) (ptr=0x5559e5a1b5b0)
+
+
+*** Subtest "dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 ./results/temp/svc-split.mp4 -out ./results/temp/svc.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.4 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.12 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3.4 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4.12 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.4 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6.12 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7.4 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 8.12 end 9
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 9.4 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 10.12 end 11
+[MPD] Generating MPD at time 2021-04-29T23:46:01.886Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 7CC8ACCC7CB00D16B430F2C48EA39932E4A7CF59
+Hash fail, ref hash ./hash_refs/svc-inspect.hash was 31760B9A8A011E13FAC698810689712A5B360913
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/svc.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+

@@ -1,0 +1,43 @@
+*** reframer-amr logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:55 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/import/bear_audio.amr reframer @ -o ./results/temp/bear_audio.amr  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -610668672
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/import/bear_audio.amr) : 0 input pids 1 output pids 13 tasks 671 us process time
+		10 packets sent 47910 bytes sent (14903.1 pck/sec 571.207 mbps)
+		* output PID bear_audio.amr: 10 packets sent
+	Filter reframer ID _0x55c9c018c040_ : 1 input pids 1 output pids 1502 tasks 1477 us process time
+		1497 packets processed 47904 bytes processed (1.01354e+06 pck/sec 259.466 mbps)
+		1497 packets sent 47904 bytes sent (1.01354e+06 pck/sec 259.466 mbps)
+		* input PID bear_audio.amr: 1497 frames (1506 packets) received
+		* output PID bear_audio.amr: 1497 packets sent
+	Filter fout (dst=./results/temp/bear_audio.amr) : 1 input pids 0 output pids 1500 tasks 1212 us process time
+		1498 packets processed 47910 bytes processed (1.23597e+06 pck/sec 316.238 mbps)
+		* input PID bear_audio.amr: 1498 packets received
+	Filter rfamr : 1 input pids 1 output pids 1509 tasks 1448 us process time
+		10 packets processed 47910 bytes processed (6906.08 pck/sec 264.696 mbps)
+		1506 packets sent 47904 bytes sent (1.04006e+06 pck/sec 264.663 mbps)
+		* input PID bear_audio.amr: 10 packets received
+		* output PID bear_audio.amr: 1506 packets sent
+	Filter writegen : 1 input pids 1 output pids 1512 tasks 1429 us process time
+		1497 packets processed 47904 bytes processed (1.04759e+06 pck/sec 268.182 mbps)
+		1498 packets sent 47910 bytes sent (1.04829e+06 pck/sec 268.216 mbps)
+		* input PID bear_audio.amr: 1497 packets received
+		* output PID bear_audio.amr: 1498 packets sent
+Session stats - threads 1
+	Thread 1: run_time 7952 us active_time 7636 us nb_tasks 6070
+
+Total: run_time 7952 us active_time 7636 us nb_tasks 6070
+
+Filters connected:
+fin (src=./external_media/import/bear_audio.amr) (ptr=0x55c9c01897f0)
+-(PID bear_audio.amr) rfamr (ptr=0x55c9c0191030)
+--(PID bear_audio.amr) reframer (ID=_0x55c9c018c040_)
+---(PID bear_audio.amr) writegen (ptr=0x55c9c0196fc0)
+----(PID bear_audio.amr) fout (dst=./results/temp/bear_audio.amr) (ptr=0x55c9c018d260)
+
+Computing ./results/temp/bear_audio.amr  (rewrite) hash: 
+File hash (SHA-1): 168B46B91DB0E8634AAC9A8BFB6982F7F01F10F7
+Hash OK for ./results/temp/bear_audio.amr

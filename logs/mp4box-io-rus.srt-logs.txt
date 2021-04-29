@@ -1,0 +1,71 @@
+*** mp4box-io-rus.srt logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:06 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/rus.srt" ***
+Import probing results for ./external_media/import/rus.srt:
+File has 1 tracks
+- Track 1 type: Text - Codec Subtitle/text 3GPP/Apple Stream
+
+For more details, use `gpac -i rus.srt inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/rus.srt.mp4  (add) hash: 
+File hash (SHA-1): 75FD5352C7C6C9525494735B9C92D43B7D291F49
+Hash OK for ./results/temp/rus.srt.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/rus.srt -new ./results/temp/rus.srt.mp4" ***
+Track Importing Timed Text - Text track 400 x 60 font Serif (size 18) layer 0
+
+Computing ./results/temp/rus.srt.1.tmp  (diso) hash: 
+File hash (SHA-1): 40557B2D4666AAEE5F31F84DA0B81BC5C6BE3297
+Hash OK for ./results/temp/rus.srt.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/rus.srt.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:06.796
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 1000
+Media Duration 00:00:06.798 
+Media Info: Language "Undetermined (und)" - Type "text:tx3g" - 5 samples
+Unknown Text Stream
+ Size 400 x 60 - Translation X=0 Y=0 - Layer 0
+	RFC6381 Codec Parameters: tx3g
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 2927 / 1000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/rus.srt.mp4 -out ./results/temp/rus.srt.1.tmp" ***
+
+Computing ./results/temp/rus.srt.2.tmp  (dts) hash: 
+File hash (SHA-1): 15F09D51D426591696BAA8915C5514F691CFA962
+Hash OK for ./results/temp/rus.srt.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/rus.srt.mp4 -out ./results/temp/rus.srt.2.tmp" ***
+
+Computing ./results/temp/rus.srt.mp4.hint  (hint) hash: 
+File hash (SHA-1): 9A69829F803C7A9902B073E6CED4C4FF6108B7D3
+Hash OK for ./results/temp/rus.srt.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/rus.srt.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): E00AFDE277BF919DEA745A1C53234C998BA21483
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/rus.srt.mp4 -out ./results/temp/rus.srt.mp4.hint" ***
+Hinting track ID 1 - Type "tx3g:tx3g" (3gpp-tt) - BW 0 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/rus.srt.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/rus.srt.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 4ECF515A10C5880AE6A963FE9FD323B6F6E34413
+Hash OK for ./results/temp/rus.srt.mp4.hint

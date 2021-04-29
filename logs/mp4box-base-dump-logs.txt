@@ -1,0 +1,187 @@
+*** mp4box-base-dump logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:04 ***
+
+
+*** Subtest "InfoTk2": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info 2 ./results/temp/test.mp4" ***
+# Track 2 Info - ID 2 - TimeScale 48000
+Media Duration 00:00:07.040 
+Media Info: Language "Undetermined (und)" - Type "soun:mp4a" - 330 samples
+Handler name: MediaHandler
+	MPEG-4 Audio AAC LC (AOT=2 implicit) - 2 Channel(s) - SampleRate 48000
+	Decoding Buffer size 297 - Bitrate: avg 94 - max 97 kbps
+	No stream dependencies for decoding
+	StreamPriority 0
+	RFC6381 Codec Parameters: mp4a.40.2
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1024 / 48000
+
+Computed info from media:
+	Total size 82748 bytes - Total samples duration 7018 ms
+	Average rate 94.33 kbps - Max Rate 97.08 kbps
+	Chunk durations: min 149 ms - max 512 ms - average 469 ms
+	Chunk sizes (bytes): min 1744 - max 6050 - average 5516
+
+
+
+*** Subtest "InfoTk3": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info 3 ./results/temp/test.mp4" ***
+# Track 3 Info - ID 3 - TimeScale 1000
+Media Duration 00:00:10.487 
+Media Info: Language "French (fra)" - Type "text:tx3g" - 11 samples
+Handler name: MediaHandler
+Unknown Text Stream
+ Size 128 x 128 - Translation X=0 Y=0 - Layer 0
+	RFC6381 Codec Parameters: tx3g
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1525 / 1000
+
+Computed info from media:
+	Total size 216 bytes - Total samples duration 10487 ms
+	Average rate 164.78 bps - Max Rate 355.70 bps
+	Chunk durations: min 0 ms - max 2787 ms - average 1048 ms
+	Chunk sizes (bytes): min 2 - max 53 - average 21
+
+
+
+*** Subtest "raw-sample": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raws 1:1 ./results/temp/test.mp4 -out ./results/temp/test.tmp" ***
+
+Computing ./results/temp/test.tmp  (raw-sample) hash: 
+File hash (SHA-1): CDE5D5E67353DC0F79FFF07164E8CBE39190C219
+Hash OK for ./results/temp/test.tmp
+
+*** Subtest "flat-storage": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -flat ./results/temp/test.mp4" ***
+
+Computing ./results/temp/test.mp4  (flat-storage) hash: 
+File hash (SHA-1): DD9BF3C2DD013C919E43D701F6623424E187B0AF
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "interleave-250ms": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -brand MP4V:1 -ab iso6 -inter 250 ./results/temp/test.mp4" ***
+
+Computing ./results/temp/test.mp4  (interleave-250ms) hash: 
+File hash (SHA-1): 3AD4699E43646EF1612B26A67B7A0BC77A9CB6EB
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "single": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -single 1 ./results/temp/test.mp4 -out ./results/temp/single.mp4" ***
+
+Computing ./results/temp/single.mp4  (single) hash: 
+File hash (SHA-1): E3D4C61812272EF29F2F8B1745AFBCAD1B7886D8
+Hash OK for ./results/temp/single.mp4
+
+*** Subtest "frag-1s": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -rb iso6 -frag 1000 ./results/temp/test.mp4 -out ./results/temp/frag-1s.mp4" ***
+Fragmenting file (1.000 seconds fragments)
+[MP4Mux] Done writing fragment - next fragment start time 2
+[MP4Mux] Done writing fragment - next fragment start time 3
+[MP4Mux] Done writing fragment - next fragment start time 5
+[MP4Mux] Done writing fragment - next fragment start time 6
+[MP4Mux] Done writing fragment - next fragment start time 8
+[MP4Mux] Done writing fragment - next fragment start time 9
+[MP4Mux] Done writing fragment - next fragment start time 11
+[MP4Mux] Done writing fragment - next fragment start time 12
+
+Computing ./results/temp/frag-1s.mp4  (frag-1s) hash: 
+File hash (SHA-1): 4066DD036515330FB7B5AE9A05673CE1AE94B887
+Hash OK for ./results/temp/frag-1s.mp4
+
+*** Subtest "frag-1s-mfra": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -rb iso6 -mfra -frag 1000 ./results/temp/test.mp4 -out ./results/temp/frag-1s-mfra.mp4" ***
+Fragmenting file (1.000 seconds fragments)
+[MP4Mux] Done writing fragment - next fragment start time 2
+[MP4Mux] Done writing fragment - next fragment start time 3
+[MP4Mux] Done writing fragment - next fragment start time 5
+[MP4Mux] Done writing fragment - next fragment start time 6
+[MP4Mux] Done writing fragment - next fragment start time 8
+[MP4Mux] Done writing fragment - next fragment start time 9
+[MP4Mux] Done writing fragment - next fragment start time 11
+[MP4Mux] Done writing fragment - next fragment start time 12
+
+Computing ./results/temp/frag-1s-mfra.mp4  (frag-1s-mfra) hash: 
+File hash (SHA-1): 7A320D126D9645B0891D6A0567659844F79F10AE
+Hash OK for ./results/temp/frag-1s-mfra.mp4
+
+*** Subtest "create-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264 -add ./media/auxiliary_files/enst_audio.aac -add ./media/auxiliary_files/subtitle_fr.srt:lang=fra -new ./results/temp/test.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+Track Importing AAC  - SampleRate 48000 Num Channels 2
+Track Importing Timed Text - Text track 128 x 128 font Serif (size 18) layer 0
+
+Computing ./results/temp/test.mp4  (create-mp4) hash: 
+File hash (SHA-1): 42437C8B946DE6763DB101F5F44DB40D8230103F
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "create-dref-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/test.mp4 -dref -new ./results/temp/dref.mp4" ***
+IsoMedia import test.mp4 - track ID 1 - Video (size 128 x 128)
+IsoMedia import test.mp4 - track ID 2 - Audio (SR 48000 - 2 channels)
+IsoMedia import test.mp4 - track ID 3 - media type "text:tx3g"
+
+Computing ./results/temp/dref.mp4  (create-dref-mp4) hash: 
+File hash (SHA-1): CC34446E8924E6AEB614D6B3F628BC7E4038F102
+Hash OK for ./results/temp/dref.mp4
+
+*** Subtest "raw-264": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -raw 1 ./results/temp/test.mp4 -out ./results/temp/test.tmp" ***
+Exporting MPEG-4 AVC|H264 Video - Size 128x128
+
+Computing ./results/temp/test.tmp  (raw-264) hash: 
+File hash (SHA-1): DD7937BD92E81F918D6DC1C03589C0C23A59B3C7
+Hash OK for ./results/temp/test.tmp
+
+*** Subtest "raw-aac": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -raw 2 ./results/temp/test.mp4 -out ./results/temp/test.tmp" ***
+Exporting MPEG-4 AAC Audio - SampleRate 48000 2 channels 16 bits per sample
+
+Computing ./results/temp/test.tmp  (raw-aac) hash: 
+File hash (SHA-1): C5CB812A89468B3A7ED871AC98FA8CBB5881820D
+Hash OK for ./results/temp/test.tmp
+
+*** Subtest "raw-text": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -raw 3 ./results/temp/test.mp4 -out ./results/temp/test.tmp" ***
+Exporting Subtitle/text 3GPP/Apple Stream - Size 128x128
+
+Computing ./results/temp/test.tmp  (raw-text) hash: 
+File hash (SHA-1): 399323016E62FB88ACDA0AB4F47E8241E4F83932
+Hash OK for ./results/temp/test.tmp
+
+*** Subtest "srt-text": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -srt 3 ./results/temp/test.mp4 -out ./results/temp/test.tmp" ***
+Conversion done
+
+Computing ./results/temp/test.tmp  (srt-text) hash: 
+File hash (SHA-1): F53E6A551D0E6D9A02C40CAE0E73EA1F6843A0E5
+Hash OK for ./results/temp/test.tmp
+
+*** Subtest "ttxt-text": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0  -ttxt 3 ./results/temp/test.mp4 -out ./results/temp/test.tmp" ***
+Conversion done
+
+Computing ./results/temp/test.tmp  (ttxt-text) hash: 
+File hash (SHA-1): 6EB9F643B3701BDEB3204C8F6C57F11973B1650C
+Hash OK for ./results/temp/test.tmp
+
+*** Subtest "raw-samples": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raws 1 ./results/temp/test.mp4" ***
+
+
+*** Subtest "InfoTk1": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info 1 ./results/temp/test.mp4" ***
+# Track 1 Info - ID 1 - TimeScale 4000000
+Media Duration 00:00:06.920 
+Track has 1 edits: track duration is 00:00:06.960
+Media Info: Language "Undetermined (und)" - Type "vide:avc1" - 173 samples
+Handler name: MediaHandler
+Visual Sample Entry Info: width=128 height=128 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=128
+	AVC/H264 Video - Visual Size 128 x 128
+	AVC Info: 1 SPS - 1 PPS - Profile High @ Level 5.1
+	NAL Unit length bits: 32
+	Chroma format YUV 4:2:0 - Luma bit depth 8 - chroma bit depth 8
+	SPS#1 hash: F6932703545AC73EB4B06422517531B1C0D283E2
+	PPS#1 hash: 3A989C24CAD66ADB5B83367A3D196480883A6252
+	Decoding Buffer size 3281 - Bitrate: avg 55 - max 93 kbps
+	No stream dependencies for decoding
+	StreamPriority 0
+	RFC6381 Codec Parameters: avc1.640033
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 173 samples
+	Max sample duration: 160000 / 4000000
+
+Computed info from media:
+	Total size 47611 bytes - Total samples duration 6880 ms
+	Average rate 55.36 kbps - Max Rate 89.58 kbps
+	Chunk durations: min 160 ms - max 520 ms - average 461 ms
+	Chunk sizes (bytes): min 362 - max 11737 - average 3174
+
+

@@ -1,0 +1,1591 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dec_nvdec.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dec_nvdec.c<span style="font-size: 80%;"> (source / <a href="dec_nvdec.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntry">688</td>
+            <td class="headerCovTableEntryLo">2.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntryLo">8.7 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / NVidia Hardware decoder filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/thread.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/internal/media_dev.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #if (!defined(GPAC_STATIC_BUILD) &amp;&amp; (defined(WIN32) || defined(GPAC_CONFIG_LINUX) || defined(GPAC_CONFIG_DARWIN)) &amp;&amp; !defined(GPAC_DISABLE_NVDEC))
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &quot;dec_nvdec_sdk.h&quot;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : //#define EMUL_NV_DLL
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : #ifdef LOAD_GL_1_5
+<span class="lineNum">      41 </span>            : GLDECL_EXTERN(glGenBuffers);
+<span class="lineNum">      42 </span>            : GLDECL_EXTERN(glBindBuffer);
+<span class="lineNum">      43 </span>            : GLDECL_EXTERN(glBufferData);
+<span class="lineNum">      44 </span>            : #endif
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : #endif
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : typedef struct _nv_dec_inst NVDecInstance;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : typedef enum
+<span class="lineNum">      51 </span>            : {
+<span class="lineNum">      52 </span>            :         NVDEC_COPY = 0,
+<span class="lineNum">      53 </span>            :         NVDEC_SINGLE,
+<span class="lineNum">      54 </span>            :         NVDEC_GL
+<span class="lineNum">      55 </span>            : } NVDecFrameMode ;
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : typedef enum
+<span class="lineNum">      58 </span>            : {
+<span class="lineNum">      59 </span>            :         NVDEC_CUVID = 0,
+<span class="lineNum">      60 </span>            :         NVDEC_CUDA,
+<span class="lineNum">      61 </span>            :         NVDEC_DXVA
+<span class="lineNum">      62 </span>            : } NVDecVideoMode;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : typedef struct _nv_dec_ctx
+<span class="lineNum">      65 </span>            : {
+<span class="lineNum">      66 </span>            :         u32 unload;
+<span class="lineNum">      67 </span>            :         NVDecFrameMode fmode;
+<span class="lineNum">      68 </span>            :         NVDecVideoMode vmode;
+<span class="lineNum">      69 </span>            :         u32 num_surfaces;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :         GF_FilterPid *ipid, *opid;
+<span class="lineNum">      72 </span>            :         u32 codec_id;
+<span class="lineNum">      73 </span>            :         Bool use_gl_texture;
+<span class="lineNum">      74 </span>            :         u32 width, height, bpp_luma, bpp_chroma;
+<span class="lineNum">      75 </span>            :         cudaVideoCodec codec_type;
+<span class="lineNum">      76 </span>            :         cudaVideoChromaFormat chroma_fmt;
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :         u32 out_size, stride, pix_fmt, stride_uv, nb_planes, uv_height;
+<span class="lineNum">      79 </span>            :         u32 reload_decoder_state;
+<span class="lineNum">      80 </span>            :         Bool skip_next_frame;
+<span class="lineNum">      81 </span>            :         CUresult decode_error, dec_create_error;
+<span class="lineNum">      82 </span>            :         Bool frame_size_changed;
+<span class="lineNum">      83 </span>            :         Bool needs_resetup;
+<span class="lineNum">      84 </span>            :         unsigned long prefer_dec_mode;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :         NVDecInstance *dec_inst;
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :         GF_List *frames;
+<span class="lineNum">      89 </span>            :         GF_List *frames_res;
+<span class="lineNum">      90 </span>            :         GF_List *src_packets;
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :         struct __nv_frame *pending_frame;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :         u8 *xps_buf;
+<span class="lineNum">      96 </span>            :         u32 xps_buf_size;
+<span class="lineNum">      97 </span>            :         u32 nal_size_length;
+<span class="lineNum">      98 </span>            :         Bool inject_xps;
+<span class="lineNum">      99 </span>            :         u8 *nal_buffer;
+<span class="lineNum">     100 </span>            :         u32 nal_buffer_alloc;
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :         u8 *single_frame_data;
+<span class="lineNum">     103 </span>            :         u32 single_frame_data_alloc;
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">     106 </span>            :         Bool gl_provider_requested;
+<span class="lineNum">     107 </span>            :         GLint y_tx_id, uv_tx_id;
+<span class="lineNum">     108 </span>            :         GLint y_pbo_id, uv_pbo_id;
+<span class="lineNum">     109 </span>            : #endif
+<span class="lineNum">     110 </span>            : } NVDecCtx;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            : struct _nv_dec_inst
+<span class="lineNum">     114 </span>            : {
+<span class="lineNum">     115 </span>            :         u32 width, height, bpp_luma, bpp_chroma, stride;
+<span class="lineNum">     116 </span>            :         cudaVideoCodec codec_type;
+<span class="lineNum">     117 </span>            :         cudaVideoChromaFormat chroma_fmt;
+<span class="lineNum">     118 </span>            :         u32 id;
+<span class="lineNum">     119 </span>            :         u32 th_id;
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :         //allocated video parser and decoder
+<span class="lineNum">     122 </span>            :         CUvideoparser cu_parser;
+<span class="lineNum">     123 </span>            :         CUvideodecoder cu_decoder;
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            :         //current associated context, 0 is none
+<span class="lineNum">     126 </span>            :         NVDecCtx *ctx;
+<span class="lineNum">     127 </span>            : };
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            : typedef struct __nv_frame
+<span class="lineNum">     131 </span>            : {
+<span class="lineNum">     132 </span>            :         CUVIDPARSERDISPINFO frame_info;
+<span class="lineNum">     133 </span>            :         NVDecCtx *ctx;
+<span class="lineNum">     134 </span>            :         GF_FilterFrameInterface gframe;
+<span class="lineNum">     135 </span>            :         Bool y_mapped, uv_mapped;
+<span class="lineNum">     136 </span>            : } NVDecFrame;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : static GF_List *global_unactive_decoders=NULL;
+<span class="lineNum">     139 </span>            : static u32 global_nb_loaded_nvdec = 0;
+<span class="lineNum">     140 </span>            : static u32 global_nb_loaded_decoders = 0;
+<span class="lineNum">     141 </span>            : static GF_Mutex *global_inst_mutex = NULL;
+<span class="lineNum">     142 </span>            : static CUcontext cuda_ctx = NULL;
+<span class="lineNum">     143 </span>            : #ifndef EMUL_NV_DLL
+<span class="lineNum">     144 </span>            : static Bool cuda_ctx_gl = GF_FALSE;
+<span class="lineNum">     145 </span>            : static CUdevice  cuda_dev = -1;
+<span class="lineNum">     146 </span>            : #endif
+<span class="lineNum">     147 </span>            : 
+<a name="148"><span class="lineNum">     148 </span>            : //#define ENABLE_10BIT_OUTPUT</a>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 : static GF_Err nvdec_init_decoder(NVDecCtx *ctx)</span>
+<span class="lineNum">     151 </span>            : {
+<span class="lineNum">     152 </span>            :         CUresult res;
+<span class="lineNum">     153 </span>            :         CUVIDDECODECREATEINFO cuvid_info;
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :         assert(ctx-&gt;dec_inst);
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :         memset(&amp;cuvid_info, 0, sizeof(CUVIDDECODECREATEINFO));
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :         cuvid_info.CodecType = ctx-&gt;codec_type;</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :         cuvid_info.ulWidth = ctx-&gt;width;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :         cuvid_info.ulHeight = ctx-&gt;height;</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :         cuvid_info.ulNumDecodeSurfaces = ctx-&gt;num_surfaces;</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :         cuvid_info.ChromaFormat = ctx-&gt;chroma_fmt;</span>
+<span class="lineNum">     163 </span>            :         cuvid_info.OutputFormat = cudaVideoSurfaceFormat_NV12;
+<span class="lineNum">     164 </span>            : #ifdef ENABLE_10BIT_OUTPUT
+<span class="lineNum">     165 </span>            :         if (ctx-&gt;bpp_luma + ctx-&gt;bpp_chroma &gt; 16)
+<span class="lineNum">     166 </span>            :                 cuvid_info.OutputFormat = cudaVideoSurfaceFormat_P016;
+<span class="lineNum">     167 </span>            : #endif
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :     cuvid_info.DeinterlaceMode = cudaVideoDeinterlaceMode_Adaptive;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :         cuvid_info.bitDepthMinus8 = ctx-&gt;bpp_luma - 8;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :         cuvid_info.ulTargetWidth = ctx-&gt;width;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :         cuvid_info.ulTargetHeight = ctx-&gt;height;</span>
+<span class="lineNum">     172 </span>            :     cuvid_info.display_area.left = 0;
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :     cuvid_info.display_area.right = ctx-&gt;width;</span>
+<span class="lineNum">     174 </span>            :     cuvid_info.display_area.top = 0;
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :         cuvid_info.display_area.bottom = ctx-&gt;height;</span>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     cuvid_info.ulNumOutputSurfaces = 1;</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :         cuvid_info.ulCreationFlags = ctx-&gt;prefer_dec_mode;</span>
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :     // create the decoder
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :         res = cuvidCreateDecoder(&amp;ctx-&gt;dec_inst-&gt;cu_decoder, &amp;cuvid_info);</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to create cuvid decoder %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                 ctx-&gt;dec_create_error = res;</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                 return GF_IO_ERR;</span>
+<span class="lineNum">     186 </span>            :         }
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :         global_nb_loaded_decoders++;</span>
+<span class="lineNum">     188 </span>            :         assert(global_nb_loaded_decoders);
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;id = global_nb_loaded_decoders;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;th_id = gf_th_id();</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] decoder instance %d created (%dx%d) - %d total decoders loaded\n&quot;, ctx-&gt;dec_inst-&gt;id, ctx-&gt;width, ctx-&gt;height, global_nb_loaded_decoders) );</span>
+<span class="lineNum">     192 </span>            :         return GF_OK;
+<a name="193"><span class="lineNum">     193 </span>            : }</a>
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 : Bool load_inactive_dec(NVDecCtx *ctx)</span>
+<span class="lineNum">     196 </span>            : {
+<span class="lineNum">     197 </span>            :         u32 i, count;
+<span class="lineNum">     198 </span>            :         //look for unactive decoder with same settings
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :         if (global_unactive_decoders) {</span>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                 gf_mx_p(global_inst_mutex);</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                 count = gf_list_count(global_unactive_decoders);</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :                         NVDecInstance *inst = gf_list_get(global_unactive_decoders, i);</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :                         if ((inst-&gt;width==ctx-&gt;width) &amp;&amp; (inst-&gt;height==ctx-&gt;height) &amp;&amp; (inst-&gt;bpp_luma == ctx-&gt;bpp_luma )</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :                                 &amp;&amp; (inst-&gt;bpp_chroma == ctx-&gt;bpp_chroma ) &amp;&amp; (inst-&gt;codec_type == ctx-&gt;codec_type) &amp;&amp; (inst-&gt;chroma_fmt == ctx-&gt;chroma_fmt )</span>
+<span class="lineNum">     207 </span>            :                                 ) {
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :                                         gf_list_rem(global_unactive_decoders, i);</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :                                         ctx-&gt;dec_inst = inst;</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :                                         inst-&gt;ctx = ctx;</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :                                         gf_mx_v(global_inst_mutex);</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                                         return GF_TRUE;</span>
+<span class="lineNum">     214 </span>            :                         }
+<span class="lineNum">     215 </span>            :                 }
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;dec_inst &amp;&amp; !ctx-&gt;dec_inst-&gt;cu_decoder) {</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :                         ctx-&gt;dec_inst-&gt;ctx = ctx;</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :                         gf_mx_v(global_inst_mutex);</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :                         return GF_FALSE;</span>
+<span class="lineNum">     220 </span>            :                 }
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;dec_inst) {</span>
+<span class="lineNum">     222 </span>            :                         NVDecInstance *inst = ctx-&gt;dec_inst;
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :                         if ((inst-&gt;width==ctx-&gt;width) &amp;&amp; (inst-&gt;height==ctx-&gt;height) &amp;&amp; (inst-&gt;bpp_luma == ctx-&gt;bpp_luma )</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :                                 &amp;&amp; (inst-&gt;bpp_chroma == ctx-&gt;bpp_chroma ) &amp;&amp; (inst-&gt;codec_type == ctx-&gt;codec_type) &amp;&amp; (inst-&gt;chroma_fmt == ctx-&gt;chroma_fmt )</span>
+<span class="lineNum">     225 </span>            :                                 ) {
+<span class="lineNum">     226 </span>            :                                 ctx-&gt;dec_inst = inst;
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :                                 inst-&gt;ctx = ctx;</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :                                 gf_mx_v(global_inst_mutex);</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :                                 return GF_TRUE;</span>
+<span class="lineNum">     230 </span>            :                         }
+<span class="lineNum">     231 </span>            :                 } else {
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :                         ctx-&gt;dec_inst = gf_list_pop_back(global_unactive_decoders);</span>
+<span class="lineNum">     233 </span>            :                 }
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :                 gf_mx_v(global_inst_mutex);</span>
+<span class="lineNum">     235 </span>            :         }
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;dec_inst) {</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :                 GF_SAFEALLOC(ctx-&gt;dec_inst, NVDecInstance);</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :                 if (!ctx-&gt;dec_inst)</span>
+<span class="lineNum">     239 </span>            :                         return GF_FALSE;
+<span class="lineNum">     240 </span>            :         }
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;ctx = ctx;</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :         return GF_FALSE;</span>
+<a name="243"><span class="lineNum">     243 </span>            : }</a>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 : static void nvdec_destroy_decoder(NVDecInstance *inst)</span>
+<span class="lineNum">     246 </span>            : {
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :         if (inst-&gt;cu_decoder) {</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :                 cuvidDestroyDecoder(inst-&gt;cu_decoder);</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :                 inst-&gt;cu_decoder = NULL;</span>
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :                 global_nb_loaded_decoders--;</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] decoder instance %d destruction - %d decoders still loaded\n&quot;, inst-&gt;id, global_nb_loaded_decoders ) );</span>
+<span class="lineNum">     252 </span>            :         }
+<a name="253"><span class="lineNum">     253 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 : static void update_pix_fmt(NVDecCtx *ctx, Bool use_10bits)</span>
+<span class="lineNum">     256 </span>            : {
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :         switch (ctx-&gt;chroma_fmt) {</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :         case cudaVideoChromaFormat_420:</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                 ctx-&gt;pix_fmt = use_10bits ? GF_PIXEL_NV12_10 : GF_PIXEL_NV12;</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :         case cudaVideoChromaFormat_422:</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :                 ctx-&gt;pix_fmt = use_10bits  ? GF_PIXEL_YUV422_10 : GF_PIXEL_YUV422;</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :         case cudaVideoChromaFormat_444:</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :                 ctx-&gt;pix_fmt = use_10bits  ? GF_PIXEL_YUV444_10 : GF_PIXEL_YUV444;</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                 ctx-&gt;pix_fmt = 0;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :                 return;</span>
+<span class="lineNum">     270 </span>            :         }
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :         gf_pixel_get_size_info(ctx-&gt;pix_fmt, ctx-&gt;width, ctx-&gt;height, &amp;ctx-&gt;out_size, &amp;ctx-&gt;stride, &amp;ctx-&gt;stride_uv, &amp;ctx-&gt;nb_planes, &amp;ctx-&gt;uv_height);</span>
+<a name="272"><span class="lineNum">     272 </span>            : }</a>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 : static int CUDAAPI HandleVideoSequence(void *pUserData, CUVIDEOFORMAT *pFormat)</span>
+<span class="lineNum">     275 </span>            : {
+<span class="lineNum">     276 </span>            :         Bool use_10bits=GF_FALSE;
+<span class="lineNum">     277 </span>            :         Bool skip_output_resize=GF_FALSE;
+<span class="lineNum">     278 </span>            :         NVDecInstance *inst= (NVDecInstance *)pUserData;
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = inst-&gt;ctx;</span>
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :         u32 w, h;
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :         w = pFormat-&gt;coded_width;</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :         h = pFormat-&gt;coded_height;</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :         if (pFormat-&gt;display_area.right &amp;&amp; (pFormat-&gt;display_area.right&lt;(s32)w)) w = pFormat-&gt;display_area.right;</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :         if (pFormat-&gt;display_area.bottom &amp;&amp; (pFormat-&gt;display_area.bottom&lt;(s32)h)) h = pFormat-&gt;display_area.bottom;</span>
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] Decoder instance %d Video sequence change detected - new setup %u x %u, %u bpp\n&quot;, inst-&gt;id, pFormat-&gt;coded_width, pFormat-&gt;coded_height, pFormat-&gt;bit_depth_luma_minus8 + 8) );</span>
+<span class="lineNum">     289 </span>            :         //no change in config
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :         if ((ctx-&gt;width == w)</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                 &amp;&amp; (ctx-&gt;height == h)</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :                 &amp;&amp; (ctx-&gt;bpp_luma == 8 + pFormat-&gt;bit_depth_luma_minus8)</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                 &amp;&amp; (ctx-&gt;bpp_chroma == 8 + pFormat-&gt;bit_depth_chroma_minus8)</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                 &amp;&amp; (ctx-&gt;codec_type == pFormat-&gt;codec)</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :                 &amp;&amp; (ctx-&gt;chroma_fmt == pFormat-&gt;chroma_format)</span>
+<span class="lineNum">     296 </span>            :         ) {
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;dec_inst &amp;&amp; ctx-&gt;dec_inst-&gt;cu_decoder)</span>
+<span class="lineNum">     298 </span>            :                         return 1;
+<span class="lineNum">     299 </span>            :                 skip_output_resize = GF_TRUE;
+<span class="lineNum">     300 </span>            :         }
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            :         //commented out since this falls back to soft decoding !
+<span class="lineNum">     303 </span>            : #ifdef ENABLE_10BIT_OUTPUT
+<span class="lineNum">     304 </span>            :         if (ctx-&gt;bpp_luma + ctx-&gt;bpp_chroma &gt; 16)  use_10bits = GF_TRUE;
+<span class="lineNum">     305 </span>            : #endif
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :         ctx-&gt;width = w;</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :         ctx-&gt;height = h;</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :         ctx-&gt;bpp_luma = 8 + pFormat-&gt;bit_depth_luma_minus8;</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :         ctx-&gt;bpp_chroma = 8 + pFormat-&gt;bit_depth_chroma_minus8;</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :         ctx-&gt;codec_type = pFormat-&gt;codec;</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :         ctx-&gt;chroma_fmt = pFormat-&gt;chroma_format;</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :         ctx-&gt;stride = pFormat-&gt;coded_width;</span>
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span>            :         //if load_inatcive returns TRUE, we are reusing an existing decoder with the same config, no need to recreate one
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :         if (load_inactive_dec(ctx)) {</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] reusing inactive decoder %dx%d - %d total decoders loaded\n&quot;, ctx-&gt;width, ctx-&gt;height, global_nb_loaded_decoders) );</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :                 ctx-&gt;stride = ctx-&gt;dec_inst-&gt;stride;</span>
+<span class="lineNum">     319 </span>            :                 //initial config, need to trigger output resize
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :                 if (!ctx-&gt;out_size) ctx-&gt;reload_decoder_state = 1;</span>
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :                 update_pix_fmt(ctx, use_10bits);</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     324 </span>            :         }
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;dec_inst) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     326 </span>            :         //if we have an existing decoder but with a different config, let's reload
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :         nvdec_destroy_decoder(ctx-&gt;dec_inst);</span>
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;width = ctx-&gt;width;</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;height = ctx-&gt;height;</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;bpp_luma = ctx-&gt;bpp_luma;</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;bpp_chroma = ctx-&gt;bpp_chroma;</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;codec_type = ctx-&gt;codec_type;</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;chroma_fmt = ctx-&gt;chroma_fmt;</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;ctx = ctx;</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :         ctx-&gt;stride = use_10bits ? 2*ctx-&gt;width : ctx-&gt;width;</span>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :         update_pix_fmt(ctx, use_10bits);</span>
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_WIDTH, &amp;PROP_UINT(ctx-&gt;width));</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(ctx-&gt;height));</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STRIDE, &amp;PROP_UINT(ctx-&gt;stride));</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_BIT_DEPTH_Y, &amp;PROP_UINT(use_10bits ? ctx-&gt;bpp_luma : 8));</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_BIT_DEPTH_UV, &amp;PROP_UINT(use_10bits ? ctx-&gt;bpp_chroma : 8));</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_PIXFMT, &amp;PROP_UINT(ctx-&gt;pix_fmt));</span>
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            :         assert(ctx-&gt;out_size);
+<span class="lineNum">     349 </span>            :         assert(ctx-&gt;stride);
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :         ctx-&gt;dec_inst-&gt;stride = ctx-&gt;stride;</span>
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :         if (! ctx-&gt;dec_inst-&gt;cu_decoder) {</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                 nvdec_init_decoder(ctx);</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                 if (!skip_output_resize) {</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :                         ctx-&gt;reload_decoder_state = 1;</span>
+<span class="lineNum">     356 </span>            :                 }
+<span class="lineNum">     357 </span>            :         } else {
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :                 ctx-&gt;reload_decoder_state = 2;</span>
+<span class="lineNum">     359 </span>            :         }
+<span class="lineNum">     360 </span>            :         return 1;
+<a name="361"><span class="lineNum">     361 </span>            : }</a>
+<span class="lineNum">     362 </span>            : 
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 : static int CUDAAPI HandlePictureDecode(void *pUserData, CUVIDPICPARAMS *pPicParams)</span>
+<span class="lineNum">     364 </span>            : {
+<span class="lineNum">     365 </span>            :         NVDecInstance *inst = (NVDecInstance *)pUserData;
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :         inst-&gt;ctx-&gt;decode_error = cuvidDecodePicture(inst-&gt;cu_decoder, pPicParams);</span>
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :         if (inst-&gt;ctx-&gt;decode_error != CUDA_SUCCESS) {</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] decoder instance %d failed to decode picture %s\n&quot;, inst-&gt;id, cudaGetErrorEnum(inst-&gt;ctx-&gt;decode_error) ) );</span>
+<span class="lineNum">     370 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     371 </span>            :         }
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_CODEC, (&quot;[NVDec] decoded picture %u OK\n&quot;, pPicParams-&gt;CurrPicIdx ) );</span>
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            :         return 1;
+<a name="375"><span class="lineNum">     375 </span>            : }</a>
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 : static int CUDAAPI HandlePictureDisplay(void *pUserData, CUVIDPARSERDISPINFO *pPicParams)</span>
+<span class="lineNum">     378 </span>            : {
+<span class="lineNum">     379 </span>            :         u32 i, count;
+<span class="lineNum">     380 </span>            :         NVDecFrame *f;
+<span class="lineNum">     381 </span>            :         NVDecInstance *inst = (NVDecInstance *)pUserData;
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = (NVDecCtx *)inst-&gt;ctx;</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_CODEC, (&quot;[NVDec] picture %u CTS &quot;LLU&quot; ready for display, queuing it\n&quot;, pPicParams-&gt;picture_index, pPicParams-&gt;timestamp) );</span>
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :         f = gf_list_pop_back(ctx-&gt;frames_res);</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :         if (!f) {</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :                 GF_SAFEALLOC(f, NVDecFrame);</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :                 if (!f) return 0;</span>
+<span class="lineNum">     389 </span>            :         }
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :         f-&gt;frame_info = *pPicParams;</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :         f-&gt;frame_info.timestamp = pPicParams-&gt;timestamp;</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :         f-&gt;ctx = ctx;</span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :         count = gf_list_count(ctx-&gt;frames);</span>
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :                 NVDecFrame *af = gf_list_get(ctx-&gt;frames, i);</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :                 if (af-&gt;frame_info.timestamp &gt; f-&gt;frame_info.timestamp) {</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :                         gf_list_insert(ctx-&gt;frames, f, i);</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :                         return 1;</span>
+<span class="lineNum">     399 </span>            :                 }
+<span class="lineNum">     400 </span>            :         }
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :         gf_list_add(ctx-&gt;frames, f);</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :         return 1;</span>
+<a name="403"><span class="lineNum">     403 </span>            : }</a>
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 : static void nvdec_store_paramlist(GF_BitStream *bs, GF_List *psl)</span>
+<span class="lineNum">     406 </span>            : {
+<span class="lineNum">     407 </span>            :         u32 i, count;
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :         count = gf_list_count(psl);</span>
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :                 GF_NALUFFParam *slc = gf_list_get(psl, i);</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :                 gf_bs_write_u32(bs, 1);</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :                 gf_bs_write_data(bs, slc-&gt;data, slc-&gt;size);</span>
+<span class="lineNum">     413 </span>            :         }
+<a name="414"><span class="lineNum">     414 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 : static void nvdec_store_xps(NVDecCtx *ctx, GF_AVCConfig *avc_cfg, GF_HEVCConfig *hevc_cfg)</span>
+<span class="lineNum">     417 </span>            : {
+<span class="lineNum">     418 </span>            :         u32 i, count;
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :         GF_BitStream *bs = gf_bs_new(NULL, 0, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :         if (avc_cfg) {</span>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :                 ctx-&gt;nal_size_length = avc_cfg-&gt;nal_unit_size;</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :                 nvdec_store_paramlist(bs, avc_cfg-&gt;sequenceParameterSets);</span>
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :                 nvdec_store_paramlist(bs, avc_cfg-&gt;sequenceParameterSetExtensions);</span>
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :                 nvdec_store_paramlist(bs, avc_cfg-&gt;pictureParameterSets);</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :                 gf_odf_avc_cfg_del(avc_cfg);</span>
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :         } else if (hevc_cfg) {</span>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :                 ctx-&gt;nal_size_length = hevc_cfg-&gt;nal_unit_size;</span>
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :                 count = gf_list_count(hevc_cfg-&gt;param_array);</span>
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :                         GF_NALUFFParamArray *pa = gf_list_get(hevc_cfg-&gt;param_array, i);</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :                         nvdec_store_paramlist(bs, pa-&gt;nalus);</span>
+<span class="lineNum">     432 </span>            :                 }
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :                 gf_odf_hevc_cfg_del(hevc_cfg);</span>
+<span class="lineNum">     434 </span>            :         }
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :         if (ctx-&gt;xps_buf) gf_free(ctx-&gt;xps_buf);</span>
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :         ctx-&gt;xps_buf = NULL;</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :         ctx-&gt;xps_buf_size = 0;</span>
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :         gf_bs_get_content(bs, &amp;ctx-&gt;xps_buf, &amp;ctx-&gt;xps_buf_size);</span>
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 :         gf_bs_del(bs);</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :         ctx-&gt;inject_xps = GF_TRUE;</span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 : }</span>
+<a name="442"><span class="lineNum">     442 </span>            : </a>
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 : static GF_Err nvdec_configure_stream(GF_Filter *filter, NVDecCtx *ctx)</span>
+<span class="lineNum">     445 </span>            : {
+<span class="lineNum">     446 </span>            : #ifndef EMUL_NV_DLL
+<span class="lineNum">     447 </span>            :         CUresult res;
+<span class="lineNum">     448 </span>            : #endif
+<span class="lineNum">     449 </span>            :         GF_HEVCConfig *hevc_cfg = NULL;
+<span class="lineNum">     450 </span>            :         GF_AVCConfig *avc_cfg = NULL;
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :         const GF_PropertyValue *dcd = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     452 </span>            :     CUVIDPARSERPARAMS oVideoParserParameters;
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :         switch (ctx-&gt;codec_id) {</span>
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :         case GF_CODECID_MPEG1:</span>
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :                 ctx-&gt;codec_type = cudaVideoCodec_MPEG1;</span>
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :         case GF_CODECID_MPEG2_SIMPLE:</span>
+<span class="lineNum">     459 </span>            :         case GF_CODECID_MPEG2_MAIN:
+<span class="lineNum">     460 </span>            :         case GF_CODECID_MPEG2_SNR:
+<span class="lineNum">     461 </span>            :         case GF_CODECID_MPEG2_SPATIAL:
+<span class="lineNum">     462 </span>            :         case GF_CODECID_MPEG2_HIGH:
+<span class="lineNum">     463 </span>            :         case GF_CODECID_MPEG2_422:
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :                 ctx-&gt;codec_type = cudaVideoCodec_MPEG2;</span>
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :         case GF_CODECID_MPEG4_PART2:</span>
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :                 ctx-&gt;codec_type = cudaVideoCodec_MPEG4;</span>
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :         case GF_CODECID_AVC:</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :                 if (!dcd) return GF_EOS;</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :                 ctx-&gt;codec_type = cudaVideoCodec_H264;</span>
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :                 avc_cfg = gf_odf_avc_cfg_read(dcd-&gt;value.data.ptr, dcd-&gt;value.data.size);</span>
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :                 if (!avc_cfg) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     474 </span>            :                 break;
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :         case GF_CODECID_HEVC:</span>
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :                 if (!dcd) return GF_EOS;</span>
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :                 ctx-&gt;codec_type = cudaVideoCodec_HEVC;</span>
+<span class="lineNum">     478 </span><span class="lineNoCov">          0 :                 hevc_cfg = gf_odf_hevc_cfg_read(dcd-&gt;value.data.ptr, dcd-&gt;value.data.size, GF_FALSE);</span>
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :                 if (!hevc_cfg) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     480 </span>            :                 break;
+<span class="lineNum">     481 </span>            :         }
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span>            :         //create a video parser and a video decoder
+<span class="lineNum">     484 </span>            :     memset(&amp;oVideoParserParameters, 0, sizeof(CUVIDPARSERPARAMS));
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :         ctx-&gt;needs_resetup = GF_FALSE;</span>
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :         ctx-&gt;nal_size_length = 0;</span>
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span>            :         //this destroys avc_cfg / hevc_cfg
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :         if (avc_cfg || hevc_cfg)</span>
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :                 nvdec_store_xps(ctx, avc_cfg, hevc_cfg);</span>
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :         if (load_inactive_dec(ctx)) {</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] reusing inactive decoder %dx%d - %d total decoders loaded\n&quot;, ctx-&gt;width, ctx-&gt;height, global_nb_loaded_decoders ) );</span>
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :                 ctx-&gt;stride = ctx-&gt;dec_inst-&gt;stride;</span>
+<span class="lineNum">     495 </span>            :         }
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;dec_inst) {</span>
+<span class="lineNum">     497 </span>            :                 return GF_OUT_OF_MEM;
+<span class="lineNum">     498 </span>            :         }
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :         ctx-&gt;decode_error = CUDA_SUCCESS;</span>
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :         oVideoParserParameters.CodecType = ctx-&gt;codec_type;</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :     oVideoParserParameters.ulMaxNumDecodeSurfaces = ctx-&gt;num_surfaces;</span>
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :     oVideoParserParameters.ulMaxDisplayDelay = 4;</span>
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :         oVideoParserParameters.ulClockRate = 1000;</span>
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :     oVideoParserParameters.pExtVideoInfo = NULL;</span>
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :     oVideoParserParameters.pfnSequenceCallback = HandleVideoSequence;    // Called before decoding frames and/or whenever there is a format change</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :     oVideoParserParameters.pfnDecodePicture = HandlePictureDecode;    // Called when a picture is ready to be decoded (decode order)</span>
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :     oVideoParserParameters.pfnDisplayPicture = HandlePictureDisplay;   // Called whenever a picture is ready to be displayed (display order)</span>
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :         oVideoParserParameters.pUserData = ctx-&gt;dec_inst;</span>
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            : #ifndef EMUL_NV_DLL
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :     res = cuCtxPushCurrent(cuda_ctx);</span>
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to push CUDA CTX %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     515 </span>            :         }
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :         res = cuvidCreateVideoParser(&amp;ctx-&gt;dec_inst-&gt;cu_parser, &amp;oVideoParserParameters);</span>
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :         cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 :         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to create CUVID parserCTX %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     521 </span>            :                 return GF_PROFILE_NOT_SUPPORTED;
+<span class="lineNum">     522 </span>            :         }
+<span class="lineNum">     523 </span>            : #endif
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_CODEC, (&quot;[NVDec] video parser init OK\n&quot;) );</span>
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :         switch (ctx-&gt;codec_type) {</span>
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :         case cudaVideoCodec_MPEG1:</span>
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :                 gf_filter_set_name(filter, ctx-&gt;use_gl_texture ? &quot;NVidia HWGL MPEG-1&quot; : &quot;NVidia HW MPEG-1&quot;);</span>
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :         case cudaVideoCodec_MPEG2:</span>
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :                 gf_filter_set_name(filter, ctx-&gt;use_gl_texture ? &quot;NVidia HWGLMPEG-2&quot; : &quot;NVidia HW MPEG-2&quot;);</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :         case cudaVideoCodec_MPEG4:</span>
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 :                 gf_filter_set_name(filter, ctx-&gt;use_gl_texture ? &quot;NVidia HWGL MPEG-4 part2&quot; : &quot;NVidia HW MPEG-4 part2&quot;);</span>
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :         case cudaVideoCodec_H264:</span>
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :                 gf_filter_set_name(filter, ctx-&gt;use_gl_texture ? &quot;NVidia HWGL AVC|H264&quot; : &quot;NVidia HW AVC|H264&quot;);</span>
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :         case cudaVideoCodec_HEVC:</span>
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :                 gf_filter_set_name(filter, ctx-&gt;use_gl_texture ? &quot;NVidia HWGL HEVC&quot; : &quot;NVidia HW HEVC&quot;);</span>
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :         case cudaVideoCodec_VC1:</span>
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :                 gf_filter_set_name(filter, ctx-&gt;use_gl_texture ? &quot;NVidia HWGL VC1&quot; : &quot;NVidia HW VC1&quot;);</span>
+<span class="lineNum">     545 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     546 </span>            :         default:
+<span class="lineNum">     547 </span>            :                 break;
+<span class="lineNum">     548 </span>            :         }
+<span class="lineNum">     549 </span>            :         return GF_OK;
+<a name="550"><span class="lineNum">     550 </span>            : }</a>
+<span class="lineNum">     551 </span>            : 
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 : static GF_Err nvdec_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     553 </span>            : {
+<span class="lineNum">     554 </span>            :         const GF_PropertyValue *prop;
+<span class="lineNum">     555 </span>            : #ifndef EMUL_NV_DLL
+<span class="lineNum">     556 </span>            :         CUresult res;
+<span class="lineNum">     557 </span>            : #endif
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = (NVDecCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span><span class="lineNoCov">          0 :         if (is_remove) {</span>
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">     562 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">     564 </span>            :                 }
+<span class="lineNum">     565 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">     566 </span>            : 
+<span class="lineNum">     567 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;unload == 2) {</span>
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 :                         global_nb_loaded_nvdec--;</span>
+<span class="lineNum">     569 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;dec_inst) {</span>
+<span class="lineNum">     570 </span>            :                                 assert(global_unactive_decoders);
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :                                 gf_mx_p(global_inst_mutex);</span>
+<span class="lineNum">     572 </span><span class="lineNoCov">          0 :                                 ctx-&gt;dec_inst-&gt;ctx = NULL;</span>
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :                                 gf_list_add(global_unactive_decoders, ctx-&gt;dec_inst);</span>
+<span class="lineNum">     574 </span><span class="lineNoCov">          0 :                                 ctx-&gt;dec_inst = NULL;</span>
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 :                                 gf_mx_v(global_inst_mutex);</span>
+<span class="lineNum">     576 </span>            :                         }
+<span class="lineNum">     577 </span>            :                 }
+<span class="lineNum">     578 </span>            :         }
+<span class="lineNum">     579 </span>            : 
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :         if (ctx-&gt;ipid &amp;&amp; (ctx-&gt;ipid != pid)) return GF_REQUIRES_NEW_INSTANCE;</span>
+<span class="lineNum">     582 </span>            : 
+<span class="lineNum">     583 </span><span class="lineNoCov">          0 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">     584 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     585 </span><span class="lineNoCov">          0 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :         ctx-&gt;use_gl_texture = (ctx-&gt;fmode == NVDEC_GL) ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">     587 </span>            : 
+<span class="lineNum">     588 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">     589 </span><span class="lineNoCov">          0 :         if (ctx-&gt;use_gl_texture &amp;&amp; (ctx-&gt;fmode==NVDEC_GL) &amp;&amp; !ctx-&gt;gl_provider_requested) {</span>
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :                 GF_Err e = gf_filter_request_opengl(filter);</span>
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :                 if (e) {</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to request an openGL provider (error %s), will not use OpenGL output\n&quot;, gf_error_to_string(e) ));</span>
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :                         ctx-&gt;use_gl_texture = GF_FALSE;</span>
+<span class="lineNum">     594 </span>            :                 }
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 :                 ctx-&gt;gl_provider_requested = GF_TRUE;</span>
+<span class="lineNum">     596 </span>            :         }
+<span class="lineNum">     597 </span>            : #endif
+<span class="lineNum">     598 </span>            : 
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :         prop = gf_filter_pid_get_property(pid, GF_PROP_PID_CODECID);</span>
+<span class="lineNum">     600 </span><span class="lineNoCov">          0 :         if (!prop) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :         ctx-&gt;codec_id = prop-&gt;value.uint;</span>
+<span class="lineNum">     602 </span>            : 
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :         switch (ctx-&gt;codec_id) {</span>
+<span class="lineNum">     604 </span>            :         case GF_CODECID_MPEG1:
+<span class="lineNum">     605 </span>            :         case GF_CODECID_MPEG2_SIMPLE:
+<span class="lineNum">     606 </span>            :         case GF_CODECID_MPEG2_MAIN:
+<span class="lineNum">     607 </span>            :         case GF_CODECID_MPEG2_SNR:
+<span class="lineNum">     608 </span>            :         case GF_CODECID_MPEG2_SPATIAL:
+<span class="lineNum">     609 </span>            :         case GF_CODECID_MPEG2_HIGH:
+<span class="lineNum">     610 </span>            :         case GF_CODECID_MPEG2_422:
+<span class="lineNum">     611 </span>            :         case GF_CODECID_MPEG4_PART2:
+<span class="lineNum">     612 </span>            :         case GF_CODECID_AVC:
+<span class="lineNum">     613 </span>            :         case GF_CODECID_HEVC:
+<span class="lineNum">     614 </span>            :                 break;
+<span class="lineNum">     615 </span>            :         default:
+<span class="lineNum">     616 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     617 </span>            :         }
+<span class="lineNum">     618 </span>            : 
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;opid)</span>
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     621 </span>            : 
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :         gf_filter_pid_copy_properties(ctx-&gt;opid, ctx-&gt;ipid);</span>
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG, NULL);</span>
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG_ENHANCEMENT, NULL);</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_RAW) );</span>
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_UNFRAMED, NULL);</span>
+<span class="lineNum">     627 </span>            : 
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :         gf_filter_pid_set_framing_mode(ctx-&gt;ipid, GF_TRUE);</span>
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span><span class="lineNoCov">          0 :         switch (ctx-&gt;codec_id) {</span>
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :         case GF_CODECID_AVC:</span>
+<span class="lineNum">     632 </span>            :         case GF_CODECID_HEVC:
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :                 prop = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     634 </span>            :                 //not ready yet
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :                 if (!prop) return GF_OK;</span>
+<span class="lineNum">     636 </span>            :                 break;
+<span class="lineNum">     637 </span>            :         }
+<span class="lineNum">     638 </span>            : 
+<span class="lineNum">     639 </span>            : #ifdef GPAC_DISABLE_3D
+<span class="lineNum">     640 </span>            :         ctx-&gt;use_gl_texture = GF_FALSE;
+<span class="lineNum">     641 </span>            : #endif
+<span class="lineNum">     642 </span>            : 
+<span class="lineNum">     643 </span><span class="lineNoCov">          0 :         if (! cuda_ctx) {</span>
+<span class="lineNum">     644 </span>            : #ifndef EMUL_NV_DLL
+<span class="lineNum">     645 </span>            :             int major, minor;
+<span class="lineNum">     646 </span>            :             char deviceName[256];
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 :                 res = cuDeviceGet(&amp;cuda_dev, 0);</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :                 if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     649 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to init cuda device %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :                         return GF_IO_ERR;</span>
+<span class="lineNum">     651 </span>            :                 }
+<span class="lineNum">     652 </span>            : 
+<span class="lineNum">     653 </span><span class="lineNoCov">          0 :                 cuDeviceComputeCapability(&amp;major, &amp;minor, cuda_dev);</span>
+<span class="lineNum">     654 </span><span class="lineNoCov">          0 :                 cuDeviceGetName(deviceName, 256, cuda_dev);</span>
+<span class="lineNum">     655 </span>            : 
+<span class="lineNum">     656 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] GPU Device %s (idx 0) has SM %d.%d compute capability\n&quot;, deviceName, major, minor));</span>
+<span class="lineNum">     657 </span>            : 
+<span class="lineNum">     658 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;use_gl_texture) {</span>
+<span class="lineNum">     659 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">     660 </span><span class="lineNoCov">          0 :                         res = cuGLCtxCreate(&amp;cuda_ctx, CU_CTX_BLOCKING_SYNC, cuda_dev);</span>
+<span class="lineNum">     661 </span>            : 
+<span class="lineNum">     662 </span>            : #ifdef LOAD_GL_1_5
+<span class="lineNum">     663 </span>            :                         GET_GLFUN(glGenBuffers);
+<span class="lineNum">     664 </span>            :                         GET_GLFUN(glBindBuffer);
+<span class="lineNum">     665 </span>            :                         GET_GLFUN(glBufferData);
+<span class="lineNum">     666 </span>            : #endif
+<span class="lineNum">     667 </span><span class="lineNoCov">          0 :                         cuda_ctx_gl = GF_TRUE;</span>
+<span class="lineNum">     668 </span>            : 
+<span class="lineNum">     669 </span>            : #endif
+<span class="lineNum">     670 </span>            :                 } else {
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 :                         res = cuCtxCreate(&amp;cuda_ctx, CU_CTX_BLOCKING_SYNC, cuda_dev);</span>
+<span class="lineNum">     672 </span><span class="lineNoCov">          0 :                         cuda_ctx_gl = GF_FALSE;</span>
+<span class="lineNum">     673 </span>            :                 }
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 :                 if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     675 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;use_gl_texture) {</span>
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 :                                 cuda_ctx_gl = GF_FALSE;</span>
+<span class="lineNum">     677 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_CODEC, (&quot;[NVDec] Couldn't initialize cuda OpenGL context (error %s), retrying without OpenGL support\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     678 </span><span class="lineNoCov">          0 :                                 res = cuCtxCreate(&amp;cuda_ctx, CU_CTX_BLOCKING_SYNC, cuda_dev);</span>
+<span class="lineNum">     679 </span><span class="lineNoCov">          0 :                                 if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     680 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to init cuda context %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     681 </span>            :                                 } else {
+<span class="lineNum">     682 </span><span class="lineNoCov">          0 :                                         ctx-&gt;use_gl_texture = GF_FALSE;</span>
+<span class="lineNum">     683 </span>            :                                 }
+<span class="lineNum">     684 </span>            :                         } else {
+<span class="lineNum">     685 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to init cuda context %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     686 </span>            :                         }
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 :                         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     689 </span>            :                                 return GF_IO_ERR;
+<span class="lineNum">     690 </span>            :                         }
+<span class="lineNum">     691 </span>            :                 }
+<span class="lineNum">     692 </span>            : #endif
+<span class="lineNum">     693 </span>            : 
+<span class="lineNum">     694 </span>            :         }
+<span class="lineNum">     695 </span>            : 
+<span class="lineNum">     696 </span><span class="lineNoCov">          0 :         if (ctx-&gt;vmode == NVDEC_DXVA)</span>
+<span class="lineNum">     697 </span><span class="lineNoCov">          0 :                 ctx-&gt;prefer_dec_mode = cudaVideoCreate_PreferDXVA;</span>
+<span class="lineNum">     698 </span><span class="lineNoCov">          0 :         else if (ctx-&gt;vmode == NVDEC_CUDA)</span>
+<span class="lineNum">     699 </span><span class="lineNoCov">          0 :                 ctx-&gt;prefer_dec_mode = cudaVideoCreate_PreferCUDA;</span>
+<span class="lineNum">     700 </span>            :         else
+<span class="lineNum">     701 </span><span class="lineNoCov">          0 :                 ctx-&gt;prefer_dec_mode = cudaVideoCreate_PreferCUVID;</span>
+<span class="lineNum">     702 </span>            : 
+<span class="lineNum">     703 </span><span class="lineNoCov">          0 :         if (ctx-&gt;unload == 2) {</span>
+<span class="lineNum">     704 </span><span class="lineNoCov">          0 :                 global_nb_loaded_nvdec++;</span>
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :                 if (!global_inst_mutex ) global_inst_mutex  = gf_mx_new(&quot;NVDecGlobal&quot;);</span>
+<span class="lineNum">     706 </span><span class="lineNoCov">          0 :                 gf_mx_p(global_inst_mutex);</span>
+<span class="lineNum">     707 </span><span class="lineNoCov">          0 :                 if (!global_unactive_decoders) global_unactive_decoders = gf_list_new();</span>
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 :                 gf_mx_v(global_inst_mutex);</span>
+<span class="lineNum">     709 </span>            :         }
+<span class="lineNum">     710 </span>            : 
+<span class="lineNum">     711 </span>            : 
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :         ctx-&gt;needs_resetup = GF_TRUE;</span>
+<span class="lineNum">     713 </span>            : 
+<span class="lineNum">     714 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<a name="715"><span class="lineNum">     715 </span>            : }</a>
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 : static Bool nvdec_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     718 </span>            : {
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = (NVDecCtx *)gf_filter_get_udta(filter);</span>
+<span class="lineNum">     720 </span><span class="lineNoCov">          0 :         if (evt-&gt;base.type == GF_FEVT_PLAY) {</span>
+<span class="lineNum">     721 </span><span class="lineNoCov">          0 :                 while (gf_list_count(ctx-&gt;frames)) {</span>
+<span class="lineNum">     722 </span><span class="lineNoCov">          0 :                         NVDecFrame *f = gf_list_pop_back(ctx-&gt;frames);</span>
+<span class="lineNum">     723 </span><span class="lineNoCov">          0 :                         gf_list_add(ctx-&gt;frames_res, f);</span>
+<span class="lineNum">     724 </span>            :                 }
+<span class="lineNum">     725 </span>            :         }
+<span class="lineNum">     726 </span><span class="lineNoCov">          0 :         return GF_FALSE;</span>
+<span class="lineNum">     727 </span>            : }
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span>            : 
+<span class="lineNum">     730 </span>            : #if 0
+<span class="lineNum">     731 </span>            :         case GF_CODEC_ABORT:
+<span class="lineNum">     732 </span>            :                 while (gf_list_count(ctx-&gt;frames)) {
+<span class="lineNum">     733 </span>            :                         NVDecFrame *f = (NVDecFrame *) gf_list_pop_back(ctx-&gt;frames);
+<span class="lineNum">     734 </span>            :                         memset(f, 0, sizeof(NVDecFrame));
+<span class="lineNum">     735 </span>            :                         gf_list_add(ctx-&gt;frames_res, f);
+<span class="lineNum">     736 </span>            :                 }
+<span class="lineNum">     737 </span>            :                 if (ctx-&gt;unload == 2) {
+<span class="lineNum">     738 </span>            :                         if (ctx-&gt;dec_inst) {
+<span class="lineNum">     739 </span>            :                                 assert(global_unactive_decoders);
+<span class="lineNum">     740 </span>            :                                 gf_mx_p(global_inst_mutex);
+<span class="lineNum">     741 </span>            :                                 if (ctx-&gt;decode_error) {
+<span class="lineNum">     742 </span>            :                                         GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] deactivating decoder %dx%d and destroying instance\n&quot;, ctx-&gt;width, ctx-&gt;height ) );
+<span class="lineNum">     743 </span>            :                                         nvdec_destroy_decoder(ctx-&gt;dec_inst);
+<span class="lineNum">     744 </span>            :                                 } else {
+<span class="lineNum">     745 </span>            :                                         GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] deactivating decoder %dx%d\n&quot;, ctx-&gt;width, ctx-&gt;height ) );
+<span class="lineNum">     746 </span>            :                                 }
+<span class="lineNum">     747 </span>            :                                 ctx-&gt;dec_inst-&gt;ctx = NULL;
+<span class="lineNum">     748 </span>            :                                 gf_list_add(global_unactive_decoders, ctx-&gt;dec_inst);
+<span class="lineNum">     749 </span>            :                                 ctx-&gt;dec_inst = NULL;
+<span class="lineNum">     750 </span>            :                                 gf_mx_v(global_inst_mutex);
+<span class="lineNum">     751 </span>            :                         }
+<span class="lineNum">     752 </span>            :                         ctx-&gt;needs_resetup = GF_TRUE;
+<span class="lineNum">     753 </span>            :                         ctx-&gt;dec_create_error = CUDA_SUCCESS;
+<span class="lineNum">     754 </span>            :                 } else if (ctx-&gt;unload == 1) {
+<span class="lineNum">     755 </span>            :                         if (ctx-&gt;dec_inst) {
+<span class="lineNum">     756 </span>            :                                 nvdec_destroy_decoder(ctx-&gt;dec_inst);
+<span class="lineNum">     757 </span>            :                         }
+<span class="lineNum">     758 </span>            :                         ctx-&gt;needs_resetup = GF_TRUE;
+<span class="lineNum">     759 </span>            :                         ctx-&gt;dec_create_error = CUDA_SUCCESS;
+<span class="lineNum">     760 </span>            :                 }
+<span class="lineNum">     761 </span>            :                 return GF_OK;
+<span class="lineNum">     762 </span>            :         }
+<span class="lineNum">     763 </span>            : #endif
+<span class="lineNum">     764 </span>            : 
+<a name="765"><span class="lineNum">     765 </span>            : static GF_Err nvdec_send_hw_frame(NVDecCtx *ctx);</a>
+<span class="lineNum">     766 </span>            : 
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 : static void nvdec_reset_pcks(NVDecCtx *ctx)</span>
+<span class="lineNum">     768 </span>            : {
+<span class="lineNum">     769 </span><span class="lineNoCov">          0 :         while (gf_list_count(ctx-&gt;src_packets)) {</span>
+<span class="lineNum">     770 </span><span class="lineNoCov">          0 :                 GF_FilterPacket *pck = gf_list_pop_back(ctx-&gt;src_packets);</span>
+<span class="lineNum">     771 </span><span class="lineNoCov">          0 :                 gf_filter_pck_unref(pck);</span>
+<span class="lineNum">     772 </span>            :         }
+<a name="773"><span class="lineNum">     773 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     774 </span>            : 
+<span class="lineNum">     775 </span><span class="lineNoCov">          0 : static void nvdec_merge_pck_props(NVDecCtx *ctx, NVDecFrame *f,  GF_FilterPacket *dst_pck)</span>
+<span class="lineNum">     776 </span>            : {
+<span class="lineNum">     777 </span>            :         u32 i, count;
+<span class="lineNum">     778 </span>            :         GF_FilterPacket *src_pck = NULL;
+<span class="lineNum">     779 </span><span class="lineNoCov">          0 :         count = gf_list_count(ctx-&gt;src_packets);</span>
+<span class="lineNum">     780 </span><span class="lineNoCov">          0 :         for (i = 0; i&lt;count; i++) {</span>
+<span class="lineNum">     781 </span><span class="lineNoCov">          0 :                 src_pck = gf_list_get(ctx-&gt;src_packets, i);</span>
+<span class="lineNum">     782 </span><span class="lineNoCov">          0 :                 if (gf_filter_pck_get_cts(src_pck) == f-&gt;frame_info.timestamp) {</span>
+<span class="lineNum">     783 </span><span class="lineNoCov">          0 :                         gf_filter_pck_merge_properties(src_pck, dst_pck);</span>
+<span class="lineNum">     784 </span><span class="lineNoCov">          0 :                         gf_list_rem(ctx-&gt;src_packets, i);</span>
+<span class="lineNum">     785 </span><span class="lineNoCov">          0 :                         gf_filter_pck_unref(src_pck);</span>
+<span class="lineNum">     786 </span>            :                         return;
+<span class="lineNum">     787 </span>            :                 }
+<span class="lineNum">     788 </span>            :         }
+<span class="lineNum">     789 </span>            :         //not found !
+<span class="lineNum">     790 </span><span class="lineNoCov">          0 :         gf_filter_pck_set_cts(dst_pck, f-&gt;frame_info.timestamp);</span>
+<span class="lineNum">     791 </span><span class="lineNoCov">          0 :         if (!gf_filter_pck_get_interlaced(dst_pck) &amp;&amp; !f-&gt;frame_info.progressive_frame) {</span>
+<span class="lineNum">     792 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_interlaced(dst_pck, f-&gt;frame_info.top_field_first ? 1 : 2);</span>
+<span class="lineNum">     793 </span>            :         }
+<a name="794"><span class="lineNum">     794 </span>            : }</a>
+<span class="lineNum">     795 </span>            : 
+<span class="lineNum">     796 </span><span class="lineNoCov">          0 : static GF_Err nvdec_process(GF_Filter *filter)</span>
+<span class="lineNum">     797 </span>            : {
+<span class="lineNum">     798 </span>            :         NVDecFrame *f;
+<span class="lineNum">     799 </span><span class="lineNoCov">          0 :     CUdeviceptr map_mem = 0;</span>
+<span class="lineNum">     800 </span>            :         CUVIDPROCPARAMS params;
+<span class="lineNum">     801 </span><span class="lineNoCov">          0 :         unsigned int pitch = 0;</span>
+<span class="lineNum">     802 </span>            :         GF_Err e;
+<span class="lineNum">     803 </span>            :         u32 pck_size;
+<span class="lineNum">     804 </span>            :         const u8 *data;
+<span class="lineNum">     805 </span>            :         u8 *output;
+<span class="lineNum">     806 </span>            :         GF_FilterPacket *ipck, *dst_pck;
+<span class="lineNum">     807 </span>            :     CUVIDSOURCEDATAPACKET cu_pkt;
+<span class="lineNum">     808 </span>            :         CUresult res;
+<span class="lineNum">     809 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = (NVDecCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     810 </span>            : 
+<span class="lineNum">     811 </span><span class="lineNoCov">          0 :         ipck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     812 </span>            : 
+<span class="lineNum">     813 </span><span class="lineNoCov">          0 :         if (ctx-&gt;needs_resetup) {</span>
+<span class="lineNum">     814 </span><span class="lineNoCov">          0 :                 e = nvdec_configure_stream(filter, ctx);</span>
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :                 if (e&lt;0) return e;</span>
+<span class="lineNum">     816 </span>            :                 //not ready
+<span class="lineNum">     817 </span><span class="lineNoCov">          0 :                 if (e==GF_EOS) return GF_OK;</span>
+<span class="lineNum">     818 </span>            :         }
+<span class="lineNum">     819 </span>            : 
+<span class="lineNum">     820 </span>            :         memset(&amp;cu_pkt, 0, sizeof(CUVIDSOURCEDATAPACKET));
+<span class="lineNum">     821 </span><span class="lineNoCov">          0 :         cu_pkt.flags = CUVID_PKT_TIMESTAMP;</span>
+<span class="lineNum">     822 </span><span class="lineNoCov">          0 :         pck_size = 0;</span>
+<span class="lineNum">     823 </span>            :         data = NULL;
+<span class="lineNum">     824 </span><span class="lineNoCov">          0 :         if (!ipck) {</span>
+<span class="lineNum">     825 </span><span class="lineNoCov">          0 :                 if (!gf_filter_pid_is_eos(ctx-&gt;ipid))</span>
+<span class="lineNum">     826 </span>            :                         return GF_OK;
+<span class="lineNum">     827 </span>            : 
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 :                 cu_pkt.flags |= CUVID_PKT_ENDOFSTREAM;</span>
+<span class="lineNum">     829 </span><span class="lineNoCov">          0 :                 ctx-&gt;skip_next_frame = GF_FALSE;</span>
+<span class="lineNum">     830 </span>            :         } else {
+<span class="lineNum">     831 </span><span class="lineNoCov">          0 :                 data = gf_filter_pck_get_data(ipck, &amp;pck_size);</span>
+<span class="lineNum">     832 </span>            :         }
+<span class="lineNum">     833 </span>            : 
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :         if (ctx-&gt;dec_create_error) {</span>
+<span class="lineNum">     835 </span><span class="lineNoCov">          0 :                 if (ipck) gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     836 </span><span class="lineNoCov">          0 :                 else if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     837 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     838 </span><span class="lineNoCov">          0 :                         return GF_EOS;</span>
+<span class="lineNum">     839 </span>            :                 }
+<span class="lineNum">     840 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     841 </span>            :         }
+<span class="lineNum">     842 </span>            : 
+<span class="lineNum">     843 </span><span class="lineNoCov">          0 :         if (data &amp;&amp; ctx-&gt;nal_size_length) {</span>
+<span class="lineNum">     844 </span><span class="lineNoCov">          0 :                 GF_BitStream *bs = gf_bs_new(ctx-&gt;nal_buffer, ctx-&gt;nal_buffer_alloc, GF_BITSTREAM_WRITE_DYN);</span>
+<span class="lineNum">     845 </span><span class="lineNoCov">          0 :                 if (!bs) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     846 </span>            : 
+<span class="lineNum">     847 </span><span class="lineNoCov">          0 :                 if (gf_filter_pck_get_sap(ipck)) ctx-&gt;inject_xps = GF_TRUE;</span>
+<span class="lineNum">     848 </span>            : 
+<span class="lineNum">     849 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;inject_xps) {</span>
+<span class="lineNum">     850 </span><span class="lineNoCov">          0 :                         ctx-&gt;inject_xps = GF_FALSE;</span>
+<span class="lineNum">     851 </span><span class="lineNoCov">          0 :                         gf_bs_write_data(bs, ctx-&gt;xps_buf, ctx-&gt;xps_buf_size);</span>
+<span class="lineNum">     852 </span>            :                 }
+<span class="lineNum">     853 </span>            : 
+<span class="lineNum">     854 </span><span class="lineNoCov">          0 :                 while (pck_size) {</span>
+<span class="lineNum">     855 </span>            :                         u32 i, nal_size = 0;
+<span class="lineNum">     856 </span><span class="lineNoCov">          0 :                         for (i = 0; i&lt;ctx-&gt;nal_size_length; i++) {</span>
+<span class="lineNum">     857 </span><span class="lineNoCov">          0 :                                 nal_size = (nal_size &lt;&lt; 8) + ((u8)data[i]);</span>
+<span class="lineNum">     858 </span>            :                         }
+<span class="lineNum">     859 </span><span class="lineNoCov">          0 :                         data += ctx-&gt;nal_size_length;</span>
+<span class="lineNum">     860 </span>            : 
+<span class="lineNum">     861 </span><span class="lineNoCov">          0 :                         if (pck_size &lt; nal_size + ctx-&gt;nal_size_length) break;</span>
+<span class="lineNum">     862 </span>            : 
+<span class="lineNum">     863 </span><span class="lineNoCov">          0 :                         gf_bs_write_u32(bs, 1);</span>
+<span class="lineNum">     864 </span><span class="lineNoCov">          0 :                         gf_bs_write_data(bs, data, nal_size);</span>
+<span class="lineNum">     865 </span><span class="lineNoCov">          0 :                         data += nal_size;</span>
+<span class="lineNum">     866 </span><span class="lineNoCov">          0 :                         pck_size -= nal_size + ctx-&gt;nal_size_length;</span>
+<span class="lineNum">     867 </span>            :                 }
+<span class="lineNum">     868 </span>            : 
+<span class="lineNum">     869 </span><span class="lineNoCov">          0 :                 gf_bs_get_content_no_truncate(bs, &amp;ctx-&gt;nal_buffer, &amp;pck_size, &amp;ctx-&gt;nal_buffer_alloc);</span>
+<span class="lineNum">     870 </span><span class="lineNoCov">          0 :                 gf_bs_del(bs);</span>
+<span class="lineNum">     871 </span><span class="lineNoCov">          0 :                 data = ctx-&gt;nal_buffer;</span>
+<span class="lineNum">     872 </span>            :         }
+<span class="lineNum">     873 </span>            : 
+<span class="lineNum">     874 </span><span class="lineNoCov">          0 :         cu_pkt.payload_size = pck_size;</span>
+<span class="lineNum">     875 </span><span class="lineNoCov">          0 :         cu_pkt.payload = data;</span>
+<span class="lineNum">     876 </span><span class="lineNoCov">          0 :         if (ipck) cu_pkt.timestamp = gf_filter_pck_get_cts(ipck);</span>
+<span class="lineNum">     877 </span>            : 
+<span class="lineNum">     878 </span>            : #ifndef EMUL_NV_DLL
+<span class="lineNum">     879 </span><span class="lineNoCov">          0 :     res = cuCtxPushCurrent(cuda_ctx);</span>
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     881 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to push CUDA CTX %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     882 </span>            :         }
+<span class="lineNum">     883 </span><span class="lineNoCov">          0 :         if (ctx-&gt;skip_next_frame) {</span>
+<span class="lineNum">     884 </span><span class="lineNoCov">          0 :                 ctx-&gt;skip_next_frame = GF_FALSE;</span>
+<span class="lineNum">     885 </span>            :         } else {
+<span class="lineNum">     886 </span><span class="lineNoCov">          0 :                 res = cuvidParseVideoData(ctx-&gt;dec_inst-&gt;cu_parser, &amp;cu_pkt);</span>
+<span class="lineNum">     887 </span><span class="lineNoCov">          0 :                 if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     888 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] decoder instance %d failed to parse data %s\n&quot;, ctx-&gt;dec_inst-&gt;id, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">     889 </span>            :                 }
+<span class="lineNum">     890 </span>            :         }
+<span class="lineNum">     891 </span>            : #endif //EMUL_NV_DLL
+<span class="lineNum">     892 </span>            : 
+<span class="lineNum">     893 </span>            :         //queue reference to source packet props
+<span class="lineNum">     894 </span><span class="lineNoCov">          0 :         if (ipck) {</span>
+<span class="lineNum">     895 </span><span class="lineNoCov">          0 :                 gf_filter_pck_ref_props(&amp;ipck);</span>
+<span class="lineNum">     896 </span><span class="lineNoCov">          0 :                 gf_list_add(ctx-&gt;src_packets, ipck);</span>
+<span class="lineNum">     897 </span>            :         }
+<span class="lineNum">     898 </span>            : 
+<span class="lineNum">     899 </span><span class="lineNoCov">          0 :         if (ctx-&gt;reload_decoder_state) {</span>
+<span class="lineNum">     900 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;reload_decoder_state==2) {</span>
+<span class="lineNum">     901 </span><span class="lineNoCov">          0 :                         nvdec_destroy_decoder(ctx-&gt;dec_inst);</span>
+<span class="lineNum">     902 </span>            :                 } else {
+<span class="lineNum">     903 </span><span class="lineNoCov">          0 :                         ctx-&gt;skip_next_frame = GF_TRUE;</span>
+<span class="lineNum">     904 </span>            :                 }
+<span class="lineNum">     905 </span>            : 
+<span class="lineNum">     906 </span><span class="lineNoCov">          0 :                 ctx-&gt;reload_decoder_state = 0;</span>
+<span class="lineNum">     907 </span><span class="lineNoCov">          0 :                 if (!ctx-&gt;out_size || !ctx-&gt;pix_fmt) {</span>
+<span class="lineNum">     908 </span><span class="lineNoCov">          0 :                         cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">     909 </span><span class="lineNoCov">          0 :                         return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     910 </span>            :                 }
+<span class="lineNum">     911 </span>            : 
+<span class="lineNum">     912 </span>            :                 //need to setup decoder
+<span class="lineNum">     913 </span><span class="lineNoCov">          0 :                 if (! ctx-&gt;dec_inst-&gt;cu_decoder) {</span>
+<span class="lineNum">     914 </span><span class="lineNoCov">          0 :                         nvdec_init_decoder(ctx);</span>
+<span class="lineNum">     915 </span>            :                 }
+<span class="lineNum">     916 </span><span class="lineNoCov">          0 :                 cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">     917 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     918 </span>            :         }
+<span class="lineNum">     919 </span>            :         //drop packet
+<span class="lineNum">     920 </span><span class="lineNoCov">          0 :         if (ipck)</span>
+<span class="lineNum">     921 </span><span class="lineNoCov">          0 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     922 </span>            : 
+<span class="lineNum">     923 </span><span class="lineNoCov">          0 :         f = gf_list_pop_front(ctx-&gt;frames);</span>
+<span class="lineNum">     924 </span><span class="lineNoCov">          0 :         if (!f) {</span>
+<span class="lineNum">     925 </span>            : #ifndef EMUL_NV_DLL
+<span class="lineNum">     926 </span><span class="lineNoCov">          0 :                 cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">     927 </span>            : #endif
+<span class="lineNum">     928 </span><span class="lineNoCov">          0 :                 if (!ipck &amp;&amp; gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     929 </span><span class="lineNoCov">          0 :                         nvdec_reset_pcks(ctx);</span>
+<span class="lineNum">     930 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     931 </span><span class="lineNoCov">          0 :                         return GF_EOS;</span>
+<span class="lineNum">     932 </span>            :                 }
+<span class="lineNum">     933 </span>            :                 return GF_OK;
+<span class="lineNum">     934 </span>            :         }
+<span class="lineNum">     935 </span><span class="lineNoCov">          0 :         if (ctx-&gt;use_gl_texture || (ctx-&gt;fmode==NVDEC_SINGLE) ) {</span>
+<span class="lineNum">     936 </span>            :                 assert(!ctx-&gt;pending_frame);
+<span class="lineNum">     937 </span><span class="lineNoCov">          0 :                 ctx-&gt;pending_frame = f;</span>
+<span class="lineNum">     938 </span><span class="lineNoCov">          0 :                 return nvdec_send_hw_frame(ctx);</span>
+<span class="lineNum">     939 </span>            :         }
+<span class="lineNum">     940 </span>            : 
+<span class="lineNum">     941 </span>            :         assert(ctx-&gt;out_size);
+<span class="lineNum">     942 </span><span class="lineNoCov">          0 :         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, ctx-&gt;out_size, &amp;output);</span>
+<span class="lineNum">     943 </span><span class="lineNoCov">          0 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     944 </span>            : 
+<span class="lineNum">     945 </span>            :         memset(&amp;params, 0, sizeof(params));
+<span class="lineNum">     946 </span><span class="lineNoCov">          0 :         params.progressive_frame = f-&gt;frame_info.progressive_frame;</span>
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 :         params.top_field_first = f-&gt;frame_info.top_field_first;</span>
+<span class="lineNum">     948 </span>            : 
+<span class="lineNum">     949 </span><span class="lineNoCov">          0 :         nvdec_merge_pck_props(ctx, f, dst_pck);</span>
+<span class="lineNum">     950 </span>            :         e = GF_OK;
+<span class="lineNum">     951 </span><span class="lineNoCov">          0 :         if (gf_filter_pck_get_seek_flag(dst_pck)) {</span>
+<span class="lineNum">     952 </span><span class="lineNoCov">          0 :                 gf_filter_pck_discard(dst_pck);</span>
+<span class="lineNum">     953 </span>            :         } else {
+<span class="lineNum">     954 </span><span class="lineNoCov">          0 :                 res = cuvidMapVideoFrame(ctx-&gt;dec_inst-&gt;cu_decoder, f-&gt;frame_info.picture_index, &amp;map_mem, &amp;pitch, &amp;params);</span>
+<span class="lineNum">     955 </span><span class="lineNoCov">          0 :                 if (res == CUDA_SUCCESS) {</span>
+<span class="lineNum">     956 </span>            :                         CUDA_MEMCPY2D mcpi;
+<span class="lineNum">     957 </span>            :                         memset(&amp;mcpi, 0, sizeof(CUDA_MEMCPY2D));
+<span class="lineNum">     958 </span><span class="lineNoCov">          0 :                         mcpi.srcMemoryType = CU_MEMORYTYPE_DEVICE;</span>
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :                         mcpi.srcDevice = map_mem;</span>
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 :                         mcpi.srcPitch = pitch;</span>
+<span class="lineNum">     961 </span>            : 
+<span class="lineNum">     962 </span><span class="lineNoCov">          0 :                         mcpi.dstMemoryType = CU_MEMORYTYPE_HOST;</span>
+<span class="lineNum">     963 </span><span class="lineNoCov">          0 :                         mcpi.dstHost = output;</span>
+<span class="lineNum">     964 </span><span class="lineNoCov">          0 :                         mcpi.dstPitch = ctx-&gt;stride;</span>
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :                         mcpi.WidthInBytes = MIN(pitch, ctx-&gt;stride);</span>
+<span class="lineNum">     966 </span><span class="lineNoCov">          0 :                         mcpi.Height = ctx-&gt;height;</span>
+<span class="lineNum">     967 </span>            : 
+<span class="lineNum">     968 </span><span class="lineNoCov">          0 :                         res = cuMemcpy2D(&amp;mcpi);</span>
+<span class="lineNum">     969 </span><span class="lineNoCov">          0 :                         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     970 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to copy Y video plane from GPU to host mem %s\n&quot;, cudaGetErrorEnum(res)));</span>
+<span class="lineNum">     971 </span>            :                                 e = GF_IO_ERR;
+<span class="lineNum">     972 </span>            :                         } else {
+<span class="lineNum">     973 </span>            : 
+<span class="lineNum">     974 </span><span class="lineNoCov">          0 :                                 mcpi.srcDevice = map_mem + ctx-&gt;height * pitch;</span>
+<span class="lineNum">     975 </span><span class="lineNoCov">          0 :                                 mcpi.dstHost = output + ctx-&gt;stride * ctx-&gt;height;</span>
+<span class="lineNum">     976 </span><span class="lineNoCov">          0 :                                 mcpi.dstPitch = ctx-&gt;stride_uv;</span>
+<span class="lineNum">     977 </span><span class="lineNoCov">          0 :                                 mcpi.WidthInBytes = MIN(pitch, ctx-&gt;stride);</span>
+<span class="lineNum">     978 </span><span class="lineNoCov">          0 :                                 mcpi.Height = ctx-&gt;uv_height;</span>
+<span class="lineNum">     979 </span>            : 
+<span class="lineNum">     980 </span><span class="lineNoCov">          0 :                                 res = cuMemcpy2D(&amp;mcpi);</span>
+<span class="lineNum">     981 </span><span class="lineNoCov">          0 :                                 if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">     982 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to copy UV video plane from GPU to host mem %s\n&quot;, cudaGetErrorEnum(res)));</span>
+<span class="lineNum">     983 </span>            :                                         e = GF_IO_ERR;
+<span class="lineNum">     984 </span>            :                                 }
+<span class="lineNum">     985 </span>            :                         }
+<span class="lineNum">     986 </span><span class="lineNoCov">          0 :                         cuvidUnmapVideoFrame(ctx-&gt;dec_inst-&gt;cu_decoder, map_mem);</span>
+<span class="lineNum">     987 </span>            : 
+<span class="lineNum">     988 </span><span class="lineNoCov">          0 :                         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     989 </span>            : 
+<span class="lineNum">     990 </span>            :                 } else {
+<span class="lineNum">     991 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to map video frame data %s\n&quot;, cudaGetErrorEnum(res)));</span>
+<span class="lineNum">     992 </span>            :                         e = GF_IO_ERR;
+<span class="lineNum">     993 </span><span class="lineNoCov">          0 :                         gf_filter_pck_discard(dst_pck);</span>
+<span class="lineNum">     994 </span>            :                 }
+<span class="lineNum">     995 </span>            :         }
+<span class="lineNum">     996 </span><span class="lineNoCov">          0 :         cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">     997 </span>            : 
+<span class="lineNum">     998 </span>            :         memset(f, 0, sizeof(NVDecFrame));
+<span class="lineNum">     999 </span><span class="lineNoCov">          0 :         gf_list_add(ctx-&gt;frames_res, f);</span>
+<span class="lineNum">    1000 </span>            : 
+<span class="lineNum">    1001 </span><span class="lineNoCov">          0 :         return e;</span>
+<a name="1002"><span class="lineNum">    1002 </span>            : }</a>
+<span class="lineNum">    1003 </span>            : 
+<span class="lineNum">    1004 </span><span class="lineNoCov">          0 : void nvframe_release(GF_Filter *filter, GF_FilterPid *pid, GF_FilterPacket *pck)</span>
+<span class="lineNum">    1005 </span>            : {
+<span class="lineNum">    1006 </span><span class="lineNoCov">          0 :         GF_FilterFrameInterface *frame = gf_filter_pck_get_frame_interface(pck);</span>
+<span class="lineNum">    1007 </span><span class="lineNoCov">          0 :         NVDecFrame *f = (NVDecFrame*) frame-&gt;user_data;</span>
+<span class="lineNum">    1008 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = (NVDecCtx *)f-&gt;ctx;</span>
+<span class="lineNum">    1009 </span>            : 
+<span class="lineNum">    1010 </span>            :         memset(f, 0, sizeof(NVDecFrame));
+<span class="lineNum">    1011 </span><span class="lineNoCov">          0 :         gf_list_add(ctx-&gt;frames_res, f);</span>
+<span class="lineNum">    1012 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1013 </span>            : 
+<span class="lineNum">    1014 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">    1015 </span>            : 
+<span class="lineNum">    1016 </span>            : /*Define codec matrix*/
+<a name="1017"><span class="lineNum">    1017 </span>            : typedef struct __matrix GF_NVCodecMatrix;</a>
+<span class="lineNum">    1018 </span>            : 
+<span class="lineNum">    1019 </span><span class="lineNoCov">          0 : GF_Err nvframe_get_gl_texture(GF_FilterFrameInterface *frame, u32 plane_idx, u32 *gl_tex_format, u32 *gl_tex_id, GF_NVCodecMatrix * texcoordmatrix)</span>
+<span class="lineNum">    1020 </span>            : {
+<span class="lineNum">    1021 </span>            :         CUDA_MEMCPY2D mcpi;
+<span class="lineNum">    1022 </span>            :         CUVIDPROCPARAMS params;
+<span class="lineNum">    1023 </span>            :         CUresult res;
+<span class="lineNum">    1024 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">    1025 </span>            :         CUdeviceptr tx_data, vid_data;
+<span class="lineNum">    1026 </span>            :         size_t tx_pitch;
+<span class="lineNum">    1027 </span>            :         u32 vid_pitch;
+<span class="lineNum">    1028 </span>            :         u32 pbo_id, tx_id, gl_fmt, gl_btype = GL_UNSIGNED_BYTE;
+<span class="lineNum">    1029 </span><span class="lineNoCov">          0 :         NVDecFrame *f = (NVDecFrame *)frame-&gt;user_data;</span>
+<span class="lineNum">    1030 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = (NVDecCtx *)f-&gt;ctx;</span>
+<span class="lineNum">    1031 </span>            : 
+<span class="lineNum">    1032 </span><span class="lineNoCov">          0 :         if (plane_idx&gt;1) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1033 </span>            : 
+<span class="lineNum">    1034 </span><span class="lineNoCov">          0 :         res = cuCtxPushCurrent(cuda_ctx);</span>
+<span class="lineNum">    1035 </span><span class="lineNoCov">          0 :         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1036 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to push CUDA CTX %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">    1037 </span>            :         }
+<span class="lineNum">    1038 </span>            : 
+<span class="lineNum">    1039 </span><span class="lineNoCov">          0 :         if (! *gl_tex_id &amp;&amp; ! plane_idx &amp;&amp; ctx-&gt;y_tx_id ) {</span>
+<span class="lineNum">    1040 </span><span class="lineNoCov">          0 :                 cuGLUnregisterBufferObject(ctx-&gt;y_pbo_id);</span>
+<span class="lineNum">    1041 </span><span class="lineNoCov">          0 :                 ctx-&gt;y_pbo_id = 0;</span>
+<span class="lineNum">    1042 </span><span class="lineNoCov">          0 :                 ctx-&gt;y_tx_id = 0;</span>
+<span class="lineNum">    1043 </span>            :         }
+<span class="lineNum">    1044 </span><span class="lineNoCov">          0 :         if (! *gl_tex_id &amp;&amp; plane_idx &amp;&amp; ctx-&gt;uv_tx_id ) {</span>
+<span class="lineNum">    1045 </span><span class="lineNoCov">          0 :                 cuGLUnregisterBufferObject(ctx-&gt;uv_pbo_id);</span>
+<span class="lineNum">    1046 </span><span class="lineNoCov">          0 :                 ctx-&gt;uv_pbo_id = 0;</span>
+<span class="lineNum">    1047 </span><span class="lineNoCov">          0 :                 ctx-&gt;uv_tx_id = 0;</span>
+<span class="lineNum">    1048 </span>            :         }
+<span class="lineNum">    1049 </span>            : 
+<span class="lineNum">    1050 </span>            : #ifdef ENABLE_10BIT_OUTPUT
+<span class="lineNum">    1051 </span>            :         if ((ctx-&gt;bpp_luma&gt;8) || (ctx-&gt;bpp_chroma&gt;8)) {
+<span class="lineNum">    1052 </span>            :                 gl_btype = GL_UNSIGNED_SHORT;
+<span class="lineNum">    1053 </span>            :         }
+<span class="lineNum">    1054 </span>            : #endif
+<span class="lineNum">    1055 </span><span class="lineNoCov">          0 :         if (!plane_idx) {</span>
+<span class="lineNum">    1056 </span><span class="lineNoCov">          0 :                 if (!ctx-&gt;y_pbo_id) {</span>
+<span class="lineNum">    1057 </span><span class="lineNoCov">          0 :                         glGenBuffers(1, &amp;ctx-&gt;y_pbo_id);</span>
+<span class="lineNum">    1058 </span><span class="lineNoCov">          0 :                         glGenTextures(1, &amp;ctx-&gt;y_tx_id);</span>
+<span class="lineNum">    1059 </span>            : 
+<span class="lineNum">    1060 </span><span class="lineNoCov">          0 :                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, ctx-&gt;y_pbo_id);</span>
+<span class="lineNum">    1061 </span><span class="lineNoCov">          0 :                         glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, ctx-&gt;stride * ctx-&gt;height, NULL, GL_STREAM_DRAW_ARB);</span>
+<span class="lineNum">    1062 </span><span class="lineNoCov">          0 :                         glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);</span>
+<span class="lineNum">    1063 </span>            : 
+<span class="lineNum">    1064 </span><span class="lineNoCov">          0 :                         cuGLRegisterBufferObject(ctx-&gt;y_pbo_id);</span>
+<span class="lineNum">    1065 </span>            : 
+<span class="lineNum">    1066 </span><span class="lineNoCov">          0 :                         glBindTexture(GL_TEXTURE_2D, ctx-&gt;y_tx_id);</span>
+<span class="lineNum">    1067 </span><span class="lineNoCov">          0 :                         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, ctx-&gt;width, ctx-&gt;height, 0, GL_LUMINANCE, gl_btype, NULL);</span>
+<span class="lineNum">    1068 </span><span class="lineNoCov">          0 :                         glBindTexture(GL_TEXTURE_2D, 0);</span>
+<span class="lineNum">    1069 </span>            : 
+<span class="lineNum">    1070 </span><span class="lineNoCov">          0 :                         f-&gt;y_mapped = GF_FALSE;</span>
+<span class="lineNum">    1071 </span>            :                 }
+<span class="lineNum">    1072 </span><span class="lineNoCov">          0 :                 *gl_tex_format = GL_TEXTURE_2D;</span>
+<span class="lineNum">    1073 </span><span class="lineNoCov">          0 :                 *gl_tex_id = tx_id = ctx-&gt;y_tx_id;</span>
+<span class="lineNum">    1074 </span><span class="lineNoCov">          0 :                 if (f-&gt;y_mapped) {</span>
+<span class="lineNum">    1075 </span><span class="lineNoCov">          0 :                         cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">    1076 </span><span class="lineNoCov">          0 :                         return GF_OK;</span>
+<span class="lineNum">    1077 </span>            :                 }
+<span class="lineNum">    1078 </span><span class="lineNoCov">          0 :                 f-&gt;y_mapped = GF_TRUE;</span>
+<span class="lineNum">    1079 </span><span class="lineNoCov">          0 :                 pbo_id = ctx-&gt;y_pbo_id;</span>
+<span class="lineNum">    1080 </span>            :                 gl_fmt = GL_LUMINANCE;
+<span class="lineNum">    1081 </span>            :         } else {
+<span class="lineNum">    1082 </span><span class="lineNoCov">          0 :                 if (!ctx-&gt;uv_pbo_id) {</span>
+<span class="lineNum">    1083 </span><span class="lineNoCov">          0 :                         glGenBuffers(1, &amp;ctx-&gt;uv_pbo_id);</span>
+<span class="lineNum">    1084 </span><span class="lineNoCov">          0 :                         glGenTextures(1, &amp;ctx-&gt;uv_tx_id);</span>
+<span class="lineNum">    1085 </span>            : 
+<span class="lineNum">    1086 </span><span class="lineNoCov">          0 :                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, ctx-&gt;uv_pbo_id);</span>
+<span class="lineNum">    1087 </span><span class="lineNoCov">          0 :                         glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, ctx-&gt;stride * ctx-&gt;height / 2, NULL, GL_STREAM_DRAW_ARB);</span>
+<span class="lineNum">    1088 </span><span class="lineNoCov">          0 :                         glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);</span>
+<span class="lineNum">    1089 </span>            : 
+<span class="lineNum">    1090 </span><span class="lineNoCov">          0 :                         cuGLRegisterBufferObject(ctx-&gt;uv_pbo_id);</span>
+<span class="lineNum">    1091 </span>            : 
+<span class="lineNum">    1092 </span><span class="lineNoCov">          0 :                     glBindTexture(GL_TEXTURE_2D, ctx-&gt;uv_tx_id);</span>
+<span class="lineNum">    1093 </span><span class="lineNoCov">          0 :                         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, ctx-&gt;width/2, ctx-&gt;height/2, 0, GL_LUMINANCE_ALPHA, gl_btype, NULL);</span>
+<span class="lineNum">    1094 </span><span class="lineNoCov">          0 :                         glBindTexture(GL_TEXTURE_2D, 0);</span>
+<span class="lineNum">    1095 </span><span class="lineNoCov">          0 :                         f-&gt;uv_mapped = GF_FALSE;</span>
+<span class="lineNum">    1096 </span>            :                 }
+<span class="lineNum">    1097 </span><span class="lineNoCov">          0 :                 *gl_tex_format = GL_TEXTURE_2D;</span>
+<span class="lineNum">    1098 </span><span class="lineNoCov">          0 :                 *gl_tex_id = tx_id = ctx-&gt;uv_tx_id;</span>
+<span class="lineNum">    1099 </span><span class="lineNoCov">          0 :                 if (f-&gt;uv_mapped) {</span>
+<span class="lineNum">    1100 </span><span class="lineNoCov">          0 :                         cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">    1101 </span><span class="lineNoCov">          0 :                         return GF_OK;</span>
+<span class="lineNum">    1102 </span>            :                 }
+<span class="lineNum">    1103 </span><span class="lineNoCov">          0 :                 f-&gt;uv_mapped = GF_TRUE;</span>
+<span class="lineNum">    1104 </span><span class="lineNoCov">          0 :                 pbo_id = ctx-&gt;uv_pbo_id;</span>
+<span class="lineNum">    1105 </span>            :                 gl_fmt = GL_LUMINANCE_ALPHA;
+<span class="lineNum">    1106 </span>            :         }
+<span class="lineNum">    1107 </span>            : 
+<span class="lineNum">    1108 </span><span class="lineNoCov">          0 :         cuGLMapBufferObject(&amp;tx_data, &amp;tx_pitch, pbo_id);</span>
+<span class="lineNum">    1109 </span><span class="lineNoCov">          0 :         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1110 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to map GL texture data %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">    1111 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">    1112 </span>            :         }
+<span class="lineNum">    1113 </span>            :         assert(tx_pitch != 0);
+<span class="lineNum">    1114 </span>            : 
+<span class="lineNum">    1115 </span>            :         memset(&amp;params, 0, sizeof(params));
+<span class="lineNum">    1116 </span><span class="lineNoCov">          0 :         params.progressive_frame = f-&gt;frame_info.progressive_frame;</span>
+<span class="lineNum">    1117 </span>            :         //params.second_field = 0;
+<span class="lineNum">    1118 </span><span class="lineNoCov">          0 :         params.top_field_first = f-&gt;frame_info.top_field_first;</span>
+<span class="lineNum">    1119 </span><span class="lineNoCov">          0 :         res = cuvidMapVideoFrame(ctx-&gt;dec_inst-&gt;cu_decoder, f-&gt;frame_info.picture_index, &amp;vid_data, &amp;vid_pitch, &amp;params);</span>
+<span class="lineNum">    1120 </span>            : 
+<span class="lineNum">    1121 </span><span class="lineNoCov">          0 :         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1122 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to map decoded picture data %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">    1123 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">    1124 </span>            :         }
+<span class="lineNum">    1125 </span>            :         assert(vid_pitch != 0);
+<span class="lineNum">    1126 </span>            : 
+<span class="lineNum">    1127 </span>            :         memset(&amp;mcpi, 0, sizeof(CUDA_MEMCPY2D));
+<span class="lineNum">    1128 </span><span class="lineNoCov">          0 :         mcpi.srcMemoryType = CU_MEMORYTYPE_DEVICE;</span>
+<span class="lineNum">    1129 </span><span class="lineNoCov">          0 :         if (plane_idx) {</span>
+<span class="lineNum">    1130 </span><span class="lineNoCov">          0 :                 mcpi.srcDevice = vid_data + ctx-&gt;height * vid_pitch;</span>
+<span class="lineNum">    1131 </span><span class="lineNoCov">          0 :                 tx_pitch *= 2; //2 bytes per pixel</span>
+<span class="lineNum">    1132 </span>            :         } else {
+<span class="lineNum">    1133 </span><span class="lineNoCov">          0 :                 mcpi.srcDevice = vid_data;</span>
+<span class="lineNum">    1134 </span>            :         }
+<span class="lineNum">    1135 </span><span class="lineNoCov">          0 :         mcpi.srcPitch = vid_pitch;</span>
+<span class="lineNum">    1136 </span>            : 
+<span class="lineNum">    1137 </span><span class="lineNoCov">          0 :         mcpi.dstMemoryType = CU_MEMORYTYPE_DEVICE;</span>
+<span class="lineNum">    1138 </span><span class="lineNoCov">          0 :         mcpi.dstDevice = tx_data;</span>
+<span class="lineNum">    1139 </span><span class="lineNoCov">          0 :         mcpi.dstPitch = tx_pitch / ctx-&gt;height;</span>
+<span class="lineNum">    1140 </span>            : 
+<span class="lineNum">    1141 </span><span class="lineNoCov">          0 :         mcpi.WidthInBytes = MIN(mcpi.dstPitch, vid_pitch);</span>
+<span class="lineNum">    1142 </span><span class="lineNoCov">          0 :         mcpi.Height = ctx-&gt;height;</span>
+<span class="lineNum">    1143 </span><span class="lineNoCov">          0 :         if (plane_idx) mcpi.Height /= 2;</span>
+<span class="lineNum">    1144 </span>            : 
+<span class="lineNum">    1145 </span><span class="lineNoCov">          0 :         res = cuMemcpy2D(&amp;mcpi);</span>
+<span class="lineNum">    1146 </span><span class="lineNoCov">          0 :         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1147 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to copy Y video plane from GPU to host mem %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">    1148 </span>            :                 e = GF_IO_ERR;
+<span class="lineNum">    1149 </span>            :         }
+<span class="lineNum">    1150 </span>            : 
+<span class="lineNum">    1151 </span><span class="lineNoCov">          0 :         cuvidUnmapVideoFrame(ctx-&gt;dec_inst-&gt;cu_decoder, vid_data);</span>
+<span class="lineNum">    1152 </span><span class="lineNoCov">          0 :         cuGLUnmapBufferObject(pbo_id);</span>
+<span class="lineNum">    1153 </span>            : 
+<span class="lineNum">    1154 </span>            : 
+<span class="lineNum">    1155 </span><span class="lineNoCov">          0 :         cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">    1156 </span>            : 
+<span class="lineNum">    1157 </span>            :         /*bind PBO to texture and call glTexSubImage2D only after PBO transfer is queued, otherwise we'll have a one frame delay*/
+<span class="lineNum">    1158 </span><span class="lineNoCov">          0 :         glBindTexture(GL_TEXTURE_2D, tx_id);</span>
+<span class="lineNum">    1159 </span><span class="lineNoCov">          0 :         glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, pbo_id);</span>
+<span class="lineNum">    1160 </span>            : 
+<span class="lineNum">    1161 </span>            : #ifdef ENABLE_10BIT_OUTPUT
+<span class="lineNum">    1162 </span>            :         if (ctx-&gt;bpp_chroma+ctx-&gt;bpp_luma&gt;16) {
+<span class="lineNum">    1163 </span>            :                 Float a, b;
+<span class="lineNum">    1164 </span>            : #error &quot;FIX NVDEC GL color mapping in 10 bit&quot;
+<span class="lineNum">    1165 </span>            :                 a = 65535.0f / (65472.0f - 63.0f);
+<span class="lineNum">    1166 </span>            :                 b = -63.0f * a / 65535.0f;
+<span class="lineNum">    1167 </span>            : 
+<span class="lineNum">    1168 </span>            :                 glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+<span class="lineNum">    1169 </span>            :                 //glPixelStorei(GL_UNPACK_SWAP_BYTES, 1);
+<span class="lineNum">    1170 </span>            :                 //glPixelStorei(GL_UNPACK_LSB_FIRST, 1);
+<span class="lineNum">    1171 </span>            :                 //we use 10 bits but GL will normalise using 16 bits, so we need to multiply the nomralized result by 2^6
+<span class="lineNum">    1172 </span>            :                 //glPixelTransferf(GL_RED_BIAS, 0.00096317f);
+<span class="lineNum">    1173 </span>            :                 //glPixelTransferf(GL_RED_SCALE, 0.000015288f);
+<span class="lineNum">    1174 </span>            : 
+<span class="lineNum">    1175 </span>            :                 glPixelTransferf(GL_RED_SCALE, a);
+<span class="lineNum">    1176 </span>            :                 glPixelTransferf(GL_RED_BIAS, b);
+<span class="lineNum">    1177 </span>            : 
+<span class="lineNum">    1178 </span>            :                 if (plane_idx) {
+<span class="lineNum">    1179 </span>            :                         glPixelTransferf(GL_ALPHA_SCALE, a);
+<span class="lineNum">    1180 </span>            :                         glPixelTransferf(GL_ALPHA_BIAS, b);
+<span class="lineNum">    1181 </span>            :                 }
+<span class="lineNum">    1182 </span>            :         }
+<span class="lineNum">    1183 </span>            : #endif
+<span class="lineNum">    1184 </span><span class="lineNoCov">          0 :         if (!plane_idx) {</span>
+<span class="lineNum">    1185 </span><span class="lineNoCov">          0 :                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ctx-&gt;width, ctx-&gt;height, gl_fmt , gl_btype, NULL);</span>
+<span class="lineNum">    1186 </span>            :         } else {
+<span class="lineNum">    1187 </span><span class="lineNoCov">          0 :                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ctx-&gt;width/2, ctx-&gt;height/2, gl_fmt , gl_btype, NULL);</span>
+<span class="lineNum">    1188 </span>            :         }
+<span class="lineNum">    1189 </span>            : 
+<span class="lineNum">    1190 </span><span class="lineNoCov">          0 :         glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);</span>
+<span class="lineNum">    1191 </span><span class="lineNoCov">          0 :         glBindTexture(GL_TEXTURE_2D, 0);</span>
+<span class="lineNum">    1192 </span>            : 
+<span class="lineNum">    1193 </span><span class="lineNoCov">          0 :         return e;</span>
+<span class="lineNum">    1194 </span>            : }
+<span class="lineNum">    1195 </span>            : 
+<a name="1196"><span class="lineNum">    1196 </span>            : #endif</a>
+<span class="lineNum">    1197 </span>            : 
+<span class="lineNum">    1198 </span><span class="lineNoCov">          0 : GF_Err nvframe_get_frame(GF_FilterFrameInterface *frame, u32 plane_idx, const u8 **outPlane, u32 *outStride)</span>
+<span class="lineNum">    1199 </span>            : {
+<span class="lineNum">    1200 </span><span class="lineNoCov">          0 :         unsigned int pitch = 0;</span>
+<span class="lineNum">    1201 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">    1202 </span><span class="lineNoCov">          0 :         NVDecFrame *f = (NVDecFrame *)frame-&gt;user_data;</span>
+<span class="lineNum">    1203 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = (NVDecCtx *)f-&gt;ctx;</span>
+<span class="lineNum">    1204 </span>            : 
+<span class="lineNum">    1205 </span><span class="lineNoCov">          0 :         if (plane_idx&gt;=ctx-&gt;nb_planes) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1206 </span>            : 
+<span class="lineNum">    1207 </span>            :         e = GF_OK;
+<span class="lineNum">    1208 </span><span class="lineNoCov">          0 :         if (!f-&gt;y_mapped) {</span>
+<span class="lineNum">    1209 </span>            :                 CUVIDPROCPARAMS params;
+<span class="lineNum">    1210 </span><span class="lineNoCov">          0 :                 CUdeviceptr map_mem = 0;</span>
+<span class="lineNum">    1211 </span>            :                 CUresult res;
+<span class="lineNum">    1212 </span>            : 
+<span class="lineNum">    1213 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;out_size &gt; ctx-&gt;single_frame_data_alloc) {</span>
+<span class="lineNum">    1214 </span><span class="lineNoCov">          0 :                         ctx-&gt;single_frame_data_alloc = ctx-&gt;out_size;</span>
+<span class="lineNum">    1215 </span><span class="lineNoCov">          0 :                         ctx-&gt;single_frame_data = gf_realloc(ctx-&gt;single_frame_data, ctx-&gt;out_size);</span>
+<span class="lineNum">    1216 </span>            :                 }
+<span class="lineNum">    1217 </span><span class="lineNoCov">          0 :                 f-&gt;y_mapped = GF_TRUE;</span>
+<span class="lineNum">    1218 </span>            : 
+<span class="lineNum">    1219 </span><span class="lineNoCov">          0 :                 res = cuCtxPushCurrent(cuda_ctx);</span>
+<span class="lineNum">    1220 </span><span class="lineNoCov">          0 :                 if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1221 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to push CUDA CTX %s\n&quot;, cudaGetErrorEnum(res)));</span>
+<span class="lineNum">    1222 </span><span class="lineNoCov">          0 :                         return GF_IO_ERR;</span>
+<span class="lineNum">    1223 </span>            :                 }
+<span class="lineNum">    1224 </span>            : 
+<span class="lineNum">    1225 </span>            :                 memset(&amp;params, 0, sizeof(params));
+<span class="lineNum">    1226 </span><span class="lineNoCov">          0 :                 params.progressive_frame = f-&gt;frame_info.progressive_frame;</span>
+<span class="lineNum">    1227 </span><span class="lineNoCov">          0 :                 params.top_field_first = f-&gt;frame_info.top_field_first;</span>
+<span class="lineNum">    1228 </span>            : 
+<span class="lineNum">    1229 </span><span class="lineNoCov">          0 :                 res = cuvidMapVideoFrame(ctx-&gt;dec_inst-&gt;cu_decoder, f-&gt;frame_info.picture_index, &amp;map_mem, &amp;pitch, &amp;params);</span>
+<span class="lineNum">    1230 </span><span class="lineNoCov">          0 :                 if (res == CUDA_SUCCESS) {</span>
+<span class="lineNum">    1231 </span>            :                         CUDA_MEMCPY2D mcpi;
+<span class="lineNum">    1232 </span>            :                         memset(&amp;mcpi, 0, sizeof(CUDA_MEMCPY2D));
+<span class="lineNum">    1233 </span><span class="lineNoCov">          0 :                         mcpi.srcMemoryType = CU_MEMORYTYPE_DEVICE;</span>
+<span class="lineNum">    1234 </span><span class="lineNoCov">          0 :                         mcpi.srcDevice = map_mem;</span>
+<span class="lineNum">    1235 </span><span class="lineNoCov">          0 :                         mcpi.srcPitch = pitch;</span>
+<span class="lineNum">    1236 </span>            : 
+<span class="lineNum">    1237 </span><span class="lineNoCov">          0 :                         mcpi.dstMemoryType = CU_MEMORYTYPE_HOST;</span>
+<span class="lineNum">    1238 </span><span class="lineNoCov">          0 :                         mcpi.dstHost = ctx-&gt;single_frame_data;</span>
+<span class="lineNum">    1239 </span><span class="lineNoCov">          0 :                         mcpi.dstPitch = ctx-&gt;stride;</span>
+<span class="lineNum">    1240 </span><span class="lineNoCov">          0 :                         mcpi.WidthInBytes = MIN(pitch, ctx-&gt;stride);</span>
+<span class="lineNum">    1241 </span><span class="lineNoCov">          0 :                         mcpi.Height = ctx-&gt;height;</span>
+<span class="lineNum">    1242 </span>            : 
+<span class="lineNum">    1243 </span><span class="lineNoCov">          0 :                         res = cuMemcpy2D(&amp;mcpi);</span>
+<span class="lineNum">    1244 </span><span class="lineNoCov">          0 :                         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1245 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to copy Y video plane from GPU to host mem %s\n&quot;, cudaGetErrorEnum(res)));</span>
+<span class="lineNum">    1246 </span>            :                                 e = GF_IO_ERR;
+<span class="lineNum">    1247 </span>            :                         }
+<span class="lineNum">    1248 </span>            :                         else {
+<span class="lineNum">    1249 </span>            : 
+<span class="lineNum">    1250 </span><span class="lineNoCov">          0 :                                 mcpi.srcDevice = map_mem + ctx-&gt;height * pitch;</span>
+<span class="lineNum">    1251 </span><span class="lineNoCov">          0 :                                 mcpi.dstHost = ctx-&gt;single_frame_data + ctx-&gt;stride * ctx-&gt;height;</span>
+<span class="lineNum">    1252 </span><span class="lineNoCov">          0 :                                 mcpi.dstPitch = ctx-&gt;stride_uv;</span>
+<span class="lineNum">    1253 </span><span class="lineNoCov">          0 :                                 mcpi.Height = ctx-&gt;uv_height;</span>
+<span class="lineNum">    1254 </span>            : 
+<span class="lineNum">    1255 </span><span class="lineNoCov">          0 :                                 res = cuMemcpy2D(&amp;mcpi);</span>
+<span class="lineNum">    1256 </span><span class="lineNoCov">          0 :                                 if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1257 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to copy UV video plane from GPU to host mem %s\n&quot;, cudaGetErrorEnum(res)));</span>
+<span class="lineNum">    1258 </span>            :                                         e = GF_IO_ERR;
+<span class="lineNum">    1259 </span>            :                                 }
+<span class="lineNum">    1260 </span>            :                         }
+<span class="lineNum">    1261 </span><span class="lineNoCov">          0 :                         cuvidUnmapVideoFrame(ctx-&gt;dec_inst-&gt;cu_decoder, map_mem);</span>
+<span class="lineNum">    1262 </span>            :                 }
+<span class="lineNum">    1263 </span>            :                 else {
+<span class="lineNum">    1264 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to map video frame %s\n&quot;, cudaGetErrorEnum(res)));</span>
+<span class="lineNum">    1265 </span>            :                         e = GF_IO_ERR;
+<span class="lineNum">    1266 </span>            :                 }
+<span class="lineNum">    1267 </span><span class="lineNoCov">          0 :                 cuCtxPopCurrent(NULL);</span>
+<span class="lineNum">    1268 </span>            :         }
+<span class="lineNum">    1269 </span><span class="lineNoCov">          0 :         if (e) return e;</span>
+<span class="lineNum">    1270 </span>            : 
+<span class="lineNum">    1271 </span><span class="lineNoCov">          0 :         switch (plane_idx) {</span>
+<span class="lineNum">    1272 </span><span class="lineNoCov">          0 :         case 0:</span>
+<span class="lineNum">    1273 </span><span class="lineNoCov">          0 :                 *outPlane = ctx-&gt;single_frame_data;</span>
+<span class="lineNum">    1274 </span><span class="lineNoCov">          0 :                 *outStride = ctx-&gt;stride;</span>
+<span class="lineNum">    1275 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">    1276 </span><span class="lineNoCov">          0 :         case 1:</span>
+<span class="lineNum">    1277 </span><span class="lineNoCov">          0 :                 *outPlane = ctx-&gt;single_frame_data + ctx-&gt;stride * ctx-&gt;height;</span>
+<span class="lineNum">    1278 </span><span class="lineNoCov">          0 :                 *outStride = ctx-&gt;stride_uv;</span>
+<span class="lineNum">    1279 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">    1280 </span><span class="lineNoCov">          0 :         case 2:</span>
+<span class="lineNum">    1281 </span><span class="lineNoCov">          0 :                 *outPlane = ctx-&gt;single_frame_data + ctx-&gt;stride * ctx-&gt;height + ctx-&gt;stride_uv * ctx-&gt;uv_height;</span>
+<span class="lineNum">    1282 </span><span class="lineNoCov">          0 :                 *outStride = ctx-&gt;stride_uv;</span>
+<span class="lineNum">    1283 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">    1284 </span>            :         default:
+<span class="lineNum">    1285 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">    1286 </span>            :         }
+<span class="lineNum">    1287 </span>            :         return GF_OK;
+<span class="lineNum">    1288 </span>            : }
+<a name="1289"><span class="lineNum">    1289 </span>            : </a>
+<span class="lineNum">    1290 </span>            : 
+<span class="lineNum">    1291 </span><span class="lineNoCov">          0 : GF_Err nvdec_send_hw_frame(NVDecCtx *ctx)</span>
+<span class="lineNum">    1292 </span>            : {
+<span class="lineNum">    1293 </span>            :         GF_FilterPacket *dst_pck;
+<span class="lineNum">    1294 </span>            :         NVDecFrame *f;
+<span class="lineNum">    1295 </span>            : 
+<span class="lineNum">    1296 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;pending_frame) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1297 </span>            :         f = ctx-&gt;pending_frame;
+<span class="lineNum">    1298 </span><span class="lineNoCov">          0 :         ctx-&gt;pending_frame = NULL;</span>
+<span class="lineNum">    1299 </span>            : 
+<span class="lineNum">    1300 </span><span class="lineNoCov">          0 :         f-&gt;gframe.user_data = f;</span>
+<span class="lineNum">    1301 </span><span class="lineNoCov">          0 :         f-&gt;gframe.get_plane = nvframe_get_frame;</span>
+<span class="lineNum">    1302 </span>            : #ifndef GPAC_DISABLE_3D
+<span class="lineNum">    1303 </span><span class="lineNoCov">          0 :         f-&gt;gframe.get_gl_texture = nvframe_get_gl_texture;</span>
+<span class="lineNum">    1304 </span>            : #endif
+<span class="lineNum">    1305 </span>            : 
+<span class="lineNum">    1306 </span><span class="lineNoCov">          0 :         if (ctx-&gt;frame_size_changed) {</span>
+<span class="lineNum">    1307 </span><span class="lineNoCov">          0 :                 ctx-&gt;frame_size_changed = GF_FALSE;</span>
+<span class="lineNum">    1308 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_WIDTH, &amp;PROP_UINT(ctx-&gt;width));</span>
+<span class="lineNum">    1309 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(ctx-&gt;height));</span>
+<span class="lineNum">    1310 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STRIDE, &amp;PROP_UINT(ctx-&gt;stride));</span>
+<span class="lineNum">    1311 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_PIXFMT, &amp;PROP_UINT(ctx-&gt;pix_fmt));</span>
+<span class="lineNum">    1312 </span>            :         }
+<span class="lineNum">    1313 </span>            : 
+<span class="lineNum">    1314 </span>            : 
+<span class="lineNum">    1315 </span><span class="lineNoCov">          0 :         if (!gf_list_count(ctx-&gt;frames) &amp;&amp; ctx-&gt;needs_resetup)</span>
+<span class="lineNum">    1316 </span><span class="lineNoCov">          0 :                 f-&gt;gframe.flags = GF_FRAME_IFCE_BLOCKING;</span>
+<span class="lineNum">    1317 </span>            : 
+<span class="lineNum">    1318 </span><span class="lineNoCov">          0 :         dst_pck = gf_filter_pck_new_frame_interface(ctx-&gt;opid, &amp;f-&gt;gframe, nvframe_release);</span>
+<span class="lineNum">    1319 </span><span class="lineNoCov">          0 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">    1320 </span>            :         
+<span class="lineNum">    1321 </span><span class="lineNoCov">          0 :         nvdec_merge_pck_props(ctx, f, dst_pck);</span>
+<span class="lineNum">    1322 </span><span class="lineNoCov">          0 :         if (gf_filter_pck_get_seek_flag(dst_pck)) {</span>
+<span class="lineNum">    1323 </span><span class="lineNoCov">          0 :                 gf_filter_pck_discard(dst_pck);</span>
+<span class="lineNum">    1324 </span>            :                 memset(f, 0, sizeof(NVDecFrame));
+<span class="lineNum">    1325 </span><span class="lineNoCov">          0 :                 gf_list_add(ctx-&gt;frames_res, f);</span>
+<span class="lineNum">    1326 </span>            :         } else {
+<span class="lineNum">    1327 </span><span class="lineNoCov">          0 :                 gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">    1328 </span>            :         }
+<span class="lineNum">    1329 </span>            : 
+<span class="lineNum">    1330 </span>            :         return GF_OK;
+<span class="lineNum">    1331 </span>            : }
+<span class="lineNum">    1332 </span>            : 
+<span class="lineNum">    1333 </span>            : 
+<span class="lineNum">    1334 </span>            : 
+<span class="lineNum">    1335 </span>            : 
+<a name="1336"><span class="lineNum">    1336 </span>            : static u32 cuvid_load_state = 0;</a>
+<span class="lineNum">    1337 </span>            : static u32 nb_cuvid_inst=0;
+<span class="lineNum">    1338 </span><span class="lineCov">       2413 : static void init_cuda_sdk()</span>
+<span class="lineNum">    1339 </span>            : {
+<span class="lineNum">    1340 </span><span class="lineCov">       2413 :         if (!cuvid_load_state) {</span>
+<span class="lineNum">    1341 </span>            : #ifdef EMUL_NV_DLL
+<span class="lineNum">    1342 </span>            :         cuvid_load_state = 2;
+<span class="lineNum">    1343 </span>            :         nb_cuvid_inst++;
+<span class="lineNum">    1344 </span>            : #else
+<span class="lineNum">    1345 </span>            :                 CUresult res;
+<span class="lineNum">    1346 </span>            :                 int device_count;
+<span class="lineNum">    1347 </span><span class="lineCov">       2276 :             res = cuInit(0, __CUDA_API_VERSION);</span>
+<span class="lineNum">    1348 </span><span class="lineCov">       2276 :                 nb_cuvid_inst++;</span>
+<span class="lineNum">    1349 </span><span class="lineCov">       2276 :                 cuvid_load_state = 1;</span>
+<span class="lineNum">    1350 </span><span class="lineCov">       2276 :                 if (res == CUDA_ERROR_SHARED_OBJECT_INIT_FAILED) {</span>
+<span class="lineNum">    1351 </span><span class="lineCov">       2276 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_CODEC, (&quot;[NVDec] cuda lib not found on system\n&quot;) );</span>
+<span class="lineNum">    1352 </span><span class="lineNoCov">          0 :                 } else if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1353 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_CODEC, (&quot;[NVDec] failed to init cuda %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">    1354 </span>            :                 } else {
+<span class="lineNum">    1355 </span><span class="lineNoCov">          0 :                         res = cuDeviceGetCount(&amp;device_count);</span>
+<span class="lineNum">    1356 </span><span class="lineNoCov">          0 :                         if (res != CUDA_SUCCESS) {</span>
+<span class="lineNum">    1357 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] failed to query cuda/nvidia cards %s\n&quot;, cudaGetErrorEnum(res) ) );</span>
+<span class="lineNum">    1358 </span>            :                         } else {
+<span class="lineNum">    1359 </span><span class="lineNoCov">          0 :                                 if (! device_count) {</span>
+<span class="lineNum">    1360 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, (&quot;[NVDec] no device found\n&quot; ) );</span>
+<span class="lineNum">    1361 </span>            :                                 } else {
+<span class="lineNum">    1362 </span><span class="lineNoCov">          0 :                                         cuvid_load_state = 2;</span>
+<span class="lineNum">    1363 </span>            :                                 }
+<span class="lineNum">    1364 </span>            :                         }
+<span class="lineNum">    1365 </span>            :                 }
+<span class="lineNum">    1366 </span>            : #endif
+<span class="lineNum">    1367 </span>            : 
+<span class="lineNum">    1368 </span>            :         } else {
+<span class="lineNum">    1369 </span><span class="lineCov">        137 :                 nb_cuvid_inst++;</span>
+<span class="lineNum">    1370 </span>            :         }
+<a name="1371"><span class="lineNum">    1371 </span><span class="lineCov">       2413 : }</span></a>
+<span class="lineNum">    1372 </span>            : 
+<span class="lineNum">    1373 </span><span class="lineNoCov">          0 : static GF_Err nvdec_initialize(GF_Filter *filter)</span>
+<span class="lineNum">    1374 </span>            : {
+<span class="lineNum">    1375 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">    1376 </span>            : 
+<span class="lineNum">    1377 </span><span class="lineNoCov">          0 :         ctx-&gt;frames = gf_list_new();</span>
+<span class="lineNum">    1378 </span><span class="lineNoCov">          0 :         ctx-&gt;frames_res = gf_list_new();</span>
+<span class="lineNum">    1379 </span><span class="lineNoCov">          0 :         ctx-&gt;src_packets = gf_list_new();</span>
+<span class="lineNum">    1380 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<a name="1381"><span class="lineNum">    1381 </span>            : }</a>
+<span class="lineNum">    1382 </span>            : 
+<span class="lineNum">    1383 </span><span class="lineNoCov">          0 : static void nvdec_finalize(GF_Filter *filter)</span>
+<span class="lineNum">    1384 </span>            : {
+<span class="lineNum">    1385 </span><span class="lineNoCov">          0 :         NVDecCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">    1386 </span>            : 
+<span class="lineNum">    1387 </span><span class="lineNoCov">          0 :         nvdec_reset_pcks(ctx);</span>
+<span class="lineNum">    1388 </span><span class="lineNoCov">          0 :         gf_list_del(ctx-&gt;src_packets);</span>
+<span class="lineNum">    1389 </span>            : 
+<span class="lineNum">    1390 </span><span class="lineNoCov">          0 :         if (!global_nb_loaded_nvdec &amp;&amp; global_unactive_decoders) {</span>
+<span class="lineNum">    1391 </span><span class="lineNoCov">          0 :                 while (gf_list_count(global_unactive_decoders)) {</span>
+<span class="lineNum">    1392 </span><span class="lineNoCov">          0 :                         NVDecInstance *inst = gf_list_pop_back(global_unactive_decoders);</span>
+<span class="lineNum">    1393 </span><span class="lineNoCov">          0 :                         nvdec_destroy_decoder(inst);</span>
+<span class="lineNum">    1394 </span><span class="lineNoCov">          0 :                         if (inst-&gt;cu_parser) cuvidDestroyVideoParser(inst-&gt;cu_parser);</span>
+<span class="lineNum">    1395 </span><span class="lineNoCov">          0 :                         gf_free(inst);</span>
+<span class="lineNum">    1396 </span>            :                 }
+<span class="lineNum">    1397 </span><span class="lineNoCov">          0 :                 gf_list_del(global_unactive_decoders);</span>
+<span class="lineNum">    1398 </span>            : 
+<span class="lineNum">    1399 </span><span class="lineNoCov">          0 :                 gf_mx_del(global_inst_mutex);</span>
+<span class="lineNum">    1400 </span>            :         }
+<span class="lineNum">    1401 </span>            : 
+<span class="lineNum">    1402 </span><span class="lineNoCov">          0 :         if (ctx-&gt;dec_inst) {</span>
+<span class="lineNum">    1403 </span><span class="lineNoCov">          0 :                 nvdec_destroy_decoder(ctx-&gt;dec_inst);</span>
+<span class="lineNum">    1404 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;dec_inst-&gt;cu_parser) cuvidDestroyVideoParser(ctx-&gt;dec_inst-&gt;cu_parser);</span>
+<span class="lineNum">    1405 </span><span class="lineNoCov">          0 :                 gf_free(ctx-&gt;dec_inst);</span>
+<span class="lineNum">    1406 </span>            :         }
+<span class="lineNum">    1407 </span>            : 
+<span class="lineNum">    1408 </span>            : 
+<span class="lineNum">    1409 </span>            :         assert(nb_cuvid_inst);
+<span class="lineNum">    1410 </span><span class="lineNoCov">          0 :         nb_cuvid_inst--;</span>
+<span class="lineNum">    1411 </span><span class="lineNoCov">          0 :         if (!nb_cuvid_inst) {</span>
+<span class="lineNum">    1412 </span><span class="lineNoCov">          0 :                 if (cuda_ctx) cuCtxDestroy(cuda_ctx);</span>
+<span class="lineNum">    1413 </span><span class="lineNoCov">          0 :                 cuda_ctx = NULL;</span>
+<span class="lineNum">    1414 </span><span class="lineNoCov">          0 :                 cuUninit();</span>
+<span class="lineNum">    1415 </span><span class="lineNoCov">          0 :                 cuvid_load_state = 0;</span>
+<span class="lineNum">    1416 </span>            :         }
+<span class="lineNum">    1417 </span><span class="lineNoCov">          0 :         while (gf_list_count(ctx-&gt;frames)) {</span>
+<span class="lineNum">    1418 </span><span class="lineNoCov">          0 :                 NVDecFrame *f = (NVDecFrame *) gf_list_pop_back(ctx-&gt;frames);</span>
+<span class="lineNum">    1419 </span><span class="lineNoCov">          0 :                 gf_free(f);</span>
+<span class="lineNum">    1420 </span>            :         }
+<span class="lineNum">    1421 </span><span class="lineNoCov">          0 :         gf_list_del(ctx-&gt;frames);</span>
+<span class="lineNum">    1422 </span><span class="lineNoCov">          0 :         while (gf_list_count(ctx-&gt;frames_res)) {</span>
+<span class="lineNum">    1423 </span><span class="lineNoCov">          0 :                 NVDecFrame *f = (NVDecFrame *) gf_list_pop_back(ctx-&gt;frames_res);</span>
+<span class="lineNum">    1424 </span><span class="lineNoCov">          0 :                 gf_free(f);</span>
+<span class="lineNum">    1425 </span>            :         }
+<span class="lineNum">    1426 </span><span class="lineNoCov">          0 :         gf_list_del(ctx-&gt;frames_res);</span>
+<span class="lineNum">    1427 </span>            : 
+<span class="lineNum">    1428 </span><span class="lineNoCov">          0 :         if (ctx-&gt;single_frame_data) gf_free(ctx-&gt;single_frame_data);</span>
+<span class="lineNum">    1429 </span><span class="lineNoCov">          0 :         if (ctx-&gt;xps_buf) gf_free(ctx-&gt;xps_buf);</span>
+<span class="lineNum">    1430 </span><span class="lineNoCov">          0 :         if (ctx-&gt;nal_buffer) gf_free(ctx-&gt;nal_buffer);</span>
+<span class="lineNum">    1431 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1432 </span>            : 
+<span class="lineNum">    1433 </span>            : 
+<span class="lineNum">    1434 </span>            : static const GF_FilterCapability NVDecCaps[] =
+<span class="lineNum">    1435 </span>            : {
+<span class="lineNum">    1436 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">    1437 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">    1438 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_MPEG4_PART2),
+<span class="lineNum">    1439 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_MPEG2_MAIN),
+<span class="lineNum">    1440 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_MPEG2_SNR),
+<span class="lineNum">    1441 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_MPEG2_SPATIAL),
+<span class="lineNum">    1442 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_MPEG2_HIGH),
+<span class="lineNum">    1443 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_MPEG2_422),
+<span class="lineNum">    1444 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_HEVC),
+<span class="lineNum">    1445 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_AVC),
+<span class="lineNum">    1446 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED,GF_PROP_PID_TILE_BASE, GF_TRUE),
+<span class="lineNum">    1447 </span>            :         //CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_CODECID, GF_CODECID_VC1),
+<span class="lineNum">    1448 </span>            :         CAP_UINT(GF_CAPS_OUTPUT_STATIC, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">    1449 </span>            :         CAP_UINT(GF_CAPS_OUTPUT_STATIC, GF_PROP_PID_CODECID, GF_CODECID_RAW)
+<span class="lineNum">    1450 </span>            : };
+<span class="lineNum">    1451 </span>            : 
+<span class="lineNum">    1452 </span>            : #define OFFS(_n)        #_n, offsetof(NVDecCtx, _n)
+<span class="lineNum">    1453 </span>            : 
+<span class="lineNum">    1454 </span>            : static const GF_FilterArgs NVDecArgs[] =
+<span class="lineNum">    1455 </span>            : {
+<span class="lineNum">    1456 </span>            :         { OFFS(num_surfaces), &quot;number of hardware surfaces to allocate&quot;, GF_PROP_UINT, &quot;20&quot;, NULL, GF_FS_ARG_HINT_ADVANCED },
+<span class="lineNum">    1457 </span>            :         { OFFS(unload), &quot;decoder unload mode\n&quot;
+<span class="lineNum">    1458 </span>            :                 &quot;- no: keep inactive decoder alive\n&quot;
+<span class="lineNum">    1459 </span>            :                 &quot;- destroy: destroy inactive decoder\n&quot;
+<span class="lineNum">    1460 </span>            :                 &quot;- reuse: detach decoder from inactive PIDs and reattach to active ones&quot;, GF_PROP_UINT, &quot;no&quot;, &quot;no|destroy|reuse&quot;, GF_FS_ARG_HINT_EXPERT },
+<span class="lineNum">    1461 </span>            :         { OFFS(vmode), &quot;video decoder backend\n&quot;
+<span class="lineNum">    1462 </span>            :                 &quot;- cuvid: use dedicated video engines directly\n&quot;
+<span class="lineNum">    1463 </span>            :                 &quot;- cuda: use a CUDA-based decoder if faster than dedicated engines\n&quot;
+<span class="lineNum">    1464 </span>            :                 &quot;- dxva: go through DXVA internally if possible (requires D3D9 interop)&quot;, GF_PROP_UINT, &quot;cuvid&quot;, &quot;cuvid|cuda|dxva&quot;, GF_FS_ARG_HINT_ADVANCED },
+<span class="lineNum">    1465 </span>            :         { OFFS(fmode), &quot;frame output mode\n&quot;
+<span class="lineNum">    1466 </span>            :                 &quot;- copy: each frame is copied and dispatched\n&quot;
+<span class="lineNum">    1467 </span>            :                 &quot;- single: frame data is only retrieved when used, single memory space for all frames (not safe if multiple consumers)\n&quot;
+<span class="lineNum">    1468 </span>            :                 &quot;- gl: frame data is mapped to an OpenGL texture&quot;
+<span class="lineNum">    1469 </span>            :         , GF_PROP_UINT, &quot;gl&quot;, &quot;copy|single|gl&quot;, 0 },
+<span class="lineNum">    1470 </span>            : 
+<span class="lineNum">    1471 </span>            :         { 0 }
+<span class="lineNum">    1472 </span>            : };
+<span class="lineNum">    1473 </span>            : 
+<span class="lineNum">    1474 </span>            : GF_FilterRegister NVDecRegister = {
+<span class="lineNum">    1475 </span>            :         .name = &quot;nvdec&quot;,
+<span class="lineNum">    1476 </span>            :         GF_FS_SET_DESCRIPTION(&quot;NVidia decoder&quot;)
+<span class="lineNum">    1477 </span>            :         GF_FS_SET_HELP(&quot;This filter decodes MPEG-2, MPEG-4 Part 2, AVC|H264 and HEVC streams through NVideia decoder. It allows GPU frame dispatch or direct frame copy.&quot;)
+<span class="lineNum">    1478 </span>            :         .private_size = sizeof(NVDecCtx),
+<span class="lineNum">    1479 </span>            :         SETCAPS(NVDecCaps),
+<span class="lineNum">    1480 </span>            :         .flags = GF_FS_REG_CONFIGURE_MAIN_THREAD,
+<span class="lineNum">    1481 </span>            :         .initialize = nvdec_initialize,
+<span class="lineNum">    1482 </span>            :         .finalize = nvdec_finalize,
+<span class="lineNum">    1483 </span>            :         .args = NVDecArgs,
+<span class="lineNum">    1484 </span>            :         .configure_pid = nvdec_configure_pid,
+<span class="lineNum">    1485 </span>            :         .process = nvdec_process,
+<span class="lineNum">    1486 </span>            :         .process_event = nvdec_process_event
+<span class="lineNum">    1487 </span>            : };
+<a name="1488"><span class="lineNum">    1488 </span>            : </a>
+<span class="lineNum">    1489 </span>            : 
+<span class="lineNum">    1490 </span><span class="lineCov">       2877 : const GF_FilterRegister *nvdec_register(GF_FilterSession *session)</span>
+<span class="lineNum">    1491 </span>            : {
+<span class="lineNum">    1492 </span>            :         //check if nvdec is not globally blacklisted - if so, do not try to load CUDA SDK which may be time consuming on some devices
+<span class="lineNum">    1493 </span><span class="lineCov">       2877 :         const char *blacklist = gf_opts_get_key(&quot;core&quot;, &quot;blacklist&quot;);</span>
+<span class="lineNum">    1494 </span><span class="lineCov">       2877 :         if (blacklist &amp;&amp; strstr(blacklist, &quot;nvdec&quot;))</span>
+<span class="lineNum">    1495 </span>            :                 return NULL;
+<span class="lineNum">    1496 </span>            : 
+<span class="lineNum">    1497 </span><span class="lineCov">       2413 :         init_cuda_sdk();</span>
+<span class="lineNum">    1498 </span>            :         //do not register if no SDK
+<span class="lineNum">    1499 </span><span class="lineCov">       2413 :         if (cuvid_load_state != 2) {</span>
+<span class="lineNum">    1500 </span>            :                 // this is man / md generation, load filter
+<span class="lineNum">    1501 </span><span class="lineCov">       2413 :                 if (!gf_opts_get_bool(&quot;temp&quot;, &quot;gendoc&quot;))</span>
+<span class="lineNum">    1502 </span>            :                         return NULL;
+<span class="lineNum">    1503 </span><span class="lineCov">         14 :                 NVDecRegister.version = &quot;! Warning: CUVID SDK NOT AVAILABLE ON THIS SYSTEM !&quot;;</span>
+<span class="lineNum">    1504 </span>            :         }
+<span class="lineNum">    1505 </span>            : 
+<span class="lineNum">    1506 </span>            :         return &amp;NVDecRegister;
+<span class="lineNum">    1507 </span>            : }
+<span class="lineNum">    1508 </span>            : 
+<span class="lineNum">    1509 </span>            : #else
+<span class="lineNum">    1510 </span>            : 
+<span class="lineNum">    1511 </span>            : const GF_FilterRegister *nvdec_register(GF_FilterSession *session)
+<span class="lineNum">    1512 </span>            : {
+<span class="lineNum">    1513 </span>            :         return NULL;
+<span class="lineNum">    1514 </span>            : }
+<span class="lineNum">    1515 </span>            : #endif // (!defined(GPAC_STATIC_BUILD) &amp;&amp; (defined(WIN32) || defined(GPAC_CONFIG_LINUX) || defined(GPAC_CONFIG_DARWIN)) &amp;&amp; !defined(GPAC_DISABLE_NVDEC))
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

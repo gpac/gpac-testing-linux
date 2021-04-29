@@ -1,0 +1,609 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/in_pipe.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - in_pipe.c<span style="font-size: 80%;"> (source / <a href="in_pipe.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">101</td>
+            <td class="headerCovTableEntry">131</td>
+            <td class="headerCovTableEntryMed">77.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2018-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / pipe input filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #ifdef WIN32
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &lt;windows.h&gt;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #else
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      38 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : #ifdef GPAC_CONFIG_LINUX
+<span class="lineNum">      41 </span>            : #include &lt;sys/types.h&gt;
+<span class="lineNum">      42 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      43 </span>            : #endif
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : #ifndef __BEOS__
+<span class="lineNum">      46 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      47 </span>            : #endif
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : #endif
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : typedef struct
+<span class="lineNum">      53 </span>            : {
+<span class="lineNum">      54 </span>            :         //options
+<span class="lineNum">      55 </span>            :         char *src;
+<span class="lineNum">      56 </span>            :         char *ext;
+<span class="lineNum">      57 </span>            :         char *mime;
+<span class="lineNum">      58 </span>            :         u32 block_size;
+<span class="lineNum">      59 </span>            :         Bool blk, ka, mkp;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :         //only one output pid declared
+<span class="lineNum">      62 </span>            :         GF_FilterPid *pid;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : #ifdef WIN32
+<span class="lineNum">      65 </span>            :         HANDLE pipe;
+<span class="lineNum">      66 </span>            :         HANDLE event;
+<span class="lineNum">      67 </span>            :         OVERLAPPED overlap;
+<span class="lineNum">      68 </span>            : #else
+<span class="lineNum">      69 </span>            :         int fd;
+<span class="lineNum">      70 </span>            : #endif
+<span class="lineNum">      71 </span>            :         u64 bytes_read;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :         Bool is_end, pck_out, is_first, owns_pipe;
+<span class="lineNum">      74 </span>            :         Bool do_reconfigure;
+<span class="lineNum">      75 </span>            :         char *buffer;
+<span class="lineNum">      76 </span>            :         Bool is_stdin;
+<span class="lineNum">      77 </span>            : } GF_PipeInCtx;
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : static Bool pipein_process_event(GF_Filter *filter, const GF_FilterEvent *evt);
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            : #ifdef WIN32
+<span class="lineNum">      82 </span>            : #include &lt;io.h&gt;
+<span class="lineNum">      83 </span>            : #include &lt;fcntl.h&gt;
+<a name="84"><span class="lineNum">      84 </span>            : #endif //WIN32</a>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">         10 : static GF_Err pipein_initialize(GF_Filter *filter)</span>
+<span class="lineNum">      87 </span>            : {
+<span class="lineNum">      88 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">      89 </span><span class="lineCov">         10 :         GF_PipeInCtx *ctx = (GF_PipeInCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">      90 </span>            :         char *frag_par = NULL;
+<span class="lineNum">      91 </span>            :         char *cgi_par = NULL;
+<span class="lineNum">      92 </span>            :         char *src;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">         10 :         if (!ctx-&gt;src) return GF_BAD_PARAM;</span>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : #ifdef WIN32
+<span class="lineNum">      97 </span>            :         ctx-&gt;pipe = INVALID_HANDLE_VALUE;
+<span class="lineNum">      98 </span>            : #else
+<span class="lineNum">      99 </span><span class="lineCov">         10 :         ctx-&gt;fd = -1;</span>
+<span class="lineNum">     100 </span>            : #endif
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">         10 :         if (!strcmp(ctx-&gt;src, &quot;-&quot;) || !strcmp(ctx-&gt;src, &quot;stdin&quot;)) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">          2 :                 ctx-&gt;is_stdin = GF_TRUE;</span>
+<span class="lineNum">     104 </span><span class="lineCov">          2 :                 ctx-&gt;mkp = GF_FALSE;</span>
+<span class="lineNum">     105 </span>            : #ifdef WIN32
+<span class="lineNum">     106 </span>            :                 _setmode(_fileno(stdin), _O_BINARY);
+<span class="lineNum">     107 </span>            : #endif
+<span class="lineNum">     108 </span>            :         }
+<span class="lineNum">     109 </span><span class="lineCov">          8 :         else if (strnicmp(ctx-&gt;src, &quot;pipe:/&quot;, 6) &amp;&amp; strstr(ctx-&gt;src, &quot;://&quot;))  {</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_NOT_SUPPORTED);</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                 return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     112 </span>            :         }
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">         10 :         if (ctx-&gt;mkp) ctx-&gt;blk = GF_TRUE;</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :         //strip any fragment identifer
+<span class="lineNum">     117 </span><span class="lineCov">         10 :         frag_par = strchr(ctx-&gt;src, '#');</span>
+<span class="lineNum">     118 </span><span class="lineCov">         10 :         if (frag_par) frag_par[0] = 0;</span>
+<span class="lineNum">     119 </span><span class="lineCov">         10 :         cgi_par = strchr(ctx-&gt;src, '?');</span>
+<span class="lineNum">     120 </span><span class="lineCov">         10 :         if (cgi_par) cgi_par[0] = 0;</span>
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineCov">         10 :         src = (char *) ctx-&gt;src;</span>
+<span class="lineNum">     123 </span><span class="lineCov">         10 :         if (!strnicmp(ctx-&gt;src, &quot;pipe://&quot;, 7)) src += 7;</span>
+<span class="lineNum">     124 </span><span class="lineCov">          2 :         else if (!strnicmp(ctx-&gt;src, &quot;pipe:&quot;, 5)) src += 5;</span>
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineCov">         10 :         if (ctx-&gt;is_stdin) {</span>
+<span class="lineNum">     127 </span>            :                 e = GF_OK;
+<span class="lineNum">     128 </span>            :                 goto setup_done;
+<span class="lineNum">     129 </span>            :         }
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            : #ifdef WIN32
+<span class="lineNum">     132 </span>            :         char szNamedPipe[GF_MAX_PATH];
+<span class="lineNum">     133 </span>            :         if (!strncmp(src, &quot;\\\\&quot;, 2)) {
+<span class="lineNum">     134 </span>            :                 strcpy(szNamedPipe, src);
+<span class="lineNum">     135 </span>            :         }
+<span class="lineNum">     136 </span>            :         else {
+<span class="lineNum">     137 </span>            :                 strcpy(szNamedPipe, &quot;\\\\.\\pipe\\gpac\\&quot;);
+<span class="lineNum">     138 </span>            :                 strcat(szNamedPipe, src);
+<span class="lineNum">     139 </span>            :         }
+<span class="lineNum">     140 </span>            :         if (strchr(szNamedPipe, '/')) {
+<span class="lineNum">     141 </span>            :                 u32 i, len = (u32)strlen(szNamedPipe);
+<span class="lineNum">     142 </span>            :                 for (i = 0; i &lt; len; i++) {
+<span class="lineNum">     143 </span>            :                         if (szNamedPipe[i] == '/')
+<span class="lineNum">     144 </span>            :                                 szNamedPipe[i] = '\\';
+<span class="lineNum">     145 </span>            :                 }
+<span class="lineNum">     146 </span>            :         }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :         if (WaitNamedPipeA(szNamedPipe, 1) == FALSE) {
+<span class="lineNum">     149 </span>            :                 if (!ctx-&gt;mkp) {
+<span class="lineNum">     150 </span>            :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[PipeIn] Failed to open %s: %d\n&quot;, szNamedPipe, GetLastError()));
+<span class="lineNum">     151 </span>            :                         e = GF_URL_ERROR;
+<span class="lineNum">     152 </span>            :                         goto err_exit;
+<span class="lineNum">     153 </span>            :                 }
+<span class="lineNum">     154 </span>            :                 DWORD pflags = PIPE_ACCESS_INBOUND;
+<span class="lineNum">     155 </span>            :                 DWORD flags = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE;
+<span class="lineNum">     156 </span>            :                 if (ctx-&gt;blk) flags |= PIPE_WAIT;
+<span class="lineNum">     157 </span>            :                 else {
+<span class="lineNum">     158 </span>            :                         flags |= PIPE_NOWAIT;
+<span class="lineNum">     159 </span>            :                         pflags |= FILE_FLAG_OVERLAPPED;
+<span class="lineNum">     160 </span>            :                         if (!ctx-&gt;event) ctx-&gt;event = CreateEvent(NULL, TRUE, FALSE, NULL);
+<span class="lineNum">     161 </span>            :                         if (!ctx-&gt;event) {
+<span class="lineNum">     162 </span>            :                                 e = GF_IO_ERR;
+<span class="lineNum">     163 </span>            :                                 goto err_exit;
+<span class="lineNum">     164 </span>            :                         }
+<span class="lineNum">     165 </span>            :                         ctx-&gt;overlap.hEvent = ctx-&gt;event;
+<span class="lineNum">     166 </span>            :                 }
+<span class="lineNum">     167 </span>            :                 ctx-&gt;pipe = CreateNamedPipe(szNamedPipe, pflags, flags, 10, ctx-&gt;block_size, ctx-&gt;block_size, 0, NULL);
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :                 if (ctx-&gt;pipe == INVALID_HANDLE_VALUE) {
+<span class="lineNum">     170 </span>            :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[PipeIn] Failed to create named pipe %s: %d\n&quot;, szNamedPipe, GetLastError()));
+<span class="lineNum">     171 </span>            :                         e = GF_URL_ERROR;
+<span class="lineNum">     172 </span>            :                         goto err_exit;
+<span class="lineNum">     173 </span>            :                 }
+<span class="lineNum">     174 </span>            :                 if (ctx-&gt;blk) {
+<span class="lineNum">     175 </span>            :                         GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[PipeIn] Waiting for client connection for %s, blocking\n&quot;, szNamedPipe));
+<span class="lineNum">     176 </span>            :                 }
+<span class="lineNum">     177 </span>            :                 if (!ConnectNamedPipe(ctx-&gt;pipe, ctx-&gt;blk ? NULL : &amp;ctx-&gt;overlap) &amp;&amp; (GetLastError() != ERROR_PIPE_CONNECTED) &amp;&amp; (GetLastError() != ERROR_PIPE_LISTENING)) {
+<span class="lineNum">     178 </span>            :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[PipeOut] Failed to connect named pipe %s: %d\n&quot;, szNamedPipe, GetLastError()));
+<span class="lineNum">     179 </span>            :                         e = GF_IO_ERR;
+<span class="lineNum">     180 </span>            :                         CloseHandle(ctx-&gt;pipe);
+<span class="lineNum">     181 </span>            :                         ctx-&gt;pipe = INVALID_HANDLE_VALUE;
+<span class="lineNum">     182 </span>            :                 }
+<span class="lineNum">     183 </span>            :                 else {
+<span class="lineNum">     184 </span>            :                         ctx-&gt;owns_pipe = GF_TRUE;
+<span class="lineNum">     185 </span>            :                 }
+<span class="lineNum">     186 </span>            :         }
+<span class="lineNum">     187 </span>            :         else {
+<span class="lineNum">     188 </span>            :                 ctx-&gt;pipe = CreateFile(szNamedPipe, GENERIC_READ, ctx-&gt;blk ? PIPE_WAIT : PIPE_NOWAIT, NULL, OPEN_EXISTING, 0, NULL);
+<span class="lineNum">     189 </span>            :                 if (ctx-&gt;pipe == INVALID_HANDLE_VALUE) {
+<span class="lineNum">     190 </span>            :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[PipeIn] Failed to open %s: %d\n&quot;, szNamedPipe, GetLastError()));
+<span class="lineNum">     191 </span>            :                         e = GF_URL_ERROR;
+<span class="lineNum">     192 </span>            :                 }
+<span class="lineNum">     193 </span>            :         }
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            : err_exit:
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            : #else
+<span class="lineNum">     198 </span><span class="lineCov">          8 :         if (!gf_file_exists(src) &amp;&amp; ctx-&gt;mkp) {</span>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            : #ifdef GPAC_CONFIG_DARWIN
+<span class="lineNum">     201 </span>            :                 mknod(src,S_IFIFO | 0666, 0);
+<span class="lineNum">     202 </span>            : #else
+<span class="lineNum">     203 </span><span class="lineCov">          1 :                 mkfifo(src, 0666);</span>
+<span class="lineNum">     204 </span>            : #endif
+<span class="lineNum">     205 </span><span class="lineCov">          1 :                 ctx-&gt;owns_pipe = GF_TRUE;</span>
+<span class="lineNum">     206 </span>            :         }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineCov">         16 :         ctx-&gt;fd = open(src, ctx-&gt;blk ? O_RDONLY : O_RDONLY|O_NONBLOCK );</span>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineCov">          8 :         if (ctx-&gt;fd &lt; 0) {</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[PipeIn] Failed to open %s: %s\n&quot;, src, gf_errno_str(errno)));</span>
+<span class="lineNum">     212 </span>            :                 e = GF_URL_ERROR;
+<span class="lineNum">     213 </span>            :         }
+<span class="lineNum">     214 </span>            : #endif
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineCov">          8 : setup_done:</span>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :         if (e) {
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :                 if (frag_par) frag_par[0] = '#';</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                 if (cgi_par) cgi_par[0] = '?';</span>
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_URL_ERROR);</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :                 ctx-&gt;owns_pipe = GF_FALSE;</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :                 return GF_URL_ERROR;</span>
+<span class="lineNum">     225 </span>            :         }
+<span class="lineNum">     226 </span><span class="lineCov">         10 :         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[PipeIn] opening %s\n&quot;, src));</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">         10 :         ctx-&gt;is_end = GF_FALSE;</span>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineCov">         10 :         if (frag_par) frag_par[0] = '#';</span>
+<span class="lineNum">     231 </span><span class="lineCov">         10 :         if (cgi_par) cgi_par[0] = '?';</span>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineCov">         10 :         ctx-&gt;is_first = GF_TRUE;</span>
+<span class="lineNum">     234 </span><span class="lineCov">         10 :         if (!ctx-&gt;buffer)</span>
+<span class="lineNum">     235 </span><span class="lineCov">         10 :                 ctx-&gt;buffer = gf_malloc(ctx-&gt;block_size +1);</span>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineCov">         10 :         gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            : #ifdef GPAC_ENABLE_COVERAGE
+<span class="lineNum">     240 </span><span class="lineCov">         10 :         if (gf_sys_is_cov_mode()) {</span>
+<span class="lineNum">     241 </span><span class="lineCov">         10 :                 pipein_process_event(NULL, NULL);</span>
+<span class="lineNum">     242 </span>            :         }
+<span class="lineNum">     243 </span>            : #endif
+<span class="lineNum">     244 </span>            :         return GF_OK;
+<span class="lineNum">     245 </span>            : }
+<a name="246"><span class="lineNum">     246 </span>            : </a>
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span><span class="lineCov">         10 : static void pipein_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     249 </span>            : {
+<span class="lineNum">     250 </span><span class="lineCov">         10 :         GF_PipeInCtx *ctx = (GF_PipeInCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineCov">         10 :         if (!ctx-&gt;is_stdin) {</span>
+<span class="lineNum">     253 </span>            : #ifdef WIN32
+<span class="lineNum">     254 </span>            :                 if (ctx-&gt;pipe != INVALID_HANDLE_VALUE) CloseHandle(ctx-&gt;pipe);
+<span class="lineNum">     255 </span>            : #else
+<span class="lineNum">     256 </span><span class="lineCov">          8 :                 if (ctx-&gt;fd&gt;=0) close(ctx-&gt;fd);</span>
+<span class="lineNum">     257 </span>            : #endif
+<span class="lineNum">     258 </span><span class="lineCov">          8 :                 if (ctx-&gt;owns_pipe)</span>
+<span class="lineNum">     259 </span><span class="lineCov">          1 :                         gf_file_delete(ctx-&gt;src);</span>
+<span class="lineNum">     260 </span>            :         }
+<span class="lineNum">     261 </span><span class="lineCov">         10 :         if (ctx-&gt;buffer) gf_free(ctx-&gt;buffer);</span>
+<span class="lineNum">     262 </span>            : 
+<a name="263"><span class="lineNum">     263 </span><span class="lineCov">         10 : }</span></a>
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineCov">       2939 : static GF_FilterProbeScore pipein_probe_url(const char *url, const char *mime_type)</span>
+<span class="lineNum">     266 </span>            : {
+<span class="lineNum">     267 </span><span class="lineCov">       2939 :         if (!strnicmp(url, &quot;pipe://&quot;, 7)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     268 </span><span class="lineCov">       2931 :         else if (!strnicmp(url, &quot;pipe:&quot;, 5)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     269 </span><span class="lineCov">       2931 :         else if (!strcmp(url, &quot;-&quot;) || !strcmp(url, &quot;stdin&quot;)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineCov">       2929 :         return GF_FPROBE_NOT_SUPPORTED;</span>
+<a name="272"><span class="lineNum">     272 </span>            : }</a>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineCov">         10 : static Bool pipein_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     275 </span>            : {
+<span class="lineNum">     276 </span>            :         GF_PipeInCtx *ctx;
+<span class="lineNum">     277 </span><span class="lineCov">         10 :         if (!filter || !evt) return GF_TRUE;</span>
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :         ctx = (GF_PipeInCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :         if (evt-&gt;base.on_pid &amp;&amp; (evt-&gt;base.on_pid != ctx-&gt;pid))</span>
+<span class="lineNum">     281 </span>            :                 return GF_TRUE;
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     284 </span>            :         case GF_FEVT_PLAY:
+<span class="lineNum">     285 </span>            :                 return GF_TRUE;
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     287 </span>            :                 //stop sending data
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :                 ctx-&gt;is_end = GF_TRUE;</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_eos(ctx-&gt;pid);</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :                 return GF_TRUE;</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :         case GF_FEVT_SOURCE_SEEK:</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[PipeIn] Seek request not possible on pipes, ignoring\n&quot;));</span>
+<span class="lineNum">     293 </span>            :                 return GF_TRUE;
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :         case GF_FEVT_SOURCE_SWITCH:</span>
+<span class="lineNum">     295 </span>            :                 assert(ctx-&gt;is_end);
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :                 if (evt-&gt;seek.source_switch) {</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[PipeIn] source switch request not possible on pipes, ignoring\n&quot;));</span>
+<span class="lineNum">     298 </span>            :                 }
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :                 pipein_initialize(filter);</span>
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :                 gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     302 </span>            :         default:
+<span class="lineNum">     303 </span>            :                 break;
+<span class="lineNum">     304 </span>            :         }
+<span class="lineNum">     305 </span>            :         return GF_TRUE;
+<span class="lineNum">     306 </span>            : }
+<a name="307"><span class="lineNum">     307 </span>            : </a>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineCov">        277 : static void pipein_pck_destructor(GF_Filter *filter, GF_FilterPid *pid, GF_FilterPacket *pck)</span>
+<span class="lineNum">     310 </span>            : {
+<span class="lineNum">     311 </span><span class="lineCov">        277 :         GF_PipeInCtx *ctx = (GF_PipeInCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     312 </span><span class="lineCov">        277 :         ctx-&gt;pck_out = GF_FALSE;</span>
+<span class="lineNum">     313 </span>            :         //ready to process again
+<span class="lineNum">     314 </span><span class="lineCov">        277 :         gf_filter_post_process_task(filter);</span>
+<a name="315"><span class="lineNum">     315 </span><span class="lineCov">        277 : }</span></a>
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span><span class="lineCov">       3977 : static GF_Err pipein_process(GF_Filter *filter)</span>
+<span class="lineNum">     318 </span>            : {
+<span class="lineNum">     319 </span>            :         GF_Err e;
+<span class="lineNum">     320 </span>            :         u32 to_read;
+<span class="lineNum">     321 </span>            :         s32 nb_read;
+<span class="lineNum">     322 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     323 </span><span class="lineCov">       3977 :         GF_PipeInCtx *ctx = (GF_PipeInCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineCov">       3977 :         if (ctx-&gt;is_end)</span>
+<span class="lineNum">     326 </span>            :                 return GF_EOS;
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            :         //until packet is released we return EOS (no processing), and ask for processing again upon release
+<span class="lineNum">     329 </span><span class="lineCov">       3977 :         if (ctx-&gt;pck_out)</span>
+<span class="lineNum">     330 </span>            :                 return GF_EOS;
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineCov">       3967 :         if (ctx-&gt;pid &amp;&amp; gf_filter_pid_would_block(ctx-&gt;pid)) {</span>
+<span class="lineNum">     333 </span>            :                 assert(0);
+<span class="lineNum">     334 </span>            :                 return GF_OK;
+<span class="lineNum">     335 </span>            :         }
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span><span class="lineCov">       3967 :         to_read = ctx-&gt;block_size;</span>
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span><span class="lineCov">       3967 :         if (ctx-&gt;is_stdin) {</span>
+<span class="lineNum">     340 </span>            :                 nb_read = 0;
+<span class="lineNum">     341 </span><span class="lineCov">         22 :                 if (feof(stdin)) {</span>
+<span class="lineNum">     342 </span><span class="lineCov">          2 :                         if (!ctx-&gt;ka) {</span>
+<span class="lineNum">     343 </span><span class="lineCov">          2 :                                 gf_filter_pid_set_eos(ctx-&gt;pid);</span>
+<span class="lineNum">     344 </span><span class="lineCov">          2 :                                 return GF_EOS;</span>
+<span class="lineNum">     345 </span>            :                         }
+<span class="lineNum">     346 </span>            :                 } else {
+<span class="lineNum">     347 </span><span class="lineCov">         40 :                         nb_read = (s32) fread(ctx-&gt;buffer, 1, to_read, stdin);</span>
+<span class="lineNum">     348 </span><span class="lineCov">         20 :                         if (nb_read&lt;0) {</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                                 if (!ctx-&gt;ka) {</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_set_eos(ctx-&gt;pid);</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                                         return GF_EOS;</span>
+<span class="lineNum">     352 </span>            :                                 }
+<span class="lineNum">     353 </span>            :                         }
+<span class="lineNum">     354 </span>            :                 }
+<span class="lineNum">     355 </span>            :         } else {
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span><span class="lineCov">       3945 :                 errno = 0;</span>
+<span class="lineNum">     358 </span>            : #ifdef WIN32
+<span class="lineNum">     359 </span>            :                 nb_read = -1;
+<span class="lineNum">     360 </span>            :                 if (!ctx-&gt;blk &amp;&amp; ctx-&gt;mkp) {
+<span class="lineNum">     361 </span>            :                         DWORD res = WaitForMultipleObjects(1, &amp;ctx-&gt;event, FALSE, 1);
+<span class="lineNum">     362 </span>            :                         ResetEvent(ctx-&gt;event);
+<span class="lineNum">     363 </span>            :                         if (res == WAIT_FAILED) {
+<span class="lineNum">     364 </span>            :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[PipeIn] WaitForMultipleObjects failed!\n&quot;));
+<span class="lineNum">     365 </span>            :                                 return GF_IO_ERR;
+<span class="lineNum">     366 </span>            :                         }
+<span class="lineNum">     367 </span>            :                         if (GetOverlappedResult(ctx-&gt;pipe, &amp;ctx-&gt;overlap, &amp;res, FALSE) == 0) {
+<span class="lineNum">     368 </span>            :                                 if (GetLastError() == ERROR_IO_INCOMPLETE) {
+<span class="lineNum">     369 </span>            :                                 }
+<span class="lineNum">     370 </span>            :                                 else {
+<span class="lineNum">     371 </span>            :                                         CloseHandle(ctx-&gt;pipe);
+<span class="lineNum">     372 </span>            :                                         ctx-&gt;pipe = INVALID_HANDLE_VALUE;
+<span class="lineNum">     373 </span>            :                                         if (!ctx-&gt;ka) {
+<span class="lineNum">     374 </span>            :                                                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MMIO, (&quot;[PipeIn] end of stream detected\n&quot;));
+<span class="lineNum">     375 </span>            :                                                 gf_filter_pid_set_eos(ctx-&gt;pid);
+<span class="lineNum">     376 </span>            :                                                 return GF_EOS;
+<span class="lineNum">     377 </span>            :                                         }
+<span class="lineNum">     378 </span>            :                                         GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[PipeIn] Pipe closed by remote side, reopening!\n&quot;));
+<span class="lineNum">     379 </span>            :                                         return pipein_initialize(filter);
+<span class="lineNum">     380 </span>            :                                 }
+<span class="lineNum">     381 </span>            :                         }
+<span class="lineNum">     382 </span>            :                 }
+<span class="lineNum">     383 </span>            :                 if (! ReadFile(ctx-&gt;pipe, ctx-&gt;buffer, to_read, (LPDWORD) &amp;nb_read, ctx-&gt;blk ? NULL : &amp;ctx-&gt;overlap) ) {
+<span class="lineNum">     384 </span>            :                         s32 error = GetLastError();
+<span class="lineNum">     385 </span>            :                         if (error == ERROR_PIPE_LISTENING) return GF_OK;
+<span class="lineNum">     386 </span>            :                         else if ((error == ERROR_IO_PENDING) || (error== ERROR_MORE_DATA)) {
+<span class="lineNum">     387 </span>            :                                 //non blocking pipe with writers active
+<span class="lineNum">     388 </span>            :                         }
+<span class="lineNum">     389 </span>            :                         else if (nb_read&lt;0) {
+<span class="lineNum">     390 </span>            :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[PipeIn] Failed to read, error %d\n&quot;, error));
+<span class="lineNum">     391 </span>            :                                 return GF_IO_ERR;
+<span class="lineNum">     392 </span>            :                         }
+<span class="lineNum">     393 </span>            :                         else if (!ctx-&gt;ka) {
+<span class="lineNum">     394 </span>            :                                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MMIO, (&quot;[PipeIn] end of stream detected\n&quot;));
+<span class="lineNum">     395 </span>            :                                 gf_filter_pid_set_eos(ctx-&gt;pid);
+<span class="lineNum">     396 </span>            :                                 CloseHandle(ctx-&gt;pipe);
+<span class="lineNum">     397 </span>            :                                 ctx-&gt;pipe = INVALID_HANDLE_VALUE;
+<span class="lineNum">     398 </span>            :                                 ctx-&gt;is_end = GF_TRUE;
+<span class="lineNum">     399 </span>            :                                 return GF_EOS;
+<span class="lineNum">     400 </span>            :                         }
+<span class="lineNum">     401 </span>            :                         else if (error == ERROR_BROKEN_PIPE) {
+<span class="lineNum">     402 </span>            :                                 GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[PipeIn] Pipe closed by remote side, reopening!\n&quot;));
+<span class="lineNum">     403 </span>            :                                 CloseHandle(ctx-&gt;pipe);
+<span class="lineNum">     404 </span>            :                                 ctx-&gt;pipe = INVALID_HANDLE_VALUE;
+<span class="lineNum">     405 </span>            :                                 return pipein_initialize(filter);
+<span class="lineNum">     406 </span>            :                         }
+<span class="lineNum">     407 </span>            :                         return GF_OK;
+<span class="lineNum">     408 </span>            :                 }
+<span class="lineNum">     409 </span>            : #else
+<span class="lineNum">     410 </span><span class="lineCov">       7890 :                 nb_read = (s32) read(ctx-&gt;fd, ctx-&gt;buffer, to_read);</span>
+<span class="lineNum">     411 </span><span class="lineCov">       3945 :                 if (nb_read &lt;= 0) {</span>
+<span class="lineNum">     412 </span><span class="lineCov">       3688 :                         s32 res = errno;</span>
+<span class="lineNum">     413 </span><span class="lineCov">       3688 :                         if (res == EAGAIN) {</span>
+<span class="lineNum">     414 </span>            :                                 //non blocking pipe with writers active
+<span class="lineNum">     415 </span><span class="lineCov">          8 :                         } else if (nb_read&lt;0) {</span>
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MMIO, (&quot;[PipeIn] Failed to read, error %s\n&quot;, gf_errno_str(res) ));</span>
+<span class="lineNum">     417 </span>            :                                 return GF_IO_ERR;
+<span class="lineNum">     418 </span><span class="lineCov">          8 :                         } else if (!ctx-&gt;ka) {</span>
+<span class="lineNum">     419 </span><span class="lineCov">          8 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[PipeIn] end of stream detected\n&quot;));</span>
+<span class="lineNum">     420 </span><span class="lineCov">          8 :                                 if (ctx-&gt;pid) gf_filter_pid_set_eos(ctx-&gt;pid);</span>
+<span class="lineNum">     421 </span><span class="lineCov">          8 :                                 close(ctx-&gt;fd);</span>
+<span class="lineNum">     422 </span><span class="lineCov">          8 :                                 ctx-&gt;fd=-1;</span>
+<span class="lineNum">     423 </span><span class="lineCov">          8 :                                 ctx-&gt;is_end = GF_TRUE;</span>
+<span class="lineNum">     424 </span><span class="lineCov">          8 :                                 return GF_EOS;</span>
+<span class="lineNum">     425 </span>            :                         }
+<span class="lineNum">     426 </span>            :                         return GF_OK;
+<span class="lineNum">     427 </span>            :                 }
+<span class="lineNum">     428 </span>            : #endif
+<span class="lineNum">     429 </span>            :         }
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span><span class="lineCov">        277 :         if (!nb_read)</span>
+<span class="lineNum">     432 </span>            :                 return GF_OK;
+<span class="lineNum">     433 </span>            :         
+<span class="lineNum">     434 </span><span class="lineCov">        277 :         ctx-&gt;buffer[nb_read] = 0;</span>
+<span class="lineNum">     435 </span><span class="lineCov">        277 :         if (!ctx-&gt;pid || ctx-&gt;do_reconfigure) {</span>
+<span class="lineNum">     436 </span><span class="lineCov">         10 :                 GF_LOG(GF_LOG_INFO, GF_LOG_MMIO, (&quot;[PipeIn] configuring stream %d probe bytes\n&quot;, nb_read));</span>
+<span class="lineNum">     437 </span><span class="lineCov">         10 :                 ctx-&gt;do_reconfigure = GF_FALSE;</span>
+<span class="lineNum">     438 </span><span class="lineCov">         10 :                 e = gf_filter_pid_raw_new(filter, ctx-&gt;src, NULL, ctx-&gt;mime, ctx-&gt;ext, ctx-&gt;buffer, nb_read, GF_TRUE, &amp;ctx-&gt;pid);</span>
+<span class="lineNum">     439 </span><span class="lineCov">         10 :                 if (e) {</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_MMIO, (&quot;[PipeIn] failed to configure stream: %s\n&quot;, gf_error_to_string(e) ));</span>
+<span class="lineNum">     441 </span>            :                         return e;
+<span class="lineNum">     442 </span>            :                 }
+<span class="lineNum">     443 </span><span class="lineCov">         10 :                 gf_filter_pid_set_property(ctx-&gt;pid, GF_PROP_PID_FILE_CACHED, &amp;PROP_BOOL(GF_FALSE) );</span>
+<span class="lineNum">     444 </span><span class="lineCov">         10 :                 gf_filter_pid_set_property(ctx-&gt;pid, GF_PROP_PID_PLAYBACK_MODE, &amp;PROP_UINT(GF_PLAYBACK_MODE_NONE) );</span>
+<span class="lineNum">     445 </span>            :         }
+<span class="lineNum">     446 </span><span class="lineCov">        277 :         pck = gf_filter_pck_new_shared(ctx-&gt;pid, ctx-&gt;buffer, nb_read, pipein_pck_destructor);</span>
+<span class="lineNum">     447 </span><span class="lineCov">        277 :         if (!pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span><span class="lineCov">        277 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_MMIO, (&quot;[PipeIn] sending %d bytes\n&quot;, nb_read));</span>
+<span class="lineNum">     450 </span><span class="lineCov">        277 :         gf_filter_pck_set_framing(pck, ctx-&gt;is_first, ctx-&gt;is_end);</span>
+<span class="lineNum">     451 </span><span class="lineCov">        277 :         gf_filter_pck_set_sap(pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span><span class="lineCov">        277 :         ctx-&gt;is_first = GF_FALSE;</span>
+<span class="lineNum">     454 </span><span class="lineCov">        277 :         ctx-&gt;pck_out = GF_TRUE;</span>
+<span class="lineNum">     455 </span><span class="lineCov">        277 :         gf_filter_pck_send(pck);</span>
+<span class="lineNum">     456 </span><span class="lineCov">        277 :         ctx-&gt;bytes_read += nb_read;</span>
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span><span class="lineCov">        277 :         if (ctx-&gt;is_end) {</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_eos(ctx-&gt;pid);</span>
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :                 return GF_EOS;</span>
+<span class="lineNum">     461 </span>            :         }
+<span class="lineNum">     462 </span><span class="lineCov">        277 :         return ctx-&gt;pck_out ? GF_EOS : GF_OK;</span>
+<span class="lineNum">     463 </span>            : }
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            : #define OFFS(_n)        #_n, offsetof(GF_PipeInCtx, _n)
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            : static const GF_FilterArgs PipeInArgs[] =
+<span class="lineNum">     470 </span>            : {
+<span class="lineNum">     471 </span>            :         { OFFS(src), &quot;name of source pipe&quot;, GF_PROP_NAME, NULL, NULL, 0},
+<span class="lineNum">     472 </span>            :         { OFFS(block_size), &quot;buffer size used to read pipe&quot;, GF_PROP_UINT, &quot;5000&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     473 </span>            :         { OFFS(ext), &quot;indicate file extension of pipe data&quot;, GF_PROP_STRING, NULL, NULL, 0},
+<span class="lineNum">     474 </span>            :         { OFFS(mime), &quot;indicate mime type of pipe data&quot;, GF_PROP_STRING, NULL, NULL, 0},
+<span class="lineNum">     475 </span>            :         { OFFS(blk), &quot;open pipe in block mode - see filter help&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     476 </span>            :         { OFFS(ka), &quot;keep-alive pipe when end of input is detected - see filter help&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     477 </span>            :         { OFFS(mkp), &quot;create pipe if not found - see filter help&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, 0},
+<span class="lineNum">     478 </span>            :         {0}
+<span class="lineNum">     479 </span>            : };
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span>            : static const GF_FilterCapability PipeInCaps[] =
+<span class="lineNum">     482 </span>            : {
+<span class="lineNum">     483 </span>            :         CAP_UINT(GF_CAPS_OUTPUT,  GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     484 </span>            : };
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            : GF_FilterRegister PipeInRegister = {
+<span class="lineNum">     487 </span>            :         .name = &quot;pin&quot;,
+<span class="lineNum">     488 </span>            :         GF_FS_SET_DESCRIPTION(&quot;pipe input&quot;)
+<span class="lineNum">     489 </span>            :         GF_FS_SET_HELP( &quot;This filter handles generic input pipes (mono-directional) in blocking or non blocking mode.\n&quot;
+<span class="lineNum">     490 </span>            :                 &quot;Warning: Input pipes cannot seek.\n&quot;
+<span class="lineNum">     491 </span>            :                 &quot;Data format of the pipe may be specified using extension (either in file name or through [-ext]()) or MIME type through [-mime]().\n&quot;
+<span class="lineNum">     492 </span>            :                 &quot;Note: Unless disabled at session level (see [-no-probe](CORE) ), file extensions are usually ignored and format probing is done on the first data block.\n&quot;
+<span class="lineNum">     493 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     494 </span>            :                 &quot;# stdin pipe\n&quot;
+<span class="lineNum">     495 </span>            :                 &quot;The filter can handle reading from stdin, by using `-` or `stdin` as input file name.\n&quot;
+<span class="lineNum">     496 </span>            :                 &quot;EX gpac -i - vout\n&quot;
+<span class="lineNum">     497 </span>            :                 &quot;EX gpac -i stdin vout\n&quot;
+<span class="lineNum">     498 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     499 </span>            :                 &quot;# Named pipes\n&quot;
+<span class="lineNum">     500 </span>            :                 &quot;The filter can handle reading from named pipes. The associated protocol scheme is `pipe://` when loaded as a generic input (eg, `-i pipe://URL` where URL is a relative or absolute pipe name).\n&quot;
+<span class="lineNum">     501 </span>            :                 &quot;On Windows hosts, the default pipe prefix is `\\\\.\\pipe\\gpac\\` if no prefix is set.\n&quot;
+<span class="lineNum">     502 </span>            :                 &quot;EX dst=mypipe resolves in \\\\.\\pipe\\gpac\\mypipe\n&quot;
+<span class="lineNum">     503 </span>            :                 &quot;EX dst=\\\\.\\pipe\\myapp\\mypipe resolves in \\\\.\\pipe\\myapp\\mypipe\n&quot;
+<span class="lineNum">     504 </span>            :                 &quot;Any destination name starting with `\\\\` is used as is, with `\\` translated in `/`.\n&quot;
+<span class="lineNum">     505 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     506 </span>            :                 &quot;Input pipes are created by default in non-blocking mode.\n&quot;
+<span class="lineNum">     507 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     508 </span>            :                 &quot;The filter can create the pipe if not found using [-mkp](). On windows hosts, this will create a pipe server.\n&quot;
+<span class="lineNum">     509 </span>            :                 &quot;On non windows hosts, the created pipe will delete the pipe file upon filter destruction.\n&quot;
+<span class="lineNum">     510 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     511 </span>            :                 &quot;Input pipes can be setup to run forever using [-ka](). In this case, any potential pipe close on the writing side and end of stream will only be triggered upon session close.\n&quot;
+<span class="lineNum">     512 </span>            :                 &quot;This can be useful to pipe raw streams from different process into gpac:\n&quot;
+<span class="lineNum">     513 </span>            :                 &quot;Receiver side: `gpac -i pipe://mypipe:ext=.264:mkp:ka`\n&quot;
+<span class="lineNum">     514 </span>            :                 &quot;Sender side: `cat raw1.264 &gt; mypipe &amp;&amp; gpac -i raw2.264 -o pipe://mypipe:ext=.264`&quot;
+<span class="lineNum">     515 </span>            :                 &quot;\n&quot;
+<span class="lineNum">     516 </span>            :                 &quot;The pipe input can be created in blocking mode or non-blocking mode. If the filter creates the pipe, blocking mode is always enabled.\n&quot;
+<span class="lineNum">     517 </span>            :         &quot;&quot;)
+<span class="lineNum">     518 </span>            :         .private_size = sizeof(GF_PipeInCtx),
+<span class="lineNum">     519 </span>            :         .args = PipeInArgs,
+<span class="lineNum">     520 </span>            :         .flags = GF_FS_REG_BLOCKING,
+<span class="lineNum">     521 </span>            :         SETCAPS(PipeInCaps),
+<span class="lineNum">     522 </span>            :         .initialize = pipein_initialize,
+<span class="lineNum">     523 </span>            :         .finalize = pipein_finalize,
+<span class="lineNum">     524 </span>            :         .process = pipein_process,
+<span class="lineNum">     525 </span>            :         .process_event = pipein_process_event,
+<span class="lineNum">     526 </span>            :         .probe_url = pipein_probe_url
+<span class="lineNum">     527 </span>            : };
+<a name="528"><span class="lineNum">     528 </span>            : </a>
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span><span class="lineCov">       2877 : const GF_FilterRegister *pipein_register(GF_FilterSession *session)</span>
+<span class="lineNum">     531 </span>            : {
+<span class="lineNum">     532 </span><span class="lineCov">       2877 :         return &amp;PipeInRegister;</span>
+<span class="lineNum">     533 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

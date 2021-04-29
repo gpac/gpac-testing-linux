@@ -1,0 +1,24 @@
+*** gpac-filter-1source-2sink-alloc-1th-locksched logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:30 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -logs=strict -ltf -stats UTSource:max_pck=100:alloc UTSink UTSink -threads=1 -sched=lock" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1120022400
+
+Filter stats - 3 filters
+	Filter UTSource (max_pck=100:alloc) : 0 input pids 1 output pids 104 tasks 406 us process time
+		100 packets sent 1000 bytes sent (246305 pck/sec 19.7044 mbps)
+		* output PID PID1: 100 packets sent
+	Filter UTSink : 1 input pids 0 output pids 101 tasks 164 us process time
+		100 packets processed 1000 bytes processed (609756 pck/sec 48.7805 mbps)
+		* input PID PID1: 100 packets received
+	Filter UTSink : 1 input pids 0 output pids 101 tasks 270 us process time
+		100 packets processed 1000 bytes processed (370370 pck/sec 29.6296 mbps)
+		* input PID PID1: 100 packets received
+Session stats - threads 2
+	Thread 1: run_time 1173 us active_time 357 us nb_tasks 83
+	Thread 2: run_time 1193 us active_time 706 us nb_tasks 223
+
+Total: run_time 2366 us active_time 1063 us nb_tasks 306
+[UTSink] Pid 1 hash OK after execution
+[UTSink] Pid 1 hash OK after execution
+

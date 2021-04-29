@@ -1,0 +1,26 @@
+*** gpac-filter-1source-1filter-1sink-mix-nb-1th logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:35 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -logs=strict -ltf -stats -no-block=all UTSource:max_pck=100 UTFilter:FID=1:fwd=mix UTSink:SID=1 -threads=1" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1171275904
+
+Filter stats - 3 filters
+	Filter UTSource (max_pck=100) : 0 input pids 1 output pids 103 tasks 273 us process time
+		100 packets sent 1200 bytes sent (366300 pck/sec 35.1648 mbps)
+		* output PID PID1: 100 packets sent
+	Filter UTFilter ID 1 (FID=1:fwd=mix) : 1 input pids 1 output pids 202 tasks 353 us process time
+		100 packets processed 1200 bytes processed (283286 pck/sec 27.1955 mbps)
+		100 packets sent 1200 bytes sent (283286 pck/sec 27.1955 mbps)
+		* input PID PID1: 100 packets received
+		* output PID PID1: 100 packets sent
+	Filter UTSink (SID=1) : 1 input pids 0 output pids 104 tasks 202 us process time
+		100 packets processed 1200 bytes processed (495050 pck/sec 47.5248 mbps)
+		* input PID PID1: 100 packets received
+Session stats - threads 2
+	Thread 1: run_time 814 us active_time 437 us nb_tasks 203
+	Thread 2: run_time 837 us active_time 673 us nb_tasks 206
+
+Total: run_time 1651 us active_time 1110 us nb_tasks 409
+[UTFilter] Pid 1 hash OK after execution
+[UTSink] Pid 1 hash OK after execution
+

@@ -1,0 +1,21 @@
+ <test name="mp4box-io-speedway.mj2" result="OK" date="29/04/2021 23:39:08">
+
+  <stat subtest="RawMediaInfo" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45040" cpu_percent="100%" cpu_elapsed_time="0:00.05" cpu_user_time="0.03" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/speedway.mj2</command_line>
+  </stat>
+  <stat subtest="MediaImport" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45912" cpu_percent="100%" cpu_elapsed_time="0:00.06" cpu_user_time="0.03" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/speedway.mj2 -new ./results/temp/speedway.mj2.mp4</command_line>
+  </stat>
+  <stat subtest="MediaInfo" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45400" cpu_percent="96%" cpu_elapsed_time="0:00.08" cpu_user_time="0.05" cpu_kernel_time="0.03" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/speedway.mj2.mp4</command_line>
+  </stat>
+  <stat subtest="XMLDump" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45560" cpu_percent="97%" cpu_elapsed_time="0:00.08" cpu_user_time="0.05" cpu_kernel_time="0.03" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/speedway.mj2.mp4 -out ./results/temp/speedway.mj2.1.tmp</command_line>
+  </stat>
+  <stat subtest="MediaTime" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45476" cpu_percent="100%" cpu_elapsed_time="0:00.05" cpu_user_time="0.03" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/speedway.mj2.mp4 -out ./results/temp/speedway.mj2.2.tmp</command_line>
+  </stat>
+  <stat subtest="mp4-inspect" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52436" cpu_percent="100%" cpu_elapsed_time="0:00.08" cpu_user_time="0.06" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/speedway.mj2.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt</command_line>
+  </stat>
+ </test>

@@ -1,0 +1,155 @@
+*** evg-pixfmt-yp4l logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:34:59 ***
+
+
+*** Subtest "rgb_yp4l": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/raw/raw.rgb:size=128x128 compositor:!softblt:opfmt=yp4l @ -o ./results/temp/dump.yp4l  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1309728896
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/raw/raw.rgb:size=128x128) : 0 input pids 1 output pids 6 tasks 838 us process time
+		2 packets sent 54152 bytes sent (2386.63 pck/sec 516.964 mbps)
+		* output PID raw.rgb: 2 packets sent
+	Filter compositor ID _0x5642f8e7e170_ (!softblt:opfmt=yp4l) : 1 input pids 1 output pids 12 tasks 2169 us process time
+		1 packets processed 49152 bytes processed (461.042 pck/sec 181.289 mbps)
+		1 packets sent 98304 bytes sent (461.042 pck/sec 362.578 mbps)
+		* input PID raw.rgb: 1 packets received
+		* output PID vout: 1 packets sent
+	Filter fout (dst=./results/temp/dump.yp4l) : 1 input pids 0 output pids 3 tasks 162 us process time
+		1 packets processed 98304 bytes processed (6172.84 pck/sec 4854.52 mbps)
+		* input PID vout: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 13 tasks 60 us process time
+		2 packets processed 54152 bytes processed (33333.3 pck/sec 7220.27 mbps)
+		1 packets sent 49152 bytes sent (16666.7 pck/sec 6553.6 mbps)
+		* input PID raw.rgb: 2 packets received
+		* output PID raw.rgb: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 5 tasks 56 us process time
+		1 packets processed 98304 bytes processed (17857.1 pck/sec 14043.4 mbps)
+		1 packets sent 98304 bytes sent (17857.1 pck/sec 14043.4 mbps)
+		* input PID vout: 1 packets received
+		* output PID vout: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3322 us active_time 3309 us nb_tasks 46
+
+Total: run_time 3322 us active_time 3309 us nb_tasks 46
+
+Filters connected:
+fin (src=./external_media/raw/raw.rgb:size=128x128) (ptr=0x5642f8e7b7f0)
+-(PID raw.rgb) rfrawvid (ptr=0x5642f8ea2d10)
+--(PID raw.rgb) compositor (!softblt:opfmt=yp4l) (ID=_0x5642f8e7e170_)
+---(PID vout) writegen (ptr=0x5642f8e93810)
+----(PID vout) fout (dst=./results/temp/dump.yp4l) (ptr=0x5642f8ea5550)
+
+Computing ./results/temp/dump.yp4l  (rgb_yp4l) hash: 
+File hash (SHA-1): 90668C48E59597B704718F3626F0B61318FB1DAB
+Hash OK for ./results/temp/dump.yp4l
+
+*** Subtest "yp4l_rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dump.yp4l:size=128x128 compositor:!softblt:opfmt=rgb @ -o ./results/temp/dump.rgb  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1625133184
+
+Filter stats - 5 filters
+	Filter fin (src=./results/temp/dump.yp4l:size=128x128) : 0 input pids 1 output pids 6 tasks 865 us process time
+		2 packets sent 103304 bytes sent (2312.14 pck/sec 955.413 mbps)
+		* output PID dump.yp4l: 2 packets sent
+	Filter compositor ID _0x559007678160_ (!softblt:opfmt=rgb) : 1 input pids 1 output pids 12 tasks 1503 us process time
+		1 packets processed 98304 bytes processed (665.336 pck/sec 523.242 mbps)
+		1 packets sent 49152 bytes sent (665.336 pck/sec 261.621 mbps)
+		* input PID dump.yp4l: 1 packets received
+		* output PID vout: 1 packets sent
+	Filter fout (dst=./results/temp/dump.rgb) : 1 input pids 0 output pids 3 tasks 206 us process time
+		1 packets processed 49152 bytes processed (4854.37 pck/sec 1908.82 mbps)
+		* input PID vout: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 13 tasks 65 us process time
+		2 packets processed 103304 bytes processed (30769.2 pck/sec 12714.3 mbps)
+		1 packets sent 98304 bytes sent (15384.6 pck/sec 12099 mbps)
+		* input PID dump.yp4l: 2 packets received
+		* output PID dump.yp4l: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 5 tasks 64 us process time
+		1 packets processed 49152 bytes processed (15625 pck/sec 6144 mbps)
+		1 packets sent 49152 bytes sent (15625 pck/sec 6144 mbps)
+		* input PID vout: 1 packets received
+		* output PID vout: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2732 us active_time 2718 us nb_tasks 46
+
+Total: run_time 2732 us active_time 2718 us nb_tasks 46
+
+Filters connected:
+fin (src=./results/temp/dump.yp4l:size=128x128) (ptr=0x5590076757f0)
+-(PID dump.yp4l) rfrawvid (ptr=0x55900769cca0)
+--(PID dump.yp4l) compositor (!softblt:opfmt=rgb) (ID=_0x559007678160_)
+---(PID vout) writegen (ptr=0x55900768d660)
+----(PID vout) fout (dst=./results/temp/dump.rgb) (ptr=0x55900769f540)
+
+Computing ./results/temp/dump.rgb  (yp4l_rgb) hash: 
+File hash (SHA-1): BD4A682CA80762E8C96BF790C1264ED50159D3EF
+Hash OK for ./results/temp/dump.rgb
+
+*** Subtest "compose_yp4l": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -font-dirs=./external_media/fonts/ -rescan-fonts -i ./results/temp/dump.yp4l:size=128x128 -i ./external_media/raw/overlay.bt compositor:!softblt:drv=no @ -o ./results/temp/compose.yp4l  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1347211136
+
+Filter stats - 10 filters
+	Filter fin (src=./results/temp/dump.yp4l:size=128x128) : 0 input pids 1 output pids 6 tasks 848 us process time
+		2 packets sent 103304 bytes sent (2358.49 pck/sec 974.566 mbps)
+		* output PID dump.yp4l: 2 packets sent
+	Filter fin (src=./external_media/raw/overlay.bt) : 0 input pids 1 output pids 5 tasks 522 us process time
+		1 packets sent 3171 bytes sent (1915.71 pck/sec 48.5977 mbps)
+		* output PID overlay.bt: 1 packets sent
+	Filter compositor ID _0x55d57a85d0a0_ (!softblt:drv=no) : 3 input pids 1 output pids 18 tasks 1904 us process time
+		2 packets processed 163840 bytes processed (1050.42 pck/sec 688.403 mbps)
+		1 packets sent 98304 bytes sent (525.21 pck/sec 413.042 mbps)
+		* input PID dump.yp4l: 1 packets received
+		* input PID overlay.bt: 0 packets received
+		* input PID logo.png: 1 packets received
+		* output PID dump.yp4l: 1 packets sent
+	Filter fout (dst=./results/temp/compose.yp4l) : 1 input pids 0 output pids 3 tasks 158 us process time
+		1 packets processed 98304 bytes processed (6329.11 pck/sec 4977.42 mbps)
+		* input PID dump.yp4l: 1 packets received
+	Filter rfrawvid : 1 input pids 1 output pids 11 tasks 56 us process time
+		2 packets processed 103304 bytes processed (35714.3 pck/sec 14757.7 mbps)
+		1 packets sent 98304 bytes sent (17857.1 pck/sec 14043.4 mbps)
+		* input PID dump.yp4l: 2 packets received
+		* output PID dump.yp4l: 1 packets sent
+	Filter btplay : 1 input pids 1 output pids 6 tasks 621 us process time
+		1 packets processed 3171 bytes processed (1610.31 pck/sec 40.8502 mbps)
+
+		* input PID overlay.bt: 1 packets received
+		* output PID overlay.bt: 0 packets sent
+	Filter writegen : 1 input pids 1 output pids 6 tasks 80 us process time
+		1 packets processed 98304 bytes processed (12500 pck/sec 9830.4 mbps)
+		1 packets sent 98304 bytes sent (12500 pck/sec 9830.4 mbps)
+		* input PID dump.yp4l: 1 packets received
+		* output PID dump.yp4l: 1 packets sent
+	Filter fin ID _0x55d57a8a82d0_ (src=./media/auxiliary_files/logo.png) : 0 input pids 1 output pids 6 tasks 609 us process time
+		4 packets sent 15681 bytes sent (6568.14 pck/sec 205.99 mbps)
+		* output PID logo.png: 4 packets sent
+	Filter rfimg : 1 input pids 1 output pids 7 tasks 336 us process time
+		1 packets processed 15681 bytes processed (2976.19 pck/sec 373.357 mbps)
+		1 packets sent 15681 bytes sent (2976.19 pck/sec 373.357 mbps)
+		* input PID logo.png: 1 frames (4 packets) received
+		* output PID logo.png: 1 packets sent
+	Filter imgdec "imgdec:libpng" : 1 input pids 1 output pids 6 tasks 597 us process time
+		1 packets processed 15681 bytes processed (1675.04 pck/sec 210.131 mbps)
+		1 packets sent 65536 bytes sent (1675.04 pck/sec 878.204 mbps)
+		* input PID logo.png: 1 packets received
+		* output PID logo.png: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 5786 us active_time 5777 us nb_tasks 87
+
+Total: run_time 5786 us active_time 5777 us nb_tasks 87
+
+Filters connected:
+fin (src=./results/temp/dump.yp4l:size=128x128) (ptr=0x55d57a856a00)
+-(PID dump.yp4l) rfrawvid (ptr=0x55d57a8722c0)
+--(PID dump.yp4l) compositor (!softblt:drv=no) (ID=_0x55d57a85d0a0_)
+---(PID dump.yp4l) writegen (ptr=0x55d57a87a560)
+----(PID dump.yp4l) fout (dst=./results/temp/compose.yp4l) (ptr=0x55d57a86de80)
+fin (src=./external_media/raw/overlay.bt) (ptr=0x55d57a8596b0)
+-(PID overlay.bt) btplay (ptr=0x55d57a877fd0)
+--(PID overlay.bt) compositor (!softblt:drv=no) (ID=_0x55d57a85d0a0_)
+fin (src=./media/auxiliary_files/logo.png) (ID=_0x55d57a8a82d0_)
+-(PID logo.png) rfimg (ptr=0x55d57a8c1a70)
+--(PID logo.png) imgdec "imgdec:libpng" (ptr=0x55d57a8ce1e0)
+---(PID logo.png) compositor (!softblt:drv=no) (ID=_0x55d57a85d0a0_)
+
+Computing ./results/temp/compose.yp4l  (compose_yp4l) hash: 
+File hash (SHA-1): E2D4F8ABFF31817B52E157D0859BE9B4A7530154
+Hash OK for ./results/temp/compose.yp4l

@@ -1,0 +1,73 @@
+*** mp4box-io-bear_video.263 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:48 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/bear_video.263" ***
+Import probing results for ./external_media/import/bear_video.263:
+File has 1 tracks
+- Track 1 type: Video - Codec H263 Video
+	Size 128x96 @ 15 FPS
+
+For more details, use `gpac -i bear_video.263 inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/bear_video.263.mp4  (add) hash: 
+File hash (SHA-1): F6379D75F007072E287629DD5077A651A6DE9E3D
+Hash OK for ./results/temp/bear_video.263.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/bear_video.263 -new ./results/temp/bear_video.263.mp4" ***
+Track Importing H263 - Width 128 Height 96 FPS 15000/1000
+
+Computing ./results/temp/bear_video.263.1.tmp  (diso) hash: 
+File hash (SHA-1): 1C55A0CB2450CCE65F22D84601D8D6951501C11D
+Hash OK for ./results/temp/bear_video.263.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/bear_video.263.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:29.533
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom 3gg6 3gg5
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 15000
+Media Duration 00:00:29.533 
+Media Info: Language "Undetermined (und)" - Type "vide:s263" - 443 samples
+Visual Sample Entry Info: width=128 height=96 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=96
+	3GPP H263 stream - Resolution 128 x 96
+	RFC6381 Codec Parameters: s263
+	Track Meta type: "undefined" - 0 resource item(s)
+	Only one sync sample
+	Max sample duration: 1000 / 15000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/bear_video.263.mp4 -out ./results/temp/bear_video.263.1.tmp" ***
+
+Computing ./results/temp/bear_video.263.2.tmp  (dts) hash: 
+File hash (SHA-1): 15D3C39E8F911AC174B62331CFC4B27499261C07
+Hash OK for ./results/temp/bear_video.263.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/bear_video.263.mp4 -out ./results/temp/bear_video.263.2.tmp" ***
+
+Computing ./results/temp/bear_video.263.mp4.hint  (hint) hash: 
+File hash (SHA-1): FCF580EB904AE761D83454C5F226D9677265F359
+Hash OK for ./results/temp/bear_video.263.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/bear_video.263.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 092FAA29C4DF927DAC70AB18D416820572E6686C
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/bear_video.263.mp4 -out ./results/temp/bear_video.263.mp4.hint" ***
+Hinting track ID 1 - Type "s263:s263" (H263-1998) - BW 65 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/bear_video.263.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/bear_video.263.mp4.hint  (unhint) hash: 
+File hash (SHA-1): BAD24BCDEE8B4EF954C8F288B4A5AB97B1B6BA8E
+Hash OK for ./results/temp/bear_video.263.mp4.hint

@@ -1,0 +1,59 @@
+*** mp4box-io-logo.png logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:31 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/logo.png" ***
+Import probing results for ./media/auxiliary_files/logo.png:
+File has 1 tracks
+- Track 1 type: Video - Codec PNG Image
+	Size 128x128
+
+For more details, use `gpac -i logo.png inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/logo.png.mp4  (add) hash: 
+File hash (SHA-1): AE1C5A9AC65AF820B02608E4263692E8EF9B1AAA
+Hash OK for ./results/temp/logo.png.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/logo.png -new ./results/temp/logo.png.mp4" ***
+Track Importing PNG - Width 128 Height 128 FPS 25/1
+
+Computing ./results/temp/logo.png.1.tmp  (diso) hash: 
+File hash (SHA-1): 42E62754312C07A2CEF7CC13949E8013730D4E39
+Hash OK for ./results/temp/logo.png.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/logo.png.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:01.000
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 1000
+Media Duration 00:00:01.000 
+Media Info: Language "Undetermined (und)" - Type "vide:png " - 1 samples
+Visual Sample Entry Info: width=128 height=128 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=128
+PNG Image - Resolution 128 x 128
+	RFC6381 Codec Parameters: mp4v.6D
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1000 / 1000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/logo.png.mp4 -out ./results/temp/logo.png.1.tmp" ***
+
+Computing ./results/temp/logo.png.2.tmp  (dts) hash: 
+File hash (SHA-1): 7DA08645705EE65294514F88FED7BE51A6434549
+Hash OK for ./results/temp/logo.png.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/logo.png.mp4 -out ./results/temp/logo.png.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/logo.png.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): D819A47E047780797E0A614DB9C77D9CF2672081
+Hash OK for ./results/temp/inspect.txt

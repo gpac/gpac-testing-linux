@@ -1,0 +1,43 @@
+*** reframer-mhas-mhm1 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:57 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_30s_audio.mhas reframer @ -o ./results/temp/dump.mp4  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1144786816
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/counter/counter_30s_audio.mhas) : 0 input pids 1 output pids 52 tasks 807 us process time
+		49 packets sent 243693 bytes sent (60718.7 pck/sec 2415.79 mbps)
+		* output PID counter_30s_audio.mhas: 49 packets sent
+	Filter reframer ID _0x55ac0b5c7020_ : 1 input pids 1 output pids 1343 tasks 1716 us process time
+		1291 packets processed 243693 bytes processed (752331 pck/sec 1136.1 mbps)
+		1291 packets sent 243693 bytes sent (752331 pck/sec 1136.1 mbps)
+		* input PID audio: 1291 packets received
+		* output PID audio: 1291 packets sent
+	Filter fout (dst=./results/temp/dump.mp4) : 1 input pids 0 output pids 51 tasks 379 us process time
+		49 packets processed 249749 bytes processed (129288 pck/sec 5271.75 mbps)
+		* input PID audio: 49 packets received
+	Filter rfmhas : 1 input pids 1 output pids 1349 tasks 2057 us process time
+		49 packets processed 243693 bytes processed (23821.1 pck/sec 947.761 mbps)
+		1291 packets sent 243693 bytes sent (627613 pck/sec 947.761 mbps)
+		* input PID counter_30s_audio.mhas: 49 packets received
+		* output PID audio: 1291 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 1295 tasks 2627 us process time
+		1291 packets processed 243693 bytes processed (491435 pck/sec 742.118 mbps)
+		49 packets sent 249749 bytes sent (18652.5 pck/sec 760.56 mbps)
+		* input PID audio: 1291 packets received
+		* output PID audio: 49 packets sent
+Session stats - threads 1
+	Thread 1: run_time 8368 us active_time 8176 us nb_tasks 4092
+
+Total: run_time 8368 us active_time 8176 us nb_tasks 4092
+
+Filters connected:
+fin (src=./external_media/counter/counter_30s_audio.mhas) (ptr=0x55ac0b5c47f0)
+-(PID counter_30s_audio.mhas) rfmhas (ptr=0x55ac0b5cc020)
+--(PID audio) reframer (ID=_0x55ac0b5c7020_)
+---(PID audio) mp4mx (ptr=0x55ac0b5d3160)
+----(PID audio) fout (dst=./results/temp/dump.mp4) (ptr=0x55ac0b5c8230)
+
+Computing ./results/temp/dump.mp4  (rewrite) hash: 
+File hash (SHA-1): 4B3A8B327FD99B092687A453134B62A3FF43EBF9
+Hash OK for ./results/temp/dump.mp4

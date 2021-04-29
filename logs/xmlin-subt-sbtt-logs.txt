@@ -1,0 +1,55 @@
+*** xmlin-subt-sbtt logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:47:27 ***
+
+
+*** Subtest "import": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/xmlin4/subt-sbtt.nhml -new ./results/temp/subt-sbtt.mp4" ***
+Track Importing Textual Subtitle
+
+Computing ./results/temp/subt-sbtt.mp4  (import) hash: 
+File hash (SHA-1): 372A35CF69F2471DF83AFC5C9360ED8178A3BA49
+Hash OK for ./results/temp/subt-sbtt.mp4
+
+*** Subtest "info": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/subt-sbtt.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:30.000
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 1000
+Media Duration 00:00:30.000 
+Media Info: Language "Undetermined (und)" - Type "subt:sbtt" - 3 samples
+Textual Subtitle Stream - mime text/plain
+ Size 0 x 0 - Translation X=0 Y=0 - Layer 0
+	RFC6381 Codec Parameters: sbtt
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 10000 / 1000
+
+
+
+*** Subtest "export-track": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raw 1 ./results/temp/subt-sbtt.mp4 -out ./results/temp/test.xml " ***
+Exporting Simple Text Stream
+
+Computing ./results/temp/test.xml  (export-track) hash: 
+File hash (SHA-1): 1F0F1BBA3926EA5FB4F4A2FFF93240C623BB3A38
+Hash OK for ./results/temp/test.xml
+
+*** Subtest "export-samples": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raws 1 ./results/temp/subt-sbtt.mp4" ***
+
+
+*** Subtest "export-nhml": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -nhml 1 ./results/temp/subt-sbtt.mp4" ***
+Exporting Simple Text Stream
+
+Computing ./results/temp/subt-sbtt_track1.nhml  (export-nhml) hash: 
+File hash (SHA-1): D917400BCDBF5C8B0089B494BD9A3097E8222870
+Hash OK for ./results/temp/subt-sbtt_track1.nhml
+
+*** Subtest "nhml-reimport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/subt-sbtt_track1.nhml -new ./results/temp/subt-sbtt_track1.mp4" ***
+Track Importing Textual Subtitle
+
+Computing ./results/temp/subt-sbtt_track1.mp4  (nhml-reimport) hash: 
+File hash (SHA-1): 372A35CF69F2471DF83AFC5C9360ED8178A3BA49
+Hash OK for ./results/temp/subt-sbtt_track1.mp4

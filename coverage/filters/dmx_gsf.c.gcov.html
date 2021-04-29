@@ -1,0 +1,1434 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dmx_gsf.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dmx_gsf.c<span style="font-size: 80%;"> (source / <a href="dmx_gsf.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">506</td>
+            <td class="headerCovTableEntry">632</td>
+            <td class="headerCovTableEntryMed">80.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryHi">95.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2018-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / GPAC stream format reader filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;gpac/internal/media_dev.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;gpac/crypt.h&gt;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : typedef struct
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span>            :         u32 offset;
+<span class="lineNum">      37 </span>            :         u32 size;
+<span class="lineNum">      38 </span>            : } GSF_PacketFragment;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : typedef struct
+<span class="lineNum">      41 </span>            : {
+<span class="lineNum">      42 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">      43 </span>            :         u8 *output;
+<span class="lineNum">      44 </span>            :         u32 full_block_size, nb_bytes, recv_bytes;
+<span class="lineNum">      45 </span>            :         Bool corrupted;
+<span class="lineNum">      46 </span>            :         u16 frame_sn;
+<span class="lineNum">      47 </span>            :         u8 pck_type;
+<span class="lineNum">      48 </span>            :         u8 crypted;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         u32 nb_frags, nb_alloc_frags, nb_recv_frags;
+<span class="lineNum">      51 </span>            :         Bool complete;
+<span class="lineNum">      52 </span>            :         GSF_PacketFragment *frags;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : } GSF_Packet;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : typedef struct
+<span class="lineNum">      58 </span>            : {
+<span class="lineNum">      59 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      60 </span>            :         GF_List *packets;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :         u32 idx;
+<span class="lineNum">      63 </span>            :         u16 nb_pck;
+<span class="lineNum">      64 </span>            :         u8 config_version;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :         u16 last_frame_sn;
+<span class="lineNum">      67 </span>            : } GSF_Stream;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : typedef struct
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :         //opts
+<span class="lineNum">      72 </span>            :         const char *magic;
+<span class="lineNum">      73 </span>            :         GF_PropData key;
+<span class="lineNum">      74 </span>            :         u32 pad, mq;
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :         //only one output pid declared
+<span class="lineNum">      78 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :         GF_List *streams;
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :         bin128 crypt_IV;
+<span class="lineNum">      83 </span>            :         GF_Crypt *crypt;
+<span class="lineNum">      84 </span>            :         u16 crypt_blocks, skip_blocks;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :         u32 nb_playing;
+<span class="lineNum">      87 </span>            :         Double start_range;
+<span class="lineNum">      88 </span>            :         Bool is_file;
+<span class="lineNum">      89 </span>            :         u64 file_pos, file_size;
+<span class="lineNum">      90 </span>            :         GF_Fraction64 duration;
+<span class="lineNum">      91 </span>            :         Bool initial_play_done;
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :         GF_BitStream *bs_r;
+<span class="lineNum">      94 </span>            :         GF_BitStream *bs_pck;
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :         //signaling stream
+<span class="lineNum">      97 </span>            :         GSF_Stream *signal_st;
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :         //where we store incoming packets
+<span class="lineNum">     100 </span>            :         char *buffer;
+<span class="lineNum">     101 </span>            :         u32 alloc_size, buf_size;
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :         u32 missing_bytes;
+<span class="lineNum">     104 </span>            :         Bool tuned;
+<span class="lineNum">     105 </span>            :         Bool tune_error;
+<span class="lineNum">     106 </span>            :         Bool use_seq_num;
+<span class="lineNum">     107 </span>            :         Bool wait_for_play;
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :         GF_List *pck_res;
+<span class="lineNum">     110 </span>            :         Bool buffer_too_small;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            :         Bool corrupted;
+<span class="lineNum">     113 </span>            :         Bool file_pids;
+<span class="lineNum">     114 </span>            : } GSF_DemuxCtx;
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : typedef enum
+<span class="lineNum">     118 </span>            : {
+<span class="lineNum">     119 </span>            :         GFS_PCKTYPE_HDR=0,
+<span class="lineNum">     120 </span>            :         GFS_PCKTYPE_PID_CONFIG,
+<span class="lineNum">     121 </span>            :         GFS_PCKTYPE_PID_INFO_UPDATE,
+<span class="lineNum">     122 </span>            :         GFS_PCKTYPE_PID_REMOVE,
+<span class="lineNum">     123 </span>            :         GFS_PCKTYPE_PID_EOS,
+<span class="lineNum">     124 </span>            :         GFS_PCKTYPE_PCK,
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :         GFS_PCKTYPE_UNDEF1,
+<span class="lineNum">     127 </span>            :         GFS_PCKTYPE_UNDEF2,
+<span class="lineNum">     128 </span>            :         GFS_PCKTYPE_UNDEF3,
+<span class="lineNum">     129 </span>            :         GFS_PCKTYPE_UNDEF4,
+<span class="lineNum">     130 </span>            :         GFS_PCKTYPE_UNDEF5,
+<span class="lineNum">     131 </span>            :         GFS_PCKTYPE_UNDEF6,
+<span class="lineNum">     132 </span>            :         GFS_PCKTYPE_UNDEF7,
+<span class="lineNum">     133 </span>            :         GFS_PCKTYPE_UNDEF8,
+<span class="lineNum">     134 </span>            :         GFS_PCKTYPE_UNDEF9,
+<span class="lineNum">     135 </span>            :         GFS_PCKTYPE_UNDEF10,
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :         /*NO MORE PACKET TYPE AVAILABLE*/
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            : } GSF_PacketType;
+<span class="lineNum">     140 </span>            : 
+<a name="141"><span class="lineNum">     141 </span>            : </a>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span><span class="lineCov">        253 : GF_Err gsfdmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     144 </span>            : {
+<span class="lineNum">     145 </span><span class="lineCov">        253 :         GSF_DemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">        253 :         if (is_remove) {</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                 while (gf_list_count(ctx-&gt;streams)) {</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                         GSF_Stream *st = gf_list_pop_back(ctx-&gt;streams);</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :                         if (st-&gt;opid)</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_remove(st-&gt;opid);</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                         gf_free(st);</span>
+<span class="lineNum">     155 </span>            :                 }
+<span class="lineNum">     156 </span>            :                 return GF_OK;
+<span class="lineNum">     157 </span>            :         }
+<span class="lineNum">     158 </span><span class="lineCov">        253 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">     159 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span><span class="lineCov">        253 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     162 </span><span class="lineCov">        253 :         return GF_OK;</span>
+<a name="163"><span class="lineNum">     163 </span>            : }</a>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineCov">        166 : static Bool gsfdmx_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     166 </span>            : {
+<span class="lineNum">     167 </span>            :         GF_FilterEvent fevt;
+<span class="lineNum">     168 </span><span class="lineCov">        166 :         GSF_DemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">        166 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     171 </span><span class="lineCov">         15 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     172 </span><span class="lineCov">         15 :                 if (ctx-&gt;nb_playing &amp;&amp; (ctx-&gt;start_range == evt-&gt;play.start_range)) {</span>
+<span class="lineNum">     173 </span>            :                         return GF_TRUE;
+<span class="lineNum">     174 </span>            :                 }
+<span class="lineNum">     175 </span><span class="lineCov">         12 :                 ctx-&gt;nb_playing++;</span>
+<span class="lineNum">     176 </span><span class="lineCov">         12 :                 ctx-&gt;wait_for_play = GF_FALSE;</span>
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span><span class="lineCov">         12 :                 if (! ctx-&gt;is_file) {</span>
+<span class="lineNum">     179 </span><span class="lineCov">         12 :                         gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     180 </span><span class="lineCov">         12 :                         return GF_FALSE;</span>
+<span class="lineNum">     181 </span>            :                 }
+<span class="lineNum">     182 </span>            : //              safdmx_check_dur(ctx);
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                 ctx-&gt;start_range = evt-&gt;play.start_range;</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                 ctx-&gt;file_pos = 0;</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;duration.num) {</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :                         ctx-&gt;file_pos = (u64) (ctx-&gt;file_size * ctx-&gt;start_range);</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                         ctx-&gt;file_pos *= ctx-&gt;duration.den;</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                         ctx-&gt;file_pos /= ctx-&gt;duration.num;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;file_pos&gt;ctx-&gt;file_size) return GF_TRUE;</span>
+<span class="lineNum">     191 </span>            :                 }
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :                 if (!ctx-&gt;initial_play_done) {</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                         ctx-&gt;initial_play_done = GF_TRUE;</span>
+<span class="lineNum">     195 </span>            :                         //seek will not change the current source state, don't send a seek
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :                         if (!ctx-&gt;file_pos)</span>
+<span class="lineNum">     197 </span>            :                                 return GF_TRUE;
+<span class="lineNum">     198 </span>            :                 }
+<span class="lineNum">     199 </span>            :                 //post a seek to 0 - we would need to build an index of AUs to find the next place to seek
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                 GF_FEVT_INIT(fevt, GF_FEVT_SOURCE_SEEK, ctx-&gt;ipid);</span>
+<span class="lineNum">     201 </span>            :                 fevt.seek.start_offset = 0;
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                 gf_filter_pid_send_event(ctx-&gt;ipid, &amp;fevt);</span>
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :                 //cancel event
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :                 return GF_TRUE;</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :                 ctx-&gt;nb_playing--;</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;file_pids) return GF_TRUE;</span>
+<span class="lineNum">     210 </span>            :                 //cancel
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :                 return ctx-&gt;nb_playing ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :         case GF_FEVT_SET_SPEED:
+<span class="lineNum">     214 </span>            :                 //cancel event
+<span class="lineNum">     215 </span>            :                 return GF_TRUE;
+<span class="lineNum">     216 </span>            :         default:
+<span class="lineNum">     217 </span>            :                 break;
+<span class="lineNum">     218 </span>            :         }
+<span class="lineNum">     219 </span>            :         //by default don't cancel event - to rework once we have downloading in place
+<span class="lineNum">     220 </span><span class="lineCov">        151 :         return GF_FALSE;</span>
+<a name="221"><span class="lineNum">     221 </span>            : }</a>
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineCov">        674 : static void gsfdmx_decrypt(GSF_DemuxCtx *ctx, char *data, u32 size)</span>
+<span class="lineNum">     224 </span>            : {
+<span class="lineNum">     225 </span>            : #ifndef GPAC_DISABLE_CRYPTO
+<span class="lineNum">     226 </span>            :         u32 pos=0;
+<span class="lineNum">     227 </span>            :         u32 clear_tail = size%16;
+<span class="lineNum">     228 </span>            :         u32 bytes_crypted = size - clear_tail;
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineCov">        674 :         if (!bytes_crypted) return;</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineCov">        672 :         gf_crypt_set_IV(ctx-&gt;crypt, ctx-&gt;crypt_IV, 16);</span>
+<span class="lineNum">     233 </span><span class="lineCov">        672 :         if (ctx-&gt;crypt_blocks &amp;&amp; ctx-&gt;skip_blocks) {</span>
+<span class="lineNum">     234 </span><span class="lineCov">        336 :                 u32 pattern_length = 16 * (ctx-&gt;crypt_blocks + ctx-&gt;skip_blocks);</span>
+<span class="lineNum">     235 </span><span class="lineCov">        336 :                 u32 cryp_len = 16 * ctx-&gt;crypt_blocks;</span>
+<span class="lineNum">     236 </span><span class="lineCov">       1078 :                 while (bytes_crypted) {</span>
+<span class="lineNum">     237 </span><span class="lineCov">        732 :                         gf_crypt_decrypt(ctx-&gt;crypt, data+pos, bytes_crypted &gt;= cryp_len ? cryp_len : bytes_crypted);</span>
+<span class="lineNum">     238 </span><span class="lineCov">        732 :                         if (bytes_crypted &gt;= pattern_length) {</span>
+<span class="lineNum">     239 </span><span class="lineCov">        406 :                                 pos += pattern_length;</span>
+<span class="lineNum">     240 </span><span class="lineCov">        406 :                                 bytes_crypted -= pattern_length;</span>
+<span class="lineNum">     241 </span>            :                         } else {
+<span class="lineNum">     242 </span>            :                                 bytes_crypted = 0;
+<span class="lineNum">     243 </span>            :                         }
+<span class="lineNum">     244 </span>            :                 }
+<span class="lineNum">     245 </span>            :         } else {
+<span class="lineNum">     246 </span><span class="lineCov">        336 :                 gf_crypt_decrypt(ctx-&gt;crypt, data, bytes_crypted);</span>
+<span class="lineNum">     247 </span>            :         }
+<span class="lineNum">     248 </span>            : #endif
+<a name="249"><span class="lineNum">     249 </span>            : }</a>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">      33255 : static GFINLINE u32 gsfdmx_read_vlen(GF_BitStream *bs)</span>
+<span class="lineNum">     252 </span>            : {
+<span class="lineNum">     253 </span><span class="lineCov">      33255 :         if (!gf_bs_read_int(bs, 1))</span>
+<span class="lineNum">     254 </span><span class="lineCov">      23972 :                 return gf_bs_read_int(bs, 7);</span>
+<span class="lineNum">     255 </span><span class="lineCov">       9283 :         if (!gf_bs_read_int(bs, 1))</span>
+<span class="lineNum">     256 </span><span class="lineCov">       6145 :                 return gf_bs_read_int(bs, 14);</span>
+<span class="lineNum">     257 </span><span class="lineCov">       3138 :         if (!gf_bs_read_int(bs, 1))</span>
+<span class="lineNum">     258 </span><span class="lineCov">       1177 :                 return gf_bs_read_int(bs, 21);</span>
+<span class="lineNum">     259 </span><span class="lineCov">       1961 :         if (!gf_bs_read_int(bs, 1))</span>
+<span class="lineNum">     260 </span><span class="lineCov">       1956 :                 return gf_bs_read_int(bs, 28);</span>
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span><span class="lineCov">          5 :         return (u32) gf_bs_read_long_int(bs, 36);</span>
+<a name="263"><span class="lineNum">     263 </span>            : }</a>
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineCov">      18270 : static GF_Err gsfdmx_read_prop(GF_BitStream *bs, GF_PropertyValue *p)</span>
+<span class="lineNum">     266 </span>            : {
+<span class="lineNum">     267 </span>            :         u32 len, len2, i;
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineCov">      18270 :         switch (p-&gt;type) {</span>
+<span class="lineNum">     270 </span><span class="lineCov">       7791 :         case GF_PROP_SINT:</span>
+<span class="lineNum">     271 </span>            :         case GF_PROP_UINT:
+<span class="lineNum">     272 </span><span class="lineCov">       7791 :                 p-&gt;value.uint = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     273 </span><span class="lineCov">       7791 :                 break;</span>
+<span class="lineNum">     274 </span><span class="lineCov">        913 :         case GF_PROP_LSINT:</span>
+<span class="lineNum">     275 </span>            :         case GF_PROP_LUINT:
+<span class="lineNum">     276 </span><span class="lineCov">        913 :                 p-&gt;value.longuint = gf_bs_read_u64(bs);</span>
+<span class="lineNum">     277 </span><span class="lineCov">        913 :                 break;</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :         case GF_PROP_4CC:</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                 p-&gt;value.uint = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     281 </span><span class="lineCov">       1104 :         case GF_PROP_BOOL:</span>
+<span class="lineNum">     282 </span><span class="lineCov">       1104 :                 p-&gt;value.boolean = gf_bs_read_u8(bs) ? 1 : 0;</span>
+<span class="lineNum">     283 </span><span class="lineCov">       1104 :                 break;</span>
+<span class="lineNum">     284 </span><span class="lineCov">       1141 :         case GF_PROP_FRACTION:</span>
+<span class="lineNum">     285 </span><span class="lineCov">       1141 :                 p-&gt;value.frac.num = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     286 </span><span class="lineCov">       1141 :                 p-&gt;value.frac.den = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     287 </span><span class="lineCov">       1141 :                 break;</span>
+<span class="lineNum">     288 </span><span class="lineCov">       1074 :         case GF_PROP_FRACTION64:</span>
+<span class="lineNum">     289 </span><span class="lineCov">       1074 :                 p-&gt;value.lfrac.num = gf_bs_read_u64(bs);</span>
+<span class="lineNum">     290 </span><span class="lineCov">       1074 :                 p-&gt;value.lfrac.den = gf_bs_read_u64(bs);</span>
+<span class="lineNum">     291 </span><span class="lineCov">       1074 :                 break;</span>
+<span class="lineNum">     292 </span><span class="lineCov">          1 :         case GF_PROP_FLOAT:</span>
+<span class="lineNum">     293 </span><span class="lineCov">          1 :                 p-&gt;value.fnumber = FLT2FIX( gf_bs_read_float(bs) );</span>
+<span class="lineNum">     294 </span><span class="lineCov">          1 :                 break;</span>
+<span class="lineNum">     295 </span><span class="lineCov">          1 :         case GF_PROP_DOUBLE:</span>
+<span class="lineNum">     296 </span><span class="lineCov">          1 :                 p-&gt;value.number = gf_bs_read_double(bs);</span>
+<span class="lineNum">     297 </span><span class="lineCov">          1 :                 break;</span>
+<span class="lineNum">     298 </span><span class="lineCov">          1 :         case GF_PROP_VEC2I:</span>
+<span class="lineNum">     299 </span><span class="lineCov">          1 :                 p-&gt;value.vec2i.x = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     300 </span><span class="lineCov">          1 :                 p-&gt;value.vec2i.y = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     301 </span><span class="lineCov">          1 :                 break;</span>
+<span class="lineNum">     302 </span><span class="lineCov">          1 :         case GF_PROP_VEC2:</span>
+<span class="lineNum">     303 </span><span class="lineCov">          1 :                 p-&gt;value.vec2.x = gf_bs_read_double(bs);</span>
+<span class="lineNum">     304 </span><span class="lineCov">          1 :                 p-&gt;value.vec2.y = gf_bs_read_double(bs);</span>
+<span class="lineNum">     305 </span><span class="lineCov">          1 :                 break;</span>
+<span class="lineNum">     306 </span><span class="lineCov">          1 :         case GF_PROP_VEC3I:</span>
+<span class="lineNum">     307 </span><span class="lineCov">          1 :                 p-&gt;value.vec3i.x = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     308 </span><span class="lineCov">          1 :                 p-&gt;value.vec3i.y = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     309 </span><span class="lineCov">          1 :                 p-&gt;value.vec3i.z = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     310 </span><span class="lineCov">          1 :                 break;</span>
+<span class="lineNum">     311 </span><span class="lineCov">          1 :         case GF_PROP_VEC4I:</span>
+<span class="lineNum">     312 </span><span class="lineCov">          1 :                 p-&gt;value.vec4i.x = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     313 </span><span class="lineCov">          1 :                 p-&gt;value.vec4i.y = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     314 </span><span class="lineCov">          1 :                 p-&gt;value.vec4i.z = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     315 </span><span class="lineCov">          1 :                 p-&gt;value.vec4i.w = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     316 </span><span class="lineCov">          1 :                 break;</span>
+<span class="lineNum">     317 </span><span class="lineCov">       5161 :         case GF_PROP_STRING:</span>
+<span class="lineNum">     318 </span>            :         case GF_PROP_STRING_NO_COPY:
+<span class="lineNum">     319 </span>            :         case GF_PROP_NAME:
+<span class="lineNum">     320 </span><span class="lineCov">       5161 :                 p-&gt;type = GF_PROP_STRING_NO_COPY;</span>
+<span class="lineNum">     321 </span><span class="lineCov">       5161 :                 len = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     322 </span><span class="lineCov">       5161 :                 p-&gt;value.string = gf_malloc(sizeof(char)*(len+1));</span>
+<span class="lineNum">     323 </span><span class="lineCov">       5161 :                 gf_bs_read_data(bs, p-&gt;value.string, len);</span>
+<span class="lineNum">     324 </span><span class="lineCov">       5161 :                 p-&gt;value.string[len]=0;</span>
+<span class="lineNum">     325 </span><span class="lineCov">       5161 :                 break;</span>
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineCov">       1076 :         case GF_PROP_DATA:</span>
+<span class="lineNum">     328 </span>            :         case GF_PROP_DATA_NO_COPY:
+<span class="lineNum">     329 </span>            :         case GF_PROP_CONST_DATA:
+<span class="lineNum">     330 </span><span class="lineCov">       1076 :                 p-&gt;type = GF_PROP_DATA_NO_COPY;</span>
+<span class="lineNum">     331 </span><span class="lineCov">       1076 :                 p-&gt;value.data.size = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     332 </span><span class="lineCov">       1076 :                 p-&gt;value.data.ptr = gf_malloc(sizeof(char) * p-&gt;value.data.size);</span>
+<span class="lineNum">     333 </span><span class="lineCov">       1076 :                 gf_bs_read_data(bs, p-&gt;value.data.ptr, p-&gt;value.data.size);</span>
+<span class="lineNum">     334 </span><span class="lineCov">       1076 :                 break;</span>
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span><span class="lineCov">          1 :         case GF_PROP_STRING_LIST:</span>
+<span class="lineNum">     337 </span><span class="lineCov">          1 :                 len2 = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     338 </span><span class="lineCov">          1 :                 p-&gt;value.string_list.nb_items = len2;</span>
+<span class="lineNum">     339 </span><span class="lineCov">          1 :                 p-&gt;value.string_list.vals = gf_malloc(sizeof(char*) * len2);</span>
+<span class="lineNum">     340 </span><span class="lineCov">          2 :                 for (i=0; i&lt;len2; i++) {</span>
+<span class="lineNum">     341 </span><span class="lineCov">          1 :                         len = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     342 </span><span class="lineCov">          1 :                         char *str = gf_malloc(sizeof(char)*(len+1));</span>
+<span class="lineNum">     343 </span><span class="lineCov">          1 :                         gf_bs_read_data(bs, str, len);</span>
+<span class="lineNum">     344 </span><span class="lineCov">          1 :                         str[len] = 0;</span>
+<span class="lineNum">     345 </span><span class="lineCov">          1 :                         p-&gt;value.string_list.vals[i] = str;</span>
+<span class="lineNum">     346 </span>            :                 }
+<span class="lineNum">     347 </span>            :                 break;
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span><span class="lineCov">          1 :         case GF_PROP_UINT_LIST:</span>
+<span class="lineNum">     350 </span>            :         case GF_PROP_SINT_LIST:
+<span class="lineNum">     351 </span><span class="lineCov">          1 :                 p-&gt;value.uint_list.nb_items = len = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     352 </span><span class="lineCov">          1 :                 p-&gt;value.uint_list.vals = gf_malloc(sizeof(u32)*len);</span>
+<span class="lineNum">     353 </span><span class="lineCov">          2 :                 for (i=0; i&lt;len; i++) {</span>
+<span class="lineNum">     354 </span><span class="lineCov">          1 :                         p-&gt;value.uint_list.vals[i] = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     355 </span>            :                 }
+<span class="lineNum">     356 </span>            :                 break;
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :         case GF_PROP_4CC_LIST:</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :                 p-&gt;value.uint_list.nb_items = len = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :                 p-&gt;value.uint_list.vals = gf_malloc(sizeof(u32)*len);</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;len; i++) {</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                         p-&gt;value.uint_list.vals[i] = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     362 </span>            :                 }
+<span class="lineNum">     363 </span>            :                 break;
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :         case GF_PROP_VEC2I_LIST:</span>
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :                 p-&gt;value.v2i_list.nb_items = len = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :                 p-&gt;value.v2i_list.vals = gf_malloc(sizeof(GF_PropVec2i)*len);</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;len; i++) {</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :                         p-&gt;value.v2i_list.vals[i].x = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                         p-&gt;value.v2i_list.vals[i].y = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     370 </span>            :                 }
+<span class="lineNum">     371 </span>            :                 break;
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :         case GF_PROP_POINTER:</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] pointer property found in serialized stream, illegal\n&quot;));</span>
+<span class="lineNum">     374 </span>            :                 return GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     375 </span><span class="lineCov">          2 :         default:</span>
+<span class="lineNum">     376 </span><span class="lineCov">          2 :                 if (gf_props_type_is_enum(p-&gt;type)) {</span>
+<span class="lineNum">     377 </span><span class="lineCov">          2 :                         p-&gt;value.uint = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     378 </span><span class="lineCov">          2 :                         break;</span>
+<span class="lineNum">     379 </span>            :                 }
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] Cannot read property of unknown type\n&quot;));</span>
+<span class="lineNum">     381 </span>            :                 return GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     382 </span>            :         }
+<span class="lineNum">     383 </span>            :         return GF_OK;
+<a name="384"><span class="lineNum">     384 </span>            : }</a>
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span><span class="lineCov">       5401 : static GSF_Stream *gsfdmx_get_stream(GF_Filter *filter, GSF_DemuxCtx *ctx, u32 idx, u32 pkt_type)</span>
+<span class="lineNum">     387 </span>            : {
+<span class="lineNum">     388 </span>            :         GSF_Stream *gst;
+<span class="lineNum">     389 </span>            :         u32 i, count;
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span><span class="lineCov">       5401 :         count = gf_list_count(ctx-&gt;streams);</span>
+<span class="lineNum">     392 </span><span class="lineCov">        694 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     393 </span><span class="lineCov">       6080 :                 gst = gf_list_get(ctx-&gt;streams, i);</span>
+<span class="lineNum">     394 </span><span class="lineCov">       6080 :                 if (gst-&gt;idx == idx) return gst;</span>
+<span class="lineNum">     395 </span>            :         }
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span><span class="lineCov">         15 :         if ((pkt_type==GFS_PCKTYPE_PID_CONFIG) || (pkt_type==GFS_PCKTYPE_PID_INFO_UPDATE) ) {</span>
+<span class="lineNum">     398 </span><span class="lineCov">         15 :                 GF_SAFEALLOC(gst, GSF_Stream);</span>
+<span class="lineNum">     399 </span><span class="lineCov">         15 :                 if (!gst) return NULL;</span>
+<span class="lineNum">     400 </span><span class="lineCov">         15 :                 gst-&gt;packets = gf_list_new();</span>
+<span class="lineNum">     401 </span><span class="lineCov">         15 :                 gst-&gt;idx = idx;</span>
+<span class="lineNum">     402 </span><span class="lineCov">         15 :                 gf_list_add(ctx-&gt;streams, gst);</span>
+<span class="lineNum">     403 </span><span class="lineCov">         15 :                 gst-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     404 </span>            :                 return gst;
+<span class="lineNum">     405 </span>            :         }
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_CONTAINER, (&quot;[GSFDemux] no stream found for idx %d\n&quot;, idx));</span>
+<a name="408"><span class="lineNum">     408 </span>            :         return NULL;</a>
+<span class="lineNum">     409 </span>            : }
+<span class="lineNum">     410 </span><span class="lineCov">       1081 : static GF_Err gsfdmx_parse_pid_info(GF_Filter *filter, GSF_DemuxCtx *ctx, GSF_Stream *gst, GSF_Packet *pck, Bool is_info_update)</span>
+<span class="lineNum">     411 </span>            : {
+<span class="lineNum">     412 </span>            :         GF_Err e;
+<span class="lineNum">     413 </span>            :         u32 nb_4cc_props=0;
+<span class="lineNum">     414 </span>            :         u32 nb_str_props=0;
+<span class="lineNum">     415 </span>            :         u32 i;
+<span class="lineNum">     416 </span>            :         u8 cfg_version;
+<span class="lineNum">     417 </span>            :         GF_BitStream *bs=NULL;
+<span class="lineNum">     418 </span>            :         Bool pid_is_file = GF_FALSE;
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span><span class="lineCov">       1081 :         if (pck-&gt;crypted) {</span>
+<span class="lineNum">     421 </span><span class="lineCov">        326 :                 gsfdmx_decrypt(ctx, pck-&gt;output, pck-&gt;full_block_size);</span>
+<span class="lineNum">     422 </span>            :         }
+<span class="lineNum">     423 </span><span class="lineCov">       1081 :         e = gf_bs_reassign_buffer(ctx-&gt;bs_pck, pck-&gt;output, pck-&gt;full_block_size);</span>
+<span class="lineNum">     424 </span><span class="lineCov">       1081 :         if (e) return e;</span>
+<span class="lineNum">     425 </span><span class="lineCov">       1081 :         bs = ctx-&gt;bs_pck;</span>
+<span class="lineNum">     426 </span>            : 
+<span class="lineNum">     427 </span><span class="lineCov">       1081 :         cfg_version = gf_bs_read_u8(bs);</span>
+<span class="lineNum">     428 </span><span class="lineCov">       1081 :         if ((gst-&gt;config_version == 1 + cfg_version) &amp;&amp; !is_info_update)</span>
+<span class="lineNum">     429 </span>            :                 return GF_OK;
+<span class="lineNum">     430 </span><span class="lineCov">       1081 :         gst-&gt;config_version = 1 + cfg_version;</span>
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span><span class="lineCov">       1081 :         nb_4cc_props = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     433 </span><span class="lineCov">       1081 :         nb_str_props = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span><span class="lineCov">      35543 :         for (i=0; i&lt;nb_4cc_props; i++) {</span>
+<span class="lineNum">     436 </span>            :                 GF_PropertyValue p;
+<span class="lineNum">     437 </span><span class="lineCov">      17231 :                 u32 p4cc = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     438 </span>            : 
+<span class="lineNum">     439 </span>            :                 memset(&amp;p, 0, sizeof(GF_PropertyValue));
+<span class="lineNum">     440 </span><span class="lineCov">      17231 :                 p.type = gf_props_4cc_get_type(p4cc);</span>
+<span class="lineNum">     441 </span><span class="lineCov">      17231 :                 if (p.type==GF_PROP_FORBIDEN) {</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] Wrong GPAC property type for property 4CC %s\n&quot;, gf_4cc_to_str(p4cc) ));</span>
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :                         return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     444 </span>            :                 }
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span><span class="lineCov">      17231 :                 e = gsfdmx_read_prop(bs, &amp;p);</span>
+<span class="lineNum">     447 </span><span class="lineCov">      17231 :                 if (e) return e;</span>
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     450 </span><span class="lineCov">      17231 :                 if (gf_log_tool_level_on(GF_LOG_PARSER, GF_LOG_DEBUG)) {</span>
+<span class="lineNum">     451 </span>            :                         char dump[GF_PROP_DUMP_ARG_SIZE];
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_PARSER, (&quot;[GSFDemux] Set pid %d %s %s to %s\n&quot;, gst-&gt;idx, gf_props_4cc_get_name(p4cc), is_info_update ? &quot;info&quot; : &quot;property&quot;, gf_props_dump(p4cc, &amp;p, dump, GF_PROP_DUMP_DATA_NONE) ) );</span>
+<span class="lineNum">     453 </span>            :                 }
+<span class="lineNum">     454 </span>            : #endif
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span><span class="lineCov">      17231 :                 if (is_info_update) gf_filter_pid_set_info(gst-&gt;opid, p4cc, &amp;p);</span>
+<span class="lineNum">     457 </span><span class="lineCov">        209 :                 else gf_filter_pid_set_property(gst-&gt;opid, p4cc, &amp;p);</span>
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span><span class="lineCov">      17231 :                 if (p4cc==GF_PROP_PID_STREAM_TYPE) {</span>
+<span class="lineNum">     460 </span><span class="lineCov">       1081 :                         if (p.value.uint==GF_STREAM_FILE)</span>
+<span class="lineNum">     461 </span>            :                                 pid_is_file = GF_TRUE;
+<span class="lineNum">     462 </span>            :                 }
+<span class="lineNum">     463 </span>            :         }
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            :         //PID is a file, we must start dispatch asap for demuxers to work
+<span class="lineNum">     466 </span><span class="lineCov">       1081 :         if (pid_is_file) {</span>
+<span class="lineNum">     467 </span><span class="lineCov">          6 :                 const GF_PropertyValue *url = gf_filter_pid_get_property(gst-&gt;opid, GF_PROP_PID_URL);</span>
+<span class="lineNum">     468 </span><span class="lineCov">          6 :                 if (url) {</span>
+<span class="lineNum">     469 </span><span class="lineCov">          6 :                         const char *base_name = gf_file_basename(url-&gt;value.string);</span>
+<span class="lineNum">     470 </span><span class="lineCov">          6 :                         if (base_name) gf_filter_pid_set_name(gst-&gt;opid, base_name);</span>
+<span class="lineNum">     471 </span>            :                 }
+<span class="lineNum">     472 </span><span class="lineCov">          6 :                 gf_filter_pid_set_property(gst-&gt;opid, GF_PROP_PID_FILE_CACHED, NULL);</span>
+<span class="lineNum">     473 </span><span class="lineCov">          6 :                 gf_filter_pid_set_property(gst-&gt;opid, GF_PROP_PID_FILEPATH, NULL);</span>
+<span class="lineNum">     474 </span><span class="lineCov">          6 :                 gf_filter_pid_set_property(gst-&gt;opid, GF_PROP_PID_DOWN_SIZE, NULL);</span>
+<span class="lineNum">     475 </span><span class="lineCov">          6 :                 gf_filter_pid_set_property(gst-&gt;opid, GF_PROP_PID_DOWN_BYTES, NULL);</span>
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span><span class="lineCov">          6 :                 ctx-&gt;wait_for_play = GF_FALSE;</span>
+<span class="lineNum">     478 </span><span class="lineCov">          6 :                 if (!ctx-&gt;file_pids) {</span>
+<span class="lineNum">     479 </span>            :                         GF_FilterEvent evt;
+<span class="lineNum">     480 </span><span class="lineCov">          2 :                         ctx-&gt;file_pids = GF_TRUE;</span>
+<span class="lineNum">     481 </span><span class="lineCov">          2 :                         GF_FEVT_INIT(evt, GF_FEVT_PLAY, ctx-&gt;ipid);</span>
+<span class="lineNum">     482 </span><span class="lineCov">          2 :                         gf_filter_pid_send_event(ctx-&gt;ipid, &amp;evt);</span>
+<span class="lineNum">     483 </span>            :                 }
+<span class="lineNum">     484 </span>            :         }
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span><span class="lineCov">          9 :         for (i=0; i&lt;nb_str_props; i++) {</span>
+<span class="lineNum">     488 </span>            :                 GF_PropertyValue p;
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span><span class="lineCov">          9 :                 u32 len = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     491 </span><span class="lineCov">          9 :                 char *pname = gf_malloc(sizeof(char)*(len+1));</span>
+<span class="lineNum">     492 </span><span class="lineCov">          9 :                 gf_bs_read_data(bs, pname, len);</span>
+<span class="lineNum">     493 </span><span class="lineCov">          9 :                 pname[len]=0;</span>
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            :                 memset(&amp;p, 0, sizeof(GF_PropertyValue));
+<span class="lineNum">     496 </span><span class="lineCov">          9 :                 p.type = gf_bs_read_u8(bs);</span>
+<span class="lineNum">     497 </span>            : 
+<span class="lineNum">     498 </span><span class="lineCov">          9 :                 e = gsfdmx_read_prop(bs, &amp;p);</span>
+<span class="lineNum">     499 </span><span class="lineCov">          9 :                 if (e) {</span>
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :                         gf_free(pname);</span>
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">     502 </span>            :                 }
+<span class="lineNum">     503 </span><span class="lineCov">          9 :                 if (is_info_update) gf_filter_pid_set_info_dyn(gst-&gt;opid, pname, &amp;p);</span>
+<span class="lineNum">     504 </span><span class="lineCov">          9 :                 else gf_filter_pid_set_property_dyn(gst-&gt;opid, pname, &amp;p);</span>
+<span class="lineNum">     505 </span><span class="lineCov">          9 :                 gf_free(pname);</span>
+<span class="lineNum">     506 </span>            :         }
+<span class="lineNum">     507 </span>            :         return GF_OK;
+<a name="508"><span class="lineNum">     508 </span>            : }</a>
+<span class="lineNum">     509 </span>            : 
+<span class="lineNum">     510 </span><span class="lineCov">         12 : static GF_Err gsfdmx_tune(GF_Filter *filter, GSF_DemuxCtx *ctx, char *pck_data, u32 pck_size, Bool is_crypted)</span>
+<span class="lineNum">     511 </span>            : {
+<span class="lineNum">     512 </span>            :         u32 len;
+<span class="lineNum">     513 </span>            :         GF_BitStream *bs;
+<span class="lineNum">     514 </span><span class="lineCov">         12 :         GF_Err e = gf_bs_reassign_buffer(ctx-&gt;bs_pck, pck_data, pck_size);</span>
+<span class="lineNum">     515 </span><span class="lineCov">         12 :         if (e) return e;</span>
+<span class="lineNum">     516 </span><span class="lineCov">         12 :         bs = ctx-&gt;bs_pck;</span>
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span><span class="lineCov">         12 :         u32 sig = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     519 </span><span class="lineCov">         12 :         if (sig != GF_4CC('G','S','5','F') ) {</span>
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] Wrong GPAC serialized signature %s, expecting \&quot;GS5F\&quot;\n&quot;, gf_4cc_to_str(sig) ));</span>
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :                 ctx-&gt;tune_error = GF_TRUE;</span>
+<span class="lineNum">     522 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     523 </span>            :         }
+<span class="lineNum">     524 </span><span class="lineCov">         12 :         sig = gf_bs_read_u8(bs);</span>
+<span class="lineNum">     525 </span><span class="lineCov">         12 :         if (sig != GF_GSF_VERSION) {</span>
+<span class="lineNum">     526 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] Wrong GPAC serialized version %d\n&quot;, sig ));</span>
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :                 ctx-&gt;tune_error = GF_TRUE;</span>
+<span class="lineNum">     528 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     529 </span>            :         }
+<span class="lineNum">     530 </span><span class="lineCov">         12 :         if (is_crypted) {</span>
+<span class="lineNum">     531 </span>            : #ifdef GPAC_DISABLE_CRYPTO
+<span class="lineNum">     532 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     533 </span>            : #else
+<span class="lineNum">     534 </span><span class="lineCov">          2 :                 if (pck_size&lt;25) {</span>
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] Wrong serialized header size %d, should be at least 25 bytes for encrypted streams\n&quot;, pck_size ));</span>
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :                         ctx-&gt;tune_error = GF_TRUE;</span>
+<span class="lineNum">     537 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">     538 </span>            :                 }
+<span class="lineNum">     539 </span><span class="lineCov">          2 :                 gf_bs_read_data(bs, ctx-&gt;crypt_IV, 16);</span>
+<span class="lineNum">     540 </span><span class="lineCov">          2 :                 ctx-&gt;crypt_blocks = gf_bs_read_u16(bs);</span>
+<span class="lineNum">     541 </span><span class="lineCov">          2 :                 ctx-&gt;skip_blocks = gf_bs_read_u16(bs);</span>
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span><span class="lineCov">          2 :                 if (!ctx-&gt;key.size) {</span>
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] stream is encrypted but no key provided\n&quot; ));</span>
+<span class="lineNum">     545 </span><span class="lineNoCov">          0 :                         ctx-&gt;tune_error = GF_TRUE;</span>
+<span class="lineNum">     546 </span>            :                         return GF_BAD_PARAM;
+<span class="lineNum">     547 </span>            :                 }
+<span class="lineNum">     548 </span><span class="lineCov">          2 :                 ctx-&gt;crypt = gf_crypt_open(GF_AES_128, GF_CBC);</span>
+<span class="lineNum">     549 </span><span class="lineCov">          2 :                 if (!ctx-&gt;crypt) {</span>
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] failed to create decryptor\n&quot; ));</span>
+<span class="lineNum">     551 </span><span class="lineNoCov">          0 :                         ctx-&gt;tune_error = GF_TRUE;</span>
+<span class="lineNum">     552 </span>            :                         return GF_IO_ERR;
+<span class="lineNum">     553 </span>            :                 }
+<span class="lineNum">     554 </span><span class="lineCov">          2 :                 gf_crypt_init(ctx-&gt;crypt, ctx-&gt;key.ptr, ctx-&gt;crypt_IV);</span>
+<span class="lineNum">     555 </span>            : 
+<span class="lineNum">     556 </span><span class="lineCov">          2 :                 gsfdmx_decrypt(ctx, pck_data+25, pck_size - 25);</span>
+<span class="lineNum">     557 </span>            : #endif
+<span class="lineNum">     558 </span>            :         }
+<span class="lineNum">     559 </span><span class="lineCov">         12 :         ctx-&gt;use_seq_num = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     560 </span><span class="lineCov">         12 :         gf_bs_read_int(bs, 7);</span>
+<span class="lineNum">     561 </span>            : 
+<span class="lineNum">     562 </span>            :         //header:magic
+<span class="lineNum">     563 </span><span class="lineCov">         12 :         len = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     564 </span><span class="lineCov">         12 :         if (len) {</span>
+<span class="lineNum">     565 </span>            :                 Bool wrongm=GF_FALSE;
+<span class="lineNum">     566 </span><span class="lineCov">          1 :                 char *magic = gf_malloc(sizeof(char)*len);</span>
+<span class="lineNum">     567 </span><span class="lineCov">          1 :                 gf_bs_read_data(bs, magic, len);</span>
+<span class="lineNum">     568 </span>            : 
+<span class="lineNum">     569 </span><span class="lineCov">          1 :                 if (ctx-&gt;magic &amp;&amp; !memcmp(ctx-&gt;magic, magic, len)) wrongm = GF_TRUE;</span>
+<span class="lineNum">     570 </span>            :                 if (!wrongm) {
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] wrong magic word in stream config\n&quot; ));</span>
+<span class="lineNum">     572 </span><span class="lineNoCov">          0 :                         ctx-&gt;tune_error = GF_TRUE;</span>
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :                         gf_free(magic);</span>
+<span class="lineNum">     574 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">     575 </span>            :                 }
+<span class="lineNum">     576 </span><span class="lineCov">          1 :                 GF_LOG(GF_LOG_INFO, GF_LOG_CONTAINER, (&quot;[GSFDemux] tuning in stream, magic %s\n&quot;, magic));</span>
+<span class="lineNum">     577 </span><span class="lineCov">          1 :                 gf_free(magic);</span>
+<span class="lineNum">     578 </span>            :         } else {
+<span class="lineNum">     579 </span><span class="lineCov">         11 :                 GF_LOG(GF_LOG_INFO, GF_LOG_CONTAINER, (&quot;[GSFDemux] tuning in stream\n&quot;));</span>
+<span class="lineNum">     580 </span>            :         }
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span><span class="lineCov">         12 :         ctx-&gt;tuned = GF_TRUE;</span>
+<span class="lineNum">     583 </span>            :         return GF_OK;
+<span class="lineNum">     584 </span>            : }
+<span class="lineNum">     585 </span>            : 
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span>            : static GFINLINE void gsfdmx_pck_reset(GSF_Packet *pck)
+<span class="lineNum">     588 </span>            : {
+<span class="lineNum">     589 </span><span class="lineCov">       4776 :         u32 alloc_frags = pck-&gt;nb_alloc_frags;</span>
+<span class="lineNum">     590 </span><span class="lineCov">       4776 :         GSF_PacketFragment *frags = pck-&gt;frags;</span>
+<span class="lineNum">     591 </span>            :         memset(pck, 0, sizeof(GSF_Packet));
+<span class="lineNum">     592 </span><span class="lineCov">       4776 :         pck-&gt;nb_alloc_frags = alloc_frags;</span>
+<span class="lineNum">     593 </span><span class="lineCov">       4776 :         pck-&gt;frags = frags;</span>
+<a name="594"><span class="lineNum">     594 </span>            : }</a>
+<span class="lineNum">     595 </span>            : 
+<span class="lineNum">     596 </span><span class="lineCov">       5401 : static GFINLINE GSF_Packet *gsfdmx_get_packet(GSF_DemuxCtx *ctx, GSF_Stream *gst, Bool pck_frag, s32 frame_sn, u8 pkt_type, u32 frame_size)</span>
+<span class="lineNum">     597 </span>            : {
+<span class="lineNum">     598 </span><span class="lineCov">       5401 :         u32 i=0, count;</span>
+<span class="lineNum">     599 </span>            :         GSF_Packet *gpck = NULL;
+<span class="lineNum">     600 </span>            : 
+<span class="lineNum">     601 </span><span class="lineCov">       5401 :         if ((frame_sn&gt;=0) || pck_frag) {</span>
+<span class="lineNum">     602 </span><span class="lineCov">       5401 :                 while (( gpck = gf_list_enum(gst-&gt;packets, &amp;i))) {</span>
+<span class="lineNum">     603 </span><span class="lineCov">        625 :                         if (gpck-&gt;frame_sn == frame_sn) {</span>
+<span class="lineNum">     604 </span>            :                                 assert(gpck-&gt;pck_type == pkt_type);
+<span class="lineNum">     605 </span>            :                                 assert(gpck-&gt;full_block_size == frame_size);
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span>            :                                 break;
+<span class="lineNum">     608 </span>            :                         }
+<span class="lineNum">     609 </span>            :                         gpck = NULL;
+<span class="lineNum">     610 </span>            :                 }
+<span class="lineNum">     611 </span>            :         }
+<span class="lineNum">     612 </span><span class="lineCov">       5401 :         if (!gpck) {</span>
+<span class="lineNum">     613 </span>            :                 Bool inserted = GF_FALSE;
+<span class="lineNum">     614 </span><span class="lineCov">       4776 :                 gpck = gf_list_pop_back(ctx-&gt;pck_res);</span>
+<span class="lineNum">     615 </span><span class="lineCov">       4776 :                 if (!gpck) {</span>
+<span class="lineNum">     616 </span><span class="lineCov">         12 :                         GF_SAFEALLOC(gpck, GSF_Packet);</span>
+<span class="lineNum">     617 </span><span class="lineCov">         12 :                         if (!gpck) return NULL;</span>
+<span class="lineNum">     618 </span><span class="lineCov">         12 :                         gpck-&gt;nb_alloc_frags = 10;</span>
+<span class="lineNum">     619 </span><span class="lineCov">         12 :                         gpck-&gt;frags = gf_malloc(sizeof(GSF_PacketFragment) * gpck-&gt;nb_alloc_frags);</span>
+<span class="lineNum">     620 </span>            :                 }
+<span class="lineNum">     621 </span><span class="lineCov">       4776 :                 gpck-&gt;frame_sn = frame_sn;</span>
+<span class="lineNum">     622 </span><span class="lineCov">       4776 :                 gpck-&gt;pck_type = pkt_type;</span>
+<span class="lineNum">     623 </span><span class="lineCov">       4776 :                 gpck-&gt;full_block_size = frame_size;</span>
+<span class="lineNum">     624 </span><span class="lineCov">       4776 :                 gpck-&gt;pck = gf_filter_pck_new_alloc(gst-&gt;opid, frame_size, &amp;gpck-&gt;output);</span>
+<span class="lineNum">     625 </span><span class="lineCov">       4776 :                 if (!gpck-&gt;pck) {</span>
+<span class="lineNum">     626 </span>            :                         gsfdmx_pck_reset(gpck);
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :                         gf_list_add(ctx-&gt;pck_res, gpck);</span>
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :                         return NULL;</span>
+<span class="lineNum">     629 </span>            :                 }
+<span class="lineNum">     630 </span><span class="lineCov">       4776 :                 memset(gpck-&gt;output, (u8) ctx-&gt;pad, sizeof(char) * gpck-&gt;full_block_size);</span>
+<span class="lineNum">     631 </span>            : 
+<span class="lineNum">     632 </span><span class="lineCov">       4776 :                 count = gf_list_count(gst-&gt;packets);</span>
+<span class="lineNum">     633 </span><span class="lineCov">       4776 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :                         GSF_Packet *apck = gf_list_get(gst-&gt;packets, i);</span>
+<span class="lineNum">     635 </span>            : 
+<span class="lineNum">     636 </span><span class="lineNoCov">          0 :                         if ( ( (apck-&gt;frame_sn &gt; frame_sn) &amp;&amp; (apck-&gt;frame_sn - frame_sn &lt;= 32768) )</span>
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :                                 || ( (apck-&gt;frame_sn &lt; frame_sn ) &amp;&amp; (frame_sn - apck-&gt;frame_sn &gt; 32768) )</span>
+<span class="lineNum">     638 </span>            :                         ) {
+<span class="lineNum">     639 </span>            :                                 inserted = GF_TRUE;
+<span class="lineNum">     640 </span><span class="lineNoCov">          0 :                                 gf_list_insert(gst-&gt;packets, gpck, i);</span>
+<span class="lineNum">     641 </span>            :                         }
+<span class="lineNum">     642 </span>            :                 }
+<span class="lineNum">     643 </span><span class="lineCov">       4776 :                 if (!inserted) gf_list_add(gst-&gt;packets, gpck);</span>
+<span class="lineNum">     644 </span>            :         }
+<span class="lineNum">     645 </span>            :         return gpck;
+<a name="646"><span class="lineNum">     646 </span>            : }</a>
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span><span class="lineCov">       5401 : static void gsfdmx_packet_append_frag(GSF_Packet *pck, u32 size, u32 offset)</span>
+<span class="lineNum">     649 </span>            : {
+<span class="lineNum">     650 </span>            :         u32 i;
+<span class="lineNum">     651 </span>            :         Bool inserted = GF_FALSE;
+<span class="lineNum">     652 </span><span class="lineCov">       5401 :         pck-&gt;recv_bytes += size;</span>
+<span class="lineNum">     653 </span><span class="lineCov">       5401 :         pck-&gt;nb_recv_frags++;</span>
+<span class="lineNum">     654 </span>            : 
+<span class="lineNum">     655 </span>            :         assert(offset + size &lt;= pck-&gt;full_block_size);
+<span class="lineNum">     656 </span>            : 
+<span class="lineNum">     657 </span><span class="lineCov">       5401 :         for (i=0; i&lt;pck-&gt;nb_frags; i++) {</span>
+<span class="lineNum">     658 </span><span class="lineCov">        625 :                 if ((pck-&gt;frags[i].offset &lt;= offset) &amp;&amp; (pck-&gt;frags[i].offset + pck-&gt;frags[i].size &gt;= offset + size) ) {</span>
+<span class="lineNum">     659 </span>            :                         return;
+<span class="lineNum">     660 </span>            :                 }
+<span class="lineNum">     661 </span>            : 
+<span class="lineNum">     662 </span>            :                 //insert fragment
+<span class="lineNum">     663 </span><span class="lineCov">        625 :                 if (pck-&gt;frags[i].offset &gt; offset) {</span>
+<span class="lineNum">     664 </span><span class="lineNoCov">          0 :                         if (pck-&gt;nb_frags==pck-&gt;nb_alloc_frags) {</span>
+<span class="lineNum">     665 </span><span class="lineNoCov">          0 :                                 pck-&gt;nb_alloc_frags *= 2;</span>
+<span class="lineNum">     666 </span><span class="lineNoCov">          0 :                                 pck-&gt;frags = gf_realloc(pck-&gt;frags, sizeof(GSF_PacketFragment)*pck-&gt;nb_alloc_frags);</span>
+<span class="lineNum">     667 </span>            :                         }
+<span class="lineNum">     668 </span><span class="lineNoCov">          0 :                         memmove(&amp;pck-&gt;frags[i+1], &amp;pck-&gt;frags[i], sizeof(GSF_PacketFragment) * (pck-&gt;nb_frags - i)  );</span>
+<span class="lineNum">     669 </span><span class="lineNoCov">          0 :                         pck-&gt;frags[i].offset = offset;</span>
+<span class="lineNum">     670 </span><span class="lineNoCov">          0 :                         pck-&gt;frags[i].size = size;</span>
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 :                         pck-&gt;nb_bytes += size;</span>
+<span class="lineNum">     672 </span><span class="lineNoCov">          0 :                         pck-&gt;nb_frags++;</span>
+<span class="lineNum">     673 </span>            :                         inserted = GF_TRUE;
+<span class="lineNum">     674 </span>            :                         break;
+<span class="lineNum">     675 </span>            :                 }
+<span class="lineNum">     676 </span>            :                 //expand fragment
+<span class="lineNum">     677 </span><span class="lineCov">        625 :                 if (pck-&gt;frags[i].offset + pck-&gt;frags[i].size == offset) {</span>
+<span class="lineNum">     678 </span><span class="lineCov">        625 :                         pck-&gt;frags[i].size += size;</span>
+<span class="lineNum">     679 </span><span class="lineCov">        625 :                         pck-&gt;nb_bytes += size;</span>
+<span class="lineNum">     680 </span>            :                         inserted = GF_TRUE;
+<span class="lineNum">     681 </span>            :                         break;
+<span class="lineNum">     682 </span>            :                 }
+<span class="lineNum">     683 </span>            :         }
+<span class="lineNum">     684 </span>            : 
+<span class="lineNum">     685 </span>            :         if (!inserted) {
+<span class="lineNum">     686 </span><span class="lineCov">       4776 :                 if (pck-&gt;nb_frags==pck-&gt;nb_alloc_frags) {</span>
+<span class="lineNum">     687 </span><span class="lineNoCov">          0 :                         pck-&gt;nb_alloc_frags *= 2;</span>
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 :                         pck-&gt;frags = gf_realloc(pck-&gt;frags, sizeof(GSF_PacketFragment)*pck-&gt;nb_alloc_frags);</span>
+<span class="lineNum">     689 </span>            :                 }
+<span class="lineNum">     690 </span><span class="lineCov">       4776 :                 pck-&gt;frags[pck-&gt;nb_frags].offset = offset;</span>
+<span class="lineNum">     691 </span><span class="lineCov">       4776 :                 pck-&gt;frags[pck-&gt;nb_frags].size = size;</span>
+<span class="lineNum">     692 </span><span class="lineCov">       4776 :                 pck-&gt;nb_frags++;</span>
+<span class="lineNum">     693 </span><span class="lineCov">       4776 :                 pck-&gt;nb_bytes += size;</span>
+<span class="lineNum">     694 </span>            :         }
+<span class="lineNum">     695 </span><span class="lineCov">       5401 :         if (pck-&gt;nb_bytes &gt;= pck-&gt;full_block_size) {</span>
+<span class="lineNum">     696 </span><span class="lineCov">       4776 :                 if (pck-&gt;nb_bytes&gt;pck-&gt;full_block_size) pck-&gt;corrupted=GF_TRUE;</span>
+<span class="lineNum">     697 </span><span class="lineCov">       4776 :                 pck-&gt;complete = GF_TRUE;</span>
+<span class="lineNum">     698 </span>            :         }
+<a name="699"><span class="lineNum">     699 </span>            : }</a>
+<span class="lineNum">     700 </span>            : 
+<span class="lineNum">     701 </span><span class="lineCov">       3695 : GF_Err gsfdmx_read_data_pck(GSF_DemuxCtx *ctx, GSF_Stream *gst, GSF_Packet *gpck, u32 pck_len, Bool full_pck, GF_BitStream *bs)</span>
+<span class="lineNum">     702 </span>            : {
+<span class="lineNum">     703 </span>            :         u64 dts=GF_FILTER_NO_TS, cts=GF_FILTER_NO_TS, bo=GF_FILTER_NO_BO;
+<span class="lineNum">     704 </span>            :         u32 copy_size, consumed, dur, dep_flags=0, tsmodebits, durmodebits, spos;
+<span class="lineNum">     705 </span>            :         s16 roll=0;
+<span class="lineNum">     706 </span>            :         u8 carv=0;
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span>            :         //not yet setup
+<span class="lineNum">     709 </span><span class="lineCov">       3695 :         if (!gst || !gpck) return GF_NOT_FOUND;</span>
+<span class="lineNum">     710 </span>            : 
+<span class="lineNum">     711 </span>            : 
+<span class="lineNum">     712 </span>            : //      gsfdmx_flush_dst_pck(gst, GF_TRUE);
+<span class="lineNum">     713 </span>            : 
+<span class="lineNum">     714 </span><span class="lineCov">       3695 :         spos = (u32) gf_bs_get_position(bs);</span>
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span>            :         //flags first byte: 1(has_dts) 1(has_cts) 1(has_dur) 1(cts_diff_neg) 2(ts_mode) 2(ts_diff_mode)
+<span class="lineNum">     717 </span>            :         //flags second byte: 3(sap) 2(encrypted) 1(has_sample_deps) 1(has builtin props) 1(has_ext)
+<span class="lineNum">     718 </span>            :         //if (ext) {
+<span class="lineNum">     719 </span>            :         //      flags third byte: 1(has_byteoffset) 1(corrupted) 1(seek) 1(has_carousel) 2(ilaced) 2(cktype)
+<span class="lineNum">     720 </span>            :         //      flags fourth byte: 1(au start) 1(au end) 1(has props) reserved(5)
+<span class="lineNum">     721 </span>            :         //}
+<span class="lineNum">     722 </span>            :         //if has_dts, dts on tsmodebits
+<span class="lineNum">     723 </span>            :         //if has_cts, has_dts ? cts_diff on ts_diff_mode : cts on tsmodebits
+<span class="lineNum">     724 </span>            :         //if durmode&gt;0, dur on ts_diff_mode
+<span class="lineNum">     725 </span>            :         //if sap==4, roll on signed 16 bits
+<span class="lineNum">     726 </span>            :         //if (has sample deps) sample_deps_flags on 8 bits
+<span class="lineNum">     727 </span>            :         //if has_carousel, carousel version on 8 bits
+<span class="lineNum">     728 </span>            :         //if has_byteoffset, byte offset on 64 bits
+<span class="lineNum">     729 </span>            :         //if (has builtin) vlen nb builtin_props then props[builtin_props]
+<span class="lineNum">     730 </span>            :         //if (has props) vlen nb_str_props then props[nb_str_props]
+<span class="lineNum">     731 </span>            : 
+<span class="lineNum">     732 </span>            :         //first flags byte
+<span class="lineNum">     733 </span><span class="lineCov">       3695 :         u8 has_dts = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     734 </span><span class="lineCov">       3695 :         u8 has_cts = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     735 </span><span class="lineCov">       3695 :         u8 has_dur = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     736 </span><span class="lineCov">       3695 :         u8 cts_diff_neg = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     737 </span><span class="lineCov">       3695 :         u8 tsmode = gf_bs_read_int(bs, 2);</span>
+<span class="lineNum">     738 </span><span class="lineCov">       3695 :         u8 tsdiffmode = gf_bs_read_int(bs, 2);</span>
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span><span class="lineCov">       3695 :         u8 sap = gf_bs_read_int(bs, 3);</span>
+<span class="lineNum">     741 </span><span class="lineCov">       3695 :         u8 crypt = gf_bs_read_int(bs, 2);</span>
+<span class="lineNum">     742 </span><span class="lineCov">       3695 :         u8 has_dep = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     743 </span><span class="lineCov">       3695 :         u8 has_4cc_props = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     744 </span><span class="lineCov">       3695 :         u8 has_ext = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     745 </span>            : 
+<span class="lineNum">     746 </span>            :         //default field values without ext
+<span class="lineNum">     747 </span>            :         u8 has_bo = 0, corr = 0, seek = 0, has_carv = 0, interl = 0, cktype = 0, has_str_props = 0;
+<span class="lineNum">     748 </span>            :         u8 is_start = 1, is_end = 1;
+<span class="lineNum">     749 </span><span class="lineCov">       3695 :         if (has_ext) {</span>
+<span class="lineNum">     750 </span><span class="lineCov">       1007 :                 has_bo = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     751 </span><span class="lineCov">       1007 :                 corr = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     752 </span><span class="lineCov">       1007 :                 seek = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     753 </span><span class="lineCov">       1007 :                 has_carv = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     754 </span><span class="lineCov">       1007 :                 interl = gf_bs_read_int(bs, 2);</span>
+<span class="lineNum">     755 </span><span class="lineCov">       1007 :                 cktype = gf_bs_read_int(bs, 2);</span>
+<span class="lineNum">     756 </span>            : 
+<span class="lineNum">     757 </span><span class="lineCov">       1007 :                 is_start = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     758 </span><span class="lineCov">       1007 :                 is_end = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     759 </span><span class="lineCov">       1007 :                 has_str_props = gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     760 </span><span class="lineCov">       1007 :                 gf_bs_read_int(bs, 5); //reserved</span>
+<span class="lineNum">     761 </span>            :         }
+<span class="lineNum">     762 </span>            : 
+<span class="lineNum">     763 </span><span class="lineCov">       3695 :         if (tsmode==3) tsmodebits = 64;</span>
+<span class="lineNum">     764 </span><span class="lineCov">       3695 :         else if (tsmode==2) tsmodebits = 32;</span>
+<span class="lineNum">     765 </span><span class="lineCov">       3287 :         else if (tsmode==1) tsmodebits = 24;</span>
+<span class="lineNum">     766 </span>            :         else tsmodebits = 16;
+<span class="lineNum">     767 </span>            : 
+<span class="lineNum">     768 </span><span class="lineCov">       3695 :         if (tsdiffmode==3) durmodebits = 32;</span>
+<span class="lineNum">     769 </span><span class="lineCov">       3695 :         else if (tsdiffmode==2) durmodebits = 24;</span>
+<span class="lineNum">     770 </span><span class="lineCov">       2830 :         else if (tsdiffmode==1) durmodebits = 16;</span>
+<span class="lineNum">     771 </span>            :         else durmodebits = 8;
+<span class="lineNum">     772 </span>            : 
+<span class="lineNum">     773 </span><span class="lineCov">       3695 :         if (has_dts) {</span>
+<span class="lineNum">     774 </span><span class="lineCov">        590 :                 if (tsmode==3) dts = gf_bs_read_long_int(bs, tsmodebits);</span>
+<span class="lineNum">     775 </span><span class="lineCov">        590 :                 else dts = gf_bs_read_int(bs, tsmodebits);</span>
+<span class="lineNum">     776 </span>            :         }
+<span class="lineNum">     777 </span><span class="lineCov">       3695 :         if (has_cts) {</span>
+<span class="lineNum">     778 </span><span class="lineCov">       3692 :                 if (has_dts) {</span>
+<span class="lineNum">     779 </span><span class="lineCov">        590 :                         s32 cts_diff = gf_bs_read_int(bs, durmodebits);</span>
+<span class="lineNum">     780 </span><span class="lineCov">        590 :                         if (cts_diff_neg) {</span>
+<span class="lineNum">     781 </span><span class="lineCov">        375 :                                 cts = dts - cts_diff;</span>
+<span class="lineNum">     782 </span>            :                         } else {
+<span class="lineNum">     783 </span><span class="lineCov">        215 :                                 cts = dts + cts_diff;</span>
+<span class="lineNum">     784 </span>            :                         }
+<span class="lineNum">     785 </span>            :                 } else {
+<span class="lineNum">     786 </span><span class="lineCov">       3102 :                         if (tsmode==3) cts = gf_bs_read_long_int(bs, tsmodebits);</span>
+<span class="lineNum">     787 </span><span class="lineCov">       3102 :                         else cts = gf_bs_read_int(bs, tsmodebits);</span>
+<span class="lineNum">     788 </span>            :                 }
+<span class="lineNum">     789 </span>            :         }
+<span class="lineNum">     790 </span>            : 
+<span class="lineNum">     791 </span><span class="lineCov">       3695 :         if (has_dur) {</span>
+<span class="lineNum">     792 </span><span class="lineCov">       3518 :                 dur = gf_bs_read_int(bs, durmodebits);</span>
+<span class="lineNum">     793 </span>            :         }
+<span class="lineNum">     794 </span>            : 
+<span class="lineNum">     795 </span><span class="lineCov">       3695 :         if ((sap==GF_FILTER_SAP_4) || (sap==GF_FILTER_SAP_4_PROL)) {</span>
+<span class="lineNum">     796 </span><span class="lineCov">          1 :                 roll = gf_bs_read_u16(bs);</span>
+<span class="lineNum">     797 </span>            :         }
+<span class="lineNum">     798 </span><span class="lineCov">       3695 :         if (has_dep)</span>
+<span class="lineNum">     799 </span><span class="lineCov">          2 :                 dep_flags = gf_bs_read_u8(bs);</span>
+<span class="lineNum">     800 </span>            : 
+<span class="lineNum">     801 </span><span class="lineCov">       3695 :         if (has_carv) {</span>
+<span class="lineNum">     802 </span><span class="lineCov">          2 :                 carv = gf_bs_read_u8(bs);</span>
+<span class="lineNum">     803 </span>            :         }
+<span class="lineNum">     804 </span><span class="lineCov">       3695 :         if (has_bo) {</span>
+<span class="lineNum">     805 </span><span class="lineCov">          1 :                 bo = gf_bs_read_u64(bs);</span>
+<span class="lineNum">     806 </span>            :         }
+<span class="lineNum">     807 </span>            : 
+<span class="lineNum">     808 </span><span class="lineCov">       3695 :         if (has_4cc_props) {</span>
+<span class="lineNum">     809 </span><span class="lineCov">          6 :                 u32 nb_4cc = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     810 </span><span class="lineCov">          6 :                 while (nb_4cc) {</span>
+<span class="lineNum">     811 </span>            :                         GF_Err e;
+<span class="lineNum">     812 </span>            :                         GF_PropertyValue p;
+<span class="lineNum">     813 </span>            :                         memset(&amp;p, 0, sizeof(GF_PropertyValue));
+<span class="lineNum">     814 </span><span class="lineCov">         10 :                         u32 p4cc = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     815 </span><span class="lineCov">         10 :                         p.type = gf_props_4cc_get_type(p4cc);</span>
+<span class="lineNum">     816 </span><span class="lineCov">         10 :                         if (p.type==GF_PROP_FORBIDEN) {</span>
+<span class="lineNum">     817 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] Wrong GPAC property type for property 4CC %s\n&quot;, gf_4cc_to_str(p4cc) ));</span>
+<span class="lineNum">     818 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_discard(gpck-&gt;pck);</span>
+<span class="lineNum">     819 </span><span class="lineNoCov">          0 :                                 gpck-&gt;pck = NULL;</span>
+<span class="lineNum">     820 </span><span class="lineNoCov">          0 :                                 return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     821 </span>            :                         }
+<span class="lineNum">     822 </span><span class="lineCov">         10 :                         nb_4cc--;</span>
+<span class="lineNum">     823 </span>            : 
+<span class="lineNum">     824 </span><span class="lineCov">         10 :                         e = gsfdmx_read_prop(bs, &amp;p);</span>
+<span class="lineNum">     825 </span><span class="lineCov">         10 :                         if (e) {</span>
+<span class="lineNum">     826 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_discard(gpck-&gt;pck);</span>
+<span class="lineNum">     827 </span><span class="lineNoCov">          0 :                                 gpck-&gt;pck = NULL;</span>
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 :                                 return e;</span>
+<span class="lineNum">     829 </span>            :                         }
+<span class="lineNum">     830 </span><span class="lineCov">         10 :                         gf_filter_pck_set_property(gpck-&gt;pck, p4cc, &amp;p);</span>
+<span class="lineNum">     831 </span>            :                 }
+<span class="lineNum">     832 </span>            :         }
+<span class="lineNum">     833 </span><span class="lineCov">       3695 :         if (has_str_props) {</span>
+<span class="lineNum">     834 </span><span class="lineCov">       1000 :                 u32 nb_props = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     835 </span><span class="lineCov">       1000 :                 while (nb_props) {</span>
+<span class="lineNum">     836 </span>            :                         GF_Err e;
+<span class="lineNum">     837 </span>            :                         GF_PropertyValue p;
+<span class="lineNum">     838 </span>            :                         char *pname;
+<span class="lineNum">     839 </span>            :                         memset(&amp;p, 0, sizeof(GF_PropertyValue));
+<span class="lineNum">     840 </span><span class="lineCov">       1020 :                         u32 len = gsfdmx_read_vlen(bs);</span>
+<span class="lineNum">     841 </span><span class="lineCov">       1020 :                         pname = gf_malloc(sizeof(char)*(len+1) );</span>
+<span class="lineNum">     842 </span><span class="lineCov">       1020 :                         gf_bs_read_data(bs, pname, len);</span>
+<span class="lineNum">     843 </span><span class="lineCov">       1020 :                         pname[len] = 0;</span>
+<span class="lineNum">     844 </span><span class="lineCov">       1020 :                         p.type = gf_bs_read_u8(bs);</span>
+<span class="lineNum">     845 </span><span class="lineCov">       1020 :                         if (p.type==GF_PROP_FORBIDEN) {</span>
+<span class="lineNum">     846 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] Wrong GPAC property type for property %s\n&quot;, pname ));</span>
+<span class="lineNum">     847 </span><span class="lineNoCov">          0 :                                 gf_free(pname);</span>
+<span class="lineNum">     848 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_discard(gpck-&gt;pck);</span>
+<span class="lineNum">     849 </span><span class="lineNoCov">          0 :                                 gpck-&gt;pck = NULL;</span>
+<span class="lineNum">     850 </span><span class="lineNoCov">          0 :                                 return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     851 </span>            :                         }
+<span class="lineNum">     852 </span><span class="lineCov">       1020 :                         nb_props--;</span>
+<span class="lineNum">     853 </span>            : 
+<span class="lineNum">     854 </span><span class="lineCov">       1020 :                         e = gsfdmx_read_prop(bs, &amp;p);</span>
+<span class="lineNum">     855 </span><span class="lineCov">       1020 :                         if (e) {</span>
+<span class="lineNum">     856 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_discard(gpck-&gt;pck);</span>
+<span class="lineNum">     857 </span><span class="lineNoCov">          0 :                                 gf_free(pname);</span>
+<span class="lineNum">     858 </span><span class="lineNoCov">          0 :                                 gpck-&gt;pck = NULL;</span>
+<span class="lineNum">     859 </span><span class="lineNoCov">          0 :                                 return e;</span>
+<span class="lineNum">     860 </span>            :                         }
+<span class="lineNum">     861 </span><span class="lineCov">       1020 :                         gf_filter_pck_set_property_dyn(gpck-&gt;pck, pname, &amp;p);</span>
+<span class="lineNum">     862 </span><span class="lineCov">       1020 :                         gf_free(pname);</span>
+<span class="lineNum">     863 </span><span class="lineCov">       1020 :                         if ((p.type==GF_PROP_UINT_LIST) || (p.type==GF_PROP_4CC_LIST) || (p.type==GF_PROP_SINT_LIST) || (p.type==GF_PROP_VEC2I_LIST) ) {</span>
+<span class="lineNum">     864 </span><span class="lineCov">          1 :                                 if (p.value.uint_list.vals)</span>
+<span class="lineNum">     865 </span><span class="lineCov">          1 :                                         gf_free(p.value.uint_list.vals);</span>
+<span class="lineNum">     866 </span>            :                         }
+<span class="lineNum">     867 </span>            :                 }
+<span class="lineNum">     868 </span>            :         }
+<span class="lineNum">     869 </span>            : 
+<span class="lineNum">     870 </span><span class="lineCov">       3695 :         consumed = (u32) gf_bs_get_position(bs) - spos;</span>
+<span class="lineNum">     871 </span><span class="lineCov">       3695 :         pck_len -= consumed;</span>
+<span class="lineNum">     872 </span><span class="lineCov">       3695 :         if (full_pck) {</span>
+<span class="lineNum">     873 </span>            :                 assert(gpck-&gt;full_block_size &gt; consumed);
+<span class="lineNum">     874 </span><span class="lineCov">       3600 :                 gpck-&gt;full_block_size -= consumed;</span>
+<span class="lineNum">     875 </span>            :                 assert(gpck-&gt;full_block_size == pck_len);
+<span class="lineNum">     876 </span><span class="lineCov">       3600 :                 gf_filter_pck_truncate(gpck-&gt;pck, gpck-&gt;full_block_size);</span>
+<span class="lineNum">     877 </span>            :         }
+<span class="lineNum">     878 </span><span class="lineCov">       3695 :         copy_size = gpck-&gt;full_block_size;</span>
+<span class="lineNum">     879 </span><span class="lineCov">       3695 :         if (copy_size &gt; pck_len)</span>
+<span class="lineNum">     880 </span>            :                 copy_size = pck_len;
+<span class="lineNum">     881 </span><span class="lineCov">       3695 :         gf_bs_read_data(bs, gpck-&gt;output, copy_size);</span>
+<span class="lineNum">     882 </span><span class="lineCov">       3695 :         gsfdmx_packet_append_frag(gpck, copy_size, 0);</span>
+<span class="lineNum">     883 </span>            : 
+<span class="lineNum">     884 </span><span class="lineCov">       3695 :         gf_filter_pck_set_framing(gpck-&gt;pck, is_start, is_end);</span>
+<span class="lineNum">     885 </span><span class="lineCov">       3695 :         if (has_dts) gf_filter_pck_set_dts(gpck-&gt;pck, dts);</span>
+<span class="lineNum">     886 </span><span class="lineCov">       3695 :         if (has_cts) gf_filter_pck_set_cts(gpck-&gt;pck, cts);</span>
+<span class="lineNum">     887 </span><span class="lineCov">       3695 :         if (has_dur) gf_filter_pck_set_duration(gpck-&gt;pck, dur);</span>
+<span class="lineNum">     888 </span><span class="lineCov">       3695 :         if (has_bo) gf_filter_pck_set_byte_offset(gpck-&gt;pck, bo);</span>
+<span class="lineNum">     889 </span><span class="lineCov">       3695 :         if (corr) gf_filter_pck_set_corrupted(gpck-&gt;pck, corr);</span>
+<span class="lineNum">     890 </span><span class="lineCov">       3695 :         if (interl) gf_filter_pck_set_interlaced(gpck-&gt;pck, interl);</span>
+<span class="lineNum">     891 </span><span class="lineCov">       3695 :         if (has_carv) gf_filter_pck_set_carousel_version(gpck-&gt;pck, carv);</span>
+<span class="lineNum">     892 </span><span class="lineCov">       3695 :         if (has_dep) gf_filter_pck_set_dependency_flags(gpck-&gt;pck, dep_flags);</span>
+<span class="lineNum">     893 </span><span class="lineCov">       3695 :         if (cktype) gf_filter_pck_set_clock_type(gpck-&gt;pck, cktype);</span>
+<span class="lineNum">     894 </span><span class="lineCov">       3695 :         if (seek) gf_filter_pck_set_seek_flag(gpck-&gt;pck, seek);</span>
+<span class="lineNum">     895 </span><span class="lineCov">       3695 :         if (crypt) gf_filter_pck_set_crypt_flags(gpck-&gt;pck, crypt);</span>
+<span class="lineNum">     896 </span><span class="lineCov">       3695 :         if (sap) gf_filter_pck_set_sap(gpck-&gt;pck, sap);</span>
+<span class="lineNum">     897 </span><span class="lineCov">       3695 :         if ((sap==GF_FILTER_SAP_4) || (sap==GF_FILTER_SAP_4_PROL))</span>
+<span class="lineNum">     898 </span><span class="lineCov">          1 :                 gf_filter_pck_set_roll_info(gpck-&gt;pck, roll);</span>
+<span class="lineNum">     899 </span>            :         return GF_OK;
+<span class="lineNum">     900 </span>            : }
+<span class="lineNum">     901 </span>            : 
+<span class="lineNum">     902 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     903 </span>            : static const char *gsfdmx_pck_name(u32 pck_type)
+<span class="lineNum">     904 </span>            : {
+<span class="lineNum">     905 </span><span class="lineCov">        337 :         switch (pck_type) {</span>
+<span class="lineNum">     906 </span>            :         case GFS_PCKTYPE_HDR: return &quot;TUNE&quot;;
+<span class="lineNum">     907 </span><span class="lineCov">          1 :         case GFS_PCKTYPE_PID_CONFIG: return &quot;CONFIG&quot;;</span>
+<span class="lineNum">     908 </span><span class="lineCov">        162 :         case GFS_PCKTYPE_PID_INFO_UPDATE: return &quot;INFO&quot;;</span>
+<span class="lineNum">     909 </span><span class="lineNoCov">          0 :         case GFS_PCKTYPE_PID_REMOVE: return &quot;PIDREM&quot;;</span>
+<span class="lineNum">     910 </span><span class="lineNoCov">          0 :         case GFS_PCKTYPE_PID_EOS: return &quot;PIDEOS&quot;;</span>
+<span class="lineNum">     911 </span><span class="lineCov">        173 :         case GFS_PCKTYPE_PCK: return &quot;PCK&quot;;</span>
+<span class="lineNum">     912 </span><span class="lineNoCov">          0 :         default: return &quot;FORBIDDEN&quot;;</span>
+<span class="lineNum">     913 </span>            :         }
+<span class="lineNum">     914 </span>            : }
+<span class="lineNum">     915 </span>            : #endif
+<a name="916"><span class="lineNum">     916 </span>            : </a>
+<span class="lineNum">     917 </span>            : 
+<span class="lineNum">     918 </span><span class="lineCov">         15 : static void gsfdmx_stream_del(GSF_DemuxCtx *ctx, GSF_Stream *gst, Bool is_flush)</span>
+<span class="lineNum">     919 </span>            : {
+<span class="lineNum">     920 </span><span class="lineCov">         15 :         while (gf_list_count(gst-&gt;packets)) {</span>
+<span class="lineNum">     921 </span><span class="lineNoCov">          0 :                 GSF_Packet *gpck = gf_list_pop_front(gst-&gt;packets);</span>
+<span class="lineNum">     922 </span>            : 
+<span class="lineNum">     923 </span><span class="lineNoCov">          0 :                 if (gpck-&gt;pck) {</span>
+<span class="lineNum">     924 </span><span class="lineNoCov">          0 :                         if (is_flush &amp;&amp; (gpck-&gt;pck_type == GFS_PCKTYPE_PCK)) {</span>
+<span class="lineNum">     925 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_set_corrupted(gpck-&gt;pck, GF_TRUE);</span>
+<span class="lineNum">     926 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_send(gpck-&gt;pck);</span>
+<span class="lineNum">     927 </span>            :                         } else {
+<span class="lineNum">     928 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_discard(gpck-&gt;pck);</span>
+<span class="lineNum">     929 </span>            :                         }
+<span class="lineNum">     930 </span>            :                 }
+<span class="lineNum">     931 </span>            :                 gsfdmx_pck_reset(gpck);
+<span class="lineNum">     932 </span><span class="lineNoCov">          0 :                 gf_list_add(ctx-&gt;pck_res, gpck);</span>
+<span class="lineNum">     933 </span>            :         }
+<span class="lineNum">     934 </span><span class="lineCov">         15 :         if (is_flush &amp;&amp; gst-&gt;opid)</span>
+<span class="lineNum">     935 </span><span class="lineNoCov">          0 :                 gf_filter_pid_remove(gst-&gt;opid);</span>
+<span class="lineNum">     936 </span>            : 
+<span class="lineNum">     937 </span><span class="lineCov">         15 :         gf_list_del(gst-&gt;packets);</span>
+<span class="lineNum">     938 </span><span class="lineCov">         15 :         gf_list_del_item(ctx-&gt;streams, gst);</span>
+<span class="lineNum">     939 </span><span class="lineCov">         15 :         gf_free(gst);</span>
+<a name="940"><span class="lineNum">     940 </span><span class="lineCov">         15 : }</span></a>
+<span class="lineNum">     941 </span>            : 
+<span class="lineNum">     942 </span><span class="lineCov">       5401 : static GF_Err gsfdmx_process_packets(GF_Filter *filter, GSF_DemuxCtx *ctx, GSF_Stream *gst)</span>
+<span class="lineNum">     943 </span>            : {
+<span class="lineNum">     944 </span>            :         GSF_Packet *gpck;
+<span class="lineNum">     945 </span>            :         GF_Err e;
+<span class="lineNum">     946 </span>            : 
+<span class="lineNum">     947 </span><span class="lineCov">       5401 :         if (ctx-&gt;tune_error) {</span>
+<span class="lineNum">     948 </span>            :                 return GF_SERVICE_ERROR;
+<span class="lineNum">     949 </span>            :         }
+<span class="lineNum">     950 </span>            :         while (1) {
+<span class="lineNum">     951 </span><span class="lineCov">      10177 :                 gpck = gf_list_get(gst-&gt;packets, 0);</span>
+<span class="lineNum">     952 </span>            : 
+<span class="lineNum">     953 </span><span class="lineCov">      10177 :                 if (!gpck)</span>
+<span class="lineNum">     954 </span>            :                         return GF_OK;
+<span class="lineNum">     955 </span>            : 
+<span class="lineNum">     956 </span><span class="lineCov">       5401 :                 if (!gpck-&gt;complete) {</span>
+<span class="lineNum">     957 </span><span class="lineCov">        625 :                         u32 pck_count = gf_list_count(gst-&gt;packets);</span>
+<span class="lineNum">     958 </span><span class="lineCov">        625 :                         if (ctx-&gt;mq &amp;&amp; (pck_count &gt; ctx-&gt;mq + 1)) {</span>
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, (&quot;[GSFDemux] packets queue too large (%d vs %d max), processing incomplete packet size %d receive %d\n&quot;, pck_count, ctx-&gt;mq, gpck-&gt;full_block_size, gpck-&gt;nb_bytes));</span>
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 :                                 gpck-&gt;corrupted = 1;</span>
+<span class="lineNum">     961 </span>            :                         } else {
+<span class="lineNum">     962 </span>            :                                 return GF_OK;
+<span class="lineNum">     963 </span>            :                         }
+<span class="lineNum">     964 </span>            :                 }
+<span class="lineNum">     965 </span>            :                 assert(gpck-&gt;pck);
+<span class="lineNum">     966 </span><span class="lineCov">       4776 :                 if (ctx-&gt;use_seq_num) {</span>
+<span class="lineNum">     967 </span>            :                         u32 frame_sn;
+<span class="lineNum">     968 </span><span class="lineCov">        336 :                         if (!gst-&gt;last_frame_sn) frame_sn = gpck-&gt;frame_sn;</span>
+<span class="lineNum">     969 </span>            :                         else {
+<span class="lineNum">     970 </span><span class="lineCov">        335 :                                 frame_sn = gst-&gt;last_frame_sn;</span>
+<span class="lineNum">     971 </span>            :                                 if (frame_sn&gt;0xFFFF) frame_sn=0;
+<span class="lineNum">     972 </span>            :                         }
+<span class="lineNum">     973 </span><span class="lineCov">        336 :                         if (gpck-&gt;frame_sn != frame_sn) {</span>
+<span class="lineNum">     974 </span><span class="lineNoCov">          0 :                                 u32 pck_count = gf_list_count(gst-&gt;packets);</span>
+<span class="lineNum">     975 </span><span class="lineNoCov">          0 :                                 if (ctx-&gt;mq &amp;&amp; (pck_count &gt; 2*ctx-&gt;mq + 1)) {</span>
+<span class="lineNum">     976 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, (&quot;[GSFDemux] packets queue too large (%d vs %d max), missed one full packet\n&quot;, pck_count, 2*ctx-&gt;mq));</span>
+<span class="lineNum">     977 </span>            :                                 } else {
+<span class="lineNum">     978 </span>            :                                         return GF_OK;
+<span class="lineNum">     979 </span>            :                                 }
+<span class="lineNum">     980 </span>            :                         }
+<span class="lineNum">     981 </span><span class="lineCov">        336 :                         gst-&gt;last_frame_sn = gpck-&gt;frame_sn+1;</span>
+<span class="lineNum">     982 </span>            :                 }
+<span class="lineNum">     983 </span>            : 
+<span class="lineNum">     984 </span><span class="lineCov">       4776 :                 switch (gpck-&gt;pck_type) {</span>
+<span class="lineNum">     985 </span><span class="lineCov">       1081 :                 case GFS_PCKTYPE_PID_CONFIG:</span>
+<span class="lineNum">     986 </span>            :                 case GFS_PCKTYPE_PID_INFO_UPDATE:
+<span class="lineNum">     987 </span><span class="lineCov">       1081 :                         if (!gpck-&gt;corrupted)</span>
+<span class="lineNum">     988 </span><span class="lineCov">       1081 :                                 e = gsfdmx_parse_pid_info(filter, ctx, gst, gpck, (gpck-&gt;pck_type==GFS_PCKTYPE_PID_INFO_UPDATE) ? GF_TRUE : GF_FALSE);</span>
+<span class="lineNum">     989 </span>            :                         else
+<span class="lineNum">     990 </span>            :                                 e = GF_CORRUPTED_DATA;
+<span class="lineNum">     991 </span><span class="lineCov">       1081 :                         if (gpck-&gt;pck) gf_filter_pck_discard(gpck-&gt;pck);</span>
+<span class="lineNum">     992 </span>            :                         break;
+<span class="lineNum">     993 </span><span class="lineNoCov">          0 :                 case GFS_PCKTYPE_PID_REMOVE:</span>
+<span class="lineNum">     994 </span><span class="lineNoCov">          0 :                         if (gpck-&gt;pck) gf_filter_pck_discard(gpck-&gt;pck);</span>
+<span class="lineNum">     995 </span><span class="lineNoCov">          0 :                         gsfdmx_stream_del(ctx, gst, GF_TRUE);</span>
+<span class="lineNum">     996 </span>            :                         return GF_OK;
+<span class="lineNum">     997 </span>            : 
+<span class="lineNum">     998 </span><span class="lineNoCov">          0 :                 case GFS_PCKTYPE_PID_EOS:</span>
+<span class="lineNum">     999 </span><span class="lineNoCov">          0 :                         if (gpck-&gt;pck) gf_filter_pck_discard(gpck-&gt;pck);</span>
+<span class="lineNum">    1000 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_eos(gst-&gt;opid);</span>
+<span class="lineNum">    1001 </span>            :                         e = GF_EOS;
+<span class="lineNum">    1002 </span>            :                         break;
+<span class="lineNum">    1003 </span><span class="lineCov">       3695 :                 case GFS_PCKTYPE_PCK:</span>
+<span class="lineNum">    1004 </span><span class="lineCov">       3695 :                         if (gpck-&gt;corrupted) gf_filter_pck_set_corrupted(gpck-&gt;pck, GF_TRUE);</span>
+<span class="lineNum">    1005 </span><span class="lineCov">       3695 :                         e = gf_filter_pck_send(gpck-&gt;pck);</span>
+<span class="lineNum">    1006 </span>            :                         break;
+<span class="lineNum">    1007 </span>            :                 default:
+<span class="lineNum">    1008 </span>            :                         e = GF_OK;
+<span class="lineNum">    1009 </span>            :                         break;
+<span class="lineNum">    1010 </span>            :                 }
+<span class="lineNum">    1011 </span><span class="lineCov">       4776 :                 gf_list_rem(gst-&gt;packets, 0);</span>
+<span class="lineNum">    1012 </span>            :                 gsfdmx_pck_reset(gpck);
+<span class="lineNum">    1013 </span><span class="lineCov">       4776 :                 gf_list_add(ctx-&gt;pck_res, gpck);</span>
+<span class="lineNum">    1014 </span><span class="lineCov">       4776 :                 if (e&gt;GF_OK) e = GF_OK;</span>
+<span class="lineNum">    1015 </span><span class="lineCov">       4765 :                 if (e) return e;</span>
+<span class="lineNum">    1016 </span>            :         }
+<span class="lineNum">    1017 </span>            :         return GF_OK;
+<a name="1018"><span class="lineNum">    1018 </span>            : }</a>
+<span class="lineNum">    1019 </span>            : 
+<span class="lineNum">    1020 </span><span class="lineCov">        422 : static GF_Err gsfdmx_demux(GF_Filter *filter, GSF_DemuxCtx *ctx, char *data, u32 data_size)</span>
+<span class="lineNum">    1021 </span>            : {
+<span class="lineNum">    1022 </span>            :         u32 last_pck_end=0;
+<span class="lineNum">    1023 </span>            : 
+<span class="lineNum">    1024 </span>            :         //always reset input buffer if not tuned - since in reliable (pipe/file/...) this is the first packet and it is less than 40 bytes at max whe should be fine
+<span class="lineNum">    1025 </span><span class="lineCov">        422 :         if (!ctx-&gt;tuned)</span>
+<span class="lineNum">    1026 </span><span class="lineCov">         12 :                 ctx-&gt;buf_size = 0;</span>
+<span class="lineNum">    1027 </span>            : 
+<span class="lineNum">    1028 </span><span class="lineCov">        422 :         if (ctx-&gt;alloc_size &lt; ctx-&gt;buf_size + data_size) {</span>
+<span class="lineNum">    1029 </span><span class="lineCov">         43 :                 ctx-&gt;buffer = (char*)gf_realloc(ctx-&gt;buffer, sizeof(char)*(ctx-&gt;buf_size + data_size) );</span>
+<span class="lineNum">    1030 </span><span class="lineCov">         43 :                 ctx-&gt;alloc_size = ctx-&gt;buf_size + data_size;</span>
+<span class="lineNum">    1031 </span>            :         }
+<span class="lineNum">    1032 </span>            : 
+<span class="lineNum">    1033 </span><span class="lineCov">        422 :         memcpy(ctx-&gt;buffer + ctx-&gt;buf_size, data, sizeof(char)*data_size);</span>
+<span class="lineNum">    1034 </span><span class="lineCov">        422 :         ctx-&gt;buf_size += data_size;</span>
+<span class="lineNum">    1035 </span>            : 
+<span class="lineNum">    1036 </span><span class="lineCov">        422 :         gf_bs_reassign_buffer(ctx-&gt;bs_r, ctx-&gt;buffer, ctx-&gt;buf_size);</span>
+<span class="lineNum">    1037 </span><span class="lineCov">       6257 :         while (gf_bs_available(ctx-&gt;bs_r) &gt; 4) { //1 byte header + 3 vlen field at least 1 bytes</span>
+<span class="lineNum">    1038 </span>            :                 GF_Err e = GF_OK;
+<span class="lineNum">    1039 </span>            :                 u32 pck_len, block_size, block_offset;
+<span class="lineNum">    1040 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">    1041 </span><span class="lineCov">       5596 :                 u32 hdr_pos = (u32) gf_bs_get_position(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1042 </span>            : #endif
+<span class="lineNum">    1043 </span><span class="lineCov">       5596 :                 /*Bool reserved =*/ gf_bs_read_int(ctx-&gt;bs_r, 1);</span>
+<span class="lineNum">    1044 </span><span class="lineCov">       5596 :                 u32 frag_flags = gf_bs_read_int(ctx-&gt;bs_r, 2);</span>
+<span class="lineNum">    1045 </span><span class="lineCov">       5596 :                 Bool is_crypted = gf_bs_read_int(ctx-&gt;bs_r, 1);</span>
+<span class="lineNum">    1046 </span><span class="lineCov">       5596 :                 u32 pck_type = gf_bs_read_int(ctx-&gt;bs_r, 4);</span>
+<span class="lineNum">    1047 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">    1048 </span>            :                 u16 sn = 0;
+<span class="lineNum">    1049 </span>            : #endif
+<span class="lineNum">    1050 </span>            :                 u32 st_idx;
+<span class="lineNum">    1051 </span>            :                 Bool needs_agg = GF_FALSE;
+<span class="lineNum">    1052 </span>            :                 u16 frame_sn = 0;
+<span class="lineNum">    1053 </span><span class="lineCov">       5596 :                 Bool has_sn = (pck_type==GFS_PCKTYPE_HDR) ? GF_FALSE : ctx-&gt;use_seq_num;</span>
+<span class="lineNum">    1054 </span>            : 
+<span class="lineNum">    1055 </span><span class="lineCov">       5596 :                 Bool full_pck = (frag_flags==0) ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">    1056 </span><span class="lineCov">       5596 :                 Bool pck_frag = (frag_flags&gt;=2) ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">    1057 </span>            : 
+<span class="lineNum">    1058 </span>            :                 //reset buffer too small flag, and blindly parse the following vlen fields
+<span class="lineNum">    1059 </span><span class="lineCov">       5596 :                 ctx-&gt;buffer_too_small = GF_FALSE;</span>
+<span class="lineNum">    1060 </span>            : 
+<span class="lineNum">    1061 </span><span class="lineCov">       5596 :                 st_idx = gsfdmx_read_vlen(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1062 </span><span class="lineCov">       5596 :                 if (has_sn) {</span>
+<span class="lineNum">    1063 </span><span class="lineCov">        974 :                         frame_sn = gf_bs_read_u16(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1064 </span>            :                 }
+<span class="lineNum">    1065 </span>            : 
+<span class="lineNum">    1066 </span>            :                 block_size = block_offset = 0;
+<span class="lineNum">    1067 </span><span class="lineCov">       5596 :                 if (!full_pck) {</span>
+<span class="lineNum">    1068 </span><span class="lineCov">        896 :                         block_size = gsfdmx_read_vlen(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1069 </span><span class="lineCov">        896 :                         if (pck_frag) block_offset = gsfdmx_read_vlen(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1070 </span>            :                 }
+<span class="lineNum">    1071 </span>            : 
+<span class="lineNum">    1072 </span><span class="lineCov">       5596 :                 pck_len = gsfdmx_read_vlen(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1073 </span><span class="lineCov">       5596 :                 if (pck_len &gt; gf_bs_available(ctx-&gt;bs_r)) {</span>
+<span class="lineNum">    1074 </span>            :                         break;
+<span class="lineNum">    1075 </span>            :                 }
+<span class="lineNum">    1076 </span>            :                 //buffer was not big enough to contain all the vlen fields, we need more data
+<span class="lineNum">    1077 </span><span class="lineCov">       5423 :                 if (ctx-&gt;buffer_too_small)</span>
+<span class="lineNum">    1078 </span>            :                         break;
+<span class="lineNum">    1079 </span>            :                         
+<span class="lineNum">    1080 </span><span class="lineCov">       5423 :                 if (full_pck) {</span>
+<span class="lineNum">    1081 </span>            :                         block_size = pck_len;
+<span class="lineNum">    1082 </span>            :                         block_offset = 0;
+<span class="lineNum">    1083 </span>            :                 }
+<span class="lineNum">    1084 </span>            : 
+<span class="lineNum">    1085 </span><span class="lineCov">       5423 :                 if (!ctx-&gt;corrupted &amp;&amp; (pck_type==GFS_PCKTYPE_PCK) &amp;&amp; !ctx-&gt;nb_playing &amp;&amp; ctx-&gt;tuned &amp;&amp; !ctx-&gt;file_pids &amp;&amp; gf_list_count(ctx-&gt;streams) ) {</span>
+<span class="lineNum">    1086 </span><span class="lineCov">         10 :                         ctx-&gt;wait_for_play = GF_TRUE;</span>
+<span class="lineNum">    1087 </span><span class="lineCov">         10 :                         break;</span>
+<span class="lineNum">    1088 </span>            :                 }
+<span class="lineNum">    1089 </span>            : 
+<span class="lineNum">    1090 </span><span class="lineCov">       5750 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_CONTAINER, (&quot;[GSFDemux] found %s on stream %d type %s cryped %d sn %d size %d block_offset %d, hdr size %d at position %d\n&quot;,</span>
+<span class="lineNum">    1091 </span>            :                                         (pck_len==block_size) ? &quot;full packet&quot; : (pck_frag ? &quot;packet fragment&quot; : &quot;packet start&quot;),
+<span class="lineNum">    1092 </span>            :                                         st_idx,
+<span class="lineNum">    1093 </span>            :                                         gsfdmx_pck_name(pck_type),
+<span class="lineNum">    1094 </span>            :                                         is_crypted, sn, pck_len, block_offset, gf_bs_get_position(ctx-&gt;bs_r)-hdr_pos, hdr_pos));
+<span class="lineNum">    1095 </span>            : 
+<span class="lineNum">    1096 </span>            :                 e = GF_OK;
+<span class="lineNum">    1097 </span>            : 
+<span class="lineNum">    1098 </span><span class="lineCov">       5413 :                 if ((pck_type != GFS_PCKTYPE_PCK) &amp;&amp; (pck_frag || (pck_len &lt; block_size)))</span>
+<span class="lineNum">    1099 </span>            :                         needs_agg = GF_TRUE;
+<span class="lineNum">    1100 </span>            : 
+<span class="lineNum">    1101 </span>            :                 //tunein, we don't care about the seq num (for now, might chenge if we want key roll or other order-dependent features)
+<span class="lineNum">    1102 </span><span class="lineCov">       5413 :                 if (!st_idx) {</span>
+<span class="lineNum">    1103 </span><span class="lineCov">         12 :                         if (ctx-&gt;tuned) {</span>
+<span class="lineNum">    1104 </span><span class="lineCov">         12 :                         } else if (needs_agg) {</span>
+<span class="lineNum">    1105 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] tune-in packet shall not be fragmented\n&quot;));</span>
+<span class="lineNum">    1106 </span>            :                                 e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">    1107 </span>            :                         } else {
+<span class="lineNum">    1108 </span><span class="lineCov">         12 :                                 u32 pos = (u32) gf_bs_get_position(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1109 </span><span class="lineCov">         12 :                                 e = gsfdmx_tune(filter, ctx, ctx-&gt;buffer + pos, pck_len, is_crypted);</span>
+<span class="lineNum">    1110 </span>            :                         }
+<span class="lineNum">    1111 </span>            :                 }
+<span class="lineNum">    1112 </span>            :                 //stream signaling or packet
+<span class="lineNum">    1113 </span>            :                 else {
+<span class="lineNum">    1114 </span><span class="lineCov">       5401 :                         u32 cur_pos = (u32) gf_bs_get_position(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1115 </span>            : 
+<span class="lineNum">    1116 </span><span class="lineCov">       5401 :                         GSF_Stream *gst = gsfdmx_get_stream(filter, ctx, st_idx, pck_type);</span>
+<span class="lineNum">    1117 </span><span class="lineCov">       5401 :                         if (!gst) {</span>
+<span class="lineNum">    1118 </span>            :                                 e = GF_OK;
+<span class="lineNum">    1119 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_DEBUG, GF_LOG_CONTAINER, (&quot;[GSFDemux] cannot find stream idx %d\n&quot;, st_idx));</span>
+<span class="lineNum">    1120 </span>            :                         } else {
+<span class="lineNum">    1121 </span><span class="lineCov">       5401 :                                 GSF_Packet *gpck = gsfdmx_get_packet(ctx, gst, pck_frag, frame_sn, pck_type, block_size);</span>
+<span class="lineNum">    1122 </span>            : 
+<span class="lineNum">    1123 </span>            :                                 //aggregate data
+<span class="lineNum">    1124 </span><span class="lineCov">       5401 :                                 if (!gpck) {</span>
+<span class="lineNum">    1125 </span>            :                                         e = GF_OUT_OF_MEM;
+<span class="lineNum">    1126 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] cannot allocate packet\n&quot;));</span>
+<span class="lineNum">    1127 </span><span class="lineCov">       5401 :                                 } else if (!gpck-&gt;pck) {</span>
+<span class="lineNum">    1128 </span>            :                                         e = GF_CORRUPTED_DATA;
+<span class="lineNum">    1129 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] lost first packet in frame, cannot reaggregate fragment\n&quot;));</span>
+<span class="lineNum">    1130 </span>            :                                 } else {
+<span class="lineNum">    1131 </span>            :                                         Bool append = GF_TRUE;
+<span class="lineNum">    1132 </span>            : 
+<span class="lineNum">    1133 </span>            :                                         //packet: decrypt on per-packet base, and decode if not first fragment
+<span class="lineNum">    1134 </span><span class="lineCov">       5401 :                                         if (pck_type==GFS_PCKTYPE_PCK) {</span>
+<span class="lineNum">    1135 </span><span class="lineCov">       4157 :                                                 if (is_crypted) {</span>
+<span class="lineNum">    1136 </span><span class="lineCov">        346 :                                                         gsfdmx_decrypt(ctx, ctx-&gt;buffer + cur_pos, pck_len);</span>
+<span class="lineNum">    1137 </span>            :                                                 }
+<span class="lineNum">    1138 </span><span class="lineCov">       4157 :                                                 if (!pck_frag) {</span>
+<span class="lineNum">    1139 </span><span class="lineCov">       3695 :                                                         gf_bs_reassign_buffer(ctx-&gt;bs_pck, ctx-&gt;buffer + cur_pos, pck_len);</span>
+<span class="lineNum">    1140 </span><span class="lineCov">       3695 :                                                         e = gsfdmx_read_data_pck(ctx, gst, gpck, pck_len, full_pck, ctx-&gt;bs_pck);</span>
+<span class="lineNum">    1141 </span>            :                                                         append = GF_FALSE;
+<span class="lineNum">    1142 </span>            :                                                 }
+<span class="lineNum">    1143 </span>            :                                         } else {
+<span class="lineNum">    1144 </span>            :                                                 //otherwise decryption will happen upon decoding the complete packet
+<span class="lineNum">    1145 </span><span class="lineCov">       1244 :                                                 if (is_crypted) gpck-&gt;crypted = 1;</span>
+<span class="lineNum">    1146 </span>            :                                         }
+<span class="lineNum">    1147 </span>            : 
+<span class="lineNum">    1148 </span>            :                                         if (append) {
+<span class="lineNum">    1149 </span><span class="lineCov">       1706 :                                                 if (block_offset + pck_len &gt; gpck-&gt;full_block_size) {</span>
+<span class="lineNum">    1150 </span><span class="lineNoCov">          0 :                                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] packet fragment out of bounds of current frame (offset %d size %d max size %d)\n&quot;, block_offset,  pck_len, gpck-&gt;full_block_size));</span>
+<span class="lineNum">    1151 </span>            :                                                         e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">    1152 </span>            :                                                 } else {
+<span class="lineNum">    1153 </span>            :                                                         //append fragment
+<span class="lineNum">    1154 </span><span class="lineCov">       1706 :                                                         memcpy(gpck-&gt;output + block_offset, ctx-&gt;buffer + cur_pos, pck_len);</span>
+<span class="lineNum">    1155 </span>            : 
+<span class="lineNum">    1156 </span><span class="lineCov">       1706 :                                                         gsfdmx_packet_append_frag(gpck, pck_len, block_offset);</span>
+<span class="lineNum">    1157 </span>            :                                                 }
+<span class="lineNum">    1158 </span>            :                                         }
+<span class="lineNum">    1159 </span><span class="lineCov">       5401 :                                         if (!e)</span>
+<span class="lineNum">    1160 </span><span class="lineCov">       5401 :                                                 e = gsfdmx_process_packets(filter, ctx, gst);</span>
+<span class="lineNum">    1161 </span>            :                                 }
+<span class="lineNum">    1162 </span>            :                         }
+<span class="lineNum">    1163 </span>            :                 }
+<span class="lineNum">    1164 </span>            : 
+<span class="lineNum">    1165 </span><span class="lineCov">       5413 :                 if (e) {</span>
+<span class="lineNum">    1166 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[GSFDemux] error decoding packet: %s\n&quot;, gf_error_to_string(e) ));</span>
+<span class="lineNum">    1167 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;tune_error) return e;</span>
+<span class="lineNum">    1168 </span><span class="lineNoCov">          0 :                         ctx-&gt;corrupted = GF_TRUE;</span>
+<span class="lineNum">    1169 </span>            :                 }
+<span class="lineNum">    1170 </span><span class="lineCov">       5413 :                 gf_bs_skip_bytes(ctx-&gt;bs_r, pck_len);</span>
+<span class="lineNum">    1171 </span><span class="lineCov">       5413 :                 last_pck_end = (u32) gf_bs_get_position(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1172 </span>            :         }
+<span class="lineNum">    1173 </span>            : 
+<span class="lineNum">    1174 </span><span class="lineCov">        422 :         if (last_pck_end) {</span>
+<span class="lineNum">    1175 </span>            :                 assert(ctx-&gt;buf_size&gt;=last_pck_end);
+<span class="lineNum">    1176 </span><span class="lineCov">        414 :                 memmove(ctx-&gt;buffer, ctx-&gt;buffer+last_pck_end, sizeof(char) * (ctx-&gt;buf_size-last_pck_end));</span>
+<span class="lineNum">    1177 </span><span class="lineCov">        414 :                 ctx-&gt;buf_size -= last_pck_end;</span>
+<span class="lineNum">    1178 </span>            :         }
+<span class="lineNum">    1179 </span>            :         return GF_OK;
+<a name="1180"><span class="lineNum">    1180 </span>            : }</a>
+<span class="lineNum">    1181 </span>            : 
+<span class="lineNum">    1182 </span><span class="lineCov">        868 : GF_Err gsfdmx_process(GF_Filter *filter)</span>
+<span class="lineNum">    1183 </span>            : {
+<span class="lineNum">    1184 </span>            :         GF_Err e;
+<span class="lineNum">    1185 </span><span class="lineCov">        868 :         GSF_DemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">    1186 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">    1187 </span>            :         GSF_Stream *st;
+<span class="lineNum">    1188 </span><span class="lineCov">        868 :         u32 i=0, pkt_size;</span>
+<span class="lineNum">    1189 </span>            :         const char *data;
+<span class="lineNum">    1190 </span>            :         u32 would_block = 0;
+<span class="lineNum">    1191 </span>            :         Bool is_eos = GF_FALSE;
+<span class="lineNum">    1192 </span>            : 
+<span class="lineNum">    1193 </span><span class="lineCov">        868 :         if (ctx-&gt;wait_for_play) return GF_OK;</span>
+<span class="lineNum">    1194 </span><span class="lineCov">        851 :         if (ctx-&gt;tune_error) return GF_SERVICE_ERROR;</span>
+<span class="lineNum">    1195 </span>            : 
+<span class="lineNum">    1196 </span><span class="lineCov">        851 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">    1197 </span><span class="lineCov">        851 :         if (!pck) {</span>
+<span class="lineNum">    1198 </span><span class="lineCov">        429 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) is_eos = GF_TRUE;</span>
+<span class="lineNum">    1199 </span>            :                 else {
+<span class="lineNum">    1200 </span><span class="lineCov">        417 :                         gf_filter_post_process_task(filter);</span>
+<span class="lineNum">    1201 </span><span class="lineCov">        417 :                         return GF_OK;</span>
+<span class="lineNum">    1202 </span>            :                 }
+<span class="lineNum">    1203 </span>            :         }
+<span class="lineNum">    1204 </span>            : 
+<span class="lineNum">    1205 </span>            :         //check if all the streams are in block state, if so return.
+<span class="lineNum">    1206 </span>            :         //we need to check for all output since one pid could still be buffering
+<span class="lineNum">    1207 </span><span class="lineCov">        926 :         while ((st = gf_list_enum(ctx-&gt;streams, &amp;i))) {</span>
+<span class="lineNum">    1208 </span><span class="lineCov">        492 :                 if (st-&gt;opid) {</span>
+<span class="lineNum">    1209 </span><span class="lineCov">        492 :                         if (is_eos) {</span>
+<span class="lineNum">    1210 </span><span class="lineCov">         15 :                                 gf_filter_pid_set_eos(st-&gt;opid);</span>
+<span class="lineNum">    1211 </span><span class="lineCov">        477 :                         } else if (gf_filter_pid_would_block(st-&gt;opid)) {</span>
+<span class="lineNum">    1212 </span><span class="lineCov">         42 :                                 would_block++;</span>
+<span class="lineNum">    1213 </span>            :                         }
+<span class="lineNum">    1214 </span>            :                 }
+<span class="lineNum">    1215 </span>            :         }
+<span class="lineNum">    1216 </span><span class="lineCov">        434 :         if (is_eos)</span>
+<span class="lineNum">    1217 </span>            :                 return GF_EOS;
+<span class="lineNum">    1218 </span>            : 
+<span class="lineNum">    1219 </span><span class="lineCov">        422 :         if (would_block &amp;&amp; (would_block+1==i))</span>
+<span class="lineNum">    1220 </span>            :                 return GF_OK;
+<span class="lineNum">    1221 </span>            : 
+<span class="lineNum">    1222 </span><span class="lineCov">        422 :         data = gf_filter_pck_get_data(pck, &amp;pkt_size);</span>
+<span class="lineNum">    1223 </span><span class="lineCov">        422 :         e = gsfdmx_demux(filter, ctx, (char *) data, pkt_size);</span>
+<span class="lineNum">    1224 </span><span class="lineCov">        422 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">    1225 </span><span class="lineCov">        422 :         if (ctx-&gt;tune_error)</span>
+<span class="lineNum">    1226 </span><span class="lineNoCov">          0 :                 gf_filter_pid_set_discard(ctx-&gt;ipid, GF_TRUE);</span>
+<span class="lineNum">    1227 </span>            : 
+<span class="lineNum">    1228 </span>            :         return e;
+<a name="1229"><span class="lineNum">    1229 </span>            : }</a>
+<span class="lineNum">    1230 </span>            : 
+<span class="lineNum">    1231 </span><span class="lineCov">       3065 : static const char *gsfdmx_probe_data(const u8 *data, u32 data_size, GF_FilterProbeScore *score)</span>
+<span class="lineNum">    1232 </span>            : {
+<span class="lineNum">    1233 </span>            :         u32 avail = data_size;
+<span class="lineNum">    1234 </span><span class="lineCov">       3065 :         if (data_size &lt; 10) return NULL;</span>
+<span class="lineNum">    1235 </span>            :         char *buf = (char *) data;
+<span class="lineNum">    1236 </span><span class="lineCov">      37109 :         while (buf) {</span>
+<span class="lineNum">    1237 </span><span class="lineCov">      37109 :                 char *start_sig = memchr(buf, 'G', avail);</span>
+<span class="lineNum">    1238 </span><span class="lineCov">      37109 :                 if (!start_sig) return NULL;</span>
+<span class="lineNum">    1239 </span>            :                 //signature found and version is 2
+<span class="lineNum">    1240 </span><span class="lineCov">      34060 :                 if (!strncmp(start_sig, &quot;GS5F&quot;, 4) &amp;&amp; (start_sig[4] == GF_GSF_VERSION)) {</span>
+<span class="lineNum">    1241 </span><span class="lineCov">         12 :                         *score = GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">    1242 </span><span class="lineCov">         12 :                         return &quot;application/x-gpac-sf&quot;;</span>
+<span class="lineNum">    1243 </span>            :                 }
+<span class="lineNum">    1244 </span><span class="lineCov">      34048 :                 buf = start_sig+1;</span>
+<span class="lineNum">    1245 </span><span class="lineCov">      34048 :                 avail = data_size - (u32) ( buf - (char *) data);</span>
+<span class="lineNum">    1246 </span>            :         }
+<span class="lineNum">    1247 </span>            :         return NULL;
+<a name="1248"><span class="lineNum">    1248 </span>            : }</a>
+<span class="lineNum">    1249 </span>            : 
+<span class="lineNum">    1250 </span><span class="lineNoCov">          0 : static void gsfdmx_not_enough_bytes(void *par)</span>
+<span class="lineNum">    1251 </span>            : {
+<span class="lineNum">    1252 </span>            :         GSF_DemuxCtx *ctx = (GSF_DemuxCtx *)par;
+<span class="lineNum">    1253 </span><span class="lineNoCov">          0 :         if (ctx)</span>
+<span class="lineNum">    1254 </span><span class="lineNoCov">          0 :                 ctx-&gt;buffer_too_small = GF_TRUE;</span>
+<a name="1255"><span class="lineNum">    1255 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">    1256 </span>            : 
+<span class="lineNum">    1257 </span><span class="lineCov">         12 : static GF_Err gsfdmx_initialize(GF_Filter *filter)</span>
+<span class="lineNum">    1258 </span>            : {
+<span class="lineNum">    1259 </span><span class="lineCov">         12 :         GSF_DemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">    1260 </span><span class="lineCov">         12 :         ctx-&gt;streams = gf_list_new();</span>
+<span class="lineNum">    1261 </span><span class="lineCov">         12 :         if (!ctx-&gt;streams) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">    1262 </span><span class="lineCov">         12 :         ctx-&gt;bs_r = gf_bs_new((char *) ctx, 1, GF_BITSTREAM_READ);</span>
+<span class="lineNum">    1263 </span><span class="lineCov">         12 :         gf_bs_set_eos_callback(ctx-&gt;bs_r, gsfdmx_not_enough_bytes, ctx);</span>
+<span class="lineNum">    1264 </span>            : 
+<span class="lineNum">    1265 </span>            : #ifdef GPAC_ENABLE_COVERAGE
+<span class="lineNum">    1266 </span><span class="lineCov">         12 :         if (gf_sys_is_cov_mode())</span>
+<span class="lineNum">    1267 </span>            :                 gsfdmx_not_enough_bytes(NULL);
+<span class="lineNum">    1268 </span>            : #endif
+<span class="lineNum">    1269 </span>            : 
+<span class="lineNum">    1270 </span><span class="lineCov">         12 :         ctx-&gt;bs_pck = gf_bs_new((char *) ctx, 1, GF_BITSTREAM_READ);</span>
+<span class="lineNum">    1271 </span><span class="lineCov">         12 :         ctx-&gt;pck_res = gf_list_new();</span>
+<span class="lineNum">    1272 </span><span class="lineCov">         12 :         return GF_OK;</span>
+<a name="1273"><span class="lineNum">    1273 </span>            : }</a>
+<span class="lineNum">    1274 </span>            : 
+<span class="lineNum">    1275 </span><span class="lineCov">         12 : static void gsfdmx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">    1276 </span>            : {
+<span class="lineNum">    1277 </span><span class="lineCov">         12 :         GSF_DemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">    1278 </span><span class="lineCov">         39 :         while (gf_list_count(ctx-&gt;streams)) {</span>
+<span class="lineNum">    1279 </span><span class="lineCov">         15 :                 GSF_Stream *gst = gf_list_pop_back(ctx-&gt;streams);</span>
+<span class="lineNum">    1280 </span><span class="lineCov">         15 :                 gsfdmx_stream_del(ctx, gst, GF_FALSE);</span>
+<span class="lineNum">    1281 </span>            :         }
+<span class="lineNum">    1282 </span><span class="lineCov">         12 :         gf_list_del(ctx-&gt;streams);</span>
+<span class="lineNum">    1283 </span>            : 
+<span class="lineNum">    1284 </span><span class="lineCov">         36 :         while (gf_list_count(ctx-&gt;pck_res)) {</span>
+<span class="lineNum">    1285 </span><span class="lineCov">         12 :                 GSF_Packet *gsp = gf_list_pop_back(ctx-&gt;pck_res);</span>
+<span class="lineNum">    1286 </span><span class="lineCov">         12 :                 if (gsp-&gt;frags) gf_free(gsp-&gt;frags);</span>
+<span class="lineNum">    1287 </span><span class="lineCov">         12 :                 gf_free(gsp);</span>
+<span class="lineNum">    1288 </span>            :         }
+<span class="lineNum">    1289 </span><span class="lineCov">         12 :         gf_list_del(ctx-&gt;pck_res);</span>
+<span class="lineNum">    1290 </span>            : 
+<span class="lineNum">    1291 </span>            : #ifndef GPAC_DISABLE_CRYPTO
+<span class="lineNum">    1292 </span><span class="lineCov">         12 :         if (ctx-&gt;crypt) gf_crypt_close(ctx-&gt;crypt);</span>
+<span class="lineNum">    1293 </span>            : #endif
+<span class="lineNum">    1294 </span><span class="lineCov">         12 :         if (ctx-&gt;buffer) gf_free(ctx-&gt;buffer);</span>
+<span class="lineNum">    1295 </span><span class="lineCov">         12 :         if (ctx-&gt;bs_r) gf_bs_del(ctx-&gt;bs_r);</span>
+<span class="lineNum">    1296 </span><span class="lineCov">         12 :         if (ctx-&gt;bs_pck) gf_bs_del(ctx-&gt;bs_pck);</span>
+<span class="lineNum">    1297 </span><span class="lineCov">         12 : }</span>
+<span class="lineNum">    1298 </span>            : 
+<span class="lineNum">    1299 </span>            : static const GF_FilterCapability GSFDemuxCaps[] =
+<span class="lineNum">    1300 </span>            : {
+<span class="lineNum">    1301 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">    1302 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_FILE_EXT, &quot;gsf&quot;),
+<span class="lineNum">    1303 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_MIME, &quot;application/x-gpac-sf&quot;),
+<span class="lineNum">    1304 </span>            :         //we deliver more than these two but this make the filter chain loading stop until we declare a pid
+<span class="lineNum">    1305 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">    1306 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">    1307 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">    1308 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_TEXT),
+<span class="lineNum">    1309 </span>            :         CAP_UINT(GF_CAPS_OUTPUT_EXCLUDED, GF_PROP_PID_CODECID, GF_CODECID_NONE),
+<span class="lineNum">    1310 </span>            : };
+<span class="lineNum">    1311 </span>            : 
+<span class="lineNum">    1312 </span>            : 
+<span class="lineNum">    1313 </span>            : 
+<span class="lineNum">    1314 </span>            : #define OFFS(_n)        #_n, offsetof(GSF_DemuxCtx, _n)
+<span class="lineNum">    1315 </span>            : static const GF_FilterArgs GSFDemuxArgs[] =
+<span class="lineNum">    1316 </span>            : {
+<span class="lineNum">    1317 </span>            : #ifndef GPAC_DISABLE_CRYPTO
+<span class="lineNum">    1318 </span>            :         { OFFS(key), &quot;key for decrypting packets&quot;, GF_PROP_DATA, NULL, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1319 </span>            : #endif
+<span class="lineNum">    1320 </span>            :         { OFFS(magic), &quot;magic string to check in setup packet&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1321 </span>            :         { OFFS(mq), &quot;set max packet queue length for loss detection. 0 will flush incomplete packet when a new one starts&quot;, GF_PROP_UINT, &quot;4&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1322 </span>            :         { OFFS(pad), &quot;byte value used to pad lost packets&quot;, GF_PROP_UINT, &quot;0&quot;, &quot;0-255&quot;, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1323 </span>            :         {0}
+<span class="lineNum">    1324 </span>            : };
+<span class="lineNum">    1325 </span>            : 
+<span class="lineNum">    1326 </span>            : 
+<span class="lineNum">    1327 </span>            : GF_FilterRegister GSFDemuxRegister = {
+<span class="lineNum">    1328 </span>            :         .name = &quot;gsfdmx&quot;,
+<span class="lineNum">    1329 </span>            :         GF_FS_SET_DESCRIPTION(&quot;GSF Demuxer&quot;)
+<span class="lineNum">    1330 </span>            : #ifndef GPAC_DISABLE_DOC
+<span class="lineNum">    1331 </span>            :         .help = &quot;This filter provides GSF (__GPAC Serialized Format__) demultiplexing.\n&quot;
+<span class="lineNum">    1332 </span>            :                         &quot;It unserializes the stream states (config/reconfig/info update/remove/eos) and packets of input PIDs.\n&quot;
+<span class="lineNum">    1333 </span>            :                         &quot;This allows either reading a session saved to file, or receiving the state/data of streams from another instance of GPAC using either pipes or sockets\n&quot;
+<span class="lineNum">    1334 </span>            :                         &quot;\n&quot;
+<span class="lineNum">    1335 </span>            : #ifndef GPAC_DISABLE_CRYPTO
+<span class="lineNum">    1336 </span>            :                         &quot;The stream format can be encrypted in AES 128 CBC mode, in which case the demux filters must be given a 128 bit key.&quot;
+<span class="lineNum">    1337 </span>            : #endif
+<span class="lineNum">    1338 </span>            :                 ,
+<span class="lineNum">    1339 </span>            : #endif
+<span class="lineNum">    1340 </span>            :         
+<span class="lineNum">    1341 </span>            :         .private_size = sizeof(GSF_DemuxCtx),
+<span class="lineNum">    1342 </span>            :         .max_extra_pids = (u32) -1,
+<span class="lineNum">    1343 </span>            :         .args = GSFDemuxArgs,
+<span class="lineNum">    1344 </span>            :         .flags = GF_FS_REG_DYNAMIC_PIDS,
+<span class="lineNum">    1345 </span>            :         SETCAPS(GSFDemuxCaps),
+<span class="lineNum">    1346 </span>            :         .initialize = gsfdmx_initialize,
+<span class="lineNum">    1347 </span>            :         .finalize = gsfdmx_finalize,
+<span class="lineNum">    1348 </span>            :         .configure_pid = gsfdmx_configure_pid,
+<span class="lineNum">    1349 </span>            :         .process = gsfdmx_process,
+<span class="lineNum">    1350 </span>            :         .process_event = gsfdmx_process_event,
+<span class="lineNum">    1351 </span>            :         .probe_data = gsfdmx_probe_data,
+<span class="lineNum">    1352 </span>            : };
+<a name="1353"><span class="lineNum">    1353 </span>            : </a>
+<span class="lineNum">    1354 </span>            : 
+<span class="lineNum">    1355 </span><span class="lineCov">       2877 : const GF_FilterRegister *gsfdmx_register(GF_FilterSession *session)</span>
+<span class="lineNum">    1356 </span>            : {
+<span class="lineNum">    1357 </span><span class="lineCov">       2877 :         return &amp;GSFDemuxRegister;</span>
+<span class="lineNum">    1358 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

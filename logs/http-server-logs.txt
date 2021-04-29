@@ -1,0 +1,34 @@
+*** http-server logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:42:09 ***
+
+
+*** Subtest "client-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i http://127.0.0.1:8080/auxiliary_files/enst_audio.aac inspect:allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -280096896
+
+Filter stats - 3 filters
+	Filter httpin (src=http://127.0.0.1:8080/auxiliary_files/enst_audio.aac) : 0 input pids 1 output pids 41 tasks 28585 us process time
+		1 packets sent 85058 bytes sent (34.9834 pck/sec 23.8049 mbps)
+		* output PID enst_audio.aac: 1 packets sent
+	Filter inspect (allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 332 tasks 1536 us process time
+		330 packets processed 82748 bytes processed (214844 pck/sec 430.979 mbps)
+		* input PID enst_audio.aac: 330 packets received
+	Filter rfadts : 1 input pids 1 output pids 8 tasks 1440 us process time
+		1 packets processed 85058 bytes processed (694.444 pck/sec 472.544 mbps)
+		330 packets sent 82748 bytes sent (229167 pck/sec 459.711 mbps)
+		* input PID enst_audio.aac: 1 packets received
+		* output PID enst_audio.aac: 330 packets sent
+Session stats - threads 1
+	Thread 1: run_time 46825 us active_time 31740 us nb_tasks 385
+
+Total: run_time 46825 us active_time 31740 us nb_tasks 385
+
+Filters connected:
+httpin (src=http://127.0.0.1:8080/auxiliary_files/enst_audio.aac) (ptr=0x562ff4997840)
+-(PID enst_audio.aac) rfadts (ptr=0x562ff49b8de0)
+--(PID enst_audio.aac) inspect (allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt) (ptr=0x562ff49b1f50)
+
+
+*** Subtest "http-server": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 httpout:port=8080:quit:reqlog:rdirs=./media" ***
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 2ADE9A289E04FF9C4C1DE7297E3ACB3AD898D93D
+Hash OK for ./results/temp/inspect.txt

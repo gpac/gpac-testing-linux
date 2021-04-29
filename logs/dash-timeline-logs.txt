@@ -1,0 +1,33 @@
+*** dash-timeline logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:23 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264 -new ./results/temp/file.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+AVC|H264 Import results: 750 samples (840 NALUs) - Slices: 30 I 720 P 0 B - 1 SEI - 30 IDR
+AVC|H264 Max NALU size is 32815 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/file.mpd  (dash-template-hash-mpd1) hash: 
+File hash (SHA-1): 078A4CB2620D10DE4D79C790873D9B3EDD0FF804
+Hash OK for ./results/temp/file.mpd
+
+*** Subtest "dash-timeline-dash1": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 ./results/temp/file.mp4:bandwidth=600000 -subdur 1000 -dash-ctx ./results/temp/dash_ctx -segment-timeline -profile live -out ./results/temp/file.mpd" ***
+DASH Warning: using -segment-timeline with no -url-template. Forcing URL template.
+[Dasher] No template assigned, using $File$_dash$FS$$Time$
+[MPD] Generating MPD at time 2021-04-29T23:33:23.293Z
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MPD] Generating MPD at time 2021-04-29T23:33:23.293Z
+
+
+Computing ./results/temp/file2.mpd  (dash-template-hash-mpd2) hash: 
+File hash (SHA-1): 67FC96240901E71B08E5CD7135A753222364C8DD
+Hash OK for ./results/temp/file2.mpd
+
+*** Subtest "dash-timeline-dash2": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 ./results/temp/file.mp4:bandwidth=600000 -subdur 1000 -dash-ctx ./results/temp/dash_ctx -segment-timeline -profile live -out ./results/temp/file2.mpd" ***
+DASH Warning: using -segment-timeline with no -url-template. Forcing URL template.
+[Dasher] No template assigned, using $File$_dash$FS$$Time$
+[MPD] Generating MPD at time 2021-04-29T23:33:23.450Z
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 3
+[MPD] Generating MPD at time 2021-04-29T23:33:23.450Z
+
+

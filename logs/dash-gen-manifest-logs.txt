@@ -1,0 +1,54 @@
+*** dash-gen-manifest logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:33 ***
+
+
+*** Subtest "import": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_640x360_192kbps.264 -new ./results/temp/source.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 640 Height 360 FPS 100/4
+AVC|H264 Import results: 750 samples (840 NALUs) - Slices: 30 I 720 P 0 B - 1 SEI - 30 IDR
+AVC|H264 Max NALU size is 12969 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 2000 -profile onDemand ./results/temp/source.mp4 -out ./results/temp/test.mpd" ***
+[Dasher] No template assigned, using $File$$FS$_dash
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 2 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 4 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 6 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 8 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 10 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 12 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 14 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 16 end 9
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 18 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 20 end 11
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 22 end 12
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 24 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 26 end 14
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 28 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 30 end 16
+[MPD] Generating MPD at time 2021-04-29T23:31:33.438Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+
+*** Subtest "gen-ondemand": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/source_dashinit.mp4 -o ./results/temp/gen-vod.mpd:sigfrag:profile=onDemand" ***
+
+Computing ./results/temp/gen-vod.mpd  (gen-ondemand) hash: 
+File hash (SHA-1): 6DD160F7A72453111EB8F52358B4FB06ACD385C6
+Hash OK for ./results/temp/gen-vod.mpd
+
+*** Subtest "gen-main": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/source_dashinit.mp4 -o ./results/temp/gen-main.mpd:sigfrag:profile=main" ***
+
+Computing ./results/temp/gen-main.mpd  (gen-main) hash: 
+File hash (SHA-1): 690050904FE2D238D315309056AB77F71E2CE7A5
+Hash OK for ./results/temp/gen-main.mpd
+Computing ./results/temp/gen-hls.m3u8  (gen-hls-master) hash: 
+File hash (SHA-1): 5D4661FD5E3AA26161AF07ECB388540FA3C96A5B
+Hash OK for ./results/temp/gen-hls.m3u8
+Computing ./results/temp/gen-hls_1.m3u8  (gen-hls-subpl) hash: 
+File hash (SHA-1): 7202ED4151D63557ED7EC590C7954E27A80B83E2
+Hash OK for ./results/temp/gen-hls_1.m3u8
+
+*** Subtest "gen-hls": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/source_dashinit.mp4 -o ./results/temp/gen-hls.m3u8:sigfrag" ***
+[Dasher] Warning, manifest generation only mode requested for live-based profile but no template provided, switching to main profile.
+

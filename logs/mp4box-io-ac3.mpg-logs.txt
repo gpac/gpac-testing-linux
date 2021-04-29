@@ -1,0 +1,56 @@
+*** mp4box-io-ac3.mpg logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:41 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/ac3.mpg" ***
+Import probing results for ./external_media/import/ac3.mpg:
+File has 1 tracks
+- Track 445 type: Audio - Codec AC3 Audio
+	SampleRate 44100 - 1 channels
+
+For more details, use `gpac -i ac3.mpg inspect[:deep][:analyze=on|bs]`
+
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/ac3.mpg -new ./results/temp/ac3.mpg.mp4" ***
+Track Importing AC-3 - SampleRate 44100 Num Channels 1
+
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/ac3.mpg.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:00.991
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 445 - TimeScale 90000
+Media Duration 00:00:00.992 
+Media Info: Language "Undetermined (und)" - Type "soun:ac-3" - 29 samples
+	AC-3 stream - Sample Rate 44100 - 1 channel(s) - bitrate 96000
+	RFC6381 Codec Parameters: ac-3
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 3134 / 90000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/ac3.mpg.mp4 -out ./results/temp/ac3.mpg.1.tmp" ***
+
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/ac3.mpg.mp4 -out ./results/temp/ac3.mpg.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/ac3.mpg.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 220BB4941790C57608A1835AD3A2C3725FF89006
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/ac3.mpg.mp4 -out ./results/temp/ac3.mpg.mp4.hint" ***
+Hinting track ID 445 - Type "ac-3:ac-3" (ac3) - BW 98 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/ac3.mpg.mp4.hint" ***
+Removing hint track ID 65980
+

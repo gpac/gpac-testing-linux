@@ -1,0 +1,544 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dmx_saf.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dmx_saf.c<span style="font-size: 80%;"> (source / <a href="dmx_saf.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">176</td>
+            <td class="headerCovTableEntry">207</td>
+            <td class="headerCovTableEntryMed">85.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2005-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / SAF demuxer filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/thread.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/list.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : typedef struct
+<span class="lineNum">      33 </span>            : {
+<span class="lineNum">      34 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      35 </span>            :         u32 au_sn, stream_id, ts_res, buffer_min;
+<span class="lineNum">      36 </span>            : } GF_SAFStream;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : enum
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span>            :         SAF_FILE_LOCAL,
+<span class="lineNum">      41 </span>            :         SAF_FILE_REMOTE,
+<span class="lineNum">      42 </span>            :         SAF_LIVE_STREAM
+<span class="lineNum">      43 </span>            : };
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : typedef struct
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         GF_List *streams;
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :         u32 saf_type;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :         Double start_range, end_range;
+<span class="lineNum">      55 </span>            :         u32 nb_playing;
+<span class="lineNum">      56 </span>            :         Bool is_file, file_loaded;
+<span class="lineNum">      57 </span>            :         GF_Fraction64 duration;
+<span class="lineNum">      58 </span>            :         u64 file_pos, file_size;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :         Bool initial_play_done;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :         char *saf_data;
+<span class="lineNum">      63 </span>            :         u32 alloc_size, saf_size;
+<span class="lineNum">      64 </span>            : } GF_SAFDmxCtx;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : static GFINLINE GF_SAFStream *saf_get_channel(GF_SAFDmxCtx *saf, u32 stream_id)
+<span class="lineNum">      68 </span>            : {
+<span class="lineNum">      69 </span>            :         GF_SAFStream *st;
+<span class="lineNum">      70 </span><span class="lineCov">         10 :         u32 i=0;</span>
+<span class="lineNum">      71 </span><span class="lineCov">         12 :         while ((st = (GF_SAFStream *)gf_list_enum(saf-&gt;streams, &amp;i))) {</span>
+<span class="lineNum">      72 </span><span class="lineCov">          8 :                 if (st-&gt;stream_id==stream_id) return st;</span>
+<span class="lineNum">      73 </span>            :         }
+<span class="lineNum">      74 </span>            :         return NULL;
+<a name="75"><span class="lineNum">      75 </span>            : }</a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">          2 : static void safdmx_demux(GF_Filter *filter, GF_SAFDmxCtx *ctx, char *data, u32 data_size)</span>
+<span class="lineNum">      78 </span>            : {
+<span class="lineNum">      79 </span>            :         Bool is_rap, go;
+<span class="lineNum">      80 </span>            :         u32 cts, au_size, type, i, stream_id;
+<span class="lineNum">      81 </span>            :         u64 bs_pos;
+<span class="lineNum">      82 </span>            :         GF_BitStream *bs;
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">          2 :         if (ctx-&gt;alloc_size &lt; ctx-&gt;saf_size + data_size) {</span>
+<span class="lineNum">      85 </span><span class="lineCov">          2 :                 ctx-&gt;saf_data = (char*)gf_realloc(ctx-&gt;saf_data, sizeof(char)*(ctx-&gt;saf_size + data_size) );</span>
+<span class="lineNum">      86 </span><span class="lineCov">          2 :                 ctx-&gt;alloc_size = ctx-&gt;saf_size + data_size;</span>
+<span class="lineNum">      87 </span>            :         }
+<span class="lineNum">      88 </span>            :         //we could avoid a full copy of the buffer, but given how much SAF is used that's not very urgent ...
+<span class="lineNum">      89 </span><span class="lineCov">          2 :         memcpy(ctx-&gt;saf_data + ctx-&gt;saf_size, data, sizeof(char)*data_size);</span>
+<span class="lineNum">      90 </span><span class="lineCov">          2 :         ctx-&gt;saf_size += data_size;</span>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :         /*first AU not complete yet*/
+<span class="lineNum">      93 </span><span class="lineCov">          2 :         if (ctx-&gt;saf_size&lt;10) return;</span>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">          2 :         bs = gf_bs_new(ctx-&gt;saf_data, ctx-&gt;saf_size, GF_BITSTREAM_READ);</span>
+<span class="lineNum">      96 </span>            :         bs_pos = 0;
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :         go = GF_TRUE;
+<span class="lineNum">      99 </span><span class="lineCov">          2 :         while (go) {</span>
+<span class="lineNum">     100 </span>            :                 GF_SAFStream *st;
+<span class="lineNum">     101 </span><span class="lineCov">         12 :                 u64 avail = gf_bs_available(bs);</span>
+<span class="lineNum">     102 </span><span class="lineCov">         12 :                 bs_pos = gf_bs_get_position(bs);</span>
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineCov">         12 :                 if (avail&lt;10) break;</span>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">         10 :                 is_rap = (Bool)gf_bs_read_int(bs, 1);</span>
+<span class="lineNum">     107 </span><span class="lineCov">         10 :                 /*au_sn = */gf_bs_read_int(bs, 15);</span>
+<span class="lineNum">     108 </span><span class="lineCov">         10 :                 gf_bs_read_int(bs, 2);</span>
+<span class="lineNum">     109 </span><span class="lineCov">         10 :                 cts = gf_bs_read_int(bs, 30);</span>
+<span class="lineNum">     110 </span><span class="lineCov">         10 :                 au_size = gf_bs_read_int(bs, 16);</span>
+<span class="lineNum">     111 </span><span class="lineCov">         10 :                 avail-=8;</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineCov">         10 :                 if (au_size &gt; avail) break;</span>
+<span class="lineNum">     114 </span>            :                 assert(au_size&gt;=2);
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">         10 :                 type = gf_bs_read_int(bs, 4);</span>
+<span class="lineNum">     117 </span><span class="lineCov">         10 :                 stream_id = gf_bs_read_int(bs, 12);</span>
+<span class="lineNum">     118 </span><span class="lineCov">         10 :                 au_size -= 2;</span>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            :                 st = saf_get_channel(ctx, stream_id);
+<span class="lineNum">     121 </span><span class="lineCov">         10 :                 switch (type) {</span>
+<span class="lineNum">     122 </span><span class="lineCov">          2 :                 case 1:</span>
+<span class="lineNum">     123 </span>            :                 case 2:
+<span class="lineNum">     124 </span>            :                 case 7:
+<span class="lineNum">     125 </span><span class="lineCov">          2 :                         if (st) {</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                                 gf_bs_skip_bytes(bs, au_size);</span>
+<span class="lineNum">     127 </span>            :                         } else {
+<span class="lineNum">     128 </span>            :                                 u32 oti, stype;
+<span class="lineNum">     129 </span><span class="lineCov">          2 :                                 GF_SAFStream *first = (GF_SAFStream *)gf_list_get(ctx-&gt;streams, 0);</span>
+<span class="lineNum">     130 </span><span class="lineCov">          2 :                                 GF_SAFEALLOC(st, GF_SAFStream);</span>
+<span class="lineNum">     131 </span><span class="lineCov">          2 :                                 if (!st) {</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[SAF] Failed to allocate SAF channel&quot;));</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :                                         gf_bs_del(bs);</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :                                         return;</span>
+<span class="lineNum">     135 </span>            :                                 }
+<span class="lineNum">     136 </span><span class="lineCov">          2 :                                 st-&gt;stream_id = stream_id;</span>
+<span class="lineNum">     137 </span><span class="lineCov">          2 :                                 st-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     138 </span><span class="lineCov">          2 :                                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_ID, &amp;PROP_UINT(stream_id));</span>
+<span class="lineNum">     139 </span><span class="lineCov">          2 :                                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_ESID, &amp;PROP_UINT(stream_id));</span>
+<span class="lineNum">     140 </span><span class="lineCov">          2 :                                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CLOCK_ID, &amp;PROP_UINT(first ? first-&gt;stream_id : stream_id));</span>
+<span class="lineNum">     141 </span><span class="lineCov">          2 :                                 if (!first) {</span>
+<span class="lineNum">     142 </span><span class="lineCov">          2 :                                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_IN_IOD, &amp;PROP_BOOL(GF_TRUE));</span>
+<span class="lineNum">     143 </span>            :                                 }
+<span class="lineNum">     144 </span><span class="lineCov">          2 :                                 oti = gf_bs_read_u8(bs);</span>
+<span class="lineNum">     145 </span><span class="lineCov">          2 :                                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(oti));</span>
+<span class="lineNum">     146 </span><span class="lineCov">          2 :                                 stype = gf_bs_read_u8(bs);</span>
+<span class="lineNum">     147 </span><span class="lineCov">          2 :                                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(stype));</span>
+<span class="lineNum">     148 </span><span class="lineCov">          2 :                                 st-&gt;ts_res = gf_bs_read_u24(bs);</span>
+<span class="lineNum">     149 </span><span class="lineCov">          2 :                                 gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(st-&gt;ts_res));</span>
+<span class="lineNum">     150 </span><span class="lineCov">          2 :                                 if (ctx-&gt;duration.num) {</span>
+<span class="lineNum">     151 </span><span class="lineCov">          2 :                                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_DURATION, &amp; PROP_FRAC64(ctx-&gt;duration));</span>
+<span class="lineNum">     152 </span><span class="lineCov">          2 :                                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_PLAYBACK_MODE, &amp;PROP_UINT(GF_PLAYBACK_MODE_FASTFORWARD ) );</span>
+<span class="lineNum">     153 </span>            :                                 }
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span><span class="lineCov">          2 :                                 /*bufferSizeDB = */gf_bs_read_u16(bs);</span>
+<span class="lineNum">     156 </span><span class="lineCov">          2 :                                 au_size -= 7;</span>
+<span class="lineNum">     157 </span><span class="lineCov">          2 :                                 if ((oti == 0xFF) &amp;&amp; (stype == 0xFF) ) {</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :                                         u16 mimeLen = gf_bs_read_u16(bs);</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :                                         gf_bs_skip_bytes(bs, mimeLen);</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :                                         au_size -= mimeLen+2;</span>
+<span class="lineNum">     161 </span>            :                                 }
+<span class="lineNum">     162 </span><span class="lineCov">          2 :                                 if (type==7) {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :                                         u16 urlLen = gf_bs_read_u16(bs);</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                                         char *url_string = (char*)gf_malloc(sizeof(char)*(urlLen+1));</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                                         gf_bs_read_data(bs, url_string, urlLen);</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :                                         url_string[urlLen] = 0;</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :                                         au_size -= urlLen+2;</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_REMOTE_URL, &amp;PROP_NAME(url_string));</span>
+<span class="lineNum">     169 </span>            :                                 }
+<span class="lineNum">     170 </span><span class="lineCov">          2 :                                 if (au_size) {</span>
+<span class="lineNum">     171 </span><span class="lineCov">          2 :                                         char *dsi = (char*)gf_malloc(sizeof(char)*au_size);</span>
+<span class="lineNum">     172 </span><span class="lineCov">          2 :                                         gf_bs_read_data(bs, dsi, au_size);</span>
+<span class="lineNum">     173 </span><span class="lineCov">          2 :                                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_DECODER_CONFIG, &amp;PROP_DATA_NO_COPY(dsi, au_size) );</span>
+<span class="lineNum">     174 </span>            :                                 }
+<span class="lineNum">     175 </span><span class="lineCov">          2 :                                 gf_list_add(ctx-&gt;streams, st);</span>
+<span class="lineNum">     176 </span>            :                         }
+<span class="lineNum">     177 </span>            :                         break;
+<span class="lineNum">     178 </span><span class="lineCov">          6 :                 case 4:</span>
+<span class="lineNum">     179 </span><span class="lineCov">          6 :                         if (st) {</span>
+<span class="lineNum">     180 </span>            :                                 GF_FilterPacket *pck;
+<span class="lineNum">     181 </span>            :                                 u8 *pck_data;
+<span class="lineNum">     182 </span><span class="lineCov">          6 :                                 bs_pos = gf_bs_get_position(bs);</span>
+<span class="lineNum">     183 </span><span class="lineCov">          6 :                                 pck = gf_filter_pck_new_alloc(st-&gt;opid, au_size, &amp;pck_data);</span>
+<span class="lineNum">     184 </span><span class="lineCov">          6 :                                 if (pck) {</span>
+<span class="lineNum">     185 </span><span class="lineCov">          6 :                                         memcpy(pck_data, ctx-&gt;saf_data+bs_pos, au_size);</span>
+<span class="lineNum">     186 </span>            :                                         //TODO: map byte range pos ?
+<span class="lineNum">     187 </span>            :                                         //TODO: map AU SN  ?
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">          6 :                                         gf_filter_pck_set_cts(pck, cts);</span>
+<span class="lineNum">     190 </span><span class="lineCov">          6 :                                         if (is_rap)</span>
+<span class="lineNum">     191 </span><span class="lineCov">          2 :                                                 gf_filter_pck_set_sap(pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineCov">          6 :                                         if (ctx-&gt;start_range &amp;&amp; (ctx-&gt;start_range * st-&gt;ts_res &gt; cts*1000)) {</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                                                 gf_filter_pck_set_seek_flag(pck, GF_TRUE);</span>
+<span class="lineNum">     195 </span>            :                                         }
+<span class="lineNum">     196 </span><span class="lineCov">          6 :                                         gf_filter_pck_send(pck);</span>
+<span class="lineNum">     197 </span>            :                                 }
+<span class="lineNum">     198 </span>            :                         }
+<span class="lineNum">     199 </span><span class="lineCov">          6 :                         gf_bs_skip_bytes(bs, au_size);</span>
+<span class="lineNum">     200 </span><span class="lineCov">          6 :                         break;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                 case 3:</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                         if (st &amp;&amp; st-&gt;opid) gf_filter_pid_set_eos(st-&gt;opid);</span>
+<span class="lineNum">     203 </span>            :                         break;
+<span class="lineNum">     204 </span><span class="lineCov">          2 :                 case 5:</span>
+<span class="lineNum">     205 </span><span class="lineCov">          2 :                         i=0;</span>
+<span class="lineNum">     206 </span><span class="lineCov">          6 :                         while ((st = (GF_SAFStream *)gf_list_enum(ctx-&gt;streams, &amp;i))) {</span>
+<span class="lineNum">     207 </span><span class="lineCov">          2 :                                 if (st-&gt;opid) gf_filter_pid_set_eos(st-&gt;opid);</span>
+<span class="lineNum">     208 </span>            :                         }
+<span class="lineNum">     209 </span>            :                         break;
+<span class="lineNum">     210 </span>            :                 }
+<span class="lineNum">     211 </span>            :         }
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span><span class="lineCov">          2 :         gf_bs_del(bs);</span>
+<span class="lineNum">     214 </span><span class="lineCov">          2 :         if (bs_pos) {</span>
+<span class="lineNum">     215 </span><span class="lineCov">          2 :                 u32 remain = (u32) (ctx-&gt;saf_size - bs_pos);</span>
+<span class="lineNum">     216 </span><span class="lineCov">          2 :                 if (remain) memmove(ctx-&gt;saf_data, ctx-&gt;saf_data+bs_pos, sizeof(char)*remain);</span>
+<span class="lineNum">     217 </span><span class="lineCov">          2 :                 ctx-&gt;saf_size = remain;</span>
+<span class="lineNum">     218 </span>            :         }
+<span class="lineNum">     219 </span>            : }
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            : typedef struct
+<span class="lineNum">     223 </span>            : {
+<span class="lineNum">     224 </span>            :         u32 stream_id;
+<span class="lineNum">     225 </span>            :         u32 ts_res;
+<a name="226"><span class="lineNum">     226 </span>            : } StreamInfo;</a>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">          6 : static void safdmx_check_dur(GF_SAFDmxCtx *ctx)</span>
+<span class="lineNum">     229 </span>            : {
+<span class="lineNum">     230 </span>            :         u32 nb_streams, i, cts, au_size, au_type, stream_id, ts_res;
+<span class="lineNum">     231 </span>            :         GF_BitStream *bs;
+<span class="lineNum">     232 </span>            :         GF_Fraction64 dur;
+<span class="lineNum">     233 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     234 </span>            :         StreamInfo si[1024];
+<span class="lineNum">     235 </span>            :         FILE *stream;
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineCov">         10 :         if (ctx-&gt;duration.num) return;</span>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">          2 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_FILE_CACHED);</span>
+<span class="lineNum">     241 </span><span class="lineCov">          2 :         if (p &amp;&amp; p-&gt;value.boolean) ctx-&gt;file_loaded = GF_TRUE;</span>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineCov">          2 :         p = gf_filter_pid_get_property(ctx-&gt;ipid, GF_PROP_PID_FILEPATH);</span>
+<span class="lineNum">     244 </span><span class="lineCov">          2 :         if (!p || !p-&gt;value.string || !strncmp(p-&gt;value.string, &quot;gmem://&quot;, 7)) {</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :                 ctx-&gt;is_file = GF_FALSE;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :                 ctx-&gt;duration.num=1;</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :                 return;</span>
+<span class="lineNum">     248 </span>            :         }
+<span class="lineNum">     249 </span><span class="lineCov">          2 :         ctx-&gt;is_file = GF_TRUE;</span>
+<span class="lineNum">     250 </span><span class="lineCov">          2 :         if (!ctx-&gt;file_loaded) return;</span>
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineCov">          2 :         stream = gf_fopen(p-&gt;value.string, &quot;rb&quot;);</span>
+<span class="lineNum">     253 </span><span class="lineCov">          2 :         if (!stream) return;</span>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineCov">          2 :         bs = gf_bs_from_file(stream, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     256 </span><span class="lineCov">          2 :         ctx-&gt;file_size = gf_bs_get_size(bs);</span>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :         dur.num = 0;
+<span class="lineNum">     259 </span>            :         dur.den = 1000;
+<span class="lineNum">     260 </span>            :         nb_streams=0;
+<span class="lineNum">     261 </span><span class="lineCov">         14 :         while (gf_bs_available(bs)) {</span>
+<span class="lineNum">     262 </span><span class="lineCov">         10 :                 gf_bs_read_u16(bs);</span>
+<span class="lineNum">     263 </span><span class="lineCov">         10 :                 gf_bs_read_int(bs, 2);</span>
+<span class="lineNum">     264 </span><span class="lineCov">         10 :                 cts = gf_bs_read_int(bs, 30);</span>
+<span class="lineNum">     265 </span><span class="lineCov">         10 :                 au_size = gf_bs_read_int(bs, 16);</span>
+<span class="lineNum">     266 </span><span class="lineCov">         10 :                 au_type = gf_bs_read_int(bs, 4);</span>
+<span class="lineNum">     267 </span><span class="lineCov">         10 :                 stream_id = gf_bs_read_int(bs, 12);</span>
+<span class="lineNum">     268 </span><span class="lineCov">         10 :                 au_size-=2;</span>
+<span class="lineNum">     269 </span>            :                 ts_res = 0;
+<span class="lineNum">     270 </span><span class="lineCov">         18 :                 for (i=0; i&lt;nb_streams; i++) {</span>
+<span class="lineNum">     271 </span><span class="lineCov">          8 :                         if (si[i].stream_id==stream_id) ts_res = si[i].ts_res;</span>
+<span class="lineNum">     272 </span>            :                 }
+<span class="lineNum">     273 </span><span class="lineCov">         10 :                 if (!ts_res) {</span>
+<span class="lineNum">     274 </span><span class="lineCov">          4 :                         if ((au_type==1) || (au_type==2) || (au_type==7)) {</span>
+<span class="lineNum">     275 </span><span class="lineCov">          2 :                                 gf_bs_read_u16(bs);</span>
+<span class="lineNum">     276 </span><span class="lineCov">          2 :                                 ts_res = gf_bs_read_u24(bs);</span>
+<span class="lineNum">     277 </span><span class="lineCov">          2 :                                 au_size -= 5;</span>
+<span class="lineNum">     278 </span><span class="lineCov">          2 :                                 si[nb_streams].stream_id = stream_id;</span>
+<span class="lineNum">     279 </span><span class="lineCov">          2 :                                 si[nb_streams].ts_res = ts_res;</span>
+<span class="lineNum">     280 </span><span class="lineCov">          2 :                                 nb_streams++;</span>
+<span class="lineNum">     281 </span>            :                         }
+<span class="lineNum">     282 </span>            :                 }
+<span class="lineNum">     283 </span><span class="lineCov">         10 :                 if (ts_res &amp;&amp; (au_type==4)) {</span>
+<span class="lineNum">     284 </span><span class="lineCov">          6 :                         Double ts = cts;</span>
+<span class="lineNum">     285 </span><span class="lineCov">          6 :                         ts /= ts_res;</span>
+<span class="lineNum">     286 </span><span class="lineCov">          6 :                         if (ts * 1000 &gt; dur.num) dur.num = (u32) (ts * 1000);</span>
+<span class="lineNum">     287 </span>            :                 }
+<span class="lineNum">     288 </span><span class="lineCov">         10 :                 gf_bs_skip_bytes(bs, au_size);</span>
+<span class="lineNum">     289 </span>            :         }
+<span class="lineNum">     290 </span><span class="lineCov">          2 :         gf_bs_del(bs);</span>
+<span class="lineNum">     291 </span><span class="lineCov">          2 :         gf_fclose(stream);</span>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineCov">          2 :         if (!ctx-&gt;duration.num || (ctx-&gt;duration.num * dur.den != dur.num * ctx-&gt;duration.den)) {</span>
+<span class="lineNum">     294 </span>            :                 GF_SAFStream *st;
+<span class="lineNum">     295 </span><span class="lineCov">          2 :                 ctx-&gt;duration = dur;</span>
+<span class="lineNum">     296 </span><span class="lineCov">          2 :                 i=0;</span>
+<span class="lineNum">     297 </span><span class="lineCov">          4 :                 while ( (st = gf_list_enum(ctx-&gt;streams, &amp;i)) ) {</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(st-&gt;opid, GF_PROP_PID_DURATION, &amp; PROP_FRAC64(ctx-&gt;duration));</span>
+<span class="lineNum">     299 </span>            :                 }
+<span class="lineNum">     300 </span>            :         }
+<span class="lineNum">     301 </span>            : }
+<a name="302"><span class="lineNum">     302 </span>            : </a>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span><span class="lineCov">          2 : GF_Err safdmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     305 </span>            : {
+<span class="lineNum">     306 </span>            :         u32 i;
+<span class="lineNum">     307 </span><span class="lineCov">          2 :         GF_SAFDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineCov">          2 :         if (is_remove) {</span>
+<span class="lineNum">     310 </span>            :                 GF_SAFStream *st;
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :                 while ((st = (GF_SAFStream*)gf_list_enum(ctx-&gt;streams, &amp;i))) {</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :                         if (st-&gt;opid)</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_remove(st-&gt;opid);</span>
+<span class="lineNum">     316 </span>            :                 }
+<span class="lineNum">     317 </span>            :                 return GF_OK;
+<span class="lineNum">     318 </span>            :         }
+<span class="lineNum">     319 </span><span class="lineCov">          2 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">     320 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">          2 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     323 </span><span class="lineCov">          2 :         return GF_OK;</span>
+<a name="324"><span class="lineNum">     324 </span>            : }</a>
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span><span class="lineCov">          4 : static Bool safdmx_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     327 </span>            : {
+<span class="lineNum">     328 </span>            :         GF_FilterEvent fevt;
+<span class="lineNum">     329 </span><span class="lineCov">          4 :         GF_SAFDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span><span class="lineCov">          4 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     332 </span><span class="lineCov">          2 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     333 </span><span class="lineCov">          2 :                 if (ctx-&gt;nb_playing &amp;&amp; (ctx-&gt;start_range == evt-&gt;play.start_range)) {</span>
+<span class="lineNum">     334 </span>            :                         return GF_TRUE;
+<span class="lineNum">     335 </span>            :                 }
+<span class="lineNum">     336 </span><span class="lineCov">          2 :                 if (! ctx-&gt;is_file) {</span>
+<span class="lineNum">     337 </span>            :                         return GF_FALSE;
+<span class="lineNum">     338 </span>            :                 }
+<span class="lineNum">     339 </span><span class="lineCov">          2 :                 safdmx_check_dur(ctx);</span>
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span><span class="lineCov">          2 :                 ctx-&gt;nb_playing++;</span>
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span><span class="lineCov">          2 :                 ctx-&gt;start_range = evt-&gt;play.start_range;</span>
+<span class="lineNum">     344 </span><span class="lineCov">          2 :                 ctx-&gt;file_pos = 0;</span>
+<span class="lineNum">     345 </span><span class="lineCov">          2 :                 if (ctx-&gt;duration.num) {</span>
+<span class="lineNum">     346 </span><span class="lineCov">          2 :                         ctx-&gt;file_pos = (u64) (ctx-&gt;file_size * ctx-&gt;start_range);</span>
+<span class="lineNum">     347 </span><span class="lineCov">          2 :                         ctx-&gt;file_pos *= ctx-&gt;duration.den;</span>
+<span class="lineNum">     348 </span><span class="lineCov">          2 :                         ctx-&gt;file_pos /= ctx-&gt;duration.num;</span>
+<span class="lineNum">     349 </span><span class="lineCov">          2 :                         if (ctx-&gt;file_pos&gt;ctx-&gt;file_size) return GF_TRUE;</span>
+<span class="lineNum">     350 </span>            :                 }
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span><span class="lineCov">          2 :                 if (!ctx-&gt;initial_play_done) {</span>
+<span class="lineNum">     353 </span><span class="lineCov">          2 :                         ctx-&gt;initial_play_done = GF_TRUE;</span>
+<span class="lineNum">     354 </span>            :                         //seek will not change the current source state, don't send a seek
+<span class="lineNum">     355 </span><span class="lineCov">          2 :                         if (!ctx-&gt;file_pos)</span>
+<span class="lineNum">     356 </span>            :                                 return GF_TRUE;
+<span class="lineNum">     357 </span>            :                 }
+<span class="lineNum">     358 </span>            :                 //post a seek to 0 - we would need to build an index of AUs to find the next place to seek
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :                 GF_FEVT_INIT(fevt, GF_FEVT_SOURCE_SEEK, ctx-&gt;ipid);</span>
+<span class="lineNum">     360 </span>            :                 fevt.seek.start_offset = 0;
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                 ctx-&gt;saf_size = 0;</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :                 gf_filter_pid_send_event(ctx-&gt;ipid, &amp;fevt);</span>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            :                 //cancel event
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :                 return GF_TRUE;</span>
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :                 ctx-&gt;nb_playing--;</span>
+<span class="lineNum">     369 </span>            :                 //don't cancel event
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                 return GF_FALSE;</span>
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            :         case GF_FEVT_SET_SPEED:
+<span class="lineNum">     373 </span>            :                 //cancel event
+<span class="lineNum">     374 </span>            :                 return GF_TRUE;
+<span class="lineNum">     375 </span>            :         default:
+<span class="lineNum">     376 </span>            :                 break;
+<span class="lineNum">     377 </span>            :         }
+<span class="lineNum">     378 </span>            :         //by default don't cancel event - to rework once we have downloading in place
+<span class="lineNum">     379 </span><span class="lineCov">          2 :         return GF_FALSE;</span>
+<a name="380"><span class="lineNum">     380 </span>            : }</a>
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span><span class="lineCov">          4 : GF_Err safdmx_process(GF_Filter *filter)</span>
+<span class="lineNum">     383 </span>            : {
+<span class="lineNum">     384 </span><span class="lineCov">          4 :         GF_SAFDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     385 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     386 </span>            :         GF_SAFStream *st;
+<span class="lineNum">     387 </span><span class="lineCov">          4 :         u32 i=0, pkt_size;</span>
+<span class="lineNum">     388 </span>            :         const char *data;
+<span class="lineNum">     389 </span>            :         u32 would_block = 0;
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            :         //update duration
+<span class="lineNum">     392 </span><span class="lineCov">          4 :         safdmx_check_dur(ctx);</span>
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span>            :         //check if all the streams are in block state, if so return.
+<span class="lineNum">     395 </span>            :         //we need to check for all output since one pid could still be buffering
+<span class="lineNum">     396 </span><span class="lineCov">         10 :         while ((st = gf_list_enum(ctx-&gt;streams, &amp;i))) {</span>
+<span class="lineNum">     397 </span><span class="lineCov">          2 :                 if (st-&gt;opid &amp;&amp; gf_filter_pid_would_block(st-&gt;opid))</span>
+<span class="lineNum">     398 </span><span class="lineCov">          2 :                         would_block++;</span>
+<span class="lineNum">     399 </span>            :         }
+<span class="lineNum">     400 </span><span class="lineCov">          4 :         if (would_block &amp;&amp; (would_block+1==i))</span>
+<span class="lineNum">     401 </span>            :                 return GF_OK;
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span><span class="lineCov">          2 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     404 </span><span class="lineCov">          2 :         if (!pck) {</span>
+<span class="lineNum">     405 </span>            : //              if (gf_filter_pid_is_eos(ctx-&gt;ipid)) oggdmx_signal_eos(ctx);
+<span class="lineNum">     406 </span>            :                 return GF_OK;
+<span class="lineNum">     407 </span>            :         }
+<span class="lineNum">     408 </span><span class="lineCov">          2 :         data = gf_filter_pck_get_data(pck, &amp;pkt_size);</span>
+<span class="lineNum">     409 </span><span class="lineCov">          2 :         safdmx_demux(filter, ctx, (char *) data, pkt_size);</span>
+<span class="lineNum">     410 </span><span class="lineCov">          2 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     411 </span><span class="lineCov">          2 :         return GF_OK;</span>
+<a name="412"><span class="lineNum">     412 </span>            : }</a>
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span><span class="lineCov">          2 : GF_Err safdmx_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     415 </span>            : {
+<span class="lineNum">     416 </span><span class="lineCov">          2 :         GF_SAFDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     417 </span><span class="lineCov">          2 :         ctx-&gt;streams = gf_list_new();</span>
+<span class="lineNum">     418 </span><span class="lineCov">          2 :         return GF_OK;</span>
+<a name="419"><span class="lineNum">     419 </span>            : }</a>
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span><span class="lineCov">          2 : void safdmx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     422 </span>            : {
+<span class="lineNum">     423 </span><span class="lineCov">          2 :         GF_SAFDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span><span class="lineCov">          6 :         while (gf_list_count(ctx-&gt;streams)) {</span>
+<span class="lineNum">     426 </span><span class="lineCov">          2 :                 GF_SAFStream *st = (GF_SAFStream *)gf_list_last(ctx-&gt;streams);</span>
+<span class="lineNum">     427 </span><span class="lineCov">          2 :                 gf_list_rem_last(ctx-&gt;streams);</span>
+<span class="lineNum">     428 </span><span class="lineCov">          2 :                 gf_free(st);</span>
+<span class="lineNum">     429 </span>            :         }
+<span class="lineNum">     430 </span><span class="lineCov">          2 :         if (ctx-&gt;saf_data) gf_free(ctx-&gt;saf_data);</span>
+<span class="lineNum">     431 </span><span class="lineCov">          2 :         gf_list_del(ctx-&gt;streams);</span>
+<a name="432"><span class="lineNum">     432 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span><span class="lineCov">       3074 : static const char *safdmx_probe_data(const u8 *data, u32 size, GF_FilterProbeScore *score)</span>
+<span class="lineNum">     435 </span>            : {
+<span class="lineNum">     436 </span><span class="lineCov">       3074 :         *score = GF_FPROBE_EXT_MATCH;</span>
+<span class="lineNum">     437 </span><span class="lineCov">       3074 :         return &quot;saf|lsr&quot;;</span>
+<span class="lineNum">     438 </span>            : }
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            : static const GF_FilterCapability SAFDmxCaps[] =
+<span class="lineNum">     441 </span>            : {
+<span class="lineNum">     442 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     443 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_FILE_EXT, &quot;saf|lsr&quot;),
+<span class="lineNum">     444 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_MIME, &quot;application/x-saf|application/saf&quot;),
+<span class="lineNum">     445 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     446 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     447 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_SCENE),
+<span class="lineNum">     448 </span>            : };
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            : GF_FilterRegister SAFDmxRegister = {
+<span class="lineNum">     451 </span>            :         .name = &quot;safdmx&quot;,
+<span class="lineNum">     452 </span>            :         GF_FS_SET_DESCRIPTION(&quot;SAF demuxer&quot;)
+<span class="lineNum">     453 </span>            :         GF_FS_SET_HELP(&quot;This filter demultiplexes SAF (MPEG-4 Simple Aggregation Format for LASeR) files/data into a set of media PIDs and frames.&quot;)
+<span class="lineNum">     454 </span>            :         .private_size = sizeof(GF_SAFDmxCtx),
+<span class="lineNum">     455 </span>            :         .initialize = safdmx_initialize,
+<span class="lineNum">     456 </span>            :         .finalize = safdmx_finalize,
+<span class="lineNum">     457 </span>            :         SETCAPS(SAFDmxCaps),
+<span class="lineNum">     458 </span>            :         .configure_pid = safdmx_configure_pid,
+<span class="lineNum">     459 </span>            :         .process = safdmx_process,
+<span class="lineNum">     460 </span>            :         .process_event = safdmx_process_event,
+<span class="lineNum">     461 </span>            :         .probe_data = safdmx_probe_data
+<a name="462"><span class="lineNum">     462 </span>            : };</a>
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span><span class="lineCov">       2877 : const GF_FilterRegister *safdmx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     465 </span>            : {
+<span class="lineNum">     466 </span><span class="lineCov">       2877 :         return &amp;SAFDmxRegister;</span>
+<span class="lineNum">     467 </span>            : }
+<span class="lineNum">     468 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

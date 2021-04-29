@@ -1,0 +1,48 @@
+*** mp4box-sar-count_video logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:34 ***
+
+
+*** Subtest "create": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_video.cmp -par 1=16:9 -new ./results/temp/setpar.mp4" ***
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+
+Computing ./results/temp/setpar.mp4  (create) hash: 
+File hash (SHA-1): CE1C604E70A47FA5D2D14F458125DDE106648131
+Hash OK for ./results/temp/setpar.mp4
+
+*** Subtest "rewrite": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_video.cmp -par 1=w16:9 -new ./results/temp/rewritepar.mp4" ***
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+
+Computing ./results/temp/rewritepar.mp4  (rewrite) hash: 
+File hash (SHA-1): 6BDB0FFE0161759183B752508AAA40C3B512801C
+Hash OK for ./results/temp/rewritepar.mp4
+
+*** Subtest "remove": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/rewritepar.mp4 -par 1=none -new ./results/temp/remove.mp4" ***
+IsoMedia import rewritepar.mp4 - track ID 1 - Video (size 120 x 96)
+
+Computing ./results/temp/remove.mp4  (remove) hash: 
+File hash (SHA-1): 489C6C54325F50245CD62B921C6915E76B3C0DC5
+Hash OK for ./results/temp/remove.mp4
+
+*** Subtest "auto": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/remove.mp4 -par 1=auto -new ./results/temp/auto.mp4" ***
+IsoMedia import remove.mp4 - track ID 1 - Video (size 120 x 96)
+
+Computing ./results/temp/auto.mp4  (auto) hash: 
+File hash (SHA-1): 6BDB0FFE0161759183B752508AAA40C3B512801C
+Hash OK for ./results/temp/auto.mp4
+
+*** Subtest "set-pl": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_video.cmp:profile=1:level:1 -new ./results/temp/set-pl.mp4" ***
+Unrecognized import option level, ignoring
+Unrecognized import option 1, ignoring
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+
+Computing ./results/temp/set-pl.mp4  (set-pl) hash: 
+File hash (SHA-1): 334B79F0C1699DBD594FF799A5638C1D37B7BDAB
+Hash OK for ./results/temp/set-pl.mp4

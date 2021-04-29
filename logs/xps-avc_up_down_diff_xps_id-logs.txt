@@ -1,0 +1,38 @@
+*** xps-avc_up_down_diff_xps_id logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:47:32 ***
+
+
+*** Subtest "create-oob": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/avc_up_down_diff_xps_id.264 -o ./results/temp/file_oob.mp4" ***
+
+Computing ./results/temp/file_oob.mp4  (create-oob) hash: 
+File hash (SHA-1): F2B199065AF494174A6685CBA1FD68DE1C484FE4
+Hash OK for ./results/temp/file_oob.mp4
+
+*** Subtest "create-ib": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/avc_up_down_diff_xps_id.264 -o ./results/temp/file_ib.mp4:xps_inband=all" ***
+
+Computing ./results/temp/file_ib.mp4  (create-ib) hash: 
+File hash (SHA-1): 950C22FC860CCA3CD4974F50EBB958A8815CDEEA
+Hash OK for ./results/temp/file_ib.mp4
+Computing ./results/temp/file.mpd  (dash-ib-mpd) hash: 
+File hash (SHA-1): 237F45D73A8771E75116C00A26BDFBF4F679E17D
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/file_ib_dashinit.mp4  (dash-ib-seg) hash: 
+File hash (SHA-1): C174523942F1D64D955DBE21E3ED49F83105FD8F
+Hash OK for ./results/temp/file_ib_dashinit.mp4
+
+*** Subtest "dash-ib": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file_ib.mp4 -o ./results/temp/file.mpd:profile=onDemand" ***
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file_ib.mp4 inspect:deep:log=./results/temp/inspect.xml" ***
+
+Computing ./results/temp/inspect.xml  (inspect) hash: 
+File hash (SHA-1): 3EA5082B93E9E005AF6345FBB66B3EB59FDA44D1
+Hash OK for ./results/temp/inspect.xml
+
+*** Subtest "decode": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/avc_up_down_diff_xps_id.264 -o null:ext=yuv -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+
+*** Subtest "create-both": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/xps_switch/avc_up_down_diff_xps_id.264 -o ./results/temp/file_both.mp4:xps_inband=both" ***
+
+Computing ./results/temp/file_both.mp4  (create-both) hash: 
+File hash (SHA-1): 9F76C25092718F9A817DE06471D5D479766AE492
+Hash OK for ./results/temp/file_both.mp4

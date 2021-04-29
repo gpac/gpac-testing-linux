@@ -1,0 +1,42 @@
+*** hevc-au-delim logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:28:52 ***
+
+
+*** Subtest "create-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/counter.hvc -new ./results/temp/test.mp4" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2546 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test.mp4  (create-mp4) hash: 
+File hash (SHA-1): FF142A08FF066EAADBE3F418FBA01F87A38A3E6E
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "dump-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raw 1 ./results/temp/test.mp4 -out ./results/temp/test.hevc" ***
+Exporting HEVC Video - Size 1280x720
+
+
+*** Subtest "audelim": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/test.hevc:au_delim -new ./results/temp/test-aud.mp4" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2798 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test-aud.mp4  (audelim) hash: 
+File hash (SHA-1): B58CDFCDC37C427A0C14B46E9360858DAFE544D9
+Hash fail, ref hash ./hash_refs/hevc-au-delim-audelim.hash was 3B71F1249EDE2D09F02A5CC57407D005B1C43A07
+
+*** Subtest "xpsinband": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/test.hevc:xps_inband -new ./results/temp/test-xpsib.mp4" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2798 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test-xpsib.mp4  (xpsinband) hash: 
+File hash (SHA-1): 816064C4885AB1AF18061BAA64D0487B3211768B
+Hash OK for ./results/temp/test-xpsib.mp4
+
+*** Subtest "xpsinband_audelim": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/test.hevc:xps_inband:au_delim -new ./results/temp/test-xpsib-aud.mp4" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 252 samples (2798 NALUs) - Slices: 99 I 2161 P 0 B - 252 SEI - 99 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test-xpsib-aud.mp4  (xpsinband_audelim) hash: 
+File hash (SHA-1): ED01DA377F476E860355C5E2BE54ED45790C525B
+Hash fail, ref hash ./hash_refs/hevc-au-delim-xpsinband_audelim.hash was 33673BE072B3A420C0FB00A659C2F6929BCBA7C5

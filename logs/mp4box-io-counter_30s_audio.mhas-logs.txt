@@ -1,0 +1,59 @@
+*** mp4box-io-counter_30s_audio.mhas logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:15 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/counter/counter_30s_audio.mhas" ***
+Import probing results for ./external_media/counter/counter_30s_audio.mhas:
+File has 1 tracks
+- Track 1 type: Audio - Codec MPEG-H AudioMux
+	SampleRate 44100 - 1 channels
+
+For more details, use `gpac -i counter_30s_audio.mhas inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/counter_30s_audio.mhas.mp4  (add) hash: 
+File hash (SHA-1): F3FA5FD4334EBC3CC5471323A56BBF11AFB48428
+Hash OK for ./results/temp/counter_30s_audio.mhas.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_audio.mhas -new ./results/temp/counter_30s_audio.mhas.mp4" ***
+Track Importing MPEG-H AudioMux - SampleRate 44100
+
+Computing ./results/temp/counter_30s_audio.mhas.1.tmp  (diso) hash: 
+File hash (SHA-1): F2AA547411C0AEFA7C4753F4C7F16797FCF7897D
+Hash OK for ./results/temp/counter_30s_audio.mhas.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/counter_30s_audio.mhas.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:29.976
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 44100
+Media Duration 00:00:29.976 
+Media Info: Language "Undetermined (und)" - Type "soun:mhm1" - 1291 samples
+	MPEG-H Audio stream - Sample Rate 44100
+	ProfileLevelIndication: 0x0B - Reference Channel Layout mono
+Cannot find MPEG-H Audio Config or audio PL, defaulting to profile 0x01
+	RFC6381 Codec Parameters: mhm1.0xFFFFFFFF
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 43 samples
+	Max sample duration: 1024 / 44100
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/counter_30s_audio.mhas.mp4 -out ./results/temp/counter_30s_audio.mhas.1.tmp" ***
+
+Computing ./results/temp/counter_30s_audio.mhas.2.tmp  (dts) hash: 
+File hash (SHA-1): 95964204877B89FF7170135B1AC867667B0B79BD
+Hash OK for ./results/temp/counter_30s_audio.mhas.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/counter_30s_audio.mhas.mp4 -out ./results/temp/counter_30s_audio.mhas.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/counter_30s_audio.mhas.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): AE36D8CF84A44444BD6CFC5CBA4D519A476B2752
+Hash OK for ./results/temp/inspect.txt

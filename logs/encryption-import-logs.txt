@@ -1,0 +1,32 @@
+*** encryption-import logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:47 ***
+
+
+*** Subtest "import": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/crypted.mp4:dur=20 -new ./results/temp/crypted_short.mp4" ***
+IsoMedia import crypted.mp4 - track ID 1 - Video (size 640 x 360)
+
+Computing ./results/temp/crypted_short.mp4  (import) hash: 
+File hash (SHA-1): 6CD9FDFA4121A226097E2979CA4B73BEE3B942B8
+Hash OK for ./results/temp/crypted_short.mp4
+
+*** Subtest "full-nhml": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -nhml 1:full ./results/temp/crypted_short.mp4" ***
+Exporting MPEG-4 AVC|H264 Video - Size 640x360
+
+Computing ./results/temp/crypted_short_track1.nhml  (full-nhml) hash: 
+File hash (SHA-1): 47DE6DC9C2373232CB7F30072851488C80DE44A3
+Hash OK for ./results/temp/crypted_short_track1.nhml
+
+*** Subtest "import-frag": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/crypted_frag.mp4:dur=20 -new ./results/temp/crypted_frag_short.mp4" ***
+IsoMedia import crypted_frag.mp4 - track ID 1 - Video (size 640 x 360)
+
+Computing ./results/temp/crypted_frag_short.mp4  (import-frag) hash: 
+File hash (SHA-1): 39290789D6AAAA5DFFFB489C1DFEBAF4E5C2E0DB
+Hash OK for ./results/temp/crypted_frag_short.mp4
+
+*** Subtest "decrypt-decoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/crypted_frag_short.mp4 -o ./results/temp/dump.yuv:sstart=1:send=100" ***
+
+Computing ./results/temp/inspect.txt  (inspect-decrypt) hash: 
+File hash (SHA-1): FCCF0E44D3843303F85FEAFAC32437B9C066454E
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dump.yuv:size=1280x720 inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+

@@ -1,0 +1,1149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/ff_dmx.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - ff_dmx.c<span style="font-size: 80%;"> (source / <a href="ff_dmx.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">325</td>
+            <td class="headerCovTableEntry">423</td>
+            <td class="headerCovTableEntryMed">76.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / ffmpeg demux filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/setup.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #ifdef GPAC_HAS_FFMPEG
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #include &quot;ff_common.h&quot;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : //for NTP clock
+<span class="lineNum">      33 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : enum
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span>            :         COPY_NO,
+<span class="lineNum">      38 </span>            :         COPY_A,
+<span class="lineNum">      39 </span>            :         COPY_V,
+<span class="lineNum">      40 </span>            :         COPY_AV
+<span class="lineNum">      41 </span>            : };
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : typedef struct
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span>            :         //options
+<span class="lineNum">      46 </span>            :         const char *src;
+<span class="lineNum">      47 </span>            :         u32 block_size;
+<span class="lineNum">      48 </span>            :         u32 copy, probes;
+<span class="lineNum">      49 </span>            :         Bool sclock;
+<span class="lineNum">      50 </span>            :         const char *fmt, *dev;
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :         //internal data
+<span class="lineNum">      53 </span>            :         const char *fname;
+<span class="lineNum">      54 </span>            :         u32 log_class;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :         Bool initialized;
+<span class="lineNum">      57 </span>            :         Bool raw_data;
+<span class="lineNum">      58 </span>            :         //input file
+<span class="lineNum">      59 </span>            :         AVFormatContext *demuxer;
+<span class="lineNum">      60 </span>            :         //demux options
+<span class="lineNum">      61 </span>            :         AVDictionary *options;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :         GF_FilterPid **pids;
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :         Bool raw_pck_out;
+<span class="lineNum">      66 </span>            :         u32 nb_playing;
+<span class="lineNum">      67 </span>            :         Bool stop_seen;
+<span class="lineNum">      68 </span>            :         u64 first_sample_clock, last_frame_ts;
+<span class="lineNum">      69 </span>            :         u32 probe_frames;
+<span class="lineNum">      70 </span>            :     u32 nb_pck_sent;
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :         AVPacket pkt;
+<span class="lineNum">      73 </span>            :         s32 audio_idx, video_idx;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :         u64 *probe_times;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :         Bool copy_audio, copy_video;
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :         u8 *avio_ctx_buffer;
+<span class="lineNum">      80 </span>            :         AVIOContext *avio_ctx;
+<span class="lineNum">      81 </span>            :         FILE *gfio;
+<a name="82"><span class="lineNum">      82 </span>            : } GF_FFDemuxCtx;</a>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">          7 : static void ffdmx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">      85 </span>            : {
+<span class="lineNum">      86 </span><span class="lineCov">          7 :         GF_FFDemuxCtx *ctx = (GF_FFDemuxCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">      87 </span><span class="lineCov">          7 :         if (ctx-&gt;pids)</span>
+<span class="lineNum">      88 </span><span class="lineCov">          7 :                 gf_free(ctx-&gt;pids);</span>
+<span class="lineNum">      89 </span><span class="lineCov">          7 :         if (ctx-&gt;options)</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :                 av_dict_free(&amp;ctx-&gt;options);</span>
+<span class="lineNum">      91 </span><span class="lineCov">          7 :         if (ctx-&gt;probe_times)</span>
+<span class="lineNum">      92 </span><span class="lineCov">          1 :                 gf_free(ctx-&gt;probe_times);</span>
+<span class="lineNum">      93 </span><span class="lineCov">          7 :         if (ctx-&gt;demuxer) {</span>
+<span class="lineNum">      94 </span><span class="lineCov">          7 :                 avformat_close_input(&amp;ctx-&gt;demuxer);</span>
+<span class="lineNum">      95 </span><span class="lineCov">          7 :                 avformat_free_context(ctx-&gt;demuxer);</span>
+<span class="lineNum">      96 </span>            :         }
+<span class="lineNum">      97 </span><span class="lineCov">          7 :         if (ctx-&gt;avio_ctx) {</span>
+<span class="lineNum">      98 </span><span class="lineCov">          1 :                 if (ctx-&gt;avio_ctx-&gt;buffer) av_freep(&amp;ctx-&gt;avio_ctx-&gt;buffer);</span>
+<span class="lineNum">      99 </span><span class="lineCov">          1 :                 av_freep(&amp;ctx-&gt;avio_ctx);</span>
+<span class="lineNum">     100 </span>            :         }
+<span class="lineNum">     101 </span><span class="lineCov">          7 :         if (ctx-&gt;gfio) gf_fclose(ctx-&gt;gfio);</span>
+<span class="lineNum">     102 </span><span class="lineCov">          7 :         return;</span>
+<a name="103"><span class="lineNum">     103 </span>            : }</a>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span><span class="lineCov">          6 : void ffdmx_shared_pck_release(GF_Filter *filter, GF_FilterPid *pid, GF_FilterPacket *pck)</span>
+<span class="lineNum">     106 </span>            : {
+<span class="lineNum">     107 </span><span class="lineCov">          6 :         GF_FFDemuxCtx *ctx = (GF_FFDemuxCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     108 </span><span class="lineCov">          6 :         if (ctx-&gt;raw_pck_out) {</span>
+<span class="lineNum">     109 </span><span class="lineCov">          6 :                 av_free_packet(&amp;ctx-&gt;pkt);</span>
+<span class="lineNum">     110 </span><span class="lineCov">          6 :                 ctx-&gt;raw_pck_out = GF_FALSE;</span>
+<span class="lineNum">     111 </span><span class="lineCov">          6 :                 gf_filter_post_process_task(filter);</span>
+<span class="lineNum">     112 </span>            :         }
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">          6 : }</span></a>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">       1202 : static GF_Err ffdmx_process(GF_Filter *filter)</span>
+<span class="lineNum">     116 </span>            : {
+<span class="lineNum">     117 </span>            :         GF_Err e;
+<span class="lineNum">     118 </span>            :         u32 i;
+<span class="lineNum">     119 </span>            :         u64 sample_time;
+<span class="lineNum">     120 </span>            :         u8 *data_dst;
+<span class="lineNum">     121 </span>            :         Bool copy = GF_TRUE;
+<span class="lineNum">     122 </span>            :         GF_FilterPacket *pck_dst;
+<span class="lineNum">     123 </span><span class="lineCov">       1202 :         GF_FFDemuxCtx *ctx = (GF_FFDemuxCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span><span class="lineCov">       1202 :         if (!ctx-&gt;nb_playing)</span>
+<span class="lineNum">     126 </span>            :                 return GF_EOS;
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">       1188 :         if (ctx-&gt;raw_pck_out)</span>
+<span class="lineNum">     129 </span>            :                 return GF_EOS;
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineCov">       1188 :         sample_time = gf_sys_clock_high_res();</span>
+<span class="lineNum">     132 </span><span class="lineCov">       1188 :         av_init_packet(&amp;ctx-&gt;pkt);</span>
+<span class="lineNum">     133 </span><span class="lineCov">       1188 :         ctx-&gt;pkt.stream_index = -1;</span>
+<span class="lineNum">     134 </span>            :         /*EOF*/
+<span class="lineNum">     135 </span><span class="lineCov">       1188 :         if (av_read_frame(ctx-&gt;demuxer, &amp;ctx-&gt;pkt) &lt;0) {</span>
+<span class="lineNum">     136 </span><span class="lineCov">          5 :                 av_free_packet(&amp;ctx-&gt;pkt);</span>
+<span class="lineNum">     137 </span><span class="lineCov">          5 :                 if (!ctx-&gt;raw_data) {</span>
+<span class="lineNum">     138 </span><span class="lineCov">          5 :                         for (i=0; i&lt;ctx-&gt;demuxer-&gt;nb_streams; i++) {</span>
+<span class="lineNum">     139 </span><span class="lineCov">          5 :                                 if (ctx-&gt;pids[i]) gf_filter_pid_set_eos(ctx-&gt;pids[i]);</span>
+<span class="lineNum">     140 </span>            :                         }
+<span class="lineNum">     141 </span>            :                         return GF_EOS;
+<span class="lineNum">     142 </span>            :                 }
+<span class="lineNum">     143 </span>            :                 return GF_OK;
+<span class="lineNum">     144 </span>            :         }
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :         assert(ctx-&gt;pkt.stream_index&gt;=0);
+<span class="lineNum">     147 </span>            :         assert(ctx-&gt;pkt.stream_index &lt; (s32) ctx-&gt;demuxer-&gt;nb_streams);
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineCov">       1183 :         if (ctx-&gt;pkt.pts == AV_NOPTS_VALUE) {</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;pkt.dts == AV_NOPTS_VALUE) {</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, ctx-&gt;log_class, (&quot;[%s] No PTS for packet on stream %d\n&quot;, ctx-&gt;fname, ctx-&gt;pkt.stream_index ));</span>
+<span class="lineNum">     152 </span>            :                 } else {
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                         ctx-&gt;pkt.pts = ctx-&gt;pkt.dts;</span>
+<span class="lineNum">     154 </span>            :                 }
+<span class="lineNum">     155 </span>            :         }
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineCov">       1183 :         if (! ctx-&gt;pids[ctx-&gt;pkt.stream_index] ) {</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_DEBUG, ctx-&gt;log_class, (&quot;[%s] No PID defined for given stream %d\n&quot;, ctx-&gt;fname, ctx-&gt;pkt.stream_index ));</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :                 av_free_packet(&amp;ctx-&gt;pkt);</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     161 </span>            :         }
+<span class="lineNum">     162 </span><span class="lineCov">       1183 :     if (ctx-&gt;stop_seen &amp;&amp; ! gf_filter_pid_is_playing( ctx-&gt;pids[ctx-&gt;pkt.stream_index] ) ) {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :         av_free_packet(&amp;ctx-&gt;pkt);</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<span class="lineNum">     165 </span>            :     }
+<span class="lineNum">     166 </span><span class="lineCov">       1183 :         if (ctx-&gt;raw_data &amp;&amp; (ctx-&gt;probe_frames&lt;ctx-&gt;probes) ) {</span>
+<span class="lineNum">     167 </span><span class="lineCov">         10 :                 if (ctx-&gt;pkt.stream_index==ctx-&gt;audio_idx) {</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                         av_free_packet(&amp;ctx-&gt;pkt);</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                         return GF_OK;</span>
+<span class="lineNum">     170 </span>            :                 }
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineCov">         10 :                 ctx-&gt;probe_times[ctx-&gt;probe_frames] = ctx-&gt;sclock ? sample_time : ctx-&gt;pkt.pts;</span>
+<span class="lineNum">     173 </span><span class="lineCov">         10 :                 ctx-&gt;probe_frames++;</span>
+<span class="lineNum">     174 </span><span class="lineCov">         10 :                 if (ctx-&gt;probe_frames==ctx-&gt;probes) {</span>
+<span class="lineNum">     175 </span>            :                         u32 best_diff=0, max_stat=0;
+<span class="lineNum">     176 </span><span class="lineCov">         10 :                         for (i=0; i&lt;ctx-&gt;probes; i++) {</span>
+<span class="lineNum">     177 </span><span class="lineCov">         10 :                                 if (i) {</span>
+<span class="lineNum">     178 </span>            :                                         u32 j, nb_stats=0;
+<span class="lineNum">     179 </span><span class="lineCov">          9 :                                         u32 diff = (u32) (ctx-&gt;probe_times[i]-ctx-&gt;probe_times[i-1]);</span>
+<span class="lineNum">     180 </span><span class="lineCov">         90 :                                         for (j=1; j&lt;ctx-&gt;probes; j++) {</span>
+<span class="lineNum">     181 </span><span class="lineCov">         81 :                                                 s32 sdiff = (s32) (ctx-&gt;probe_times[j]-ctx-&gt;probe_times[j-1]);</span>
+<span class="lineNum">     182 </span><span class="lineCov">         81 :                                                 sdiff -= (s32) diff;</span>
+<span class="lineNum">     183 </span><span class="lineCov">         81 :                                                 if (sdiff&lt;0) sdiff = -sdiff;</span>
+<span class="lineNum">     184 </span><span class="lineCov">         81 :                                                 if (sdiff&lt;2000) nb_stats++;</span>
+<span class="lineNum">     185 </span>            :                                         }
+<span class="lineNum">     186 </span><span class="lineCov">          9 :                                         if (max_stat&lt;nb_stats) {</span>
+<span class="lineNum">     187 </span>            :                                                 max_stat = nb_stats;
+<span class="lineNum">     188 </span>            :                                                 best_diff = diff;
+<span class="lineNum">     189 </span>            :                                         }
+<span class="lineNum">     190 </span>            :                                 }
+<span class="lineNum">     191 </span>            :                         }
+<span class="lineNum">     192 </span><span class="lineCov">          1 :                         GF_LOG(GF_LOG_INFO, ctx-&gt;log_class, (&quot;[%s] Video probing done, frame diff is %d us (for %d frames out of %d)\n&quot;, ctx-&gt;fname, best_diff, max_stat, ctx-&gt;probes));</span>
+<span class="lineNum">     193 </span>            :                 } else {
+<span class="lineNum">     194 </span><span class="lineCov">          9 :                         av_free_packet(&amp;ctx-&gt;pkt);</span>
+<span class="lineNum">     195 </span><span class="lineCov">          9 :                         return GF_OK;</span>
+<span class="lineNum">     196 </span>            :                 }
+<span class="lineNum">     197 </span>            :         }
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span><span class="lineCov">       1174 :         if (ctx-&gt;raw_data) {</span>
+<span class="lineNum">     200 </span><span class="lineCov">          6 :                 if (ctx-&gt;pkt.stream_index==ctx-&gt;audio_idx) copy = ctx-&gt;copy_audio;</span>
+<span class="lineNum">     201 </span><span class="lineCov">          6 :                 else copy = ctx-&gt;copy_video;</span>
+<span class="lineNum">     202 </span>            :         }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span><span class="lineCov">       1174 :         if (ctx-&gt;raw_data &amp;&amp; !copy) {</span>
+<span class="lineNum">     205 </span>            :                 //we don't use shared memory on demuxers since they are usually the ones performing all the buffering
+<span class="lineNum">     206 </span><span class="lineCov">          6 :                 pck_dst = gf_filter_pck_new_shared(ctx-&gt;pids[ctx-&gt;pkt.stream_index], ctx-&gt;pkt.data, ctx-&gt;pkt.size, ffdmx_shared_pck_release);</span>
+<span class="lineNum">     207 </span><span class="lineCov">          6 :                 if (!pck_dst) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     208 </span><span class="lineCov">          6 :                 ctx-&gt;raw_pck_out = GF_TRUE;</span>
+<span class="lineNum">     209 </span>            :         } else {
+<span class="lineNum">     210 </span>            :                 //we don't use shared memory on demuxers since they are usually the ones performing all the buffering
+<span class="lineNum">     211 </span><span class="lineCov">       1168 :                 pck_dst = gf_filter_pck_new_alloc(ctx-&gt;pids[ctx-&gt;pkt.stream_index] , ctx-&gt;pkt.size, &amp;data_dst);</span>
+<span class="lineNum">     212 </span><span class="lineCov">       1168 :                 if (!pck_dst) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     213 </span>            :                 assert(pck_dst);
+<span class="lineNum">     214 </span><span class="lineCov">       1168 :                 memcpy(data_dst, ctx-&gt;pkt.data, ctx-&gt;pkt.size);</span>
+<span class="lineNum">     215 </span>            :         }
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineCov">       1177 :         if (ctx-&gt;raw_data &amp;&amp; ctx-&gt;sclock) {</span>
+<span class="lineNum">     219 </span>            :                 u64 ts;
+<span class="lineNum">     220 </span><span class="lineCov">          3 :                 if (!ctx-&gt;first_sample_clock) {</span>
+<span class="lineNum">     221 </span><span class="lineCov">          1 :                         ctx-&gt;last_frame_ts = ctx-&gt;first_sample_clock = sample_time;</span>
+<span class="lineNum">     222 </span>            :                 }
+<span class="lineNum">     223 </span><span class="lineCov">          3 :                 ts = sample_time - ctx-&gt;first_sample_clock;</span>
+<span class="lineNum">     224 </span><span class="lineCov">          3 :                 gf_filter_pck_set_cts(pck_dst, ts );</span>
+<span class="lineNum">     225 </span><span class="lineCov">          3 :                 ctx-&gt;last_frame_ts = ts;</span>
+<span class="lineNum">     226 </span><span class="lineCov">       1171 :         } else if (ctx-&gt;pkt.pts != AV_NOPTS_VALUE) {</span>
+<span class="lineNum">     227 </span><span class="lineCov">       1171 :                 AVStream *stream = ctx-&gt;demuxer-&gt;streams[ctx-&gt;pkt.stream_index];</span>
+<span class="lineNum">     228 </span>            :                 u64 ts;
+<span class="lineNum">     229 </span><span class="lineCov">       1171 :                 if ((stream-&gt;first_dts!=AV_NOPTS_VALUE) &amp;&amp; (stream-&gt;first_dts&lt;0))</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :                         ts = (ctx-&gt;pkt.pts - stream-&gt;first_dts) * stream-&gt;time_base.num;</span>
+<span class="lineNum">     231 </span>            :                 else
+<span class="lineNum">     232 </span><span class="lineCov">       1171 :                         ts = ctx-&gt;pkt.pts * stream-&gt;time_base.num;</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineCov">       1171 :                 gf_filter_pck_set_cts(pck_dst, ts );</span>
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineCov">       1171 :                 if (ctx-&gt;pkt.dts != AV_NOPTS_VALUE) {</span>
+<span class="lineNum">     237 </span><span class="lineCov">       1167 :                         if ((stream-&gt;first_dts!=AV_NOPTS_VALUE) &amp;&amp; (stream-&gt;first_dts&lt;0))</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :                                 ts = (ctx-&gt;pkt.dts - stream-&gt;first_dts) * stream-&gt;time_base.num;</span>
+<span class="lineNum">     239 </span>            :                         else
+<span class="lineNum">     240 </span><span class="lineCov">       1167 :                                 ts = ctx-&gt;pkt.dts * stream-&gt;time_base.num;</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">       1167 :                         gf_filter_pck_set_dts(pck_dst, ts);</span>
+<span class="lineNum">     243 </span>            :                 }
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">       1171 :                 if (ctx-&gt;pkt.duration)</span>
+<span class="lineNum">     246 </span><span class="lineCov">        928 :                         gf_filter_pck_set_duration(pck_dst, (u32) ctx-&gt;pkt.duration);</span>
+<span class="lineNum">     247 </span>            :         }
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :         //fixme: try to identify SAP type 2 and more
+<span class="lineNum">     250 </span><span class="lineCov">       1174 :         if (ctx-&gt;pkt.flags &amp; AV_PKT_FLAG_KEY)</span>
+<span class="lineNum">     251 </span><span class="lineCov">        352 :                 gf_filter_pck_set_sap(pck_dst, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span><span class="lineCov">       1174 :         if (ctx-&gt;pkt.flags &amp; AV_PKT_FLAG_CORRUPT)</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :                 gf_filter_pck_set_corrupted(pck_dst, GF_TRUE);</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">       1174 :         gf_net_get_utc();</span>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span><span class="lineCov">       1174 :         if (ctx-&gt;raw_data) {</span>
+<span class="lineNum">     259 </span><span class="lineCov">          6 :                 u64 ntp = gf_net_get_ntp_ts();</span>
+<span class="lineNum">     260 </span><span class="lineCov">          6 :                 gf_filter_pck_set_property(pck_dst, GF_PROP_PCK_SENDER_NTP, &amp;PROP_LONGUINT(ntp) );</span>
+<span class="lineNum">     261 </span>            :         }
+<span class="lineNum">     262 </span><span class="lineCov">       1174 :         e = gf_filter_pck_send(pck_dst);</span>
+<span class="lineNum">     263 </span><span class="lineCov">       1174 :     ctx-&gt;nb_pck_sent++;</span>
+<span class="lineNum">     264 </span><span class="lineCov">       1174 :         if (!ctx-&gt;raw_pck_out)</span>
+<span class="lineNum">     265 </span><span class="lineCov">       1170 :                 av_free_packet(&amp;ctx-&gt;pkt);</span>
+<span class="lineNum">     266 </span>            :         return e;
+<span class="lineNum">     267 </span>            : }
+<a name="268"><span class="lineNum">     268 </span>            : </a>
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span><span class="lineCov">          7 : static GF_Err ffdmx_update_arg(GF_Filter *filter, const char *arg_name, const GF_PropertyValue *arg_val)</span>
+<span class="lineNum">     271 </span>            : {
+<span class="lineNum">     272 </span>            :         s32 res;
+<span class="lineNum">     273 </span><span class="lineCov">          7 :         GF_FFDemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            :         //initial parsing of arguments
+<span class="lineNum">     276 </span><span class="lineCov">          7 :         if (!ctx-&gt;initialized) {</span>
+<span class="lineNum">     277 </span><span class="lineCov">          2 :                 switch (arg_val-&gt;type) {</span>
+<span class="lineNum">     278 </span><span class="lineCov">          2 :                 case GF_PROP_STRING:</span>
+<span class="lineNum">     279 </span><span class="lineCov">          2 :                         res = av_dict_set(&amp;ctx-&gt;options, arg_name, arg_val-&gt;value.string, 0);</span>
+<span class="lineNum">     280 </span><span class="lineCov">          2 :                         if (res&lt;0) {</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Failed to set option %s:%s\n&quot;, ctx-&gt;fname, arg_name, arg_val ));</span>
+<span class="lineNum">     282 </span>            :                         }
+<span class="lineNum">     283 </span>            :                         break;
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :                 default:</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Failed to set option %s:%s, unrecognized type %d\n&quot;, ctx-&gt;fname, arg_name, arg_val, arg_val-&gt;type ));</span>
+<span class="lineNum">     286 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">     287 </span>            :                 }
+<span class="lineNum">     288 </span>            :                 return GF_OK;
+<span class="lineNum">     289 </span>            :         }
+<span class="lineNum">     290 </span>            :         //updates of arguments, not supported for ffmpeg demuxers
+<span class="lineNum">     291 </span>            :         return GF_NOT_SUPPORTED;
+<a name="292"><span class="lineNum">     292 </span>            : }</a>
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span><span class="lineCov">          7 : GF_Err ffdmx_init_common(GF_Filter *filter, GF_FFDemuxCtx *ctx, Bool is_grab)</span>
+<span class="lineNum">     295 </span>            : {
+<span class="lineNum">     296 </span>            :         u32 i;
+<span class="lineNum">     297 </span>            :         u32 nb_a, nb_v;
+<span class="lineNum">     298 </span>            : #ifdef FF_SUB_SUPPORT
+<span class="lineNum">     299 </span>            :         u32 nb_t = 0;
+<span class="lineNum">     300 </span>            : #endif
+<span class="lineNum">     301 </span>            :         char szName[50];
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span><span class="lineCov">          7 :         ctx-&gt;pids = gf_malloc(sizeof(GF_FilterPid *)*ctx-&gt;demuxer-&gt;nb_streams);</span>
+<span class="lineNum">     305 </span><span class="lineCov">          7 :         memset(ctx-&gt;pids, 0, sizeof(GF_FilterPid *)*ctx-&gt;demuxer-&gt;nb_streams);</span>
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :         nb_a = nb_v = 0;
+<span class="lineNum">     308 </span><span class="lineCov">         14 :         for (i = 0; i &lt; ctx-&gt;demuxer-&gt;nb_streams; i++) {</span>
+<span class="lineNum">     309 </span>            :                 GF_FilterPid *pid=NULL;
+<span class="lineNum">     310 </span>            :                 Bool force_reframer = GF_FALSE;
+<span class="lineNum">     311 </span>            :                 Bool expose_ffdec=GF_FALSE;
+<span class="lineNum">     312 </span><span class="lineCov">          7 :                 AVStream *stream = ctx-&gt;demuxer-&gt;streams[i];</span>
+<span class="lineNum">     313 </span><span class="lineCov">          7 :                 AVCodecContext *codec = stream-&gt;codec;</span>
+<span class="lineNum">     314 </span>            :                 u32 gpac_codec_id;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span><span class="lineCov">          7 :                 switch(codec-&gt;codec_type) {</span>
+<span class="lineNum">     317 </span><span class="lineCov">          1 :                 case AVMEDIA_TYPE_AUDIO:</span>
+<span class="lineNum">     318 </span><span class="lineCov">          1 :                         pid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     319 </span><span class="lineCov">          1 :                         if (!pid) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     320 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_AUDIO) );</span>
+<span class="lineNum">     321 </span><span class="lineCov">          1 :                         nb_a++;</span>
+<span class="lineNum">     322 </span>            :                         sprintf(szName, &quot;audio%d&quot;, nb_a);
+<span class="lineNum">     323 </span><span class="lineCov">          1 :                         if (ctx-&gt;audio_idx&lt;0)</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                                 ctx-&gt;audio_idx = i;</span>
+<span class="lineNum">     325 </span>            :                         break;
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineCov">          6 :                 case AVMEDIA_TYPE_VIDEO:</span>
+<span class="lineNum">     328 </span><span class="lineCov">          6 :                         pid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     329 </span><span class="lineCov">          6 :                         if (!pid) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     330 </span><span class="lineCov">          6 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_VISUAL) );</span>
+<span class="lineNum">     331 </span><span class="lineCov">          6 :                         nb_v++;</span>
+<span class="lineNum">     332 </span>            :                         sprintf(szName, &quot;video%d&quot;, nb_v);
+<span class="lineNum">     333 </span><span class="lineCov">          6 :                         if (ctx-&gt;video_idx&lt;0)</span>
+<span class="lineNum">     334 </span><span class="lineCov">          2 :                                 ctx-&gt;video_idx = i;</span>
+<span class="lineNum">     335 </span>            :                         break;
+<span class="lineNum">     336 </span>            : #ifdef FF_SUB_SUPPORT
+<span class="lineNum">     337 </span>            :                 case AVMEDIA_TYPE_SUBTITLE:
+<span class="lineNum">     338 </span>            :                         pid = gf_filter_pid_new(filter);
+<span class="lineNum">     339 </span>            :                         if (!pid) return GF_OUT_OF_MEM;
+<span class="lineNum">     340 </span>            :                         gf_filter_pid_set_property(pid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_TEXT) );
+<span class="lineNum">     341 </span>            :                         nb_t++;
+<span class="lineNum">     342 </span>            :                         sprintf(szName, &quot;text%d&quot;, nb_t);
+<span class="lineNum">     343 </span>            :                         break;
+<span class="lineNum">     344 </span>            : #endif
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :                 default:</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                         sprintf(szName, &quot;ffdmx%d&quot;, i+1);</span>
+<span class="lineNum">     347 </span>            :                         break;
+<span class="lineNum">     348 </span>            :                 }
+<span class="lineNum">     349 </span><span class="lineCov">          7 :                 if (!pid) continue;</span>
+<span class="lineNum">     350 </span><span class="lineCov">          7 :                 ctx-&gt;pids[i] = pid;</span>
+<span class="lineNum">     351 </span><span class="lineCov">          7 :                 gf_filter_pid_set_udta(pid, stream);</span>
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_ID, &amp;PROP_UINT(stream-&gt;id ? stream-&gt;id : i+1) );</span>
+<span class="lineNum">     354 </span><span class="lineCov">          7 :                 gf_filter_pid_set_name(pid, szName);</span>
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineCov">          7 :                 if (ctx-&gt;raw_data &amp;&amp; ctx-&gt;sclock) {</span>
+<span class="lineNum">     357 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(1000000) );</span>
+<span class="lineNum">     358 </span>            :                 } else {
+<span class="lineNum">     359 </span><span class="lineCov">          6 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(stream-&gt;time_base.den) );</span>
+<span class="lineNum">     360 </span>            :                 }
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span><span class="lineCov">          7 :                 if (!ctx-&gt;raw_data) {</span>
+<span class="lineNum">     363 </span><span class="lineCov">          5 :                         if (stream-&gt;duration&gt;=0)</span>
+<span class="lineNum">     364 </span><span class="lineCov">          1 :                                 gf_filter_pid_set_property(pid, GF_PROP_PID_DURATION, &amp;PROP_FRAC64_INT(stream-&gt;duration, stream-&gt;time_base.den) );</span>
+<span class="lineNum">     365 </span><span class="lineCov">          4 :                         else if (ctx-&gt;demuxer-&gt;duration&gt;=0)</span>
+<span class="lineNum">     366 </span><span class="lineCov">          4 :                                 gf_filter_pid_set_property(pid, GF_PROP_PID_DURATION, &amp;PROP_FRAC64_INT(ctx-&gt;demuxer-&gt;duration, AV_TIME_BASE) );</span>
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineCov">          5 :                         if ((stream-&gt;first_dts!=AV_NOPTS_VALUE) &amp;&amp; (stream-&gt;first_dts&lt;0))</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_set_property(pid, GF_PROP_PID_DELAY, &amp;PROP_LONGSINT( stream-&gt;first_dts) );</span>
+<span class="lineNum">     370 </span>            :                 }
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span><span class="lineCov">          7 :                 if (stream-&gt;sample_aspect_ratio.num &amp;&amp; stream-&gt;sample_aspect_ratio.den)</span>
+<span class="lineNum">     373 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_SAR, &amp;PROP_FRAC_INT( stream-&gt;sample_aspect_ratio.num, stream-&gt;sample_aspect_ratio.den ) );</span>
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span><span class="lineCov">          7 :                 if (stream-&gt;metadata) {</span>
+<span class="lineNum">     376 </span>            :                         AVDictionaryEntry *ent=NULL;
+<span class="lineNum">     377 </span>            :                         while (1) {
+<span class="lineNum">     378 </span><span class="lineCov">         12 :                                 ent = av_dict_get(stream-&gt;metadata, &quot;&quot;, ent, AV_DICT_IGNORE_SUFFIX);</span>
+<span class="lineNum">     379 </span><span class="lineCov">          8 :                                 if (!ent) break;</span>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            :                                 //we use the same syntax as ffmpeg here
+<span class="lineNum">     382 </span><span class="lineCov">          4 :                                 gf_filter_pid_set_property_str(pid, ent-&gt;key, &amp;PROP_STRING(ent-&gt;value) );</span>
+<span class="lineNum">     383 </span>            :                         }
+<span class="lineNum">     384 </span>            :                 }
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span><span class="lineCov">          7 :                 gpac_codec_id = ffmpeg_codecid_to_gpac(codec-&gt;codec_id);</span>
+<span class="lineNum">     387 </span><span class="lineCov">          7 :                 if (!gpac_codec_id) {</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_FFMPEG) );</span>
+<span class="lineNum">     389 </span>            :                         expose_ffdec=GF_TRUE;
+<span class="lineNum">     390 </span>            :                 } else {
+<span class="lineNum">     391 </span><span class="lineCov">          7 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_CODECID, &amp;PROP_UINT(gpac_codec_id) );</span>
+<span class="lineNum">     392 </span>            :                 }
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span><span class="lineCov">          7 :                 if (is_grab)</span>
+<span class="lineNum">     395 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_RAWGRAB, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     396 </span><span class="lineCov">          5 :                 else if (ctx-&gt;demuxer-&gt;iformat) {</span>
+<span class="lineNum">     397 </span><span class="lineCov">          5 :                         if ((ctx-&gt;demuxer-&gt;iformat-&gt;flags &amp; AVFMT_SEEK_TO_PTS) || ctx-&gt;demuxer-&gt;iformat-&gt;read_seek)</span>
+<span class="lineNum">     398 </span><span class="lineCov">          4 :                                 gf_filter_pid_set_property(pid, GF_PROP_PID_PLAYBACK_MODE, &amp;PROP_UINT(GF_PLAYBACK_MODE_FASTFORWARD ) );</span>
+<span class="lineNum">     399 </span>            :                 }
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            :                 //force reframer for the following formats if no DSI is found
+<span class="lineNum">     402 </span><span class="lineCov">          7 :                 if (!codec-&gt;extradata_size) {</span>
+<span class="lineNum">     403 </span><span class="lineCov">          4 :                         switch (gpac_codec_id) {</span>
+<span class="lineNum">     404 </span><span class="lineCov">          1 :                         case GF_CODECID_AC3:</span>
+<span class="lineNum">     405 </span>            :                         case GF_CODECID_AAC_MPEG4:
+<span class="lineNum">     406 </span>            :                         case GF_CODECID_AAC_MPEG2_MP:
+<span class="lineNum">     407 </span>            :                         case GF_CODECID_AAC_MPEG2_LCP:
+<span class="lineNum">     408 </span>            :                         case GF_CODECID_AAC_MPEG2_SSRP:
+<span class="lineNum">     409 </span>            :                         case GF_CODECID_AVC:
+<span class="lineNum">     410 </span>            :                         case GF_CODECID_HEVC:
+<span class="lineNum">     411 </span>            :                         case GF_CODECID_AV1:
+<span class="lineNum">     412 </span>            :                                 force_reframer = GF_TRUE;
+<span class="lineNum">     413 </span><span class="lineCov">          1 :                                 break;</span>
+<span class="lineNum">     414 </span>            :                         }
+<span class="lineNum">     415 </span>            :                 }
+<span class="lineNum">     416 </span><span class="lineCov">          7 :                 if (expose_ffdec) {</span>
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :                         const char *cname = avcodec_get_name(codec-&gt;codec_id);</span>
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(pid, GF_FFMPEG_DECODER_CONFIG, &amp;PROP_POINTER( (void*)codec ) );</span>
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :                         if (cname)</span>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_set_property_str(pid, &quot;ffmpeg:codec&quot;, &amp;PROP_STRING(cname ) );</span>
+<span class="lineNum">     422 </span><span class="lineCov">          7 :                 } else if (codec-&gt;extradata_size) {</span>
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span>            :                         //avc/hevc read by ffmpeg is still in annex B format
+<span class="lineNum">     425 </span><span class="lineCov">          3 :                         if (ctx-&gt;demuxer-&gt;iformat) {</span>
+<span class="lineNum">     426 </span><span class="lineCov">          3 :                                 if (!strcmp(ctx-&gt;demuxer-&gt;iformat-&gt;name, &quot;h264&quot;) || !strcmp(ctx-&gt;demuxer-&gt;iformat-&gt;name, &quot;hevc&quot;)) {</span>
+<span class="lineNum">     427 </span>            :                                         force_reframer = GF_TRUE;
+<span class="lineNum">     428 </span>            :                                 }
+<span class="lineNum">     429 </span>            :                         }
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span><span class="lineCov">          3 :                         if (!force_reframer) {</span>
+<span class="lineNum">     432 </span>            :                                 //expose as const data
+<span class="lineNum">     433 </span><span class="lineCov">          3 :                                 gf_filter_pid_set_property(pid, GF_PROP_PID_DECODER_CONFIG, &amp;PROP_CONST_DATA( (char *)codec-&gt;extradata, codec-&gt;extradata_size) );</span>
+<span class="lineNum">     434 </span>            :                         }
+<span class="lineNum">     435 </span>            :                 }
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span><span class="lineCov">          7 :                 if (force_reframer) {</span>
+<span class="lineNum">     438 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_UNFRAMED, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     439 </span>            :                 }
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span><span class="lineCov">          7 :                 if (codec-&gt;sample_rate)</span>
+<span class="lineNum">     443 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_SAMPLE_RATE, &amp;PROP_UINT( codec-&gt;sample_rate ) );</span>
+<span class="lineNum">     444 </span><span class="lineCov">          7 :                 if (codec-&gt;frame_size)</span>
+<span class="lineNum">     445 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_SAMPLES_PER_FRAME, &amp;PROP_UINT( codec-&gt;frame_size ) );</span>
+<span class="lineNum">     446 </span><span class="lineCov">          7 :                 if (codec-&gt;channels)</span>
+<span class="lineNum">     447 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_NUM_CHANNELS, &amp;PROP_UINT( codec-&gt;channels ) );</span>
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span><span class="lineCov">          7 :                 if (codec-&gt;width)</span>
+<span class="lineNum">     450 </span><span class="lineCov">          6 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_WIDTH, &amp;PROP_UINT( codec-&gt;width ) );</span>
+<span class="lineNum">     451 </span><span class="lineCov">          7 :                 if (codec-&gt;height)</span>
+<span class="lineNum">     452 </span><span class="lineCov">          6 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT( codec-&gt;height ) );</span>
+<span class="lineNum">     453 </span>            : #if LIBAVCODEC_VERSION_MAJOR &gt;= 58
+<span class="lineNum">     454 </span>            :                 if (codec-&gt;framerate.num &amp;&amp; codec-&gt;framerate.den)
+<span class="lineNum">     455 </span>            :                         gf_filter_pid_set_property(pid, GF_PROP_PID_FPS, &amp;PROP_FRAC_INT( codec-&gt;framerate.num, codec-&gt;framerate.den ) );
+<span class="lineNum">     456 </span>            : #endif
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span><span class="lineCov">          7 :                 if (codec-&gt;field_order&gt;AV_FIELD_PROGRESSIVE)</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_INTERLACED, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span><span class="lineCov">          7 :                 if ((codec-&gt;codec_type==AVMEDIA_TYPE_VIDEO)</span>
+<span class="lineNum">     462 </span><span class="lineCov">          6 :                         &amp;&amp; (codec-&gt;pix_fmt || ((codec-&gt;codec_id==AV_CODEC_ID_RAWVIDEO) &amp;&amp; codec-&gt;codec_tag))</span>
+<span class="lineNum">     463 </span>            :                 ) {
+<span class="lineNum">     464 </span><span class="lineCov">          3 :                         Bool is_full_range = GF_FALSE;</span>
+<span class="lineNum">     465 </span>            :                         u32 pfmt = 0;
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span><span class="lineCov">          3 :                         if (codec-&gt;pix_fmt) {</span>
+<span class="lineNum">     468 </span><span class="lineCov">          3 :                                 pfmt = ffmpeg_pixfmt_to_gpac(codec-&gt;pix_fmt);</span>
+<span class="lineNum">     469 </span><span class="lineCov">          3 :                                 is_full_range = ffmpeg_pixfmt_is_fullrange(codec-&gt;pix_fmt);</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :                         } else if (codec-&gt;codec_tag) {</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :                                 pfmt = ffmpeg_pixfmt_from_codec_tag(codec-&gt;codec_tag, &amp;is_full_range);</span>
+<span class="lineNum">     472 </span>            :                         }
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span><span class="lineCov">          3 :                         if (!pfmt) {</span>
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, ctx-&gt;log_class, (&quot;[%s] Unsupported pixel format %d\n&quot;, ctx-&gt;fname, codec-&gt;pix_fmt));</span>
+<span class="lineNum">     476 </span>            :                         } else {
+<span class="lineNum">     477 </span><span class="lineCov">          3 :                                 gf_filter_pid_set_property(pid, GF_PROP_PID_PIXFMT, &amp;PROP_UINT( pfmt) );</span>
+<span class="lineNum">     478 </span><span class="lineCov">          3 :                                 if (is_full_range)</span>
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :                                         gf_filter_pid_set_property(pid, GF_PROP_PID_COLR_RANGE, &amp;PROP_BOOL( GF_TRUE ) );</span>
+<span class="lineNum">     480 </span>            :                         }
+<span class="lineNum">     481 </span>            :                 }
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span><span class="lineCov">          7 :                 if (codec-&gt;sample_fmt&gt;0) {</span>
+<span class="lineNum">     485 </span>            :                         u32 sfmt = 0;
+<span class="lineNum">     486 </span><span class="lineCov">          1 :                         switch (codec-&gt;sample_fmt) {</span>
+<span class="lineNum">     487 </span>            :                         case AV_SAMPLE_FMT_U8: sfmt = GF_AUDIO_FMT_U8; break;
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :                         case AV_SAMPLE_FMT_S16: sfmt = GF_AUDIO_FMT_S16; break;</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :                         case AV_SAMPLE_FMT_S32: sfmt = GF_AUDIO_FMT_S32; break;</span>
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :                         case AV_SAMPLE_FMT_FLT: sfmt = GF_AUDIO_FMT_FLT; break;</span>
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :                         case AV_SAMPLE_FMT_DBL: sfmt = GF_AUDIO_FMT_DBL; break;</span>
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :                         case AV_SAMPLE_FMT_U8P: sfmt = GF_AUDIO_FMT_U8P; break;</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :                         case AV_SAMPLE_FMT_S16P: sfmt = GF_AUDIO_FMT_S16P; break;</span>
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :                         case AV_SAMPLE_FMT_S32P: sfmt = GF_AUDIO_FMT_S32P; break;</span>
+<span class="lineNum">     495 </span><span class="lineCov">          1 :                         case AV_SAMPLE_FMT_FLTP: sfmt = GF_AUDIO_FMT_FLTP; break;</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :                         case AV_SAMPLE_FMT_DBLP: sfmt = GF_AUDIO_FMT_DBLP; break;</span>
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :                         default:</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, ctx-&gt;log_class, (&quot;[%s] Unsupported sample format %d\n&quot;, ctx-&gt;fname, codec-&gt;sample_fmt));</span>
+<span class="lineNum">     499 </span>            :                         }
+<span class="lineNum">     500 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_AUDIO_FORMAT, &amp;PROP_UINT( sfmt) );</span>
+<span class="lineNum">     501 </span>            :                 }
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineCov">          7 :                 if (codec-&gt;bit_rate)</span>
+<span class="lineNum">     504 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pid, GF_PROP_PID_BITRATE, &amp;PROP_UINT( (u32) codec-&gt;bit_rate ) );</span>
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span><span class="lineCov">          7 :                 gf_filter_pid_set_property(pid, GF_PROP_PID_URL, &amp;PROP_STRING(ctx-&gt;demuxer-&gt;filename));</span>
+<span class="lineNum">     507 </span>            :         }
+<span class="lineNum">     508 </span>            : 
+<span class="lineNum">     509 </span><span class="lineCov">          7 :         if (!nb_a &amp;&amp; !nb_v</span>
+<span class="lineNum">     510 </span>            : #ifdef FF_SUB_SUPPORT
+<span class="lineNum">     511 </span>            :                 &amp;&amp; !nb_t
+<span class="lineNum">     512 </span>            : #endif
+<span class="lineNum">     513 </span>            :         )
+<span class="lineNum">     514 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span><span class="lineCov">          7 :         return GF_OK;</span>
+<a name="517"><span class="lineNum">     517 </span>            : }</a>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span><span class="lineCov">         27 : static int ffavio_read_packet(void *opaque, uint8_t *buf, int buf_size)</span>
+<span class="lineNum">     520 </span>            : {
+<span class="lineNum">     521 </span>            :         GF_FFDemuxCtx *ctx = (GF_FFDemuxCtx *)opaque;
+<span class="lineNum">     522 </span><span class="lineCov">         27 :         return (int) gf_fread(buf, buf_size, ctx-&gt;gfio);</span>
+<a name="523"><span class="lineNum">     523 </span>            : }</a>
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span><span class="lineCov">          4 : static int64_t ffavio_seek(void *opaque, int64_t offset, int whence)</span>
+<span class="lineNum">     526 </span>            : {
+<span class="lineNum">     527 </span>            :         GF_FFDemuxCtx *ctx = (GF_FFDemuxCtx *)opaque;
+<span class="lineNum">     528 </span><span class="lineCov">          4 :         if (whence==AVSEEK_SIZE) {</span>
+<span class="lineNum">     529 </span><span class="lineCov">          4 :                 u64 pos = gf_ftell(ctx-&gt;gfio);</span>
+<span class="lineNum">     530 </span><span class="lineCov">          4 :                 u64 size = gf_fsize(ctx-&gt;gfio);</span>
+<span class="lineNum">     531 </span><span class="lineCov">          4 :                 gf_fseek(ctx-&gt;gfio, pos, SEEK_SET);</span>
+<span class="lineNum">     532 </span><span class="lineCov">          4 :                 return size;</span>
+<span class="lineNum">     533 </span>            :         }
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :         return (int64_t) gf_fseek(ctx-&gt;gfio, offset, whence);</span>
+<a name="535"><span class="lineNum">     535 </span>            : }</a>
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span><span class="lineCov">          5 : static GF_Err ffdmx_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     538 </span>            : {
+<span class="lineNum">     539 </span><span class="lineCov">          5 :         GF_FFDemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     540 </span>            :         GF_Err e;
+<span class="lineNum">     541 </span>            :         s32 res;
+<span class="lineNum">     542 </span>            :         char *ext;
+<span class="lineNum">     543 </span>            :         const char *url;
+<span class="lineNum">     544 </span>            :         AVInputFormat *av_in = NULL;
+<span class="lineNum">     545 </span><span class="lineCov">          5 :         ctx-&gt;fname = &quot;FFDmx&quot;;</span>
+<span class="lineNum">     546 </span><span class="lineCov">          5 :         ctx-&gt;log_class = GF_LOG_CONTAINER;</span>
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span><span class="lineCov">          5 :         ffmpeg_setup_logs(ctx-&gt;log_class);</span>
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span><span class="lineCov">          5 :         ctx-&gt;initialized = GF_TRUE;</span>
+<span class="lineNum">     551 </span>            : #ifdef GPAC_ENABLE_COVERAGE
+<span class="lineNum">     552 </span><span class="lineCov">          5 :         if (gf_sys_is_cov_mode()) {</span>
+<span class="lineNum">     553 </span><span class="lineCov">          5 :                 ffdmx_update_arg(filter, NULL, NULL);</span>
+<span class="lineNum">     554 </span>            :         }
+<span class="lineNum">     555 </span>            : #endif
+<span class="lineNum">     556 </span><span class="lineCov">          5 :         if (!ctx-&gt;src) {</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Missing file name, cannot open\n&quot;, ctx-&gt;fname));</span>
+<span class="lineNum">     558 </span>            :                 return GF_SERVICE_ERROR;
+<span class="lineNum">     559 </span>            :         }
+<span class="lineNum">     560 </span>            :         /*some extensions not supported by ffmpeg, overload input format*/
+<span class="lineNum">     561 </span><span class="lineCov">          5 :         ext = strrchr(ctx-&gt;src, '.');</span>
+<span class="lineNum">     562 </span><span class="lineCov">          5 :         if (ext) {</span>
+<span class="lineNum">     563 </span><span class="lineCov">          4 :                 if (!stricmp(ext+1, &quot;cmp&quot;)) av_in = av_find_input_format(&quot;m4v&quot;);</span>
+<span class="lineNum">     564 </span>            :         }
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span><span class="lineCov">          5 :         GF_LOG(GF_LOG_DEBUG, ctx-&gt;log_class, (&quot;[%s] opening file %s - av_in %08x\n&quot;, ctx-&gt;fname, ctx-&gt;src, av_in));</span>
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span><span class="lineCov">          5 :         ctx-&gt;demuxer = avformat_alloc_context();</span>
+<span class="lineNum">     569 </span><span class="lineCov">          5 :         ffmpeg_set_mx_dmx_flags(ctx-&gt;options, ctx-&gt;demuxer);</span>
+<span class="lineNum">     570 </span>            : 
+<span class="lineNum">     571 </span><span class="lineCov">          5 :         url = ctx-&gt;src;</span>
+<span class="lineNum">     572 </span><span class="lineCov">          5 :         if (!strncmp(ctx-&gt;src, &quot;gfio://&quot;, 7)) {</span>
+<span class="lineNum">     573 </span><span class="lineCov">          1 :                 ctx-&gt;gfio = gf_fopen(ctx-&gt;src, &quot;rb&quot;);</span>
+<span class="lineNum">     574 </span><span class="lineCov">          1 :                 if (!ctx-&gt;gfio) {</span>
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Failed to open %s\n&quot;, ctx-&gt;fname, ctx-&gt;src));</span>
+<span class="lineNum">     576 </span>            :                         return GF_URL_ERROR;
+<span class="lineNum">     577 </span>            :                 }
+<span class="lineNum">     578 </span><span class="lineCov">          1 :                 ctx-&gt;avio_ctx_buffer = av_malloc(ctx-&gt;block_size);</span>
+<span class="lineNum">     579 </span><span class="lineCov">          1 :                 if (!ctx-&gt;avio_ctx_buffer) {</span>
+<span class="lineNum">     580 </span>            :                         return GF_OUT_OF_MEM;
+<span class="lineNum">     581 </span>            :                 }
+<span class="lineNum">     582 </span><span class="lineCov">          1 :                 ctx-&gt;avio_ctx = avio_alloc_context(ctx-&gt;avio_ctx_buffer, ctx-&gt;block_size,</span>
+<span class="lineNum">     583 </span>            :                                                                           0, ctx, &amp;ffavio_read_packet, NULL, &amp;ffavio_seek);
+<span class="lineNum">     584 </span>            : 
+<span class="lineNum">     585 </span><span class="lineCov">          1 :                 if (!ctx-&gt;avio_ctx) {</span>
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Failed to create AVIO context for %s\n&quot;, ctx-&gt;fname, ctx-&gt;src));</span>
+<span class="lineNum">     587 </span>            :                         return GF_OUT_OF_MEM;
+<span class="lineNum">     588 </span>            :                 }
+<span class="lineNum">     589 </span><span class="lineCov">          1 :                 ctx-&gt;demuxer-&gt;pb = ctx-&gt;avio_ctx;</span>
+<span class="lineNum">     590 </span><span class="lineCov">          1 :                 url = gf_fileio_translate_url(ctx-&gt;src);</span>
+<span class="lineNum">     591 </span>            :         }
+<span class="lineNum">     592 </span>            : 
+<span class="lineNum">     593 </span><span class="lineCov">          5 :         res = avformat_open_input(&amp;ctx-&gt;demuxer, url, av_in, ctx-&gt;options ? &amp;ctx-&gt;options : NULL);</span>
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span><span class="lineCov">          5 :         switch (res) {</span>
+<span class="lineNum">     596 </span>            :         case 0:
+<span class="lineNum">     597 </span>            :                 e = GF_OK;
+<span class="lineNum">     598 </span>            :                 break;
+<span class="lineNum">     599 </span>            :         case AVERROR_INVALIDDATA:
+<span class="lineNum">     600 </span>            :                 e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">     601 </span>            :                 break;
+<span class="lineNum">     602 </span>            :         case AVERROR_DEMUXER_NOT_FOUND:
+<span class="lineNum">     603 </span>            :         case -ENOENT:
+<span class="lineNum">     604 </span>            :                 e = GF_URL_ERROR;
+<span class="lineNum">     605 </span>            :                 break;
+<span class="lineNum">     606 </span>            :         case AVERROR_EOF:
+<span class="lineNum">     607 </span>            :                 e = GF_EOS;
+<span class="lineNum">     608 </span>            :                 break;
+<span class="lineNum">     609 </span>            :         default:
+<span class="lineNum">     610 </span>            :                 e = GF_NOT_SUPPORTED;
+<span class="lineNum">     611 </span>            :                 break;
+<span class="lineNum">     612 </span>            :         }
+<span class="lineNum">     613 </span>            :         if (e) {
+<span class="lineNum">     614 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Fail to open %s - error %s\n&quot;, ctx-&gt;fname, ctx-&gt;src, av_err2str(res) ));</span>
+<span class="lineNum">     615 </span><span class="lineNoCov">          0 :                 avformat_close_input(&amp;ctx-&gt;demuxer);</span>
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :                 avformat_free_context(ctx-&gt;demuxer);</span>
+<span class="lineNum">     617 </span><span class="lineNoCov">          0 :                 return e;</span>
+<span class="lineNum">     618 </span>            :         }
+<span class="lineNum">     619 </span>            : 
+<span class="lineNum">     620 </span>            : 
+<span class="lineNum">     621 </span><span class="lineCov">          5 :         ffmpeg_report_unused_options(filter, ctx-&gt;options);</span>
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span><span class="lineCov">          5 :         res = avformat_find_stream_info(ctx-&gt;demuxer, ctx-&gt;options ? &amp;ctx-&gt;options : NULL);</span>
+<span class="lineNum">     624 </span><span class="lineCov">          5 :         if (res &lt;0) {</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] cannot locate streams - error %s\n&quot;, ctx-&gt;fname, av_err2str(res)));</span>
+<span class="lineNum">     626 </span>            :                 e = GF_NOT_SUPPORTED;
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :                 avformat_close_input(&amp;ctx-&gt;demuxer);</span>
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :                 avformat_free_context(ctx-&gt;demuxer);</span>
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 :                 return e;</span>
+<span class="lineNum">     630 </span>            :         }
+<span class="lineNum">     631 </span><span class="lineCov">          5 :         GF_LOG(GF_LOG_DEBUG, ctx-&gt;log_class, (&quot;[%s] file %s opened - %d streams\n&quot;, ctx-&gt;fname, ctx-&gt;src, ctx-&gt;demuxer-&gt;nb_streams));</span>
+<span class="lineNum">     632 </span>            : 
+<span class="lineNum">     633 </span><span class="lineCov">          5 :         return ffdmx_init_common(filter, ctx, GF_FALSE);</span>
+<span class="lineNum">     634 </span>            : }
+<a name="635"><span class="lineNum">     635 </span>            : </a>
+<span class="lineNum">     636 </span>            : 
+<span class="lineNum">     637 </span><span class="lineCov">          9 : static Bool ffdmx_process_event(GF_Filter *filter, const GF_FilterEvent *com)</span>
+<span class="lineNum">     638 </span>            : {
+<span class="lineNum">     639 </span><span class="lineCov">          9 :         GF_FFDemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     640 </span>            : 
+<span class="lineNum">     641 </span><span class="lineCov">          9 :         switch (com-&gt;base.type) {</span>
+<span class="lineNum">     642 </span><span class="lineCov">          7 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     643 </span><span class="lineCov">          7 :                 if (!ctx-&gt;nb_playing &amp;&amp; !ctx-&gt;raw_data</span>
+<span class="lineNum">     644 </span><span class="lineCov">          5 :                         &amp;&amp; (ctx-&gt;stop_seen || (com-&gt;play.start_range&gt;0))</span>
+<span class="lineNum">     645 </span>            :                 ) {
+<span class="lineNum">     646 </span><span class="lineNoCov">          0 :                         int res = av_seek_frame(ctx-&gt;demuxer, -1, (s64) (AV_TIME_BASE*com-&gt;play.start_range), AVSEEK_FLAG_BACKWARD);</span>
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 :                         if (res&lt;0) {</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, ctx-&gt;log_class, (&quot;[%s] Fail to seek %s to %g - error %s\n&quot;, ctx-&gt;fname, ctx-&gt;src, com-&gt;play.start_range, av_err2str(res) ));</span>
+<span class="lineNum">     649 </span>            :                         }
+<span class="lineNum">     650 </span>            :                 }
+<span class="lineNum">     651 </span><span class="lineCov">          7 :                 ctx-&gt;nb_playing++;</span>
+<span class="lineNum">     652 </span><span class="lineCov">          7 :                 ctx-&gt;stop_seen = GF_FALSE;</span>
+<span class="lineNum">     653 </span>            :                 //cancel event
+<span class="lineNum">     654 </span><span class="lineCov">          7 :                 return GF_TRUE;</span>
+<span class="lineNum">     655 </span>            : 
+<span class="lineNum">     656 </span><span class="lineCov">          2 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     657 </span><span class="lineCov">          2 :                 if (ctx-&gt;nb_playing) {</span>
+<span class="lineNum">     658 </span><span class="lineCov">          2 :                         ctx-&gt;nb_playing--;</span>
+<span class="lineNum">     659 </span><span class="lineCov">          2 :                         if (!ctx-&gt;nb_playing &amp;&amp; ctx-&gt;nb_pck_sent)</span>
+<span class="lineNum">     660 </span><span class="lineCov">          2 :                                 ctx-&gt;stop_seen = GF_TRUE;</span>
+<span class="lineNum">     661 </span>            :                 }
+<span class="lineNum">     662 </span>            :                 //cancel event
+<span class="lineNum">     663 </span>            :                 return GF_TRUE;
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span>            :         case GF_FEVT_SET_SPEED:
+<span class="lineNum">     666 </span>            :                 //cancel event
+<span class="lineNum">     667 </span>            :                 return GF_TRUE;
+<span class="lineNum">     668 </span>            :         default:
+<span class="lineNum">     669 </span>            :                 break;
+<span class="lineNum">     670 </span>            :         }
+<span class="lineNum">     671 </span>            :         //by default don't cancel event - to rework once we have downloading in place
+<span class="lineNum">     672 </span><span class="lineNoCov">          0 :         return GF_FALSE;</span>
+<a name="673"><span class="lineNum">     673 </span>            : }</a>
+<span class="lineNum">     674 </span>            : 
+<span class="lineNum">     675 </span><span class="lineCov">       2938 : static GF_FilterProbeScore ffdmx_probe_url(const char *url, const char *mime)</span>
+<span class="lineNum">     676 </span>            : {
+<span class="lineNum">     677 </span><span class="lineCov">       2938 :         if (!strncmp(url, &quot;video://&quot;, 8)) return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">     678 </span><span class="lineCov">       2938 :         if (!strncmp(url, &quot;audio://&quot;, 8)) return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">     679 </span><span class="lineCov">       2938 :         if (!strncmp(url, &quot;av://&quot;, 5)) return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">     680 </span><span class="lineCov">       2938 :         if (!strncmp(url, &quot;pipe://&quot;, 7)) return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">     681 </span><span class="lineCov">       2930 :         return GF_FPROBE_MAYBE_SUPPORTED;</span>
+<span class="lineNum">     682 </span>            : }
+<a name="683"><span class="lineNum">     683 </span>            : </a>
+<span class="lineNum">     684 </span>            : 
+<span class="lineNum">     685 </span><span class="lineCov">       3063 : static const char *ffdmx_probe_data(const u8 *data, u32 size, GF_FilterProbeScore *score)</span>
+<span class="lineNum">     686 </span>            : {
+<span class="lineNum">     687 </span>            :         int ffscore;
+<span class="lineNum">     688 </span>            :         AVInputFormat *probe_fmt;
+<span class="lineNum">     689 </span>            :         AVProbeData pb;
+<span class="lineNum">     690 </span>            : 
+<span class="lineNum">     691 </span><span class="lineCov">       3063 :         av_register_all();</span>
+<span class="lineNum">     692 </span>            : 
+<span class="lineNum">     693 </span>            : 
+<span class="lineNum">     694 </span>            :         memset(&amp;pb, 0, sizeof(AVProbeData));
+<span class="lineNum">     695 </span>            :         //not setting this crashes some probers in ffmpeg
+<span class="lineNum">     696 </span><span class="lineCov">       3063 :         pb.filename = &quot;&quot;;</span>
+<span class="lineNum">     697 </span><span class="lineCov">       3063 :         if (size &lt;= AVPROBE_PADDING_SIZE) {</span>
+<span class="lineNum">     698 </span><span class="lineCov">          4 :                 pb.buf = gf_malloc(sizeof(char)*(size+AVPROBE_PADDING_SIZE) );</span>
+<span class="lineNum">     699 </span><span class="lineCov">          4 :                 memcpy(pb.buf, data, sizeof(char)*size);</span>
+<span class="lineNum">     700 </span><span class="lineCov">          4 :                 pb.buf_size = size;</span>
+<span class="lineNum">     701 </span><span class="lineCov">          4 :                 probe_fmt = av_probe_input_format3(&amp;pb, GF_FALSE, &amp;ffscore);</span>
+<span class="lineNum">     702 </span><span class="lineCov">          4 :                 gf_free(pb.buf);</span>
+<span class="lineNum">     703 </span>            :         } else {
+<span class="lineNum">     704 </span><span class="lineCov">       3059 :                 pb.buf =  (char *) data;</span>
+<span class="lineNum">     705 </span><span class="lineCov">       3059 :                 pb.buf_size = size - AVPROBE_PADDING_SIZE;</span>
+<span class="lineNum">     706 </span><span class="lineCov">       3059 :                 probe_fmt = av_probe_input_format3(&amp;pb, GF_FALSE, &amp;ffscore);</span>
+<span class="lineNum">     707 </span>            :         }
+<span class="lineNum">     708 </span>            : 
+<span class="lineNum">     709 </span><span class="lineCov">       3063 :         if (!probe_fmt) return NULL;</span>
+<span class="lineNum">     710 </span><span class="lineNoCov">          0 :         if (probe_fmt-&gt;mime_type) {</span>
+<span class="lineNum">     711 </span>            :                 //TODO try to refine based on ffprobe score
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :                 *score = GF_FPROBE_MAYBE_SUPPORTED;</span>
+<span class="lineNum">     713 </span><span class="lineNoCov">          0 :                 return probe_fmt-&gt;mime_type;</span>
+<span class="lineNum">     714 </span>            :         }
+<span class="lineNum">     715 </span>            :         return NULL;
+<span class="lineNum">     716 </span>            : }
+<span class="lineNum">     717 </span>            : 
+<span class="lineNum">     718 </span>            : #define OFFS(_n)        #_n, offsetof(GF_FFDemuxCtx, _n)
+<span class="lineNum">     719 </span>            : 
+<span class="lineNum">     720 </span>            : static const GF_FilterCapability FFDmxCaps[] =
+<span class="lineNum">     721 </span>            : {
+<span class="lineNum">     722 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     723 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     724 </span>            : };
+<span class="lineNum">     725 </span>            : 
+<span class="lineNum">     726 </span>            : 
+<span class="lineNum">     727 </span>            : GF_FilterRegister FFDemuxRegister = {
+<span class="lineNum">     728 </span>            :         .name = &quot;ffdmx&quot;,
+<span class="lineNum">     729 </span>            :         .version=LIBAVFORMAT_IDENT,
+<span class="lineNum">     730 </span>            :         GF_FS_SET_DESCRIPTION(&quot;FFMPEG demuxer&quot;)
+<span class="lineNum">     731 </span>            :         GF_FS_SET_HELP(&quot;Demultiplexes files and open protocol using FFMPEG.\n&quot;
+<span class="lineNum">     732 </span>            :         &quot;See FFMPEG documentation (https://ffmpeg.org/documentation.html) for more details.\n&quot;
+<span class="lineNum">     733 </span>            :         &quot;To list all supported demuxers for your GPAC build, use `gpac -h ffdmx:*`.\n&quot;
+<span class="lineNum">     734 </span>            :         &quot;This will list both supported input formats and protocols.\n&quot;
+<span class="lineNum">     735 </span>            :         &quot;Input protocols are listed with `Description: Input protocol`, and the subclass name identitfes the protocol scheme.\n&quot;
+<span class="lineNum">     736 </span>            :         &quot;For example, if `ffdmx:rtmp` is listed as input protocol, this means `rtmp://` source URLs are supported.\n&quot;
+<span class="lineNum">     737 </span>            :         )
+<span class="lineNum">     738 </span>            :         .private_size = sizeof(GF_FFDemuxCtx),
+<span class="lineNum">     739 </span>            :         SETCAPS(FFDmxCaps),
+<span class="lineNum">     740 </span>            :         .initialize = ffdmx_initialize,
+<span class="lineNum">     741 </span>            :         .finalize = ffdmx_finalize,
+<span class="lineNum">     742 </span>            :         .process = ffdmx_process,
+<span class="lineNum">     743 </span>            :         .update_arg = ffdmx_update_arg,
+<span class="lineNum">     744 </span>            :         .probe_url = ffdmx_probe_url,
+<span class="lineNum">     745 </span>            :         .probe_data = ffdmx_probe_data,
+<span class="lineNum">     746 </span>            :         .process_event = ffdmx_process_event,
+<span class="lineNum">     747 </span>            :         .flags = GF_FS_REG_META,
+<span class="lineNum">     748 </span>            : };
+<span class="lineNum">     749 </span>            : 
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span>            : static const GF_FilterArgs FFDemuxArgs[] =
+<span class="lineNum">     752 </span>            : {
+<span class="lineNum">     753 </span>            :         { OFFS(src), &quot;URL of source content&quot;, GF_PROP_NAME, NULL, NULL, 0},
+<span class="lineNum">     754 </span>            :         { &quot;*&quot;, -1, &quot;any possible options defined for AVFormatContext and sub-classes. See `gpac -hx ffdmx` and `gpac -hx ffdmx:*`&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_META},
+<span class="lineNum">     755 </span>            :         {0}
+<span class="lineNum">     756 </span>            : };
+<a name="757"><span class="lineNum">     757 </span>            : </a>
+<span class="lineNum">     758 </span>            : 
+<span class="lineNum">     759 </span><span class="lineCov">       2877 : const GF_FilterRegister *ffdmx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     760 </span>            : {
+<span class="lineNum">     761 </span><span class="lineCov">       2877 :         ffmpeg_build_register(session, &amp;FFDemuxRegister, FFDemuxArgs, 2, FF_REG_TYPE_DEMUX);</span>
+<span class="lineNum">     762 </span><span class="lineCov">       2877 :         return &amp;FFDemuxRegister;</span>
+<span class="lineNum">     763 </span>            : }
+<span class="lineNum">     764 </span>            : 
+<a name="765"><span class="lineNum">     765 </span>            : </a>
+<span class="lineNum">     766 </span>            : 
+<span class="lineNum">     767 </span><span class="lineCov">          2 : static GF_Err ffavin_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     768 </span>            : {
+<span class="lineNum">     769 </span><span class="lineCov">          2 :         s32 res, i, dev_idx=-1;</span>
+<span class="lineNum">     770 </span>            :         Bool has_a, has_v;
+<span class="lineNum">     771 </span>            :         char szPatchedName[1024];
+<span class="lineNum">     772 </span>            :         const char *dev_name=NULL;
+<span class="lineNum">     773 </span>            :         const char *default_fmt=NULL;
+<span class="lineNum">     774 </span>            :         AVInputFormat *dev_fmt=NULL;
+<span class="lineNum">     775 </span><span class="lineCov">          2 :         GF_FFDemuxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     776 </span>            :         Bool wants_audio = GF_FALSE;
+<span class="lineNum">     777 </span>            :         Bool wants_video = GF_FALSE;
+<span class="lineNum">     778 </span><span class="lineCov">          2 :         ctx-&gt;fname = &quot;FFAVIn&quot;;</span>
+<span class="lineNum">     779 </span><span class="lineCov">          2 :         ctx-&gt;log_class = GF_LOG_MMIO;</span>
+<span class="lineNum">     780 </span>            : 
+<span class="lineNum">     781 </span><span class="lineCov">          2 :         ffmpeg_setup_logs(ctx-&gt;log_class);</span>
+<span class="lineNum">     782 </span>            : 
+<span class="lineNum">     783 </span><span class="lineCov">          2 :         avdevice_register_all();</span>
+<span class="lineNum">     784 </span><span class="lineCov">          2 :         ctx-&gt;initialized = GF_TRUE;</span>
+<span class="lineNum">     785 </span><span class="lineCov">          2 :         if (!ctx-&gt;src) {</span>
+<span class="lineNum">     786 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] No source URL specified, expecting video://, audio:/ or av://\n&quot;, ctx-&gt;fname));</span>
+<span class="lineNum">     787 </span>            :                 return GF_SERVICE_ERROR;
+<span class="lineNum">     788 </span>            :         }
+<span class="lineNum">     789 </span><span class="lineCov">          2 :         default_fmt = ctx-&gt;fmt;</span>
+<span class="lineNum">     790 </span><span class="lineCov">          2 :         if (!default_fmt) {</span>
+<span class="lineNum">     791 </span>            : #ifdef WIN32
+<span class="lineNum">     792 </span>            :                 default_fmt = &quot;dshow&quot;;
+<span class="lineNum">     793 </span>            : #elif defined(__DARWIN) || defined(__APPLE__)
+<span class="lineNum">     794 </span>            :                 default_fmt = &quot;avfoundation&quot;;
+<span class="lineNum">     795 </span>            : #else
+<span class="lineNum">     796 </span>            :                 default_fmt = &quot;video4linux2&quot;;
+<span class="lineNum">     797 </span>            : #endif
+<span class="lineNum">     798 </span>            :         }
+<span class="lineNum">     799 </span>            : 
+<span class="lineNum">     800 </span><span class="lineCov">          2 :         if (default_fmt) {</span>
+<span class="lineNum">     801 </span><span class="lineCov">          2 :                 dev_fmt = av_find_input_format(default_fmt);</span>
+<span class="lineNum">     802 </span><span class="lineCov">          2 :                 if (dev_fmt == NULL) {</span>
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Cannot find the input format %s\n&quot;, ctx-&gt;fname, ctx-&gt;fmt));</span>
+<span class="lineNum">     804 </span>            :                 }
+<span class="lineNum">     805 </span>            : #if LIBAVCODEC_VERSION_MAJOR &gt;= 58
+<span class="lineNum">     806 </span>            :                 else if (dev_fmt-&gt;priv_class-&gt;category!=AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT) {
+<span class="lineNum">     807 </span>            :                         GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s]] %s is not a video input device\n&quot;, ctx-&gt;fname, ctx-&gt;fmt));
+<span class="lineNum">     808 </span>            :                         dev_fmt = NULL;
+<span class="lineNum">     809 </span>            :                 }
+<span class="lineNum">     810 </span>            : #else
+<span class="lineNum">     811 </span>            :                 //not supported for old FFMPE versions
+<span class="lineNum">     812 </span>            : #endif
+<span class="lineNum">     813 </span>            :         }
+<span class="lineNum">     814 </span>            : #if (LIBAVCODEC_VERSION_MAJOR &gt;= 58) &amp;&amp; (LIBAVCODEC_VERSION_MINOR&gt;=20)
+<span class="lineNum">     815 </span>            :         if (!dev_fmt) {
+<span class="lineNum">     816 </span>            :                 while (1) {
+<span class="lineNum">     817 </span>            :                         dev_fmt = av_input_video_device_next(dev_fmt);
+<span class="lineNum">     818 </span>            :                         if (!dev_fmt) break;
+<span class="lineNum">     819 </span>            :                         if (!dev_fmt || !dev_fmt-&gt;priv_class) continue;
+<span class="lineNum">     820 </span>            :                         if ((dev_fmt-&gt;priv_class-&gt;category != AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT) &amp;&amp; (dev_fmt-&gt;priv_class-&gt;category != AV_CLASS_CATEGORY_DEVICE_AUDIO_INPUT))
+<span class="lineNum">     821 </span>            :                                 continue;
+<span class="lineNum">     822 </span>            : 
+<span class="lineNum">     823 </span>            :                         //listing devices is on its way of implementation in ffmpeg ... for now break at first provider
+<span class="lineNum">     824 </span>            :                         break;
+<span class="lineNum">     825 </span>            :                 }
+<span class="lineNum">     826 </span>            :         }
+<span class="lineNum">     827 </span>            : #endif
+<span class="lineNum">     828 </span><span class="lineCov">          2 :         if (!dev_fmt) {</span>
+<span class="lineNum">     829 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] No input format specified\n&quot;, ctx-&gt;fname, ctx-&gt;fmt));</span>
+<span class="lineNum">     830 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     831 </span>            :         }
+<span class="lineNum">     832 </span>            : 
+<span class="lineNum">     833 </span><span class="lineCov">          2 :         dev_name = ctx-&gt;dev;</span>
+<span class="lineNum">     834 </span>            : 
+<span class="lineNum">     835 </span><span class="lineCov">          2 :         if (!strncmp(ctx-&gt;src, &quot;video://&quot;, 8)) wants_video = GF_TRUE;</span>
+<span class="lineNum">     836 </span><span class="lineNoCov">          0 :         else if (!strncmp(ctx-&gt;src, &quot;audio://&quot;, 8)) wants_audio = GF_TRUE;</span>
+<span class="lineNum">     837 </span><span class="lineNoCov">          0 :         else if (!strncmp(ctx-&gt;src, &quot;av://&quot;, 5)) wants_video = wants_audio = GF_TRUE;</span>
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span><span class="lineCov">          2 :         if (sscanf(dev_name, &quot;%d&quot;, &amp;dev_idx)==1) {</span>
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :                 sprintf(szPatchedName, &quot;%d&quot;, dev_idx);</span>
+<span class="lineNum">     841 </span><span class="lineNoCov">          0 :                 if (strcmp(szPatchedName, dev_name)) </span>
+<span class="lineNum">     842 </span><span class="lineNoCov">          0 :                         dev_idx = -1;</span>
+<span class="lineNum">     843 </span>            :         } else {
+<span class="lineNum">     844 </span><span class="lineCov">          2 :                 dev_idx = -1;</span>
+<span class="lineNum">     845 </span>            :         }
+<span class="lineNum">     846 </span>            : 
+<span class="lineNum">     847 </span><span class="lineCov">          2 :         szPatchedName[0]=0;</span>
+<span class="lineNum">     848 </span>            : 
+<span class="lineNum">     849 </span>            : #if defined(__DARWIN) || defined(__APPLE__)
+<span class="lineNum">     850 </span>            :         if (!strncmp(dev_name, &quot;screen&quot;, 6)) {
+<span class="lineNum">     851 </span>            :                 strcpy(szPatchedName, &quot;Capture screen &quot;);
+<span class="lineNum">     852 </span>            :                 strcat(szPatchedName, dev_name+6);
+<span class="lineNum">     853 </span>            :                 dev_name = (char *) szPatchedName;
+<span class="lineNum">     854 </span>            :         }
+<span class="lineNum">     855 </span>            : #endif
+<span class="lineNum">     856 </span><span class="lineCov">          2 :         if (!strncmp(dev_fmt-&gt;priv_class-&gt;class_name, &quot;V4L2&quot;, 4) &amp;&amp; (dev_idx&gt;=0) ) {</span>
+<span class="lineNum">     857 </span><span class="lineNoCov">          0 :                 if (wants_audio) {</span>
+<span class="lineNum">     858 </span>            :                         sprintf(szPatchedName, &quot;/dev/video%d:hw:%d&quot;, dev_idx, dev_idx);
+<span class="lineNum">     859 </span>            :                 } else {
+<span class="lineNum">     860 </span>            :                         sprintf(szPatchedName, &quot;/dev/video%d&quot;, dev_idx);
+<span class="lineNum">     861 </span>            :                 }
+<span class="lineNum">     862 </span>            :                 dev_name = (char *) szPatchedName;
+<span class="lineNum">     863 </span>            :         }
+<span class="lineNum">     864 </span>            : 
+<span class="lineNum">     865 </span><span class="lineCov">          2 :         else if (wants_video &amp;&amp; wants_audio &amp;&amp; (dev_idx&gt;=0)) {</span>
+<span class="lineNum">     866 </span>            :                 sprintf(szPatchedName, &quot;%d:%d&quot;, dev_idx, dev_idx);
+<span class="lineNum">     867 </span>            :                 dev_name = (char *) szPatchedName;
+<span class="lineNum">     868 </span>            :         }
+<span class="lineNum">     869 </span>            : #if defined(__APPLE__) &amp;&amp; !defined(GPAC_CONFIG_IOS)
+<span class="lineNum">     870 </span>            :         else if (!strncmp(dev_fmt-&gt;priv_class-&gt;class_name, &quot;AVFoundation&quot;, 12) &amp;&amp; wants_audio) {
+<span class="lineNum">     871 </span>            :                 if (ctx-&gt;dev[0] != ':') {
+<span class="lineNum">     872 </span>            :                         strcpy(szPatchedName, &quot;:&quot;);
+<span class="lineNum">     873 </span>            :                         strcat(szPatchedName, ctx-&gt;dev);
+<span class="lineNum">     874 </span>            :                         dev_name = (char *) szPatchedName;
+<span class="lineNum">     875 </span>            :                 }
+<span class="lineNum">     876 </span>            :         }
+<span class="lineNum">     877 </span>            : #endif
+<span class="lineNum">     878 </span>            : 
+<span class="lineNum">     879 </span>            :         /* Open video */
+<span class="lineNum">     880 </span><span class="lineCov">          2 :         ctx-&gt;demuxer = avformat_alloc_context();</span>
+<span class="lineNum">     881 </span><span class="lineCov">          2 :         ffmpeg_set_mx_dmx_flags(ctx-&gt;options, ctx-&gt;demuxer);</span>
+<span class="lineNum">     882 </span>            : 
+<span class="lineNum">     883 </span><span class="lineCov">          2 :         res = avformat_open_input(&amp;ctx-&gt;demuxer, dev_name, dev_fmt, &amp;ctx-&gt;options);</span>
+<span class="lineNum">     884 </span><span class="lineCov">          2 :         if ( (res &lt; 0) &amp;&amp; !stricmp(ctx-&gt;dev, &quot;screen-capture-recorder&quot;) ) {</span>
+<span class="lineNum">     885 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Buggy screen capture input (open failed with code %d), retrying without specifying resolution\n&quot;, ctx-&gt;fname, res));</span>
+<span class="lineNum">     886 </span><span class="lineNoCov">          0 :                 av_dict_set(&amp;ctx-&gt;options, &quot;video_size&quot;, NULL, 0);</span>
+<span class="lineNum">     887 </span><span class="lineNoCov">          0 :                 res = avformat_open_input(&amp;ctx-&gt;demuxer, ctx-&gt;dev, dev_fmt, &amp;ctx-&gt;options);</span>
+<span class="lineNum">     888 </span>            :         }
+<span class="lineNum">     889 </span>            : 
+<span class="lineNum">     890 </span><span class="lineCov">          2 :         if (res &lt; 0) {</span>
+<span class="lineNum">     891 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;options) {</span>
+<span class="lineNum">     892 </span><span class="lineNoCov">          0 :                         av_dict_free(&amp;ctx-&gt;options);</span>
+<span class="lineNum">     893 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Error %d opening input - retrying without options\n&quot;, ctx-&gt;fname, res));</span>
+<span class="lineNum">     894 </span><span class="lineNoCov">          0 :                         res = avformat_open_input(&amp;ctx-&gt;demuxer, dev_name, dev_fmt, NULL);</span>
+<span class="lineNum">     895 </span>            :                 }
+<span class="lineNum">     896 </span><span class="lineNoCov">          0 :                 if (res&lt;0) {</span>
+<span class="lineNum">     897 </span><span class="lineNoCov">          0 :                         av_dict_set(&amp;ctx-&gt;options, &quot;framerate&quot;, &quot;30&quot;, 0);</span>
+<span class="lineNum">     898 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Error %d opening input - retrying with 30 fps\n&quot;, ctx-&gt;fname, res));</span>
+<span class="lineNum">     899 </span><span class="lineNoCov">          0 :                         res = avformat_open_input(&amp;ctx-&gt;demuxer, dev_name, dev_fmt, &amp;ctx-&gt;options);</span>
+<span class="lineNum">     900 </span><span class="lineNoCov">          0 :                         if (res &lt; 0) {</span>
+<span class="lineNum">     901 </span><span class="lineNoCov">          0 :                                 av_dict_set(&amp;ctx-&gt;options, &quot;framerate&quot;, &quot;25&quot;, 0);</span>
+<span class="lineNum">     902 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Error %d opening input - retrying with 25 fps\n&quot;, ctx-&gt;fname, res));</span>
+<span class="lineNum">     903 </span><span class="lineNoCov">          0 :                                 res = avformat_open_input(&amp;ctx-&gt;demuxer, dev_name, dev_fmt, &amp;ctx-&gt;options);</span>
+<span class="lineNum">     904 </span>            :                         }
+<span class="lineNum">     905 </span>            :                 }
+<span class="lineNum">     906 </span>            :         }
+<span class="lineNum">     907 </span>            : 
+<span class="lineNum">     908 </span><span class="lineCov">          2 :         if (res &lt; 0) {</span>
+<span class="lineNum">     909 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] Cannot open device %s:%s\n&quot;, ctx-&gt;fname, dev_fmt-&gt;priv_class-&gt;class_name, ctx-&gt;dev));</span>
+<span class="lineNum">     910 </span>            :                 return -1;
+<span class="lineNum">     911 </span>            :         }
+<span class="lineNum">     912 </span>            : 
+<span class="lineNum">     913 </span><span class="lineCov">          2 :         ffmpeg_report_unused_options(filter, ctx-&gt;options);</span>
+<span class="lineNum">     914 </span>            : 
+<span class="lineNum">     915 </span><span class="lineCov">          2 :         av_dump_format(ctx-&gt;demuxer, 0, ctx-&gt;dev, 0);</span>
+<span class="lineNum">     916 </span><span class="lineCov">          2 :         ctx-&gt;raw_data = GF_TRUE;</span>
+<span class="lineNum">     917 </span><span class="lineCov">          2 :         ctx-&gt;audio_idx = ctx-&gt;video_idx = -1;</span>
+<span class="lineNum">     918 </span>            : 
+<span class="lineNum">     919 </span><span class="lineCov">          2 :         res = avformat_find_stream_info(ctx-&gt;demuxer, ctx-&gt;options ? &amp;ctx-&gt;options : NULL);</span>
+<span class="lineNum">     920 </span>            : 
+<span class="lineNum">     921 </span><span class="lineCov">          2 :         if (res &lt;0) {</span>
+<span class="lineNum">     922 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] cannot locate streams - error %s\n&quot;, ctx-&gt;fname,  av_err2str(res)));</span>
+<span class="lineNum">     923 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     924 </span>            :         }
+<span class="lineNum">     925 </span>            : 
+<span class="lineNum">     926 </span>            :         //check we have the stream we want
+<span class="lineNum">     927 </span>            :         has_a = has_v = GF_FALSE;
+<span class="lineNum">     928 </span><span class="lineCov">          2 :         for (i = 0; (u32) i &lt; ctx-&gt;demuxer-&gt;nb_streams; i++) {</span>
+<span class="lineNum">     929 </span><span class="lineCov">          2 :                 switch(ctx-&gt;demuxer-&gt;streams[i]-&gt;codec-&gt;codec_type) {</span>
+<span class="lineNum">     930 </span><span class="lineNoCov">          0 :                 case AVMEDIA_TYPE_AUDIO:</span>
+<span class="lineNum">     931 </span>            :                         has_a = GF_TRUE;
+<span class="lineNum">     932 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     933 </span><span class="lineCov">          2 :                 case AVMEDIA_TYPE_VIDEO:</span>
+<span class="lineNum">     934 </span>            :                         has_v = GF_TRUE;
+<span class="lineNum">     935 </span><span class="lineCov">          2 :                         break;</span>
+<span class="lineNum">     936 </span>            :                 default:
+<span class="lineNum">     937 </span>            :                         break;
+<span class="lineNum">     938 </span>            :                 }
+<span class="lineNum">     939 </span>            :         }
+<span class="lineNum">     940 </span><span class="lineCov">          2 :         if (wants_audio &amp;&amp; !has_a) {</span>
+<span class="lineNum">     941 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] No audio stream in input device\n&quot;, ctx-&gt;fname));</span>
+<span class="lineNum">     942 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     943 </span>            :         }
+<span class="lineNum">     944 </span><span class="lineCov">          2 :         if (wants_video &amp;&amp; !has_v) {</span>
+<span class="lineNum">     945 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, ctx-&gt;log_class, (&quot;[%s] No video stream in input device\n&quot;, ctx-&gt;fname));</span>
+<span class="lineNum">     946 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     947 </span>            :         }
+<span class="lineNum">     948 </span><span class="lineCov">          2 :         ctx-&gt;probe_frames = ctx-&gt;probes;</span>
+<span class="lineNum">     949 </span><span class="lineCov">          2 :         if (has_v &amp;&amp; ctx-&gt;probes) {</span>
+<span class="lineNum">     950 </span><span class="lineCov">          1 :                 ctx-&gt;probe_times = gf_malloc(sizeof(u64) * ctx-&gt;probes);</span>
+<span class="lineNum">     951 </span><span class="lineCov">          1 :                 memset(ctx-&gt;probe_times, 0, sizeof(u64) * ctx-&gt;probes);</span>
+<span class="lineNum">     952 </span>            :                 //we probe timestamps in either modes because timestamps of first frames are sometimes off
+<span class="lineNum">     953 </span><span class="lineCov">          1 :                 ctx-&gt;probe_frames = 0;</span>
+<span class="lineNum">     954 </span>            :         }
+<span class="lineNum">     955 </span>            : 
+<span class="lineNum">     956 </span><span class="lineCov">          2 :         GF_LOG(GF_LOG_INFO, ctx-&gt;log_class, (&quot;[%s] device %s:%s opened - %d streams\n&quot;, ctx-&gt;fname, dev_fmt-&gt;priv_class-&gt;class_name, ctx-&gt;dev, ctx-&gt;demuxer-&gt;nb_streams));</span>
+<span class="lineNum">     957 </span>            : 
+<span class="lineNum">     958 </span><span class="lineCov">          2 :         ctx-&gt;copy_audio = ctx-&gt;copy_video = GF_FALSE;</span>
+<span class="lineNum">     959 </span><span class="lineCov">          2 :         switch (ctx-&gt;copy) {</span>
+<span class="lineNum">     960 </span>            :         case COPY_NO:
+<span class="lineNum">     961 </span>            :                 break;
+<span class="lineNum">     962 </span><span class="lineCov">          1 :         case COPY_A:</span>
+<span class="lineNum">     963 </span><span class="lineCov">          1 :                 ctx-&gt;copy_audio = GF_TRUE;</span>
+<span class="lineNum">     964 </span><span class="lineCov">          1 :                 break;</span>
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :         case COPY_V:</span>
+<span class="lineNum">     966 </span><span class="lineNoCov">          0 :                 ctx-&gt;copy_video = GF_TRUE;</span>
+<span class="lineNum">     967 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     968 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     969 </span><span class="lineNoCov">          0 :                 ctx-&gt;copy_audio = ctx-&gt;copy_video = GF_TRUE;</span>
+<span class="lineNum">     970 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     971 </span>            :         }
+<span class="lineNum">     972 </span><span class="lineCov">          2 :         if (wants_audio &amp;&amp; wants_video) {</span>
+<span class="lineNum">     973 </span><span class="lineNoCov">          0 :                 if (!ctx-&gt;copy_audio || !ctx-&gt;copy_video) {</span>
+<span class="lineNum">     974 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, ctx-&gt;log_class, (&quot;[%s] using muxed capture av:// without copy on %s, this might introduce packet losses due to blocking modes or delayed consumption of the frames. If experiencing problems, either set [-copy]() to `AV` or consider using two filters video:// and audio://\n&quot;, ctx-&gt;fname, (!ctx-&gt;copy_audio &amp;&amp; !ctx-&gt;copy_video) ? &quot;audio and video streams&quot; : ctx-&gt;copy_video ? &quot;audio stream&quot; : &quot;video stream&quot;));</span>
+<span class="lineNum">     975 </span>            :                 }
+<span class="lineNum">     976 </span>            :         }
+<span class="lineNum">     977 </span><span class="lineCov">          2 :         return ffdmx_init_common(filter, ctx, GF_TRUE);</span>
+<a name="978"><span class="lineNum">     978 </span>            : }</a>
+<span class="lineNum">     979 </span>            : 
+<span class="lineNum">     980 </span><span class="lineCov">       2941 : static GF_FilterProbeScore ffavin_probe_url(const char *url, const char *mime)</span>
+<span class="lineNum">     981 </span>            : {
+<span class="lineNum">     982 </span><span class="lineCov">       2941 :         if (!strncmp(url, &quot;video://&quot;, 8)) return GF_FPROBE_MAYBE_SUPPORTED;</span>
+<span class="lineNum">     983 </span><span class="lineCov">       2939 :         if (!strncmp(url, &quot;audio://&quot;, 8)) return GF_FPROBE_MAYBE_SUPPORTED;</span>
+<span class="lineNum">     984 </span><span class="lineCov">       2939 :         if (!strncmp(url, &quot;av://&quot;, 5)) return GF_FPROBE_MAYBE_SUPPORTED;</span>
+<span class="lineNum">     985 </span><span class="lineCov">       2939 :         return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">     986 </span>            : }
+<span class="lineNum">     987 </span>            : 
+<span class="lineNum">     988 </span>            : static const GF_FilterCapability FFAVInCaps[] =
+<span class="lineNum">     989 </span>            : {
+<span class="lineNum">     990 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_AUDIO),
+<span class="lineNum">     991 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL)
+<span class="lineNum">     992 </span>            :         //do not expose a specific codec ID (eg raw) as some grabbers might give us mjpeg
+<span class="lineNum">     993 </span>            : };
+<span class="lineNum">     994 </span>            : 
+<span class="lineNum">     995 </span>            : GF_FilterRegister FFAVInRegister = {
+<span class="lineNum">     996 </span>            :         .name = &quot;ffavin&quot;,
+<span class="lineNum">     997 </span>            :         .version = LIBAVDEVICE_IDENT,
+<span class="lineNum">     998 </span>            :         GF_FS_SET_DESCRIPTION(&quot;FFMPEG AV Capture&quot;)
+<span class="lineNum">     999 </span>            :         GF_FS_SET_HELP(&quot;Reads from audio/video capture devices using FFMPEG.\n&quot;
+<span class="lineNum">    1000 </span>            :         &quot;See FFMPEG documentation (https://ffmpeg.org/documentation.html) for more details.\n&quot;
+<span class="lineNum">    1001 </span>            :         &quot;To list all supported grabbers for your GPAC build, use `gpac -h ffavin:*`.\n&quot;
+<span class="lineNum">    1002 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1003 </span>            :         &quot;# Device identification\n&quot;
+<span class="lineNum">    1004 </span>            :         &quot;Typical classes are `dshow` on windows, `avfoundation` on OSX, `video4linux2` or `x11grab` on linux\n&quot;
+<span class="lineNum">    1005 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1006 </span>            :         &quot;Typical device name can be the webcam name:\n&quot;
+<span class="lineNum">    1007 </span>            :         &quot;- `FaceTime HD Camera` on OSX, device name on windows, `/dev/video0` on linux\n&quot;
+<span class="lineNum">    1008 </span>            :         &quot;- `screen-capture-recorder`, see http://screencapturer.sf.net/ on windows\n&quot;
+<span class="lineNum">    1009 </span>            :         &quot;- `Capture screen 0` on OSX (0=first screen), or `screenN` for short\n&quot;
+<span class="lineNum">    1010 </span>            :         &quot;- X display name (eg `:0.0`) on linux\n&quot;
+<span class="lineNum">    1011 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1012 </span>            :         &quot;The general mapping from ffmpeg command line is:\n&quot;
+<span class="lineNum">    1013 </span>            :         &quot;- ffmpeg `-f` maps to [-fmt]() option\n&quot;
+<span class="lineNum">    1014 </span>            :         &quot;- ffmpeg `-i` maps to [-dev]() option\n&quot;
+<span class="lineNum">    1015 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1016 </span>            :         &quot;EX ffmpeg -f libndi_newtek -i MY_NDI_TEST ...\n&quot;
+<span class="lineNum">    1017 </span>            :         &quot;EX gpac -i av://:fmt=libndi_newtek:dev=MY_NDI_TEST ...\n&quot;
+<span class="lineNum">    1018 </span>            :         &quot;\n&quot;
+<span class="lineNum">    1019 </span>            :         )
+<span class="lineNum">    1020 </span>            :         .private_size = sizeof(GF_FFDemuxCtx),
+<span class="lineNum">    1021 </span>            :         SETCAPS(FFAVInCaps),
+<span class="lineNum">    1022 </span>            :         .initialize = ffavin_initialize,
+<span class="lineNum">    1023 </span>            :         .finalize = ffdmx_finalize,
+<span class="lineNum">    1024 </span>            :         .process = ffdmx_process,
+<span class="lineNum">    1025 </span>            :         .update_arg = ffdmx_update_arg,
+<span class="lineNum">    1026 </span>            :         .probe_url = ffavin_probe_url,
+<span class="lineNum">    1027 </span>            :         .process_event = ffdmx_process_event,
+<span class="lineNum">    1028 </span>            :         .flags = GF_FS_REG_META,
+<span class="lineNum">    1029 </span>            : };
+<span class="lineNum">    1030 </span>            : 
+<span class="lineNum">    1031 </span>            : 
+<span class="lineNum">    1032 </span>            : static const GF_FilterArgs FFAVInArgs[] =
+<span class="lineNum">    1033 </span>            : {
+<span class="lineNum">    1034 </span>            :         { OFFS(src), &quot;url of device, `video://`, `audio://` or `av://`&quot;, GF_PROP_STRING, NULL, NULL, 0},
+<span class="lineNum">    1035 </span>            :         { OFFS(fmt), &quot;name of device class - see filter help. If not set, defaults to first device class&quot;, GF_PROP_STRING, NULL, NULL, 0},
+<span class="lineNum">    1036 </span>            :         { OFFS(dev), &quot;name of device or index of device - see filter help&quot;, GF_PROP_STRING, &quot;0&quot;, NULL, 0},
+<span class="lineNum">    1037 </span>            :         { OFFS(copy), &quot;set copy mode of raw frames\n&quot;
+<span class="lineNum">    1038 </span>            :                 &quot;- N: frames are only forwarded (shared memory, no copy)\n&quot;
+<span class="lineNum">    1039 </span>            :                 &quot;- A: audio frames are copied, video frames are forwarded\n&quot;
+<span class="lineNum">    1040 </span>            :                 &quot;- V: video frames are copied, audio frames are forwarded\n&quot;
+<span class="lineNum">    1041 </span>            :                 &quot;- AV: all frames are copied&quot;
+<span class="lineNum">    1042 </span>            :                 &quot;&quot;, GF_PROP_UINT, &quot;A&quot;, &quot;N|A|V|AV&quot;, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1043 </span>            :         { OFFS(sclock), &quot;use system clock (us) instead of device timestamp (for buggy devices)&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">    1044 </span>            :         { OFFS(probes), &quot;probe a given number of video frames before emitting - this usually helps with bad timing of the first frames&quot;, GF_PROP_UINT, &quot;10&quot;, &quot;0-100&quot;, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">    1045 </span>            :         { OFFS(block_size), &quot;block size used to read file when using avio context&quot;, GF_PROP_UINT, &quot;4096&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">    1046 </span>            :         { &quot;*&quot;, -1, &quot;any possible options defined for AVInputFormat and AVFormatContext. See `gpac -hx ffavin` and `gpac -hx ffavin:*`&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_META},
+<span class="lineNum">    1047 </span>            :         {0}
+<span class="lineNum">    1048 </span>            : };
+<span class="lineNum">    1049 </span>            : 
+<span class="lineNum">    1050 </span>            : 
+<span class="lineNum">    1051 </span>            : //number of arguments defined above
+<a name="1052"><span class="lineNum">    1052 </span>            : const int FFAVIN_STATIC_ARGS = (sizeof (FFAVInArgs) / sizeof (GF_FilterArgs)) - 1;</a>
+<span class="lineNum">    1053 </span>            : 
+<span class="lineNum">    1054 </span><span class="lineCov">       2877 : const GF_FilterRegister *ffavin_register(GF_FilterSession *session)</span>
+<span class="lineNum">    1055 </span>            : {
+<span class="lineNum">    1056 </span><span class="lineCov">       2877 :         ffmpeg_build_register(session, &amp;FFAVInRegister, FFAVInArgs, FFAVIN_STATIC_ARGS, FF_REG_TYPE_DEV_IN);</span>
+<span class="lineNum">    1057 </span><span class="lineCov">       2877 :         return &amp;FFAVInRegister;</span>
+<span class="lineNum">    1058 </span>            : }
+<span class="lineNum">    1059 </span>            : 
+<span class="lineNum">    1060 </span>            : #else
+<span class="lineNum">    1061 </span>            : 
+<span class="lineNum">    1062 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">    1063 </span>            : 
+<span class="lineNum">    1064 </span>            : const GF_FilterRegister *ffdmx_register(GF_FilterSession *session)
+<span class="lineNum">    1065 </span>            : {
+<span class="lineNum">    1066 </span>            :         return NULL;
+<span class="lineNum">    1067 </span>            : }
+<span class="lineNum">    1068 </span>            : 
+<span class="lineNum">    1069 </span>            : const GF_FilterRegister *ffavin_register(GF_FilterSession *session)
+<span class="lineNum">    1070 </span>            : {
+<span class="lineNum">    1071 </span>            :         return NULL;
+<span class="lineNum">    1072 </span>            : }
+<span class="lineNum">    1073 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/dmx_vobsub.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - dmx_vobsub.c<span style="font-size: 80%;"> (source / <a href="dmx_vobsub.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">150</td>
+            <td class="headerCovTableEntry">200</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2005-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / NHNT demuxer filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/thread.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/list.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #ifndef GPAC_DISABLE_VOBSUB
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : #include &lt;gpac/internal/vobsub.h&gt;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : typedef struct
+<span class="lineNum">      38 </span>            : {
+<span class="lineNum">      39 </span>            :         //opts
+<span class="lineNum">      40 </span>            :         Bool blankframe;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :         GF_FilterPid *idx_pid, *sub_pid;
+<span class="lineNum">      43 </span>            :         GF_Filter *sub_filter;
+<span class="lineNum">      44 </span>            :         GF_List *opids;
+<span class="lineNum">      45 </span>            :         Bool first;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :         u32 idx_file_crc;
+<span class="lineNum">      48 </span>            :         FILE *mdia;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         Double start_range;
+<span class="lineNum">      51 </span>            :         u64 first_dts;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :         u32 nb_playing;
+<span class="lineNum">      54 </span>            :         GF_Fraction64 duration;
+<span class="lineNum">      55 </span>            :         Bool in_seek;
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :         Bool initial_play_done;
+<span class="lineNum">      58 </span>            :         Bool idx_parsed;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :         u32 timescale;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :         vobsub_file *vobsub;
+<span class="lineNum">      63 </span>            : } GF_VOBSubDmxCtx;
+<a name="64"><span class="lineNum">      64 </span>            : </a>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">          4 : GF_Err vobsubdmx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      67 </span>            : {
+<span class="lineNum">      68 </span>            :         u32 crc;
+<span class="lineNum">      69 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">      70 </span><span class="lineCov">          4 :         GF_VOBSubDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineCov">          4 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_URL);</span>
+<span class="lineNum">      73 </span><span class="lineCov">          4 :         if (!p) {</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_URL_ERROR);</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :                 return GF_EOS;</span>
+<span class="lineNum">      76 </span>            :         }
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineCov">          4 :         if (is_remove) {</span>
+<span class="lineNum">      79 </span>            :                 u32 i, count;
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :                 ctx-&gt;idx_pid = NULL;</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :                 ctx-&gt;sub_pid = NULL;</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :                 count = gf_filter_get_opid_count(filter);</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove( gf_filter_get_opid(filter, i) );</span>
+<span class="lineNum">      85 </span>            :                 }
+<span class="lineNum">      86 </span>            :                 return GF_OK;
+<span class="lineNum">      87 </span>            :         }
+<span class="lineNum">      88 </span><span class="lineCov">          4 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">      89 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">          4 :         if (!ctx-&gt;idx_pid) {</span>
+<span class="lineNum">      92 </span><span class="lineCov">          2 :                 ctx-&gt;idx_pid = pid;</span>
+<span class="lineNum">      93 </span><span class="lineCov">          2 :         } else if (ctx-&gt;idx_pid != pid) {</span>
+<span class="lineNum">      94 </span><span class="lineCov">          2 :                 ctx-&gt;sub_pid = pid;</span>
+<span class="lineNum">      95 </span>            :         }
+<span class="lineNum">      96 </span>            :         
+<span class="lineNum">      97 </span><span class="lineCov">          4 :         gf_filter_pid_set_framing_mode(pid, GF_TRUE);</span>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineCov">          4 :         if (ctx-&gt;idx_pid==pid) {</span>
+<span class="lineNum">     100 </span>            :                 GF_Err e;
+<span class="lineNum">     101 </span>            :                 Bool use_gfio = GF_FALSE;
+<span class="lineNum">     102 </span>            :                 char sURL[GF_MAX_PATH], *ext;
+<span class="lineNum">     103 </span><span class="lineCov">          2 :                 crc = gf_crc_32(p-&gt;value.string, (u32) strlen(p-&gt;value.string));</span>
+<span class="lineNum">     104 </span><span class="lineCov">          2 :                 if (ctx-&gt;idx_file_crc == crc) return GF_OK;</span>
+<span class="lineNum">     105 </span><span class="lineCov">          2 :                 ctx-&gt;idx_file_crc = crc;</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">          2 :                 if (ctx-&gt;sub_filter) {</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :                         gf_filter_remove_src(filter, ctx-&gt;sub_filter);</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                         ctx-&gt;sub_filter = NULL;</span>
+<span class="lineNum">     110 </span>            :                 }
+<span class="lineNum">     111 </span><span class="lineCov">          2 :                 if (!strncmp(p-&gt;value.string, &quot;gfio://&quot;, 7)) {</span>
+<span class="lineNum">     112 </span>            :                         use_gfio = GF_TRUE;
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                         strcpy(sURL, gf_fileio_translate_url(p-&gt;value.string) );</span>
+<span class="lineNum">     114 </span>            :                 } else {
+<span class="lineNum">     115 </span>            :                         strcpy(sURL, p-&gt;value.string);
+<span class="lineNum">     116 </span>            :                 }
+<span class="lineNum">     117 </span><span class="lineCov">          2 :                 ext = gf_file_ext_start(sURL);</span>
+<span class="lineNum">     118 </span><span class="lineCov">          2 :                 if (ext) ext[0] = 0;</span>
+<span class="lineNum">     119 </span>            :                 strcat(sURL, &quot;.sub&quot;);
+<span class="lineNum">     120 </span><span class="lineCov">          2 :                 if (use_gfio) {</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :                         GF_FileIO *gfio = gf_fileio_from_url(p-&gt;value.string);</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :                         char *base = gf_file_basename(sURL);</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                         const char *new_url = gf_fileio_factory(gfio, base ? base : sURL);</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :                         if (new_url) {</span>
+<span class="lineNum">     125 </span>            :                                 strcpy(sURL, new_url);
+<span class="lineNum">     126 </span>            :                         }
+<span class="lineNum">     127 </span>            :                 }
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span><span class="lineCov">          2 :                 ctx-&gt;sub_filter = gf_filter_connect_source(filter, sURL, NULL, GF_TRUE, &amp;e);</span>
+<span class="lineNum">     130 </span><span class="lineCov">          2 :                 if (e) return e;</span>
+<span class="lineNum">     131 </span><span class="lineCov">          2 :                 if (ctx-&gt;mdia) gf_fclose(ctx-&gt;mdia);</span>
+<span class="lineNum">     132 </span><span class="lineCov">          2 :                 ctx-&gt;mdia = NULL;</span>
+<span class="lineNum">     133 </span><span class="lineCov">          2 :                 gf_filter_disable_probe(ctx-&gt;sub_filter);</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">          2 :                 ctx-&gt;first = GF_TRUE;</span>
+<span class="lineNum">     136 </span>            :         }
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :         return GF_OK;
+<a name="139"><span class="lineNum">     139 </span>            : }</a>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineCov">         36 : static Bool vobsubdmx_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     142 </span>            : {
+<span class="lineNum">     143 </span><span class="lineCov">         36 :         GF_VOBSubDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span><span class="lineCov">         36 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     146 </span><span class="lineCov">          2 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     147 </span><span class="lineCov">          2 :                 if (ctx-&gt;nb_playing) return GF_TRUE;</span>
+<span class="lineNum">     148 </span><span class="lineCov">          2 :                 if (ctx-&gt;vobsub &amp;&amp; (ctx-&gt;start_range != evt-&gt;play.start_range)) {</span>
+<span class="lineNum">     149 </span>            :                         u32 i;
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                         for (i=0; i&lt;ctx-&gt;vobsub-&gt;num_langs; i++) {</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                                 ctx-&gt;vobsub-&gt;langs[i].last_dts = 0;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :                                 ctx-&gt;vobsub-&gt;langs[i].current = 0;</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                                 ctx-&gt;vobsub-&gt;langs[i].is_seek = GF_TRUE;</span>
+<span class="lineNum">     154 </span>            :                         }
+<span class="lineNum">     155 </span>            :                 }
+<span class="lineNum">     156 </span><span class="lineCov">          2 :                 ctx-&gt;start_range = evt-&gt;play.start_range;</span>
+<span class="lineNum">     157 </span><span class="lineCov">          2 :                 ctx-&gt;nb_playing++;</span>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :                 //cancel event
+<span class="lineNum">     160 </span><span class="lineCov">          2 :                 return GF_TRUE;</span>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :                 ctx-&gt;nb_playing--;</span>
+<span class="lineNum">     164 </span>            :                 //don't cancel event
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                 return GF_FALSE;</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :         case GF_FEVT_SET_SPEED:
+<span class="lineNum">     168 </span>            :                 //cancel event
+<span class="lineNum">     169 </span>            :                 return GF_TRUE;
+<span class="lineNum">     170 </span>            :         default:
+<span class="lineNum">     171 </span>            :                 break;
+<span class="lineNum">     172 </span>            :         }
+<span class="lineNum">     173 </span>            :         //by default don't cancel event - to rework once we have downloading in place
+<span class="lineNum">     174 </span><span class="lineCov">         34 :         return GF_FALSE;</span>
+<a name="175"><span class="lineNum">     175 </span>            : }</a>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span><span class="lineCov">          2 : GF_Err vobsubdmx_parse_idx(GF_Filter *filter, GF_VOBSubDmxCtx *ctx)</span>
+<span class="lineNum">     178 </span>            : {
+<span class="lineNum">     179 </span>            :         FILE *file = NULL;
+<span class="lineNum">     180 </span>            :         int               version;
+<span class="lineNum">     181 </span>            :         GF_Err err = GF_OK;
+<span class="lineNum">     182 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineCov">          2 :         if (!ctx-&gt;idx_pid) return GF_SERVICE_ERROR;</span>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">          2 :         p = gf_filter_pid_get_property(ctx-&gt;idx_pid, GF_PROP_PID_FILEPATH);</span>
+<span class="lineNum">     187 </span><span class="lineCov">          2 :         if (!p) {</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_URL_ERROR);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                 return GF_EOS;</span>
+<span class="lineNum">     190 </span>            :         }
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span><span class="lineCov">          2 :         file = gf_fopen(p-&gt;value.string, &quot;rb&quot;);</span>
+<span class="lineNum">     193 </span><span class="lineCov">          2 :         if (!file) {</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_URL_ERROR);</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :                 return GF_EOS;</span>
+<span class="lineNum">     196 </span>            :         }
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span><span class="lineCov">          2 :         GF_SAFEALLOC(ctx-&gt;vobsub, vobsub_file);</span>
+<span class="lineNum">     199 </span><span class="lineCov">          2 :         if (!ctx-&gt;vobsub) {</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                 gf_fclose(file);</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_URL_ERROR);</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                 return GF_EOS;</span>
+<span class="lineNum">     203 </span>            :         }
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span><span class="lineCov">          2 :         err = vobsub_read_idx(file, ctx-&gt;vobsub, &amp;version);</span>
+<span class="lineNum">     206 </span><span class="lineCov">          2 :         gf_fclose(file);</span>
+<span class="lineNum">     207 </span><span class="lineCov">          2 :         if (err) {</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, GF_URL_ERROR);</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :                 return GF_EOS;</span>
+<span class="lineNum">     210 </span>            :         }
+<span class="lineNum">     211 </span><span class="lineCov">          2 :         if (!gf_filter_get_opid_count(filter) ) {</span>
+<span class="lineNum">     212 </span>            :                 u32 i;
+<span class="lineNum">     213 </span><span class="lineCov">          2 :                 ctx-&gt;duration.num = 0;</span>
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineCov">          4 :                 for (i=0; i&lt;ctx-&gt;vobsub-&gt;num_langs; i++) {</span>
+<span class="lineNum">     216 </span><span class="lineCov">          2 :                         vobsub_pos *pos = (vobsub_pos*)gf_list_last(ctx-&gt;vobsub-&gt;langs[i].subpos);</span>
+<span class="lineNum">     217 </span><span class="lineCov">          2 :                         if ((u64) ctx-&gt;duration.num &lt; pos-&gt;start*90)</span>
+<span class="lineNum">     218 </span><span class="lineCov">          2 :                                 ctx-&gt;duration.num = (s64) (pos-&gt;start*90);</span>
+<span class="lineNum">     219 </span>            :                 }
+<span class="lineNum">     220 </span><span class="lineCov">          2 :                 ctx-&gt;duration.den = 90000;</span>
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">          6 :                 for (i=0; i&lt;ctx-&gt;vobsub-&gt;num_langs; i++) {</span>
+<span class="lineNum">     223 </span><span class="lineCov">          2 :                         GF_FilterPid *opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :                         //copy properties from idx pid
+<span class="lineNum">     226 </span><span class="lineCov">          2 :                         gf_filter_pid_copy_properties(opid, ctx-&gt;idx_pid);</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_ID, &amp;PROP_UINT(i+1) );</span>
+<span class="lineNum">     229 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_TEXT) );</span>
+<span class="lineNum">     230 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_SUBPIC) );</span>
+<span class="lineNum">     231 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(90000) );</span>
+<span class="lineNum">     232 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_DECODER_CONFIG, &amp;PROP_DATA((char*)&amp;ctx-&gt;vobsub-&gt;palette[0][0], sizeof(ctx-&gt;vobsub-&gt;palette)) );</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_WIDTH, &amp;PROP_UINT(ctx-&gt;vobsub-&gt;width) );</span>
+<span class="lineNum">     236 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(ctx-&gt;vobsub-&gt;height) );</span>
+<span class="lineNum">     237 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_LANGUAGE, &amp;PROP_STRING(ctx-&gt;vobsub-&gt;langs[i].name) );</span>
+<span class="lineNum">     238 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_DURATION, &amp;PROP_FRAC64(ctx-&gt;duration) );</span>
+<span class="lineNum">     239 </span><span class="lineCov">          2 :                         gf_filter_pid_set_property(opid, GF_PROP_PID_PLAYBACK_MODE, &amp;PROP_UINT(GF_PLAYBACK_MODE_FASTFORWARD ) );</span>
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span><span class="lineCov">          2 :                         gf_filter_pid_set_udta(opid, &amp;ctx-&gt;vobsub-&gt;langs[i]);</span>
+<span class="lineNum">     242 </span>            :                 }
+<span class="lineNum">     243 </span>            :         }
+<span class="lineNum">     244 </span>            :         return GF_OK;
+<a name="245"><span class="lineNum">     245 </span>            : }</a>
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineCov">         32 : static GF_Err vobsubdmx_send_stream(GF_VOBSubDmxCtx *ctx, GF_FilterPid *pid)</span>
+<span class="lineNum">     248 </span>            : {
+<span class="lineNum">     249 </span>            :         static const u8 null_subpic[] = { 0x00, 0x09, 0x00, 0x04, 0x00, 0x00, 0x00, 0x04, 0xFF };
+<span class="lineNum">     250 </span>            :         GF_List *subpic;
+<span class="lineNum">     251 </span>            :         vobsub_lang *vslang;
+<span class="lineNum">     252 </span>            :         u32 c, count;
+<span class="lineNum">     253 </span>            :         GF_FilterPacket *dst_pck;
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :         unsigned char buf[0x800];
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span><span class="lineCov">         32 :         vslang = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">     258 </span><span class="lineCov">         32 :         subpic = vslang-&gt;subpos;</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineCov">         32 :         count = gf_list_count(subpic);</span>
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span><span class="lineCov">         32 :         c = vslang-&gt;current;</span>
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">         32 :         for (; c&lt;count; c++) {</span>
+<span class="lineNum">     265 </span>            :                 u32             i, left, size, psize, dsize, hsize, duration;
+<span class="lineNum">     266 </span>            :                 u8 *packet;
+<span class="lineNum">     267 </span><span class="lineCov">         30 :                 vobsub_pos *pos = (vobsub_pos*)gf_list_get(subpic, c);</span>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineCov">         30 :                 if (vslang-&gt;is_seek) {</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :                         if (pos-&gt;start*90 &lt; ctx-&gt;start_range * 90000) {</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :                                 continue;</span>
+<span class="lineNum">     272 </span>            :                         }
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :                         vslang-&gt;is_seek = GF_FALSE;</span>
+<span class="lineNum">     274 </span>            :                 }
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span><span class="lineCov">         30 :                 gf_fseek(ctx-&gt;mdia, pos-&gt;filepos, SEEK_SET);</span>
+<span class="lineNum">     277 </span><span class="lineCov">         30 :                 if (gf_ftell(ctx-&gt;mdia) != pos-&gt;filepos) {</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[VobSub] Could not seek in file\n&quot;));</span>
+<span class="lineNum">     279 </span><span class="lineCov">         30 :                         return GF_IO_ERR;</span>
+<span class="lineNum">     280 </span>            :                 }
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span><span class="lineCov">         30 :                 if (!gf_fread(buf, sizeof(buf), ctx-&gt;mdia)) {</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[VobSub] Could not read from file\n&quot;));</span>
+<span class="lineNum">     284 </span>            :                         return GF_IO_ERR;
+<span class="lineNum">     285 </span>            :                 }
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineCov">         60 :                 if (*(u32*)&amp;buf[0x00] != 0xba010000            ||</span>
+<span class="lineNum">     288 </span><span class="lineCov">         90 :                             (buf[14] || buf[15] || (buf[16]!=0x01) || (buf[17]!=0xbd)) ||</span>
+<span class="lineNum">     289 </span><span class="lineCov">         60 :                         !(buf[0x15] &amp; 0x80)                            ||</span>
+<span class="lineNum">     290 </span><span class="lineCov">         60 :                         (buf[0x17] &amp; 0xf0) != 0x20                     ||</span>
+<span class="lineNum">     291 </span><span class="lineCov">         30 :                         (buf[buf[0x16] + 0x17] &amp; 0xe0) != 0x20)</span>
+<span class="lineNum">     292 </span>            :                 {
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[VobSub] Corrupted data found in file (1)\n&quot;));</span>
+<span class="lineNum">     294 </span>            :                         return GF_CORRUPTED_DATA;
+<span class="lineNum">     295 </span>            :                 }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineCov">         30 :                 psize = (buf[buf[0x16] + 0x18] &lt;&lt; 8) + buf[buf[0x16] + 0x19];</span>
+<span class="lineNum">     298 </span><span class="lineCov">         30 :                 dsize = (buf[buf[0x16] + 0x1a] &lt;&lt; 8) + buf[buf[0x16] + 0x1b];</span>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">         30 :                 if (ctx-&gt;blankframe &amp;&amp; !c &amp;&amp; (pos-&gt;start&gt;0)) {</span>
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :                         dst_pck = gf_filter_pck_new_alloc(pid, sizeof(null_subpic), &amp;packet);</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :                         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :                         memcpy(packet, null_subpic, sizeof(null_subpic));</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :                         gf_filter_pck_set_cts(dst_pck, 0);</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :                         gf_filter_pck_set_sap(dst_pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                         gf_filter_pck_set_duration(dst_pck, (u32) (pos-&gt;start * 90) );</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :                         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     309 </span>            :                 }
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span><span class="lineCov">         30 :                 dst_pck = gf_filter_pck_new_alloc(pid, psize, &amp;packet);</span>
+<span class="lineNum">     312 </span><span class="lineCov">         30 :                 if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span><span class="lineCov">         48 :                 for (i = 0, left = psize; i &lt; psize; i += size, left -= size) {</span>
+<span class="lineNum">     315 </span><span class="lineCov">         48 :                         hsize = 0x18 + buf[0x16];</span>
+<span class="lineNum">     316 </span><span class="lineCov">         48 :                         size  = MIN(left, 0x800 - hsize);</span>
+<span class="lineNum">     317 </span><span class="lineCov">         48 :                         memcpy(packet + i, buf + hsize, size);</span>
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span><span class="lineCov">         48 :                         if (size != left) {</span>
+<span class="lineNum">     320 </span><span class="lineCov">         18 :                                 while (gf_fread(buf, sizeof(buf), ctx-&gt;mdia)) {</span>
+<span class="lineNum">     321 </span><span class="lineCov">         18 :                                         if (buf[buf[0x16] + 0x17] == (vslang-&gt;idx | 0x20)) {</span>
+<span class="lineNum">     322 </span>            :                                                 break;
+<span class="lineNum">     323 </span>            :                                         }
+<span class="lineNum">     324 </span>            :                                 }
+<span class="lineNum">     325 </span>            :                         }
+<span class="lineNum">     326 </span>            :                 }
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span><span class="lineCov">         30 :                 if (i != psize || left &gt; 0) {</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[VobSub] Corrupted data found in file (2)\n&quot;));</span>
+<span class="lineNum">     330 </span>            :                         return GF_CORRUPTED_DATA;
+<span class="lineNum">     331 </span>            :                 }
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span><span class="lineCov">         30 :                 if (vobsub_get_subpic_duration(packet, psize, dsize, &amp;duration) != GF_OK) {</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[VobSub] Corrupted data found in file (3)\n&quot;));</span>
+<span class="lineNum">     335 </span>            :                         return GF_CORRUPTED_DATA;
+<span class="lineNum">     336 </span>            :                 }
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineCov">         30 :                 gf_filter_pck_set_cts(dst_pck, pos-&gt;start * 90);</span>
+<span class="lineNum">     339 </span><span class="lineCov">         30 :                 gf_filter_pck_set_sap(dst_pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     340 </span><span class="lineCov">         30 :                 gf_filter_pck_set_duration(dst_pck, duration);</span>
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineCov">         30 :                 if (vslang-&gt;last_dts &amp;&amp; (vslang-&gt;last_dts &gt;= pos-&gt;start * 90)) {</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_PARSER, (&quot;[VobSub] Out of order timestamps in vobsub file\n&quot;));</span>
+<span class="lineNum">     344 </span>            :                 }
+<span class="lineNum">     345 </span><span class="lineCov">         30 :                 gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     346 </span><span class="lineCov">         30 :                 vslang-&gt;last_dts = pos-&gt;start * 90;</span>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span><span class="lineCov">         30 :                 vslang-&gt;current++;</span>
+<span class="lineNum">     349 </span><span class="lineCov">         30 :                 if (gf_filter_pid_would_block(pid)) return GF_OK;</span>
+<span class="lineNum">     350 </span>            :         }
+<span class="lineNum">     351 </span>            :         return GF_EOS;
+<a name="352"><span class="lineNum">     352 </span>            : }</a>
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span><span class="lineCov">         52 : GF_Err vobsubdmx_process(GF_Filter *filter)</span>
+<span class="lineNum">     355 </span>            : {
+<span class="lineNum">     356 </span><span class="lineCov">         52 :         GF_VOBSubDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     357 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     358 </span>            :         u32 pkt_size, i, count, nb_eos;
+<span class="lineNum">     359 </span>            :         Bool start, end;
+<span class="lineNum">     360 </span>            : 
+<span class="lineNum">     361 </span><span class="lineCov">         52 :         if (!ctx-&gt;idx_parsed) {</span>
+<span class="lineNum">     362 </span>            :                 GF_Err e;
+<span class="lineNum">     363 </span><span class="lineCov">          2 :                 pck = gf_filter_pid_get_packet(ctx-&gt;idx_pid);</span>
+<span class="lineNum">     364 </span><span class="lineCov">          2 :                 if (!pck) return GF_OK;</span>
+<span class="lineNum">     365 </span><span class="lineCov">          2 :                 gf_filter_pck_get_framing(pck, &amp;start, &amp;end);</span>
+<span class="lineNum">     366 </span>            :                 //for now we only work with complete files
+<span class="lineNum">     367 </span>            :                 assert(end);
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span><span class="lineCov">          2 :                 e = vobsubdmx_parse_idx(filter, ctx);</span>
+<span class="lineNum">     370 </span><span class="lineCov">          2 :                 ctx-&gt;idx_parsed = GF_TRUE;</span>
+<span class="lineNum">     371 </span><span class="lineCov">          2 :                 gf_filter_pid_drop_packet(ctx-&gt;idx_pid);</span>
+<span class="lineNum">     372 </span><span class="lineCov">          2 :                 if (e) {</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :                         gf_filter_setup_failure(filter, e);</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">     375 </span>            :                 }
+<span class="lineNum">     376 </span>            :         }
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span><span class="lineCov">         52 :         if (!ctx-&gt;nb_playing) return GF_OK;</span>
+<span class="lineNum">     379 </span>            : 
+<span class="lineNum">     380 </span><span class="lineCov">         48 :         if (!ctx-&gt;mdia) {</span>
+<span class="lineNum">     381 </span>            :                 const GF_PropertyValue *p;
+<span class="lineNum">     382 </span><span class="lineCov">          2 :                 if (!ctx-&gt;sub_pid) return GF_OK;</span>
+<span class="lineNum">     383 </span><span class="lineCov">          2 :                 p = gf_filter_pid_get_property(ctx-&gt;sub_pid, GF_PROP_PID_FILEPATH);</span>
+<span class="lineNum">     384 </span><span class="lineCov">          2 :                 if (!p) {</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :                         gf_filter_setup_failure(filter, GF_URL_ERROR);</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_PARSER, (&quot;[VobSub] Cannot open sub file\n&quot;));</span>
+<span class="lineNum">     387 </span>            :                         return GF_EOS;
+<span class="lineNum">     388 </span>            :                 }
+<span class="lineNum">     389 </span><span class="lineCov">          2 :                 ctx-&gt;mdia = gf_fopen(p-&gt;value.string, &quot;rb&quot;);</span>
+<span class="lineNum">     390 </span>            :         }
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span><span class="lineCov">         48 :         pck = gf_filter_pid_get_packet(ctx-&gt;sub_pid);</span>
+<span class="lineNum">     393 </span><span class="lineCov">         48 :         if (!pck) {</span>
+<span class="lineNum">     394 </span><span class="lineCov">         16 :                 if (gf_filter_pid_is_eos(ctx-&gt;sub_pid)) return GF_EOS;</span>
+<span class="lineNum">     395 </span><span class="lineCov">         16 :                 return GF_OK;</span>
+<span class="lineNum">     396 </span>            :         }
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span><span class="lineCov">         32 :         /*data =*/ gf_filter_pck_get_data(pck, &amp;pkt_size);</span>
+<span class="lineNum">     399 </span><span class="lineCov">         32 :         gf_filter_pck_get_framing(pck, &amp;start, &amp;end);</span>
+<span class="lineNum">     400 </span>            :         //for now we only work with complete files
+<span class="lineNum">     401 </span>            :         assert(end);
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            :         nb_eos = 0;
+<span class="lineNum">     404 </span><span class="lineCov">         32 :         count = gf_filter_get_opid_count(filter);</span>
+<span class="lineNum">     405 </span><span class="lineCov">         64 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     406 </span><span class="lineCov">         32 :                 GF_FilterPid *opid = gf_filter_get_opid(filter, i);</span>
+<span class="lineNum">     407 </span><span class="lineCov">         32 :                 GF_Err e = vobsubdmx_send_stream(ctx, opid);</span>
+<span class="lineNum">     408 </span><span class="lineCov">         32 :                 if (e==GF_EOS) {</span>
+<span class="lineNum">     409 </span><span class="lineCov">          2 :                         nb_eos++;</span>
+<span class="lineNum">     410 </span><span class="lineCov">          2 :                         gf_filter_pid_set_eos(opid);</span>
+<span class="lineNum">     411 </span>            :                 }
+<span class="lineNum">     412 </span>            :         }
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span><span class="lineCov">         32 :         if (nb_eos==count) {</span>
+<span class="lineNum">     415 </span>            :                 //only drop packet once we are done
+<span class="lineNum">     416 </span><span class="lineCov">          2 :                 gf_filter_pid_drop_packet(ctx-&gt;sub_pid);</span>
+<span class="lineNum">     417 </span><span class="lineCov">          2 :                 return GF_EOS;</span>
+<span class="lineNum">     418 </span>            :         }
+<span class="lineNum">     419 </span>            :         return GF_OK;
+<a name="420"><span class="lineNum">     420 </span>            : }</a>
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span><span class="lineCov">          2 : static void vobsubdmx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     423 </span>            : {
+<span class="lineNum">     424 </span><span class="lineCov">          2 :         GF_VOBSubDmxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     425 </span><span class="lineCov">          2 :         if (ctx-&gt;vobsub) vobsub_free(ctx-&gt;vobsub);</span>
+<span class="lineNum">     426 </span><span class="lineCov">          2 :         if (ctx-&gt;mdia) gf_fclose(ctx-&gt;mdia);</span>
+<a name="427"><span class="lineNum">     427 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span><span class="lineCov">       3065 : static const char * vobsubdmx_probe_data(const u8 *data, u32 size, GF_FilterProbeScore *score)</span>
+<span class="lineNum">     430 </span>            : {
+<span class="lineNum">     431 </span><span class="lineCov">       3065 :         if (!strncmp(data, &quot;# VobSub&quot;, 8)) {</span>
+<span class="lineNum">     432 </span><span class="lineCov">          2 :                 *score = GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     433 </span><span class="lineCov">          2 :                 return &quot;text/vobsub&quot;;</span>
+<span class="lineNum">     434 </span>            :         }
+<span class="lineNum">     435 </span>            :         return NULL;
+<span class="lineNum">     436 </span>            : }
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            : #define OFFS(_n)        #_n, offsetof(GF_VOBSubDmxCtx, _n)
+<span class="lineNum">     439 </span>            : static const GF_FilterArgs GF_VOBSubDmxArgs[] =
+<span class="lineNum">     440 </span>            : {
+<span class="lineNum">     441 </span>            :         { OFFS(blankframe), &quot;force inserting a blank frame if first subpic is not at 0&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     442 </span>            :         {0}
+<span class="lineNum">     443 </span>            : };
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            : static const GF_FilterCapability VOBSubDmxCaps[] =
+<span class="lineNum">     447 </span>            : {
+<span class="lineNum">     448 </span>            :         CAP_UINT(GF_CAPS_INPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_FILE),
+<span class="lineNum">     449 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_FILE_EXT, &quot;idx|sub&quot;),
+<span class="lineNum">     450 </span>            :         CAP_STRING(GF_CAPS_INPUT, GF_PROP_PID_MIME, &quot;text/vobsub&quot;),
+<span class="lineNum">     451 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_STREAM_TYPE, GF_STREAM_TEXT),
+<span class="lineNum">     452 </span>            :         CAP_UINT(GF_CAPS_OUTPUT, GF_PROP_PID_CODECID, GF_CODECID_SUBPIC),
+<span class="lineNum">     453 </span>            : };
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            : GF_FilterRegister VOBSubDmxRegister = {
+<span class="lineNum">     457 </span>            :         .name = &quot;vobsubdmx&quot;,
+<span class="lineNum">     458 </span>            :         GF_FS_SET_DESCRIPTION(&quot;VobSub demuxer&quot;)
+<span class="lineNum">     459 </span>            :         GF_FS_SET_HELP(&quot;This filter demultiplexes VobSub files/data to produce media PIDs and frames.&quot;)
+<span class="lineNum">     460 </span>            :         .private_size = sizeof(GF_VOBSubDmxCtx),
+<span class="lineNum">     461 </span>            :         .max_extra_pids = 1,
+<span class="lineNum">     462 </span>            :         .args = GF_VOBSubDmxArgs,
+<span class="lineNum">     463 </span>            :         .finalize = vobsubdmx_finalize,
+<span class="lineNum">     464 </span>            :         SETCAPS(VOBSubDmxCaps),
+<span class="lineNum">     465 </span>            :         .configure_pid = vobsubdmx_configure_pid,
+<span class="lineNum">     466 </span>            :         .process = vobsubdmx_process,
+<span class="lineNum">     467 </span>            :         .probe_data = vobsubdmx_probe_data,
+<span class="lineNum">     468 </span>            :         .process_event = vobsubdmx_process_event
+<span class="lineNum">     469 </span>            : };
+<span class="lineNum">     470 </span>            : 
+<a name="471"><span class="lineNum">     471 </span>            : #endif</a>
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineCov">       2877 : const GF_FilterRegister *vobsubdmx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     474 </span>            : {
+<span class="lineNum">     475 </span>            : #ifndef GPAC_DISABLE_VOBSUB
+<span class="lineNum">     476 </span><span class="lineCov">       2877 :         return &amp;VOBSubDmxRegister;</span>
+<span class="lineNum">     477 </span>            : #else
+<span class="lineNum">     478 </span>            :         return NULL;
+<span class="lineNum">     479 </span>            : #endif
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span>            : }
+<span class="lineNum">     482 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

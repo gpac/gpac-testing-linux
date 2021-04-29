@@ -1,0 +1,105 @@
+*** gpac-hh logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:19 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -hh" ***
+Usage: gpac [options] FILTER [LINK] FILTER [...] 
+gpac is GPAC's command line tool for setting up and running filter chains.
+
+FILTER: a single filter declaration (eg, -i file, -o dump, inspect, ...), see gpac -h doc.
+[LINK]: a link instruction (eg, @, @2, @2#StreamType=Visual, ...), see gpac -h doc.
+[options]: one or more option strings, each starting with a - character.
+  - an option using a single - indicates an option of gpac (see gpac -hx) or of libgpac (see gpac -hx core)
+  - an option using -- indicates a global filter option, for example --block_size=1000 (see gpac -h doc)
+  - an option using -+ indicates a global meta-filter filter (eg FFMPEG) option, for example -+profile=Baseline (see gpac -h doc)
+  
+Filter declaration order may impact the link resolver which will try linking in declaration order. Most of the time for simple graphs, this has no impact. However, for complex graphs with no link declarations, this can lead to different results.  
+Options do not require any specific order, and may be present anywhere, including between link statements or filter declarations.  
+Boolean values do not need any value specified. Other types shall be formatted as opt=val, except -i, -src, -o, -dst and -h options.
+
+The possible options for gpac are:
+
+-mem-track:                    enable memory tracker
+-mem-track-stack:              enable memory tracker with stack dumping
+-ltf:                          load test-unit filters (used for for unit tests only)
+-sloop (int):                  loop execution of session, creating a session at each loop, mainly used for testing. If no value is given, loops forever
+-runfor (int):                 run for the given amount of milliseconds
+-runforx (int):                run for the given amount of milliseconds and exit with no cleanup
+-stats:                        print stats after execution
+-graph:                        print graph after execution
+-k:                            enable keyboard interaction from command line
+-r (string):                   enable reporting
+	* r: runtime reporting
+	* r=FA[,FB]: runtime reporting but only print given filters, eg r=mp4mx for ISOBMFF muxer only
+	* r=: only print final report
+-seps (string, default: :=#,!@): set the default character sets used to separate various arguments
+- the first char is used to separate argument names
+- the second char, if present, is used to separate names and values
+- the third char, if present, is used to separate fragments for PID sources
+- the fourth char, if present, is used for list separators (sourceIDs, gfreg, ...)
+- the fifth char, if present, is used for boolean negation
+- the sixth char, if present, is used for LINK directives (see filters help (-h doc))
+-i,-src (string):              specify an input file - see filters help (-h doc)
+-o,-dst (string):              specify an output file - see filters help (-h doc)
+-ib (string):                  specify an input file to wrap as GF_FileIO object (testing of GF_FileIO)
+-ob (string):                  specify an output file to wrap as GF_FileIO object (testing of GF_FileIO)
+-h,-help,-ha,-hx,-hh (string): print help. Use -help or -h for basic options, -ha for advanced options, -hx for expert options and -hh for all.  
+Note: The @ character can be used in place of the * character. String parameter can be:
+	* empty: print command line options help
+	* doc: print the general filter info
+	* alias: print the gpac alias syntax
+	* log: print the log system help
+	* core: print the supported libgpac core options. Use -ha/-hx/-hh for advanced/expert options
+	* cfg: print the GPAC configuration help
+	* prompt: print the GPAC prompt help when running in interactive mode (see -k )
+	* modules: print available modules
+	* filters: print name of all available filters
+	* filters:*: print name of all available filters, including meta filters
+	* codecs: print the supported builtin codecs
+	* props: print the supported builtin PID and packet properties
+	* colors: print the builtin color names and their values
+	* links: print possible connections between each supported filters
+	* links FNAME: print sources and sinks for filter FNAME (either builtin or JS filter)
+	* FNAME: print filter FNAME info (multiple FNAME can be given)
+  - For meta-filters, use FNAME:INST, eg ffavin:avfoundation
+  - Use * to print info on all filters (big output!), *:* to print info on all filters including meta filter instances (really big output!)
+  - By default only basic filter options and description are shown. Use -ha to show advanced options capabilities, -hx for expert options, -hh for all options and filter capabilities including on filters disabled in this build
+	* FNAME.OPT: print option OPT in filter FNAME
+	* OPT: look in filter names and options for OPT and suggest possible matches if none found. Use -hx to look for keyword in all option descriptions
+
+-p (string):                   use indicated profile for the global GPAC config. If not found, config file is created. If a file path is indicated, this will load profile from that file. Otherwise, this will create a directory of the specified name and store new config there. Reserved name 0 means a new profile, not stored to disk. Appending :reload to the profile name will force recreating a new configuration file
+-alias (string):               assign a new alias or remove an alias. Can be specified several times. See alias usage (-h alias)
+-aliasdoc (string):            assign documentation for a given alias (optional). Can be specified several times
+-uncache:                      revert all items in GPAC cache directory to their original name and server path
+-js (string):                  specify javascript file to use as controller of filter session
+-wc:                           write all core options in the config file unless already set
+-we:                           write all file extensions in the config file unless already set (useful to change some default file extensions)
+-wf:                           write all filter options in the config file unless already set
+-wfx:                          write all filter options and all meta filter arguments in the config file unless already set (large config file !)
+-xopt:                         unrecognized options and filters declaration following this option are ignored - used to pass arguments to GUI
+
+  
+The following libgpac core options allow customizing the filter session:
+  
+-dbg-edges:                    log edges status in filter graph before dijkstra resolution (for debug). Edges are logged as edge_source(status, weight, src_cap_idx, dst_cap_idx)
+-full-link:                    throw error if any pid in the filter graph cannot be linked
+-no-block (Enum, default: no): disable blocking mode of filters
+	* no: enable blocking mode
+	* fanout: disable blocking on fanout, unblocking the PID as soon as one of its destinations requires a packet
+	* all: disable blocking
+-no-reg:                       disable regulation (no sleep) in session
+-no-reassign:                  disable source filter reassignment in pid graph resolution
+-sched (Enum, default: free):  set scheduler mode
+	* free: lock-free queues except for task list (default)
+	* lock: mutexes for queues when several threads
+	* freex: lock-free queues including for task lists (experimental)
+	* flock: mutexes for queues even when no thread (debug mode)
+	* direct: no threads and direct dispatch of tasks whenever possible (debug mode)
+-max-chain (int, default: 6):  set maximum chain length when resolving filter links. Default value covers for [ in -> ] demux -> reframe -> decode -> encode -> reframe -> mux [ -> out]. Filter chains loaded for adaptation (eg pixel format change) are loaded after the link resolution. Setting the value to 0 disables dynamic link resolution. You will have to specify the entire chain manually
+-max-sleep (int, default: 50): set maximum sleep time slot in milliseconds when regulation is enabled
+-threads (int):                set N extra thread for the session. -1 means use all available cores
+-no-probe:                     disable data probing on sources and relies on extension (faster load but more error-prone)
+-no-argchk:                    disable tracking of argument usage (all arguments will be considered as used)
+-blacklist (string):           blacklist the filters listed in the given string (comma-separated list)
+-no-graph-cache:               disable internal caching of filter graph connections. If disabled, the graph will be recomputed at each link resolution (lower memory usage but slower)
+-no-reservoir:                 disable memory recycling for packets and properties. This uses much less memory but stresses the system memory allocator much more
+

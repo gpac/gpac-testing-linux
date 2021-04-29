@@ -1,0 +1,60 @@
+*** rtsp-server-dynurl logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:45:53 ***
+
+Computing ./results/temp/inspect.txt  (dump-inspect) hash: 
+File hash (SHA-1): 9C0D1BEC1F723D35420F3654B05C159203CF22E2
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i rtsp://127.0.0.1:8888/@enst_audio.aac@enst_video.h264 inspect:deep:allp:dur=1/1:interleave=false:log=./results/temp/inspect.txt  -stats -graph" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1675452288
+
+Filter stats - 2 filters
+	Filter rtpin (src=rtsp://127.0.0.1:8888/@enst_audio.aac@enst_video.h264) : 0 input pids 2 output pids 63165 tasks 359234 us process time
+		98 packets sent 15757 bytes sent (272.803 pck/sec 0.350902 mbps)
+		* output PID PID1: 48 packets sent
+		* output PID PID2: 50 packets sent
+	Filter inspect (deep:allp:dur=1/1:interleave=false:log=./results/temp/inspect.txt) : 2 input pids 0 output pids 78 tasks 1047 us process time
+		73 packets processed 15757 bytes processed (69723 pck/sec 120.397 mbps)
+		* input PID PID1: 48 packets received
+		* input PID PID2: 25 frames (50 packets) received
+Session stats - threads 1
+	Thread 1: run_time 1859915 us active_time 375129 us nb_tasks 63243
+
+Total: run_time 1859915 us active_time 375129 us nb_tasks 63243
+
+Filters connected:
+rtpin (src=rtsp://127.0.0.1:8888/@enst_audio.aac@enst_video.h264) (ptr=0x55a3868d7840)
+-(PID PID1) inspect (deep:allp:dur=1/1:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55a3868d9fd0)
+-(PID PID2) inspect (deep:allp:dur=1/1:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55a3868d9fd0)
+
+
+*** Subtest "server": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -runfor=4000 rtspout:port=8888:runfor=1500:mounts=./media/auxiliary_files/  --tso=10000 --dynurl -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -829214848
+[RTPOut] AAC stream detected but not information available on average size/tsdelta/duration, assuming const dur 1024 max_tsdelta 1024 average size 500 max size 1000
+[RTPOut] RTP session stream 2 - sending packet 1 (DTS 0) too late by 6708 us - clock 1282559 us
+
+Filter stats - 5 filters
+	Filter rtspout (port=8888:runfor=1500:mounts=./media/auxiliary_files/) : 2 input pids 0 output pids 760 tasks 435477 us process time
+		119 packets processed 25330 bytes processed (273.264 pck/sec 0.465329 mbps)
+		* input PID enst_audio.aac: 79 frames (330 packets) received
+		* input PID enst_video.h264: 40 frames (174 packets) received
+	Filter fin (src=./media/auxiliary_files//enst_audio.aac) : 0 input pids 1 output pids 23 tasks 955 us process time
+		18 packets sent 85058 bytes sent (18848.2 pck/sec 712.528 mbps)
+		* output PID enst_audio.aac: 18 packets sent
+	Filter fin (src=./media/auxiliary_files//enst_video.h264) : 0 input pids 1 output pids 15 tasks 665 us process time
+		10 packets sent 47679 bytes sent (15037.6 pck/sec 573.582 mbps)
+		* output PID enst_video.h264: 10 packets sent
+	Filter rfadts : 1 input pids 1 output pids 95758 tasks 9029 us process time
+		18 packets processed 85058 bytes processed (1993.58 pck/sec 75.3643 mbps)
+		330 packets sent 82748 bytes sent (36548.9 pck/sec 73.3175 mbps)
+		* input PID enst_audio.aac: 18 packets received
+		* output PID enst_audio.aac: 330 packets sent
+	Filter rfnalu : 1 input pids 1 output pids 147175 tasks 20657 us process time
+		10 packets processed 47679 bytes processed (484.097 pck/sec 18.465 mbps)
+		174 packets sent 47611 bytes sent (8423.29 pck/sec 18.4387 mbps)
+		* input PID enst_video.h264: 10 packets received
+		* output PID enst_video.h264: 174 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2940172 us active_time 544078 us nb_tasks 243842
+
+Total: run_time 2940172 us active_time 544078 us nb_tasks 243842
+

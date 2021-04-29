@@ -1,0 +1,39 @@
+*** mp4box-tsel logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:43 ***
+
+
+*** Subtest "add": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_video.cmp -add ./media/auxiliary_files/count_french.mp3 -add ./media/auxiliary_files/count_english.mp3 -add ./media/auxiliary_files/count_german.mp3 -new ./results/temp/base.mp4" ***
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+Track Importing MP3 - SampleRate 22050 Num Channels 2
+Track Importing MP3 - SampleRate 22050 Num Channels 2
+Track Importing MP3 - SampleRate 22050 Num Channels 2
+
+Computing ./results/temp/base.mp4  (add) hash: 
+File hash (SHA-1): 84926D405D64C6910CB1A06609FA2E3864EFD159
+Hash OK for ./results/temp/base.mp4
+
+*** Subtest "group-add": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -group-add switchID=1:criteria=main:trackID=1 -group-add switchID=2:criteria=lang:trackID=2:trackID=3:trackID=4 ./results/temp/base.mp4" ***
+
+Computing ./results/temp/base.mp4  (group-add) hash: 
+File hash (SHA-1): 605592496AEBB135E538ECE3AE9B4D1033525AD7
+Hash fail, ref hash ./hash_refs/mp4box-tsel-group-add.hash was 080443BF0BF54E9FA8011A5817434AB4E2340357
+
+*** Subtest "group-rem-track": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -group-rem-track 2 ./results/temp/base.mp4" ***
+
+Computing ./results/temp/base.mp4  (group-rem-track) hash: 
+File hash (SHA-1): 7A0A407E7608357D6E7591EB6FDE301DE74E1690
+Hash fail, ref hash ./hash_refs/mp4box-tsel-group-rem-track.hash was 01F2970CF4108D68A17CB006161F50BEC6D7AC8D
+
+*** Subtest "group-rem": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -group-rem 3 ./results/temp/base.mp4" ***
+
+Computing ./results/temp/base.mp4  (group-rem) hash: 
+File hash (SHA-1): 9DD0B8A3739FB1F2DC4193E6D6A802B5EAACFD3B
+Hash fail, ref hash ./hash_refs/mp4box-tsel-group-rem.hash was C5CF569358CECF3473A1828EAC98906C5A3F31D9
+
+*** Subtest "group-clean": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -group-clean ./results/temp/base.mp4" ***
+
+Computing ./results/temp/base.mp4  (group-clean) hash: 
+File hash (SHA-1): 89851B32C0A54CF35346231F87C93B119DD9B6D1
+Hash fail, ref hash ./hash_refs/mp4box-tsel-group-clean.hash was 7539CA1620D004E391CF88418E157E4295FA6E81

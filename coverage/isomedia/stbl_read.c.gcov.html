@@ -1,0 +1,698 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - isomedia/stbl_read.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">isomedia</a> - stbl_read.c<span style="font-size: 80%;"> (source / <a href="stbl_read.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">192</td>
+            <td class="headerCovTableEntry">258</td>
+            <td class="headerCovTableEntryLo">74.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryHi">91.7 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2019
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / ISO Media File Format sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/internal/isomedia_dev.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #ifndef GPAC_DISABLE_ISOM
+<a name="29"><span class="lineNum">      29 </span>            : </a>
+<span class="lineNum">      30 </span>            : //Get the sample number
+<span class="lineNum">      31 </span><span class="lineCov">        441 : GF_Err stbl_findEntryForTime(GF_SampleTableBox *stbl, u64 DTS, u8 useCTS, u32 *sampleNumber, u32 *prevSampleNumber)</span>
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :         u32 i, j, curSampNum, count;
+<span class="lineNum">      34 </span>            :         s32 CTSOffset;
+<span class="lineNum">      35 </span>            :         u64 curDTS;
+<span class="lineNum">      36 </span>            :         GF_SttsEntry *ent;
+<span class="lineNum">      37 </span><span class="lineCov">        441 :         (*sampleNumber) = 0;</span>
+<span class="lineNum">      38 </span><span class="lineCov">        441 :         (*prevSampleNumber) = 0;</span>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">        441 :         if (!stbl-&gt;TimeToSample) return GF_ISOM_INVALID_FILE;</span>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :         /*CTS is ALWAYS disabled for now to make sure samples are fetched in decoding order. useCTS is therefore disabled*/
+<span class="lineNum">      43 </span>            : #if 0
+<span class="lineNum">      44 </span>            :         if (!stbl-&gt;CompositionOffset) useCTS = 0;
+<span class="lineNum">      45 </span>            : #endif
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :         //our cache
+<span class="lineNum">      48 </span><span class="lineCov">        737 :         if (stbl-&gt;TimeToSample-&gt;r_FirstSampleInEntry &amp;&amp;</span>
+<span class="lineNum">      49 </span><span class="lineCov">        296 :                 (DTS &gt;= stbl-&gt;TimeToSample-&gt;r_CurrentDTS) ) {</span>
+<span class="lineNum">      50 </span>            :                 //if we're using CTS, we don't really know whether we're in the good entry or not
+<span class="lineNum">      51 </span>            :                 //(eg, the real DTS of the sample could be in a previous entry
+<span class="lineNum">      52 </span><span class="lineCov">        286 :                 i = stbl-&gt;TimeToSample-&gt;r_currentEntryIndex;</span>
+<span class="lineNum">      53 </span>            :                 curDTS = stbl-&gt;TimeToSample-&gt;r_CurrentDTS;
+<span class="lineNum">      54 </span><span class="lineCov">        286 :                 curSampNum = stbl-&gt;TimeToSample-&gt;r_FirstSampleInEntry;</span>
+<span class="lineNum">      55 </span>            :         } else {
+<span class="lineNum">      56 </span>            :                 i = 0;
+<span class="lineNum">      57 </span><span class="lineCov">        155 :                 curDTS = stbl-&gt;TimeToSample-&gt;r_CurrentDTS = 0;</span>
+<span class="lineNum">      58 </span><span class="lineCov">        155 :                 curSampNum = stbl-&gt;TimeToSample-&gt;r_FirstSampleInEntry = 1;</span>
+<span class="lineNum">      59 </span><span class="lineCov">        155 :                 stbl-&gt;TimeToSample-&gt;r_currentEntryIndex = 0;</span>
+<span class="lineNum">      60 </span>            :         }
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : #if 0
+<span class="lineNum">      63 </span>            :         //we need to validate our cache if we are using CTS because of B-frames and co...
+<span class="lineNum">      64 </span>            :         if (i &amp;&amp; useCTS) {
+<span class="lineNum">      65 </span>            :                 while (1) {
+<span class="lineNum">      66 </span>            :                         stbl_GetSampleCTS(stbl-&gt;CompositionOffset, curSampNum, &amp;CTSOffset);
+<span class="lineNum">      67 </span>            :                         //we're too far, rewind
+<span class="lineNum">      68 </span>            :                         if ( i &amp;&amp; (curDTS + CTSOffset &gt; DTS) ) {
+<span class="lineNum">      69 </span>            :                                 ent = &amp;stbl-&gt;TimeToSample-&gt;entries[i];
+<span class="lineNum">      70 </span>            :                                 curSampNum -= ent-&gt;sampleCount;
+<span class="lineNum">      71 </span>            :                                 curDTS -= (u64)ent-&gt;sampleDelta * ent-&gt;sampleCount;
+<span class="lineNum">      72 </span>            :                                 i --;
+<span class="lineNum">      73 </span>            :                         } else if (!i) {
+<span class="lineNum">      74 </span>            :                                 //beginning of the table, no choice
+<span class="lineNum">      75 </span>            :                                 curDTS = stbl-&gt;TimeToSample-&gt;r_CurrentDTS = 0;
+<span class="lineNum">      76 </span>            :                                 curSampNum = stbl-&gt;TimeToSample-&gt;r_FirstSampleInEntry = 1;
+<span class="lineNum">      77 </span>            :                                 stbl-&gt;TimeToSample-&gt;r_currentEntryIndex = 0;
+<span class="lineNum">      78 </span>            :                                 break;
+<span class="lineNum">      79 </span>            :                         } else {
+<span class="lineNum">      80 </span>            :                                 //OK now we're good
+<span class="lineNum">      81 </span>            :                                 break;
+<span class="lineNum">      82 </span>            :                         }
+<span class="lineNum">      83 </span>            :                 }
+<span class="lineNum">      84 </span>            :         }
+<span class="lineNum">      85 </span>            : #endif
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :         //look for the DTS from this entry
+<span class="lineNum">      88 </span><span class="lineCov">        441 :         count = stbl-&gt;TimeToSample-&gt;nb_entries;</span>
+<span class="lineNum">      89 </span><span class="lineCov">        471 :         for (; i&lt;count; i++) {</span>
+<span class="lineNum">      90 </span><span class="lineCov">        392 :                 ent = &amp;stbl-&gt;TimeToSample-&gt;entries[i];</span>
+<span class="lineNum">      91 </span>            : #if 0
+<span class="lineNum">      92 </span>            :                 if (useCTS) {
+<span class="lineNum">      93 </span>            :                         stbl_GetSampleCTS(stbl-&gt;CompositionOffset, curSampNum, &amp;CTSOffset);
+<span class="lineNum">      94 </span>            :                 } else
+<span class="lineNum">      95 </span>            : #endif
+<span class="lineNum">      96 </span>            :                 {
+<span class="lineNum">      97 </span>            :                         CTSOffset = 0;
+<span class="lineNum">      98 </span>            :                 }
+<span class="lineNum">      99 </span><span class="lineCov">       8329 :                 for (j=0; j&lt;ent-&gt;sampleCount; j++) {</span>
+<span class="lineNum">     100 </span><span class="lineCov">       8299 :                         if (curDTS + CTSOffset &gt;= DTS) goto entry_found;</span>
+<span class="lineNum">     101 </span><span class="lineCov">       7937 :                         curSampNum += 1;</span>
+<span class="lineNum">     102 </span><span class="lineCov">       7937 :                         curDTS += ent-&gt;sampleDelta;</span>
+<span class="lineNum">     103 </span>            :                 }
+<span class="lineNum">     104 </span>            :                 //we're switching to the next entry, update the cache!
+<span class="lineNum">     105 </span><span class="lineCov">         30 :                 stbl-&gt;TimeToSample-&gt;r_CurrentDTS += (u64)ent-&gt;sampleCount * ent-&gt;sampleDelta;</span>
+<span class="lineNum">     106 </span><span class="lineCov">         30 :                 stbl-&gt;TimeToSample-&gt;r_currentEntryIndex += 1;</span>
+<span class="lineNum">     107 </span><span class="lineCov">         30 :                 stbl-&gt;TimeToSample-&gt;r_FirstSampleInEntry += ent-&gt;sampleCount;</span>
+<span class="lineNum">     108 </span>            :         }
+<span class="lineNum">     109 </span>            :         //return as is
+<span class="lineNum">     110 </span>            :         return GF_OK;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineCov">        362 : entry_found:</span>
+<span class="lineNum">     113 </span>            :         //do we have the exact time ?
+<span class="lineNum">     114 </span><span class="lineCov">        362 :         if (curDTS + CTSOffset == DTS) {</span>
+<span class="lineNum">     115 </span><span class="lineCov">        278 :                 (*sampleNumber) = curSampNum;</span>
+<span class="lineNum">     116 </span>            :         }
+<span class="lineNum">     117 </span>            :         //if we match the exact DTS also select this sample
+<span class="lineNum">     118 </span>            :         else if (curDTS == DTS) {
+<span class="lineNum">     119 </span>            :                 (*sampleNumber) = curSampNum;
+<span class="lineNum">     120 </span>            :         } else {
+<span class="lineNum">     121 </span>            :                 //exception for the first sample (we need to &quot;load&quot; the playback)
+<span class="lineNum">     122 </span><span class="lineCov">         84 :                 if (curSampNum != 1) {</span>
+<span class="lineNum">     123 </span><span class="lineCov">         84 :                         (*prevSampleNumber) = curSampNum - 1;</span>
+<span class="lineNum">     124 </span>            :                 } else {
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                         (*prevSampleNumber) = 1;</span>
+<span class="lineNum">     126 </span>            :                 }
+<span class="lineNum">     127 </span>            :         }
+<span class="lineNum">     128 </span>            :         return GF_OK;
+<span class="lineNum">     129 </span>            : }
+<a name="130"><span class="lineNum">     130 </span>            : </a>
+<span class="lineNum">     131 </span>            : //Get the Size of a given sample
+<span class="lineNum">     132 </span><span class="lineCov">    3886024 : GF_Err stbl_GetSampleSize(GF_SampleSizeBox *stsz, u32 SampleNumber, u32 *Size)</span>
+<span class="lineNum">     133 </span>            : {
+<span class="lineNum">     134 </span><span class="lineCov">    3886024 :         if (!stsz || !SampleNumber || (SampleNumber &gt; stsz-&gt;sampleCount))</span>
+<span class="lineNum">     135 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">    3886024 :         if (stsz-&gt;sampleSize &amp;&amp; (stsz-&gt;type != GF_ISOM_BOX_TYPE_STZ2)) {</span>
+<span class="lineNum">     138 </span><span class="lineCov">    1121139 :                 (*Size) = stsz-&gt;sampleSize;</span>
+<span class="lineNum">     139 </span><span class="lineCov">    2764885 :         } else if (stsz-&gt;sizes) {</span>
+<span class="lineNum">     140 </span><span class="lineCov">    2764885 :                 (*Size) = stsz-&gt;sizes[SampleNumber - 1];</span>
+<span class="lineNum">     141 </span>            :         } else {
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :                 (*Size) = 0;</span>
+<span class="lineNum">     143 </span>            :         }
+<span class="lineNum">     144 </span>            :         return GF_OK;
+<span class="lineNum">     145 </span>            : }
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            : 
+<a name="148"><span class="lineNum">     148 </span>            : </a>
+<span class="lineNum">     149 </span>            : //Get the CTS offset of a given sample
+<span class="lineNum">     150 </span><span class="lineCov">     436672 : GF_Err stbl_GetSampleCTS(GF_CompositionOffsetBox *ctts, u32 SampleNumber, s32 *CTSoffset)</span>
+<span class="lineNum">     151 </span>            : {
+<span class="lineNum">     152 </span>            :         u32 i;
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineCov">     436672 :         (*CTSoffset) = 0;</span>
+<span class="lineNum">     155 </span>            :         //test on SampleNumber is done before
+<span class="lineNum">     156 </span><span class="lineCov">     436672 :         if (!ctts || !SampleNumber) return GF_BAD_PARAM;</span>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span><span class="lineCov">     436672 :         if (ctts-&gt;r_FirstSampleInEntry &amp;&amp; (ctts-&gt;r_FirstSampleInEntry &lt; SampleNumber) ) {</span>
+<span class="lineNum">     159 </span><span class="lineCov">     431400 :                 i = ctts-&gt;r_currentEntryIndex;</span>
+<span class="lineNum">     160 </span>            :         } else {
+<span class="lineNum">     161 </span><span class="lineCov">       5272 :                 ctts-&gt;r_FirstSampleInEntry = 1;</span>
+<span class="lineNum">     162 </span><span class="lineCov">       5272 :                 ctts-&gt;r_currentEntryIndex = 0;</span>
+<span class="lineNum">     163 </span>            :                 i = 0;
+<span class="lineNum">     164 </span>            :         }
+<span class="lineNum">     165 </span><span class="lineCov">     393963 :         for (; i&lt; ctts-&gt;nb_entries; i++) {</span>
+<span class="lineNum">     166 </span><span class="lineCov">     826783 :                 if (SampleNumber &lt; ctts-&gt;r_FirstSampleInEntry + ctts-&gt;entries[i].sampleCount) break;</span>
+<span class="lineNum">     167 </span>            :                 //update our cache
+<span class="lineNum">     168 </span><span class="lineCov">     393963 :                 ctts-&gt;r_currentEntryIndex += 1;</span>
+<span class="lineNum">     169 </span><span class="lineCov">     393963 :                 ctts-&gt;r_FirstSampleInEntry += ctts-&gt;entries[i].sampleCount;</span>
+<span class="lineNum">     170 </span>            :         }
+<span class="lineNum">     171 </span>            :         //no ent, set everything to 0...
+<span class="lineNum">     172 </span><span class="lineCov">     436672 :         if (i==ctts-&gt;nb_entries) return GF_OK;</span>
+<span class="lineNum">     173 </span>            :         /*asked for a sample not in table - this means CTTS is 0 (that's due to out internal packing construction of CTTS)*/
+<span class="lineNum">     174 </span><span class="lineCov">     432820 :         if (SampleNumber &gt;= ctts-&gt;r_FirstSampleInEntry + ctts-&gt;entries[i].sampleCount) return GF_OK;</span>
+<span class="lineNum">     175 </span><span class="lineCov">     432820 :         (*CTSoffset) = ctts-&gt;entries[i].decodingOffset;</span>
+<span class="lineNum">     176 </span><span class="lineCov">     432820 :         return GF_OK;</span>
+<span class="lineNum">     177 </span>            : }
+<a name="178"><span class="lineNum">     178 </span>            : </a>
+<span class="lineNum">     179 </span>            : //Get the DTS of a sample
+<span class="lineNum">     180 </span><span class="lineCov">    4376569 : GF_Err stbl_GetSampleDTS_and_Duration(GF_TimeToSampleBox *stts, u32 SampleNumber, u64 *DTS, u32 *duration)</span>
+<span class="lineNum">     181 </span>            : {
+<span class="lineNum">     182 </span>            :         u32 i, j, count;
+<span class="lineNum">     183 </span>            :         GF_SttsEntry *ent;
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">    4376569 :         (*DTS) = 0;</span>
+<span class="lineNum">     186 </span><span class="lineCov">    4376569 :         if (duration) {</span>
+<span class="lineNum">     187 </span><span class="lineCov">    2674138 :                 *duration = 0;</span>
+<span class="lineNum">     188 </span>            :         }
+<span class="lineNum">     189 </span><span class="lineCov">    4376569 :         if (!stts || !SampleNumber) return GF_BAD_PARAM;</span>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            :         ent = NULL;
+<span class="lineNum">     192 </span>            :         //use our cache
+<span class="lineNum">     193 </span><span class="lineCov">    4362484 :         count = stts-&gt;nb_entries;</span>
+<span class="lineNum">     194 </span><span class="lineCov">    4362484 :         if (stts-&gt;r_FirstSampleInEntry</span>
+<span class="lineNum">     195 </span><span class="lineCov">    3800454 :                 &amp;&amp; (stts-&gt;r_FirstSampleInEntry &lt;= SampleNumber)</span>
+<span class="lineNum">     196 </span>            :                 //this is for read/write access
+<span class="lineNum">     197 </span><span class="lineCov">    3799710 :                 &amp;&amp; (stts-&gt;r_currentEntryIndex &lt; count) ) {</span>
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            :                 i = stts-&gt;r_currentEntryIndex;
+<span class="lineNum">     200 </span>            :         } else {
+<span class="lineNum">     201 </span><span class="lineCov">     562841 :                 i = stts-&gt;r_currentEntryIndex = 0;</span>
+<span class="lineNum">     202 </span><span class="lineCov">     562841 :                 stts-&gt;r_FirstSampleInEntry = 1;</span>
+<span class="lineNum">     203 </span><span class="lineCov">     562841 :                 stts-&gt;r_CurrentDTS = 0;</span>
+<span class="lineNum">     204 </span>            :         }
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span><span class="lineCov">    5523627 :         for (; i &lt; count; i++) {</span>
+<span class="lineNum">     207 </span><span class="lineCov">    9885977 :                 ent = &amp;stts-&gt;entries[i];</span>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            :                 //in our entry
+<span class="lineNum">     210 </span><span class="lineCov">    9885977 :                 if (ent-&gt;sampleCount + stts-&gt;r_FirstSampleInEntry &gt;= 1 + SampleNumber) {</span>
+<span class="lineNum">     211 </span><span class="lineCov">    4362350 :                         j = SampleNumber - stts-&gt;r_FirstSampleInEntry;</span>
+<span class="lineNum">     212 </span>            :                         goto found;
+<span class="lineNum">     213 </span>            :                 }
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :                 //update our cache
+<span class="lineNum">     216 </span><span class="lineCov">    5523627 :                 stts-&gt;r_CurrentDTS += (u64)ent-&gt;sampleCount * ent-&gt;sampleDelta;</span>
+<span class="lineNum">     217 </span><span class="lineCov">    5523627 :                 stts-&gt;r_currentEntryIndex += 1;</span>
+<span class="lineNum">     218 </span><span class="lineCov">    5523627 :                 stts-&gt;r_FirstSampleInEntry += ent-&gt;sampleCount;</span>
+<span class="lineNum">     219 </span>            :         }
+<span class="lineNum">     220 </span>            : //      if (SampleNumber &gt;= stts-&gt;r_FirstSampleInEntry + ent-&gt;sampleCount) return GF_BAD_PARAM;
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :         //no ent, this is really weird. Let's assume the DTS is then what is written in the table
+<span class="lineNum">     223 </span><span class="lineCov">        134 :         if (!ent || (i == count)) {</span>
+<span class="lineNum">     224 </span><span class="lineCov">        134 :                 (*DTS) = stts-&gt;r_CurrentDTS;</span>
+<span class="lineNum">     225 </span><span class="lineCov">        134 :                 if (duration) *duration = ent ? ent-&gt;sampleDelta : 0;</span>
+<span class="lineNum">     226 </span>            :         }
+<span class="lineNum">     227 </span>            :         return GF_OK;
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            : found:
+<span class="lineNum">     230 </span><span class="lineCov">    4362350 :         (*DTS) = stts-&gt;r_CurrentDTS + j * (u64) ent-&gt;sampleDelta;</span>
+<span class="lineNum">     231 </span><span class="lineCov">    7022269 :         if (duration) *duration = ent-&gt;sampleDelta;</span>
+<span class="lineNum">     232 </span>            :         return GF_OK;
+<a name="233"><span class="lineNum">     233 </span>            : }</a>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">    1702431 : GF_Err stbl_GetSampleDTS(GF_TimeToSampleBox *stts, u32 SampleNumber, u64 *DTS)</span>
+<span class="lineNum">     236 </span>            : {
+<span class="lineNum">     237 </span><span class="lineCov">    1702431 :         return stbl_GetSampleDTS_and_Duration(stts, SampleNumber, DTS, NULL);</span>
+<a name="238"><span class="lineNum">     238 </span>            : }</a>
+<span class="lineNum">     239 </span>            : //Retrieve closes RAP for a given sample - if sample is RAP, sets the RAP flag
+<span class="lineNum">     240 </span><span class="lineCov">     743736 : GF_Err stbl_GetSampleRAP(GF_SyncSampleBox *stss, u32 SampleNumber, GF_ISOSAPType *IsRAP, u32 *prevRAP, u32 *nextRAP)</span>
+<span class="lineNum">     241 </span>            : {
+<span class="lineNum">     242 </span>            :         u32 i;
+<span class="lineNum">     243 </span><span class="lineCov">     743736 :         if (prevRAP) *prevRAP = 0;</span>
+<span class="lineNum">     244 </span><span class="lineCov">     743736 :         if (nextRAP) *nextRAP = 0;</span>
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">     743736 :         (*IsRAP) = RAP_NO;</span>
+<span class="lineNum">     247 </span><span class="lineCov">     743736 :         if (!stss || !SampleNumber) return GF_BAD_PARAM;</span>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineCov">     743736 :         if (stss-&gt;r_LastSyncSample &amp;&amp; (stss-&gt;r_LastSyncSample &lt; SampleNumber) ) {</span>
+<span class="lineNum">     250 </span><span class="lineCov">     732485 :                 i = stss-&gt;r_LastSampleIndex;</span>
+<span class="lineNum">     251 </span>            :         } else {
+<span class="lineNum">     252 </span>            :                 i = 0;
+<span class="lineNum">     253 </span>            :         }
+<span class="lineNum">     254 </span><span class="lineCov">     765133 :         for (; i &lt; stss-&gt;nb_entries; i++) {</span>
+<span class="lineNum">     255 </span>            :                 //get the entry
+<span class="lineNum">     256 </span><span class="lineCov">    1377655 :                 if (stss-&gt;sampleNumbers[i] == SampleNumber) {</span>
+<span class="lineNum">     257 </span>            :                         //update the cache
+<span class="lineNum">     258 </span><span class="lineCov">      28213 :                         stss-&gt;r_LastSyncSample = SampleNumber;</span>
+<span class="lineNum">     259 </span><span class="lineCov">      28213 :                         stss-&gt;r_LastSampleIndex = i;</span>
+<span class="lineNum">     260 </span><span class="lineCov">      28213 :                         (*IsRAP) = RAP;</span>
+<span class="lineNum">     261 </span>            :                 }
+<span class="lineNum">     262 </span><span class="lineCov">    1349442 :                 else if (stss-&gt;sampleNumbers[i] &gt; SampleNumber) {</span>
+<span class="lineNum">     263 </span><span class="lineCov">     612522 :                         if (nextRAP) *nextRAP = stss-&gt;sampleNumbers[i];</span>
+<span class="lineNum">     264 </span>            :                         return GF_OK;
+<span class="lineNum">     265 </span>            :                 }
+<span class="lineNum">     266 </span><span class="lineCov">     765133 :                 if (prevRAP) *prevRAP = stss-&gt;sampleNumbers[i];</span>
+<span class="lineNum">     267 </span>            :         }
+<span class="lineNum">     268 </span>            :         return GF_OK;
+<a name="269"><span class="lineNum">     269 </span>            : }</a>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineCov">         57 : GF_Err stbl_SearchSAPs(GF_SampleTableBox *stbl, u32 SampleNumber, GF_ISOSAPType *IsRAP, u32 *prevRAP, u32 *nextRAP)</span>
+<span class="lineNum">     272 </span>            : {
+<span class="lineNum">     273 </span>            :         u32 i, j, count, count2;
+<span class="lineNum">     274 </span>            :         assert(prevRAP);
+<span class="lineNum">     275 </span>            :         assert(nextRAP);
+<span class="lineNum">     276 </span><span class="lineCov">         57 :         (*prevRAP) = 0;</span>
+<span class="lineNum">     277 </span><span class="lineCov">         57 :         (*nextRAP) = 0;</span>
+<span class="lineNum">     278 </span><span class="lineCov">         57 :         (*IsRAP) = RAP_NO;</span>
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span><span class="lineCov">         57 :         if (!stbl-&gt;sampleGroups || !stbl-&gt;sampleGroupsDescription) return GF_OK;</span>
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span><span class="lineCov">          1 :         count = gf_list_count(stbl-&gt;sampleGroups);</span>
+<span class="lineNum">     283 </span><span class="lineCov">          1 :         count2 = gf_list_count(stbl-&gt;sampleGroupsDescription);</span>
+<span class="lineNum">     284 </span><span class="lineCov">          2 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     285 </span>            :                 GF_SampleGroupDescriptionBox *sgdp = NULL;
+<span class="lineNum">     286 </span>            :                 Bool is_rap_group = 0;
+<span class="lineNum">     287 </span>            :                 s32 roll_distance = 0;
+<span class="lineNum">     288 </span>            :                 u32 first_sample_in_entry, last_sample_in_entry;
+<span class="lineNum">     289 </span><span class="lineCov">          1 :                 GF_SampleGroupBox *sg = gf_list_get(stbl-&gt;sampleGroups, i);</span>
+<span class="lineNum">     290 </span><span class="lineCov">          1 :                 switch (sg-&gt;grouping_type) {</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                 case GF_ISOM_SAMPLE_GROUP_RAP:</span>
+<span class="lineNum">     292 </span>            :                 case GF_ISOM_SAMPLE_GROUP_SYNC:
+<span class="lineNum">     293 </span>            :                         is_rap_group = 1;
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     295 </span>            :                 case GF_ISOM_SAMPLE_GROUP_ROLL:
+<span class="lineNum">     296 </span>            :                         break;
+<span class="lineNum">     297 </span><span class="lineCov">          1 :                 default:</span>
+<span class="lineNum">     298 </span><span class="lineCov">          1 :                         continue;</span>
+<span class="lineNum">     299 </span>            :                 }
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :                 for (j=0; j&lt;count2; j++) {</span>
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :                         sgdp = gf_list_get(stbl-&gt;sampleGroupsDescription, j);</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :                         if (sgdp-&gt;grouping_type==sg-&gt;grouping_type) break;</span>
+<span class="lineNum">     303 </span>            :                         sgdp = NULL;
+<span class="lineNum">     304 </span>            :                 }
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :                 if (! sgdp) continue;</span>
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :                 first_sample_in_entry=1;
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :                 for (j=0; j&lt;sg-&gt;entry_count; j++) {</span>
+<span class="lineNum">     309 </span>            :                         u32 first_rap_in_entry, last_rap_in_entry;
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :                         last_sample_in_entry = first_sample_in_entry + sg-&gt;sample_entries[j].sample_count - 1;</span>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            :                         /*samples in this entry are not RAPs, continue*/
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :                         if (! sg-&gt;sample_entries[j].group_description_index) {</span>
+<span class="lineNum">     314 </span>            :                                 first_sample_in_entry += sg-&gt;sample_entries[j].sample_count;
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                                 continue;</span>
+<span class="lineNum">     316 </span>            :                         }
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :                         if (!is_rap_group) {</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :                                 GF_RollRecoveryEntry *entry = gf_list_get(sgdp-&gt;group_descriptions, sg-&gt;sample_entries[j].group_description_index - 1);</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                                 roll_distance = entry ? entry-&gt;roll_distance : 0;</span>
+<span class="lineNum">     320 </span>            :                         }
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :                         /*we consider the first sample in a roll or rap group entry to be the RAP (eg, we have to decode from this sample anyway)
+<span class="lineNum">     323 </span>            :                         except if roll_distance is strictly negative in which case we have to rewind our sample numbers from roll_distance*/
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                         if (roll_distance &lt; 0) {</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :                                 if ((s32) first_sample_in_entry + roll_distance&gt;=0) first_rap_in_entry = first_sample_in_entry + roll_distance;</span>
+<span class="lineNum">     326 </span>            :                                 else first_rap_in_entry = 0;
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :                                 if ((s32) last_sample_in_entry + roll_distance&gt;=0) last_rap_in_entry = last_sample_in_entry + roll_distance;</span>
+<span class="lineNum">     329 </span>            :                                 else last_rap_in_entry = 0;
+<span class="lineNum">     330 </span>            :                         } else {
+<span class="lineNum">     331 </span>            :                                 first_rap_in_entry = first_sample_in_entry;
+<span class="lineNum">     332 </span>            :                                 last_rap_in_entry = last_sample_in_entry;
+<span class="lineNum">     333 </span>            :                         }
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span>            :                         /*store previous &amp; next sample RAP - note that we do not store the closest previous RAP, only the first of the previous RAP group
+<span class="lineNum">     336 </span>            :                         as RAPs are usually isolated this should not be an issue*/
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :                         if (first_rap_in_entry &lt;= SampleNumber) {</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :                                 *prevRAP = first_rap_in_entry;</span>
+<span class="lineNum">     339 </span>            :                         }
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :                         *nextRAP = last_rap_in_entry;</span>
+<span class="lineNum">     341 </span>            :                         
+<span class="lineNum">     342 </span>            :                         /*sample lies in this (rap) group, it is rap*/
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                         if (is_rap_group) {</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :                                 if ((first_rap_in_entry &lt;= SampleNumber) &amp;&amp; (SampleNumber &lt;= last_rap_in_entry)) {</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :                                         (*IsRAP) = RAP;</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                                         return GF_OK;</span>
+<span class="lineNum">     347 </span>            :                                 }
+<span class="lineNum">     348 </span>            :                         } else {
+<span class="lineNum">     349 </span>            :                                 /*prevRAP or nextRAP matches SampleNumber, sample is RAP*/
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                                 if ((*prevRAP == SampleNumber) || (*nextRAP == SampleNumber)) {</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                                         (*IsRAP) = RAP;</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :                                         return GF_OK;</span>
+<span class="lineNum">     353 </span>            :                                 }
+<span class="lineNum">     354 </span>            :                         }
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            :                         /*first sample in entry is after our target sample, abort*/
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                         if (first_rap_in_entry &gt; SampleNumber) {</span>
+<span class="lineNum">     358 </span>            :                                 break;
+<span class="lineNum">     359 </span>            :                         }
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                         first_sample_in_entry += sg-&gt;sample_entries[j].sample_count;</span>
+<span class="lineNum">     361 </span>            :                 }
+<span class="lineNum">     362 </span>            :         }
+<span class="lineNum">     363 </span>            :         return GF_OK;
+<span class="lineNum">     364 </span>            : }
+<a name="365"><span class="lineNum">     365 </span>            : </a>
+<span class="lineNum">     366 </span>            : //get the number of &quot;ghost chunk&quot; (implicit chunks described by an entry)
+<span class="lineNum">     367 </span><span class="lineCov">    1933354 : void GetGhostNum(GF_StscEntry *ent, u32 EntryIndex, u32 count, GF_SampleTableBox *stbl)</span>
+<span class="lineNum">     368 </span>            : {
+<span class="lineNum">     369 </span>            :         GF_StscEntry *nextEnt;
+<span class="lineNum">     370 </span>            :         u32 ghostNum = 1;
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span><span class="lineCov">    1933354 :         if (!ent) {</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :                 stbl-&gt;SampleToChunk-&gt;ghostNumber = 0;</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :                 return;</span>
+<span class="lineNum">     375 </span>            :         }
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span><span class="lineCov">    1933354 :         if (!ent-&gt;nextChunk) {</span>
+<span class="lineNum">     378 </span><span class="lineCov">     129254 :                 if (EntryIndex+1 == count) {</span>
+<span class="lineNum">     379 </span>            :                         //not specified in the spec, what if the last sample to chunk is no written?
+<span class="lineNum">     380 </span><span class="lineCov">     129254 :                         if (stbl-&gt;ChunkOffset-&gt;type == GF_ISOM_BOX_TYPE_STCO) {</span>
+<span class="lineNum">     381 </span>            :                                 GF_ChunkOffsetBox *stco = (GF_ChunkOffsetBox *)stbl-&gt;ChunkOffset;
+<span class="lineNum">     382 </span><span class="lineCov">     129254 :                                 ghostNum = (stco-&gt;nb_entries &gt; ent-&gt;firstChunk) ? (1 + stco-&gt;nb_entries - ent-&gt;firstChunk) : 1;</span>
+<span class="lineNum">     383 </span>            :                         } else {
+<span class="lineNum">     384 </span>            :                                 GF_ChunkLargeOffsetBox *co64 = (GF_ChunkLargeOffsetBox *)stbl-&gt;ChunkOffset;
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :                                 ghostNum = (co64-&gt;nb_entries &gt; ent-&gt;firstChunk) ? (1 + co64-&gt;nb_entries - ent-&gt;firstChunk) : 1;</span>
+<span class="lineNum">     386 </span>            :                         }
+<span class="lineNum">     387 </span>            :                 } else {
+<span class="lineNum">     388 </span>            :                         //this is an unknown case due to edit mode...
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :                         nextEnt = &amp;stbl-&gt;SampleToChunk-&gt;entries[EntryIndex+1];</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :                         ghostNum = nextEnt-&gt;firstChunk - ent-&gt;firstChunk;</span>
+<span class="lineNum">     391 </span>            :                 }
+<span class="lineNum">     392 </span>            :         } else {
+<span class="lineNum">     393 </span><span class="lineCov">    1804100 :                 ghostNum = (ent-&gt;nextChunk &gt; ent-&gt;firstChunk) ? (ent-&gt;nextChunk - ent-&gt;firstChunk) : 1;</span>
+<span class="lineNum">     394 </span>            :         }
+<span class="lineNum">     395 </span><span class="lineCov">    1933354 :         stbl-&gt;SampleToChunk-&gt;ghostNumber = ghostNum;</span>
+<span class="lineNum">     396 </span>            : }
+<a name="397"><span class="lineNum">     397 </span>            : </a>
+<span class="lineNum">     398 </span>            : //Get the offset, descIndex and chunkNumber of a sample...
+<span class="lineNum">     399 </span><span class="lineCov">    3324005 : GF_Err stbl_GetSampleInfos(GF_SampleTableBox *stbl, u32 sampleNumber, u64 *offset, u32 *chunkNumber, u32 *descIndex, GF_StscEntry **out_ent)</span>
+<span class="lineNum">     400 </span>            : {
+<span class="lineNum">     401 </span>            :         GF_Err e;
+<span class="lineNum">     402 </span>            :         u32 i, k, offsetInChunk, size, chunk_num;
+<span class="lineNum">     403 </span>            :         GF_ChunkOffsetBox *stco;
+<span class="lineNum">     404 </span>            :         GF_ChunkLargeOffsetBox *co64;
+<span class="lineNum">     405 </span>            :         GF_StscEntry *ent;
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span><span class="lineCov">    3324005 :         (*offset) = 0;</span>
+<span class="lineNum">     408 </span><span class="lineCov">    3324005 :         (*chunkNumber) = (*descIndex) = 0;</span>
+<span class="lineNum">     409 </span><span class="lineCov">    3324005 :         if (out_ent) (*out_ent) = NULL;</span>
+<span class="lineNum">     410 </span><span class="lineCov">    3324005 :         if (!stbl || !sampleNumber) return GF_BAD_PARAM;</span>
+<span class="lineNum">     411 </span><span class="lineCov">    3324004 :         if (!stbl-&gt;ChunkOffset || !stbl-&gt;SampleToChunk || !stbl-&gt;SampleSize) return GF_ISOM_INVALID_FILE;</span>
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span><span class="lineCov">    3324004 :         if (stbl-&gt;SampleSize &amp;&amp; stbl-&gt;SampleToChunk-&gt;nb_entries == stbl-&gt;SampleSize-&gt;sampleCount) {</span>
+<span class="lineNum">     414 </span><span class="lineCov">    1477230 :                 ent = &amp;stbl-&gt;SampleToChunk-&gt;entries[sampleNumber-1];</span>
+<span class="lineNum">     415 </span><span class="lineCov">    1477230 :                 if (!ent) return GF_BAD_PARAM;</span>
+<span class="lineNum">     416 </span><span class="lineCov">    1477230 :                 (*descIndex) = ent-&gt;sampleDescriptionIndex;</span>
+<span class="lineNum">     417 </span><span class="lineCov">    1477230 :                 (*chunkNumber) = sampleNumber;</span>
+<span class="lineNum">     418 </span><span class="lineCov">    1477230 :                 if (out_ent) *out_ent = ent;</span>
+<span class="lineNum">     419 </span><span class="lineCov">    1477230 :                 if ( stbl-&gt;ChunkOffset-&gt;type == GF_ISOM_BOX_TYPE_STCO) {</span>
+<span class="lineNum">     420 </span>            :                         stco = (GF_ChunkOffsetBox *)stbl-&gt;ChunkOffset;
+<span class="lineNum">     421 </span><span class="lineCov">    1477230 :                         if (!stco-&gt;offsets) return GF_ISOM_INVALID_FILE;</span>
+<span class="lineNum">     422 </span><span class="lineCov">    1477230 :                         if (stco-&gt;nb_entries &lt; sampleNumber) return GF_ISOM_INVALID_FILE;</span>
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span><span class="lineCov">    1477230 :                         (*offset) = (u64) stco-&gt;offsets[sampleNumber - 1];</span>
+<span class="lineNum">     425 </span>            :                 } else {
+<span class="lineNum">     426 </span>            :                         co64 = (GF_ChunkLargeOffsetBox *)stbl-&gt;ChunkOffset;
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :                         if (!co64-&gt;offsets) return GF_ISOM_INVALID_FILE;</span>
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :                         if (co64-&gt;nb_entries &lt; sampleNumber) return GF_ISOM_INVALID_FILE;</span>
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :                         (*offset) = co64-&gt;offsets[sampleNumber - 1];</span>
+<span class="lineNum">     431 </span>            :                 }
+<span class="lineNum">     432 </span>            :                 return GF_OK;
+<span class="lineNum">     433 </span>            :         }
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span>            :         //check our cache: if desired sample is at or above current cache entry, start from here
+<span class="lineNum">     436 </span><span class="lineCov">    1846774 :         if (stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk &amp;&amp;</span>
+<span class="lineNum">     437 </span>            :                 (stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk &lt;= sampleNumber)) {
+<span class="lineNum">     438 </span>            : 
+<span class="lineNum">     439 </span><span class="lineCov">    1841954 :                 i = stbl-&gt;SampleToChunk-&gt;currentIndex;</span>
+<span class="lineNum">     440 </span><span class="lineCov">    1841954 :                 ent = &amp;stbl-&gt;SampleToChunk-&gt;entries[stbl-&gt;SampleToChunk-&gt;currentIndex];</span>
+<span class="lineNum">     441 </span><span class="lineCov">    1841954 :                 GetGhostNum(ent, i, stbl-&gt;SampleToChunk-&gt;nb_entries, stbl);</span>
+<span class="lineNum">     442 </span><span class="lineCov">    1841954 :                 k = stbl-&gt;SampleToChunk-&gt;currentChunk;</span>
+<span class="lineNum">     443 </span>            :         }
+<span class="lineNum">     444 </span>            :         //otherwise start from first entry
+<span class="lineNum">     445 </span>            :         else {
+<span class="lineNum">     446 </span>            :                 i = 0;
+<span class="lineNum">     447 </span><span class="lineCov">       4820 :                 stbl-&gt;SampleToChunk-&gt;currentIndex = 0;</span>
+<span class="lineNum">     448 </span><span class="lineCov">       4820 :                 stbl-&gt;SampleToChunk-&gt;currentChunk = 1;</span>
+<span class="lineNum">     449 </span><span class="lineCov">       4820 :                 stbl-&gt;SampleToChunk-&gt;ghostNumber = 1;</span>
+<span class="lineNum">     450 </span><span class="lineCov">       4820 :                 stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk = 1;</span>
+<span class="lineNum">     451 </span><span class="lineCov">       4820 :                 ent = &amp;stbl-&gt;SampleToChunk-&gt;entries[0];</span>
+<span class="lineNum">     452 </span><span class="lineCov">       4820 :                 GetGhostNum(ent, 0, stbl-&gt;SampleToChunk-&gt;nb_entries, stbl);</span>
+<span class="lineNum">     453 </span><span class="lineCov">       4820 :                 k = stbl-&gt;SampleToChunk-&gt;currentChunk;</span>
+<span class="lineNum">     454 </span>            :         }
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :         //first get the chunk
+<span class="lineNum">     457 </span><span class="lineCov">    1933358 :         for (; i &lt; stbl-&gt;SampleToChunk-&gt;nb_entries; i++) {</span>
+<span class="lineNum">     458 </span>            :                 assert(stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk &lt;= sampleNumber);
+<span class="lineNum">     459 </span>            :                 //corrupted file (less sample2chunk info than sample count
+<span class="lineNum">     460 </span><span class="lineCov">    1933354 :                 if (k &gt; stbl-&gt;SampleToChunk-&gt;ghostNumber) {</span>
+<span class="lineNum">     461 </span>            :                         return GF_ISOM_INVALID_FILE;
+<span class="lineNum">     462 </span>            :                 }
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            :                 //check if sample is in current chunk
+<span class="lineNum">     466 </span><span class="lineCov">    1933354 :                 u32 max_chunks_in_entry = stbl-&gt;SampleToChunk-&gt;ghostNumber - k;</span>
+<span class="lineNum">     467 </span><span class="lineCov">    1933354 :                 u32 nb_chunks_for_sample = sampleNumber - stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk;</span>
+<span class="lineNum">     468 </span><span class="lineCov">    1933354 :                 if (ent-&gt;samplesPerChunk) </span>
+<span class="lineNum">     469 </span><span class="lineCov">    1933354 :                         nb_chunks_for_sample /= ent-&gt;samplesPerChunk;</span>
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span><span class="lineCov">    1933354 :                 if (</span>
+<span class="lineNum">     472 </span>            :                         (nb_chunks_for_sample &lt;= max_chunks_in_entry)
+<span class="lineNum">     473 </span><span class="lineCov">    1846770 :                         &amp;&amp; (stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk + (nb_chunks_for_sample+1) * ent-&gt;samplesPerChunk &gt; sampleNumber)</span>
+<span class="lineNum">     474 </span>            :                 ) {
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span><span class="lineCov">    1846770 :                         stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk += nb_chunks_for_sample * ent-&gt;samplesPerChunk;</span>
+<span class="lineNum">     477 </span><span class="lineCov">    1846770 :                         stbl-&gt;SampleToChunk-&gt;currentChunk += nb_chunks_for_sample;</span>
+<span class="lineNum">     478 </span>            :                         goto sample_found;
+<span class="lineNum">     479 </span>            :                 }
+<span class="lineNum">     480 </span><span class="lineCov">      86584 :                 max_chunks_in_entry += 1;</span>
+<span class="lineNum">     481 </span><span class="lineCov">      86584 :                 stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk += max_chunks_in_entry * ent-&gt;samplesPerChunk;</span>
+<span class="lineNum">     482 </span><span class="lineCov">      86584 :                 stbl-&gt;SampleToChunk-&gt;currentChunk += max_chunks_in_entry;</span>
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span>            :                 //not in this entry, get the next entry if not the last one
+<span class="lineNum">     485 </span><span class="lineCov">      86584 :                 if (i+1 != stbl-&gt;SampleToChunk-&gt;nb_entries) {</span>
+<span class="lineNum">     486 </span><span class="lineCov">      86580 :                         ent = &amp;stbl-&gt;SampleToChunk-&gt;entries[i+1];</span>
+<span class="lineNum">     487 </span>            :                         //update the GhostNumber
+<span class="lineNum">     488 </span><span class="lineCov">      86580 :                         GetGhostNum(ent, i+1, stbl-&gt;SampleToChunk-&gt;nb_entries, stbl);</span>
+<span class="lineNum">     489 </span>            :                         //update the entry in our cache
+<span class="lineNum">     490 </span><span class="lineCov">      86580 :                         stbl-&gt;SampleToChunk-&gt;currentIndex = i+1;</span>
+<span class="lineNum">     491 </span><span class="lineCov">      86580 :                         stbl-&gt;SampleToChunk-&gt;currentChunk = 1;</span>
+<span class="lineNum">     492 </span>            :                         k = 1;
+<span class="lineNum">     493 </span>            :                 }
+<span class="lineNum">     494 </span>            :         }
+<span class="lineNum">     495 </span>            :         //if we get here, gasp, the sample was not found
+<span class="lineNum">     496 </span>            :         return GF_ISOM_INVALID_FILE;
+<span class="lineNum">     497 </span>            : 
+<span class="lineNum">     498 </span>            : sample_found:
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span><span class="lineCov">    1846770 :         (*descIndex) = ent-&gt;sampleDescriptionIndex;</span>
+<span class="lineNum">     501 </span><span class="lineCov">    1846770 :         (*chunkNumber) = chunk_num = ent-&gt;firstChunk + stbl-&gt;SampleToChunk-&gt;currentChunk - 1;</span>
+<span class="lineNum">     502 </span><span class="lineCov">    3548681 :         if (out_ent) *out_ent = ent;</span>
+<span class="lineNum">     503 </span><span class="lineCov">    1846770 :         if (! *chunkNumber)</span>
+<span class="lineNum">     504 </span>            :                 return GF_ISOM_INVALID_FILE;
+<span class="lineNum">     505 </span>            :         
+<span class="lineNum">     506 </span>            :         //ok, get the size of all the previous samples in the chunk
+<span class="lineNum">     507 </span>            :         offsetInChunk = 0;
+<span class="lineNum">     508 </span>            :         //constant size
+<span class="lineNum">     509 </span><span class="lineCov">    2799613 :         if (stbl-&gt;SampleSize &amp;&amp; stbl-&gt;SampleSize-&gt;sampleSize) {</span>
+<span class="lineNum">     510 </span><span class="lineCov">     952843 :                 u32 diff = sampleNumber - stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk;</span>
+<span class="lineNum">     511 </span><span class="lineCov">     952843 :                 offsetInChunk += diff * stbl-&gt;SampleSize-&gt;sampleSize;</span>
+<span class="lineNum">     512 </span><span class="lineCov">     893927 :         } else if ((stbl-&gt;r_last_chunk_num == chunk_num) &amp;&amp; (stbl-&gt;r_last_sample_num == sampleNumber)) {</span>
+<span class="lineNum">     513 </span><span class="lineCov">      40429 :                 offsetInChunk = stbl-&gt;r_last_offset_in_chunk;</span>
+<span class="lineNum">     514 </span><span class="lineCov">     853498 :         } else if ((stbl-&gt;r_last_chunk_num == chunk_num) &amp;&amp; (stbl-&gt;r_last_sample_num + 1 == sampleNumber)) {</span>
+<span class="lineNum">     515 </span><span class="lineCov">     710288 :                 e = stbl_GetSampleSize(stbl-&gt;SampleSize, stbl-&gt;r_last_sample_num, &amp;size);</span>
+<span class="lineNum">     516 </span><span class="lineCov">     710288 :                 if (e) return e;</span>
+<span class="lineNum">     517 </span><span class="lineCov">     710288 :                 stbl-&gt;r_last_offset_in_chunk += size;</span>
+<span class="lineNum">     518 </span><span class="lineCov">     710288 :                 stbl-&gt;r_last_sample_num = sampleNumber;</span>
+<span class="lineNum">     519 </span><span class="lineCov">     710288 :                 offsetInChunk = stbl-&gt;r_last_offset_in_chunk;</span>
+<span class="lineNum">     520 </span>            :         } else {
+<span class="lineNum">     521 </span>            :                 //warning, firstSampleInChunk is at least 1 - not 0
+<span class="lineNum">     522 </span><span class="lineCov">     143652 :                 for (i = stbl-&gt;SampleToChunk-&gt;firstSampleInCurrentChunk; i &lt; sampleNumber; i++) {</span>
+<span class="lineNum">     523 </span><span class="lineCov">        442 :                         e = stbl_GetSampleSize(stbl-&gt;SampleSize, i, &amp;size);</span>
+<span class="lineNum">     524 </span><span class="lineCov">        442 :                         if (e) return e;</span>
+<span class="lineNum">     525 </span><span class="lineCov">        442 :                         offsetInChunk += size;</span>
+<span class="lineNum">     526 </span>            :                 }
+<span class="lineNum">     527 </span><span class="lineCov">     143210 :                 stbl-&gt;r_last_chunk_num = chunk_num;</span>
+<span class="lineNum">     528 </span><span class="lineCov">     143210 :                 stbl-&gt;r_last_sample_num = sampleNumber;</span>
+<span class="lineNum">     529 </span><span class="lineCov">     143210 :                 stbl-&gt;r_last_offset_in_chunk = offsetInChunk;</span>
+<span class="lineNum">     530 </span>            :         }
+<span class="lineNum">     531 </span>            :         //OK, that's the size of our offset in the chunk
+<span class="lineNum">     532 </span>            :         //now get the chunk
+<span class="lineNum">     533 </span><span class="lineCov">    1846770 :         if ( stbl-&gt;ChunkOffset-&gt;type == GF_ISOM_BOX_TYPE_STCO) {</span>
+<span class="lineNum">     534 </span>            :                 stco = (GF_ChunkOffsetBox *)stbl-&gt;ChunkOffset;
+<span class="lineNum">     535 </span><span class="lineCov">    1846770 :                 if (stco-&gt;nb_entries &lt; (*chunkNumber) ) return GF_ISOM_INVALID_FILE;</span>
+<span class="lineNum">     536 </span><span class="lineCov">    1846770 :                 (*offset) = (u64) stco-&gt;offsets[(*chunkNumber) - 1] + (u64) offsetInChunk;</span>
+<span class="lineNum">     537 </span>            :         } else {
+<span class="lineNum">     538 </span>            :                 co64 = (GF_ChunkLargeOffsetBox *)stbl-&gt;ChunkOffset;
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :                 if (co64-&gt;nb_entries &lt; (*chunkNumber) ) return GF_ISOM_INVALID_FILE;</span>
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :                 (*offset) = co64-&gt;offsets[(*chunkNumber) - 1] + (u64) offsetInChunk;</span>
+<span class="lineNum">     541 </span>            :         }
+<span class="lineNum">     542 </span>            :         return GF_OK;
+<span class="lineNum">     543 </span>            : }
+<a name="544"><span class="lineNum">     544 </span>            : </a>
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 : GF_Err stbl_GetSampleShadow(GF_ShadowSyncBox *stsh, u32 *sampleNumber, u32 *syncNum)</span>
+<span class="lineNum">     547 </span>            : {
+<span class="lineNum">     548 </span>            :         u32 i, count;
+<span class="lineNum">     549 </span>            :         GF_StshEntry *ent;
+<span class="lineNum">     550 </span>            : 
+<span class="lineNum">     551 </span><span class="lineNoCov">          0 :         if (stsh-&gt;r_LastFoundSample &amp;&amp; (stsh-&gt;r_LastFoundSample &lt;= *sampleNumber)) {</span>
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :                 i = stsh-&gt;r_LastEntryIndex;</span>
+<span class="lineNum">     553 </span>            :         } else {
+<span class="lineNum">     554 </span>            :                 i = 0;
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :                 stsh-&gt;r_LastFoundSample = 1;</span>
+<span class="lineNum">     556 </span>            :         }
+<span class="lineNum">     557 </span>            : 
+<span class="lineNum">     558 </span>            :         ent = NULL;
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :         (*syncNum) = 0;</span>
+<span class="lineNum">     560 </span>            : 
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :         count = gf_list_count(stsh-&gt;entries);</span>
+<span class="lineNum">     562 </span><span class="lineNoCov">          0 :         for (; i&lt;count; i++) {</span>
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :                 ent = (GF_StshEntry*)gf_list_get(stsh-&gt;entries, i);</span>
+<span class="lineNum">     564 </span>            :                 //we get the exact desired sample !
+<span class="lineNum">     565 </span><span class="lineNoCov">          0 :                 if (ent-&gt;shadowedSampleNumber == *sampleNumber) {</span>
+<span class="lineNum">     566 </span><span class="lineNoCov">          0 :                         (*syncNum) = ent-&gt;syncSampleNumber;</span>
+<span class="lineNum">     567 </span><span class="lineNoCov">          0 :                         stsh-&gt;r_LastFoundSample = *sampleNumber;</span>
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 :                         stsh-&gt;r_LastEntryIndex = i;</span>
+<span class="lineNum">     569 </span><span class="lineNoCov">          0 :                         return GF_OK;</span>
+<span class="lineNum">     570 </span><span class="lineNoCov">          0 :                 } else if (ent-&gt;shadowedSampleNumber &gt; *sampleNumber) {</span>
+<span class="lineNum">     571 </span>            :                         //do we have an entry before ? If not, there is no shadowing available
+<span class="lineNum">     572 </span>            :                         //for this sample
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :                         if (!i) return GF_OK;</span>
+<span class="lineNum">     574 </span>            :                         //ok, indicate the previous ShadowedSample
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 :                         ent = (GF_StshEntry*)gf_list_get(stsh-&gt;entries, i-1);</span>
+<span class="lineNum">     576 </span><span class="lineNoCov">          0 :                         (*syncNum) = ent-&gt;syncSampleNumber;</span>
+<span class="lineNum">     577 </span>            :                         //change the sample number
+<span class="lineNum">     578 </span><span class="lineNoCov">          0 :                         (*sampleNumber) = ent-&gt;shadowedSampleNumber;</span>
+<span class="lineNum">     579 </span>            :                         //reset the cache to the last ShadowedSample
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :                         stsh-&gt;r_LastEntryIndex = i-1;</span>
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :                         stsh-&gt;r_LastFoundSample = ent-&gt;shadowedSampleNumber;</span>
+<span class="lineNum">     582 </span>            :                 }
+<span class="lineNum">     583 </span>            :         }
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 :         stsh-&gt;r_LastEntryIndex = i-1;</span>
+<span class="lineNum">     585 </span><span class="lineNoCov">          0 :         stsh-&gt;r_LastFoundSample = ent ? ent-&gt;shadowedSampleNumber : 0;</span>
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<span class="lineNum">     587 </span>            : }
+<span class="lineNum">     588 </span>            : 
+<a name="589"><span class="lineNum">     589 </span>            : </a>
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span><span class="lineCov">          1 : GF_Err stbl_GetPaddingBits(GF_PaddingBitsBox *padb, u32 SampleNumber, u8 *PadBits)</span>
+<span class="lineNum">     592 </span>            : {
+<span class="lineNum">     593 </span><span class="lineCov">          1 :         if (!PadBits) return GF_BAD_PARAM;</span>
+<span class="lineNum">     594 </span><span class="lineCov">          1 :         *PadBits = 0;</span>
+<span class="lineNum">     595 </span><span class="lineCov">          1 :         if (!padb || !padb-&gt;padbits) return GF_OK;</span>
+<span class="lineNum">     596 </span>            :         //the spec says &quot;should&quot; not shall. return 0 padding
+<span class="lineNum">     597 </span><span class="lineNoCov">          0 :         if (padb-&gt;SampleCount &lt; SampleNumber) return GF_OK;</span>
+<span class="lineNum">     598 </span><span class="lineNoCov">          0 :         *PadBits = padb-&gt;padbits[SampleNumber-1];</span>
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<span class="lineNum">     600 </span>            : }
+<a name="601"><span class="lineNum">     601 </span>            : </a>
+<span class="lineNum">     602 </span>            : //Set the RAP flag of a sample
+<span class="lineNum">     603 </span><span class="lineCov">     231983 : GF_Err stbl_GetSampleDepType(GF_SampleDependencyTypeBox *sdep, u32 SampleNumber, u32 *isLeading, u32 *dependsOn, u32 *dependedOn, u32 *redundant)</span>
+<span class="lineNum">     604 </span>            : {
+<span class="lineNum">     605 </span>            :         u8 flag;
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span>            :         assert(dependsOn &amp;&amp; dependedOn &amp;&amp; redundant);
+<span class="lineNum">     608 </span><span class="lineCov">     231983 :         *dependsOn = *dependedOn = *redundant = 0;</span>
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span><span class="lineCov">     231983 :         if (SampleNumber &gt; sdep-&gt;sampleCount) {</span>
+<span class="lineNum">     611 </span>            :                 return GF_OK;
+<span class="lineNum">     612 </span>            :         }
+<span class="lineNum">     613 </span><span class="lineCov">     224279 :         flag = sdep-&gt;sample_info[SampleNumber-1];</span>
+<span class="lineNum">     614 </span><span class="lineCov">     224279 :         *isLeading = (flag &gt;&gt; 6) &amp; 3;</span>
+<span class="lineNum">     615 </span><span class="lineCov">     224279 :         *dependsOn = (flag &gt;&gt; 4) &amp; 3;</span>
+<span class="lineNum">     616 </span><span class="lineCov">     224279 :         *dependedOn = (flag &gt;&gt; 2) &amp; 3;</span>
+<span class="lineNum">     617 </span><span class="lineCov">     224279 :         *redundant = (flag) &amp; 3;</span>
+<span class="lineNum">     618 </span><span class="lineCov">     224279 :         return GF_OK;</span>
+<span class="lineNum">     619 </span>            : }
+<span class="lineNum">     620 </span>            : 
+<span class="lineNum">     621 </span>            : 
+<span class="lineNum">     622 </span>            : #endif /*GPAC_DISABLE_ISOM*/
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

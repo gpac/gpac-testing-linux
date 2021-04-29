@@ -1,0 +1,52 @@
+*** mp4box-udta logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:44 ***
+
+
+*** Subtest "udta-moov": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/logo.png -udta 0:type=GPAC:src=./media/auxiliary_files/logo.jpg -new ./results/temp/udtamoov.mp4" ***
+Track Importing PNG - Width 128 Height 128 FPS 25/1
+
+Computing ./results/temp/udtamoov.mp4  (udta-moov) hash: 
+File hash (SHA-1): AFE25A0209F862BA29566DCFE671482596662D44
+Hash OK for ./results/temp/udtamoov.mp4
+
+*** Subtest "udta-moov-dump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dump-udta GPAC ./results/temp/udtamoov.mp4 -out ./results/temp/dumpmoov.jpg" ***
+
+Computing ./results/temp/dumpmoov.jpg  (udta-moov-dump) hash: 
+File hash (SHA-1): D4FB3C984FD24FEEBE0E69019929AAD82245EEBC
+Hash OK for ./results/temp/dumpmoov.jpg
+
+*** Subtest "udta-moov-rem": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -udta 0:type=GPAC:src= ./results/temp/udtamoov.mp4" ***
+
+Computing ./results/temp/udtamoov.mp4  (udta-moov-rem) hash: 
+File hash (SHA-1): 237E02B95A22CEFD3B661FAEC1A06E55527B409E
+Hash fail, ref hash ./hash_refs/mp4box-udta-udta-moov-rem.hash was CF77544AA3F02A5ACFCEC7BD70FAB101898D50B8
+
+*** Subtest "udta-track": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/logo.png -udta 1:type=GPAC:src=base64,dGVzdA== -new ./results/temp/udtatrack.mp4" ***
+Track Importing PNG - Width 128 Height 128 FPS 25/1
+
+Computing ./results/temp/udtatrack.mp4  (udta-track) hash: 
+File hash (SHA-1): DF32B936B3E171C934FFB649B91B89583DCBE69D
+Hash OK for ./results/temp/udtatrack.mp4
+
+*** Subtest "udta-track-dump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dump-udta 1:GPAC ./results/temp/udtatrack.mp4 -out ./results/temp/dumptrack.bin" ***
+
+Computing ./results/temp/dumptrack.bin  (udta-track-dump) hash: 
+File hash (SHA-1): A94A8FE5CCB19BA61C4C0873D391E987982FBBD3
+Hash OK for ./results/temp/dumptrack.bin
+
+*** Subtest "udta-box-track": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/logo.png -udta 1:type=GPAC:box=./results/temp/udtatrack.mp4 -new ./results/temp/udtatrack2.mp4" ***
+Track Importing PNG - Width 128 Height 128 FPS 25/1
+[iso file] Box udta wrote 664 bytes but size is 16345
+[iso file] Box trak wrote 1115 bytes but size is 16796
+[iso file] Box moov wrote 1231 bytes but size is 16912
+
+Computing ./results/temp/udtatrack2.mp4  (udta-box-track) hash: 
+corrupted isobmf file, box read 0 but expected still 1229278788 bytes
+File hash (SHA-1): A63435DEBE7F971357C99D3C585102D3C62890A9
+Hash OK for ./results/temp/udtatrack2.mp4
+
+*** Subtest "udta-track-str": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_audio.aac -udta 1:type=name:str=My_Super_Name -new ./results/temp/udtatrackstr.mp4" ***
+Track Importing AAC  - SampleRate 48000 Num Channels 2
+
+Computing ./results/temp/udtatrackstr.mp4  (udta-track-str) hash: 
+File hash (SHA-1): 8FE8A590A5A6C331298FE6FF5236E43400BE87F7
+Hash OK for ./results/temp/udtatrackstr.mp4

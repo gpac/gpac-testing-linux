@@ -1,0 +1,70 @@
+*** gpac-h logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:19 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -h" ***
+Usage: gpac [options] FILTER [LINK] FILTER [...] 
+gpac is GPAC's command line tool for setting up and running filter chains.
+
+FILTER: a single filter declaration (eg, -i file, -o dump, inspect, ...), see gpac -h doc.
+[LINK]: a link instruction (eg, @, @2, @2#StreamType=Visual, ...), see gpac -h doc.
+[options]: one or more option strings, each starting with a - character.
+  - an option using a single - indicates an option of gpac (see gpac -hx) or of libgpac (see gpac -hx core)
+  - an option using -- indicates a global filter option, for example --block_size=1000 (see gpac -h doc)
+  - an option using -+ indicates a global meta-filter filter (eg FFMPEG) option, for example -+profile=Baseline (see gpac -h doc)
+  
+Filter declaration order may impact the link resolver which will try linking in declaration order. Most of the time for simple graphs, this has no impact. However, for complex graphs with no link declarations, this can lead to different results.  
+Options do not require any specific order, and may be present anywhere, including between link statements or filter declarations.  
+Boolean values do not need any value specified. Other types shall be formatted as opt=val, except -i, -src, -o, -dst and -h options.
+
+The possible options for gpac are:
+
+-stats:                        print stats after execution
+-graph:                        print graph after execution
+-r (string):                   enable reporting
+	* r: runtime reporting
+	* r=FA[,FB]: runtime reporting but only print given filters, eg r=mp4mx for ISOBMFF muxer only
+	* r=: only print final report
+-i,-src (string):              specify an input file - see filters help (-h doc)
+-o,-dst (string):              specify an output file - see filters help (-h doc)
+-h,-help,-ha,-hx,-hh (string): print help. Use -help or -h for basic options, -ha for advanced options, -hx for expert options and -hh for all.  
+Note: The @ character can be used in place of the * character. String parameter can be:
+	* empty: print command line options help
+	* doc: print the general filter info
+	* alias: print the gpac alias syntax
+	* log: print the log system help
+	* core: print the supported libgpac core options. Use -ha/-hx/-hh for advanced/expert options
+	* cfg: print the GPAC configuration help
+	* prompt: print the GPAC prompt help when running in interactive mode (see -k )
+	* modules: print available modules
+	* filters: print name of all available filters
+	* filters:*: print name of all available filters, including meta filters
+	* codecs: print the supported builtin codecs
+	* props: print the supported builtin PID and packet properties
+	* colors: print the builtin color names and their values
+	* links: print possible connections between each supported filters
+	* links FNAME: print sources and sinks for filter FNAME (either builtin or JS filter)
+	* FNAME: print filter FNAME info (multiple FNAME can be given)
+  - For meta-filters, use FNAME:INST, eg ffavin:avfoundation
+  - Use * to print info on all filters (big output!), *:* to print info on all filters including meta filter instances (really big output!)
+  - By default only basic filter options and description are shown. Use -ha to show advanced options capabilities, -hx for expert options, -hh for all options and filter capabilities including on filters disabled in this build
+	* FNAME.OPT: print option OPT in filter FNAME
+	* OPT: look in filter names and options for OPT and suggest possible matches if none found. Use -hx to look for keyword in all option descriptions
+
+
+Available aliases (use 'gpac -hx alias' for more info on aliases):
+-play:                         play file. EX: gpac -play source.mp4
+-plist:                        build seamless playlist of files. EX: gpac -plist s1.mp4 [... sN.mp4]
+-info:                         inspect files. EX: gpac -info s1.mp4 [... sN.mp4]
+-mplay:                        play input files in parallel. EX: gpac -mplay s1.mp4 [... sN.mp4]
+-bench:                        check decoding speed of source. EX: gpac -bench source.mp4
+-vbench:                       check decoding and display speed of source. EX: gpac -vbench source.mp4
+-gui:                          launch GUI (see gpac -gui -h for GUI options and gpac -h[x] compositor for compositor options)
+
+gpac - GPAC command line filter engine - version 1.1.0-DEV-revUNKNOWN-HEAD
+(c) 2000-2021 Telecom Paris distributed under LGPL v2.1+ - http://gpac.io
+
+Please cite our work in your research:
+	GPAC Filters: https://doi.org/10.1145/3339825.3394929
+	GPAC: https://doi.org/10.1145/1291233.1291452
+
+

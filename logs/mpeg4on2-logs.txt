@@ -1,0 +1,26 @@
+*** mpeg4on2 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:42:05 ***
+
+
+*** Subtest "bifsenc": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -mp4 ./media/bifs/bifs-2D-background-background2D-movie.bt -out ./results/temp/source.mp4" ***
+BT: MPEG-4 Scene Parsing
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+Arg mpeg4 set but not used
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/source.mp4  (bifsenc) hash: 
+File hash (SHA-1): C320DE9CB3DFA156DC58D79C36CDF45485E79678
+Hash OK for ./results/temp/source.mp4
+
+*** Subtest "mux-ts": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/source.mp4 -o ./results/temp/mux.ts" ***
+
+Computing ./results/temp/mux.ts  (mux) hash: 
+File hash (SHA-1): A468B2B13C0450DF56C44DBF2498E825C61BE7EF
+Hash OK for ./results/temp/mux.ts
+
+*** Subtest "demux-ts": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/mux.ts -o ./results/temp/demux.mp4" ***
+
+Computing ./results/temp/demux.mp4  (demux) hash: 
+File hash (SHA-1): 69F5079061A6066A0BCEAC69259535108E95AD18
+Hash OK for ./results/temp/demux.mp4

@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - /home/travis/build/gpac/gpac/modules/dektec_out/dektec_video_decl.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../../../index.html">top level</a> - <a href="index.html">home/travis/build/gpac/gpac/modules/dektec_out</a> - dektec_video_decl.c<span style="font-size: 80%;"> (source / <a href="dektec_video_decl.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntryHi">92.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr><td><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            : *                       GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            : *
+<span class="lineNum">       4 </span>            : *                       Authors: Romain Bouqueau, Jean Le Feuvre
+<span class="lineNum">       5 </span>            : *                       Copyright (c) 2014-2016 GPAC Licensing
+<span class="lineNum">       6 </span>            : *                       Copyright (c) 2016-2020 Telecom Paris
+<span class="lineNum">       7 </span>            : *                                       All rights reserved
+<span class="lineNum">       8 </span>            : *
+<span class="lineNum">       9 </span>            : *  This file is part of GPAC / Dektec SDI video output filter
+<span class="lineNum">      10 </span>            : *
+<span class="lineNum">      11 </span>            : *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      12 </span>            : *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      13 </span>            : *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      14 </span>            : *  any later version.
+<span class="lineNum">      15 </span>            : *
+<span class="lineNum">      16 </span>            : *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      17 </span>            : *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      18 </span>            : *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      19 </span>            : *  GNU Lesser General Public License for more details.
+<span class="lineNum">      20 </span>            : *
+<span class="lineNum">      21 </span>            : *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      22 </span>            : *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      23 </span>            : *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      24 </span>            : *
+<span class="lineNum">      25 </span>            : */
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &quot;dektec_video.h&quot;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #ifdef GPAC_HAS_DTAPI
+<span class="lineNum">      31 </span>            : #define OFFS(_n)        #_n, offsetof(GF_DTOutCtx, _n)
+<span class="lineNum">      32 </span>            : #else
+<a name="33"><span class="lineNum">      33 </span>            : #define OFFS(_n)        #_n, -1</a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 : static GF_Err dtout_process_dummy(GF_Filter *filter)</span>
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<span class="lineNum">      38 </span>            : }
+<span class="lineNum">      39 </span>            : #endif
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : static const GF_FilterArgs DTOutArgs[] =
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span>            :         { OFFS(bus), &quot;PCI bus number - if not set, device discovery is used&quot;, GF_PROP_SINT, &quot;-1&quot;, NULL, GF_FS_ARG_HINT_EXPERT},
+<span class="lineNum">      44 </span>            :         { OFFS(slot), &quot;PCI bus number - if not set, device discovery is used&quot;, GF_PROP_SINT, &quot;-1&quot;, NULL, GF_FS_ARG_HINT_EXPERT },
+<span class="lineNum">      45 </span>            :         { OFFS(fps), &quot;default FPS to use if input stream fps cannot be detected&quot;, GF_PROP_FRACTION, &quot;30/1&quot;, NULL, GF_FS_ARG_HINT_ADVANCED },
+<span class="lineNum">      46 </span>            :         { OFFS(clip), &quot;clip YUV data to valid SDI range, slower&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_HINT_ADVANCED },
+<span class="lineNum">      47 </span>            :         { OFFS(port), &quot;set sdi output port of card&quot;, GF_PROP_UINT, &quot;1&quot;, NULL, GF_FS_ARG_HINT_ADVANCED },
+<span class="lineNum">      48 </span>            :         { OFFS(start), &quot;set playback start offset, [-1, 0] means percent of media dur, eg -1 == dur&quot;, GF_PROP_DOUBLE, &quot;0.0&quot;, NULL, GF_FS_ARG_HINT_NORMAL },
+<span class="lineNum">      49 </span>            :         { 0 }
+<span class="lineNum">      50 </span>            : };
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : static GF_FilterCapability DTOutCaps[3];
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : GF_FilterRegister DTOutRegister;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : #ifdef GPAC_HAS_DTAPI
+<span class="lineNum">      57 </span>            : GPAC_MODULE_EXPORT
+<a name="58"><span class="lineNum">      58 </span>            : GF_FilterRegister *RegisterFilter(GF_FilterSession *session)</a>
+<span class="lineNum">      59 </span>            : #else
+<span class="lineNum">      60 </span><span class="lineCov">       2877 : GF_FilterRegister *dtout_register(GF_FilterSession *session)</span>
+<span class="lineNum">      61 </span>            : #endif
+<span class="lineNum">      62 </span>            : {
+<span class="lineNum">      63 </span>            :         memset(DTOutCaps, 0, sizeof(DTOutCaps));
+<span class="lineNum">      64 </span>            :         memset(&amp;DTOutRegister, 0, sizeof(GF_FilterRegister));
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : #ifndef GPAC_HAS_DTAPI
+<span class="lineNum">      67 </span><span class="lineCov">       2877 :         if (!gf_opts_get_bool(&quot;temp&quot;, &quot;gendoc&quot;))</span>
+<span class="lineNum">      68 </span>            :                 return NULL;
+<span class="lineNum">      69 </span><span class="lineCov">         14 :         DTOutRegister.version = &quot;! Warning: DekTek SDK NOT AVAILABLE IN THIS BUILD !&quot;;</span>
+<span class="lineNum">      70 </span>            : #endif
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineCov">         14 :         DTOutCaps[0].code = GF_PROP_PID_STREAM_TYPE;</span>
+<span class="lineNum">      73 </span><span class="lineCov">         14 :         DTOutCaps[0].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">      74 </span><span class="lineCov">         14 :         DTOutCaps[0].val.type = GF_PROP_UINT;</span>
+<span class="lineNum">      75 </span><span class="lineCov">         14 :         DTOutCaps[0].val.value.uint = GF_STREAM_VISUAL;</span>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">         14 :         DTOutCaps[1].code = GF_PROP_PID_STREAM_TYPE;</span>
+<span class="lineNum">      78 </span><span class="lineCov">         14 :         DTOutCaps[1].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">      79 </span><span class="lineCov">         14 :         DTOutCaps[1].val.type = GF_PROP_UINT;</span>
+<span class="lineNum">      80 </span><span class="lineCov">         14 :         DTOutCaps[1].val.value.uint = GF_STREAM_AUDIO;</span>
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span><span class="lineCov">         14 :         DTOutCaps[2].code = GF_PROP_PID_CODECID;</span>
+<span class="lineNum">      83 </span><span class="lineCov">         14 :         DTOutCaps[2].flags = GF_CAPS_INPUT;</span>
+<span class="lineNum">      84 </span><span class="lineCov">         14 :         DTOutCaps[2].val.type = GF_PROP_UINT;</span>
+<span class="lineNum">      85 </span><span class="lineCov">         14 :         DTOutCaps[2].val.value.uint = GF_CODECID_RAW;</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineCov">         14 :         DTOutRegister.name = &quot;dtout&quot;;</span>
+<span class="lineNum">      88 </span>            : #ifndef GPAC_DISABLE_DOC
+<span class="lineNum">      89 </span><span class="lineCov">         14 :         DTOutRegister.description = &quot;DekTec SDIOut&quot;;</span>
+<span class="lineNum">      90 </span><span class="lineCov">         14 :         DTOutRegister.help = &quot;This filter provides SDI output to be used with __DTA 2174__ or __DTA 2154__ cards.&quot;;</span>
+<span class="lineNum">      91 </span>            : #endif
+<span class="lineNum">      92 </span><span class="lineCov">         14 :         DTOutRegister.private_size = sizeof(GF_DTOutCtx);</span>
+<span class="lineNum">      93 </span><span class="lineCov">         14 :         DTOutRegister.args = DTOutArgs;</span>
+<span class="lineNum">      94 </span><span class="lineCov">         14 :         DTOutRegister.caps = DTOutCaps;</span>
+<span class="lineNum">      95 </span><span class="lineCov">         14 :         DTOutRegister.nb_caps = 3;</span>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            : #if defined(GPAC_HAS_DTAPI) &amp;&amp; !defined(FAKE_DT_API)
+<span class="lineNum">      98 </span>            :         DTOutRegister.initialize = dtout_initialize;
+<span class="lineNum">      99 </span>            :         DTOutRegister.finalize = dtout_finalize;
+<span class="lineNum">     100 </span>            :         DTOutRegister.configure_pid = dtout_configure_pid;
+<span class="lineNum">     101 </span>            :         DTOutRegister.process = dtout_process;
+<span class="lineNum">     102 </span>            : #else
+<span class="lineNum">     103 </span><span class="lineCov">         14 :         DTOutRegister.process = dtout_process_dummy;</span>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : #ifdef GPAC_ENABLE_COVERAGE
+<span class="lineNum">     106 </span>            :         dtout_process_dummy(NULL);
+<span class="lineNum">     107 </span>            : #endif
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            : #endif
+<span class="lineNum">     110 </span><span class="lineCov">         14 :         return &amp;DTOutRegister;</span>
+<span class="lineNum">     111 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

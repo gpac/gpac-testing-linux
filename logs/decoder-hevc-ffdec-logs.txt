@@ -1,0 +1,43 @@
+*** decoder-hevc-ffdec logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:29 ***
+
+
+*** Subtest "decoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4 -o ./results/temp/test.yuv -graph -stats -blacklist=vtbdec,nvdec,ohevcdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 732409728
+
+Filter stats - 5 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 6 tasks 643 us process time
+		1 packets sent 5000 bytes sent (1555.21 pck/sec 62.2084 mbps)
+		* output PID in.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/test.yuv) : 1 input pids 0 output pids 14 tasks 12017 us process time
+		12 packets processed 16588800 bytes processed (998.585 pck/sec 11043.6 mbps)
+		* input PID in.mp4: 12 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 9 tasks 854 us process time
+		2 packets processed 5000 bytes processed (2341.92 pck/sec 46.8384 mbps)
+		12 packets sent 27841 bytes sent (14051.5 pck/sec 260.806 mbps)
+		* input PID in.mp4: 2 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter ffdec "ffdec:hevc" : 1 input pids 1 output pids 16 tasks 51310 us process time
+		12 packets processed 27841 bytes processed (233.873 pck/sec 4.34083 mbps)
+		12 packets sent 16588800 bytes sent (233.873 pck/sec 2586.44 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter writegen : 1 input pids 1 output pids 16 tasks 155 us process time
+		12 packets processed 16588800 bytes processed (77419.4 pck/sec 856196 mbps)
+		12 packets sent 16588800 bytes sent (77419.4 pck/sec 856196 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+Session stats - threads 1
+	Thread 1: run_time 65055 us active_time 65031 us nb_tasks 65
+
+Total: run_time 65055 us active_time 65031 us nb_tasks 65
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x562e0a8309f0)
+-(PID in.mp4) mp4dmx (ptr=0x562e0a837f50)
+--(PID in.mp4) ffdec "ffdec:hevc" (ptr=0x562e0a8448c0)
+---(PID in.mp4) writegen (ptr=0x562e0a845950)
+----(PID in.mp4) fout (dst=./results/temp/test.yuv) (ptr=0x562e0a8333d0)
+
+Computing ./results/temp/test.yuv  (decoder) hash: 
+File hash (SHA-1): AA59C248D2C802DF7F9DEC0B3FB4477931CFE497
+Hash OK for ./results/temp/test.yuv

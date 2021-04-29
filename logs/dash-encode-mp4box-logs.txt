@@ -1,0 +1,30 @@
+*** dash-encode-mp4box logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:24 ***
+
+
+*** Subtest "dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -profile live -out ./results/temp/file.mpd ./results/temp/source.mp4:@enc:c=avc:fintra=1" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.08 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.08 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3.08 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4.08 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.08 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6.08 end 7
+[MPD] Generating MPD at time 2021-04-29T23:31:24.499Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7.04 end 8
+
+
+Computing ./results/temp/source_dashinit.mp4  (init-seg) hash: 
+File hash (SHA-1): 2B7160B62266311581AB6F63D7C2D677C9D3BB98
+Hash fail, ref hash ./hash_refs/dash-encode-mp4box-init-seg.hash was 1E618B9BC16F27A3EBEEDAD51C1AD7C87107C187
+Computing ./results/temp/file.mpd  (mpd) hash: 
+File hash (SHA-1): C02F628DF19540541D414F4139198F234E623F8A
+Hash fail, ref hash ./hash_refs/dash-encode-mp4box-mpd.hash was 1B6442718AC95A79F990A6DE0AFFA782356A6CC4
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 06240F15FEDF5F56AD0FBE033D14C72F9204EBFD
+Hash fail, ref hash ./hash_refs/dash-encode-mp4box-inspect.hash was 967B2C8C4BA44E480A726E12EEF0BE6FEE6CD722
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:interleave=false:fmt=%pn%-%dts%%lf%:log=./results/temp/inspect.txt" ***
+

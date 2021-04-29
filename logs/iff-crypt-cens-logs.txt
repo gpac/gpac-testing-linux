@@ -1,0 +1,37 @@
+*** iff-crypt-cens logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:36:22 ***
+
+Computing ./results/temp/vid_cryp.mp4  (crypt-vid) hash: 
+File hash (SHA-1): 5E75A96F1869C382C4934458707257C290A9FAE1
+Hash OK for ./results/temp/vid_cryp.mp4
+
+*** Subtest "make_src_crypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264 -crypt ./media/encryption/cens.xml -new ./results/temp/vid_cryp.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "add_crypted_img": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add-image ./results/temp/vid_cryp.mp4:time=6 -new ./results/temp/img_src.heif" ***
+Adding sample at time 6.520 as item 1
+
+Computing ./results/temp/img_src.heif  (add_crypted_img) hash: 
+File hash (SHA-1): 1E75E6509DB766428141E109ED34FAF33E5795AF
+Hash OK for ./results/temp/img_src.heif
+
+*** Subtest "decrypt_imf": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/cens.xml ./results/temp/img_src.heif -out ./results/temp/img_decryp.heif" ***
+
+Computing ./results/temp/img_decryp.heif  (decrypt_imf) hash: 
+File hash (SHA-1): D70646B9653E3E2E1202069F45102DA3341FA200
+Hash OK for ./results/temp/img_decryp.heif
+
+*** Subtest "recrypt_imf": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/cens.xml ./results/temp/img_decryp.heif -out ./results/temp/img_recryp.heif" ***
+
+Computing ./results/temp/img_recryp.heif  (recrypt_imf) hash: 
+File hash (SHA-1): B6BA85B8E416247577D80B92A07ADEE7EFFC426B
+Hash OK for ./results/temp/img_recryp.heif
+
+*** Subtest "diso": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/img_recryp.heif" ***
+
+Computing ./results/temp/img_recryp_info.xml  (diso) hash: 
+File hash (SHA-1): 7B0BDA352ACB0D75CA19D867B97ED4FC61C004B2
+Hash OK for ./results/temp/img_recryp_info.xml

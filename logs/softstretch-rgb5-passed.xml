@@ -1,0 +1,12 @@
+ <test name="softstretch-rgb5" result="OK" date="29/04/2021 23:46:22">
+
+  <stat subtest="dump-rgb5" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52996" cpu_percent="98%" cpu_elapsed_time="0:00.08" cpu_user_time="0.07" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.jpg compositor:opfmt=rgb5 @ -o ./results/temp/raw.rgb5 -blacklist=vtbdec,nvdec,ohevcdec</command_line>
+  </stat>
+  <stat subtest="blit-alpha-rgb5" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52944" cpu_percent="97%" cpu_elapsed_time="0:00.08" cpu_user_time="0.07" cpu_kernel_time="0.01" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.png compositor:opfmt=rgb5 @ -o ./results/temp/dump_alpha.rgb5</command_line>
+  </stat>
+  <stat subtest="blit-rgb" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52948" cpu_percent="98%" cpu_elapsed_time="0:00.08" cpu_user_time="0.06" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.rgb5:size=128x128 compositor:opfmt=rgb @ -o ./results/temp/dump.rgb</command_line>
+  </stat>
+ </test>

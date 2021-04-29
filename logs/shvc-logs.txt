@@ -1,0 +1,70 @@
+*** shvc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:45:59 ***
+
+Computing ./results/temp/shvc-split.mp4  (split) hash: 
+File hash (SHA-1): 7DE655517A8B910FBB6D34C4FDB131D0618EED5E
+Hash fail, ref hash ./hash_refs/shvc-split.hash was C35A2FEB829A1C06C6A569ECD51105E3DD64C387
+
+*** Subtest "Split": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/scalable/shvc.265:svcmode=split -new ./results/temp/shvc-split.mp4" ***
+Track Importing HEVC - Width 1920 Height 800 FPS 25000/1000
+OpenGOP detected - adjusting file brand
+HEVC Import results: 502 samples (2014 NALUs) - Slices: 11 I 53 P 438 B - 1004 SEI - 2 IDR
+HEVC L-HEVC Import results: Slices: 0 I 64 P 438 B
+HEVC Stream uses forward prediction - stream CTS offset: 7 frames
+
+
+*** Subtest "dnal": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 2 ./results/temp/shvc-split.mp4" ***
+
+Computing ./results/temp/shvc-merge.mp4  (merge) hash: 
+File hash (SHA-1): E03AC390D4DD026A3AC15AB980A843FAC8016960
+Hash fail, ref hash ./hash_refs/shvc-merge.hash was D7B421AACB296B0349177EC3703B38BB0D9F0E35
+
+*** Subtest "Merge": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/shvc-split.mp4:svcmode=merge -new ./results/temp/shvc-merge.mp4" ***
+IsoMedia import shvc-split.mp4 - track ID 1 - Video (size 1920 x 800)
+IsoMedia import shvc-split.mp4 - track ID 2 - Video (size 3840 x 1600)
+
+Same Hash for ./results/temp/shvc.mp4 and ./results/temp/shvc-merge.mp4
+
+*** Subtest "decode": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -blacklist=nvdec,vtbdec,ffdec -i ./results/temp/shvc-split.mp4 -o ./results/temp/shvc-split.yuv:sstart=8:send=9" ***
+No filter chain found for PID V1 in filter mp4dmx to any loaded filters - NOT CONNECTED
+No filter chain found for PID V2 in filter mp4dmx to any loaded filters - NOT CONNECTED
+Filters not connected:
+fout (dst=./results/temp/shvc-split.yuv:sstart=8:send=9) (ptr=0x55c7898b3580)
+
+Computing ./results/temp/shvc-split.yuv  (decode) hash: 
+
+	Error: Requested URL is not valid or cannot be found
+
+*** Subtest "dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 ./results/temp/shvc-split.mp4 -out ./results/temp/shvc.mpd" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.4 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.36 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3.32 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4.28 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.24 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6.2 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7.16 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 8.12 end 9
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 9.4 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 10.36 end 11
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 11.32 end 12
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 12.28 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 13.24 end 14
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 14.2 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 15.16 end 16
+[MP4Mux] Done writing segment 16 - estimated next fragment times start 16.12 end 17
+[MP4Mux] Done writing segment 17 - estimated next fragment times start 17.4 end 18
+[MP4Mux] Done writing segment 18 - estimated next fragment times start 18.36 end 19
+[MP4Mux] Done writing segment 19 - estimated next fragment times start 19.32 end 20
+[MP4Mux] Done writing segment 20 - estimated next fragment times start 20.28 end 21
+[MP4Mux] Done writing segment 21 - estimated next fragment times start 20.32 end 22
+[MPD] Generating MPD at time 2021-04-29T23:46:00.740Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 56E54F6128EA6E1B2988EDE74B9F07D7C268995C
+Hash fail, ref hash ./hash_refs/shvc-inspect.hash was C6B1581A621A1791223A3A87B3294308B62583E3
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/shvc.mpd inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+

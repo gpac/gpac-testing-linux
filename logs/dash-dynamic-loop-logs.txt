@@ -1,0 +1,44 @@
+*** dash-dynamic-loop logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:30:46 ***
+
+
+*** Subtest "dash-gen": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash-live 2000 -closest -subdur 2000 -profile live -mpd-refresh 10 -time-shift -1 -run-for 4000 ./results/temp/file.mp4#video ./results/temp/file.mp4#audio -out ./results/temp/file.mpd" ***
+Live DASH-ing - press 'q' to quit, 's' to save context and quit
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[Dasher] Input ./results/temp/file.mp4: max audio duration 106496/44100 in the period is less than duration 248/100, clamping will happen
+[Dasher] MPD Availability start time initialized to 1619739046263 ms
+[MPD] Generating MPD at time 2021-04-29T23:30:46.265Z
+[Dasher] AS-1 Rep 1 segment 1 done 1997 ms before UTC due time
+[Dasher] AS-1 Rep 2 segment 1 done 1992 ms before UTC due time
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.99692 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 2 end 2
+[Dasher] updated period DID1 duration 2000 MPD time 2000
+[MPD] Generating MPD at time 2021-04-29T23:30:46.267Z
+
+Next generation scheduled in 1995 ms (DASH time 2000 ms)Slept for 1994 ms before generation, dash cumulated time 2019
+[Dasher] Input ./results/temp/file.mp4: max audio duration 106496/44100 in the period is less than duration 248/100, clamping will happen
+[Dasher] AS-1 Rep 1 segment 2 done 2409 ms before UTC due time
+[Dasher] AS-1 Rep 2 segment 2 done 1992 ms before UTC due time
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 4.41 end 3
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 3.99383 end 3
+[Dasher] updated period DID1 duration 4410 MPD time 4410
+[MPD] Generating MPD at time 2021-04-29T23:30:48.265Z
+
+Next generation scheduled in 2407 ms (DASH time 4410 ms)Done running, computing static MPD
+[MPD] Generating MPD at time 2021-04-29T23:30:48.266Z
+
+
+Computing ./results/temp/file.mpd  (hash-mpd) hash: 
+File hash (SHA-1): B85A4CFB45D224D6555F360BB5F0FCF0BB42EAD6
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/file_dash_track2_2.m4s  (hash-seg2-audio) hash: 
+File hash (SHA-1): E08BA4DFA1F2A846BC632DBDAB02E7C1C37BCEA7
+Hash OK for ./results/temp/file_dash_track2_2.m4s
+Computing ./results/temp/file_dash_track1_2.m4s  (hash-seg2-video) hash: 
+File hash (SHA-1): 26165E227008D97E7B12E79EEA450099C58FD4A2
+Hash OK for ./results/temp/file_dash_track1_2.m4s
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:dur=2/1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 1B523A4C96703CCC027B4CB3F1844379734FDC15
+Hash fail, ref hash ./hash_refs/dash-dynamic-loop-inspect.hash was CCE06C08A9938F2F9BDC296D8AD3DA6599D08DFA

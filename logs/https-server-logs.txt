@@ -1,0 +1,34 @@
+*** https-server logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:42:44 ***
+
+
+*** Subtest "client-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i https://127.0.0.1:8080/auxiliary_files/enst_audio.aac inspect:allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1814708352
+
+Filter stats - 3 filters
+	Filter httpin (src=https://127.0.0.1:8080/auxiliary_files/enst_audio.aac) : 0 input pids 1 output pids 7 tasks 46996 us process time
+		1 packets sent 85058 bytes sent (21.2784 pck/sec 14.4792 mbps)
+		* output PID enst_audio.aac: 1 packets sent
+	Filter inspect (allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 332 tasks 1582 us process time
+		330 packets processed 82748 bytes processed (208597 pck/sec 418.448 mbps)
+		* input PID enst_audio.aac: 330 packets received
+	Filter rfadts : 1 input pids 1 output pids 8 tasks 1377 us process time
+		1 packets processed 85058 bytes processed (726.216 pck/sec 494.164 mbps)
+		330 packets sent 82748 bytes sent (239651 pck/sec 480.744 mbps)
+		* input PID enst_audio.aac: 1 packets received
+		* output PID enst_audio.aac: 330 packets sent
+Session stats - threads 1
+	Thread 1: run_time 51154 us active_time 50042 us nb_tasks 351
+
+Total: run_time 51154 us active_time 50042 us nb_tasks 351
+
+Filters connected:
+httpin (src=https://127.0.0.1:8080/auxiliary_files/enst_audio.aac) (ptr=0x559040ce6840)
+-(PID enst_audio.aac) rfadts (ptr=0x559040d2b130)
+--(PID enst_audio.aac) inspect (allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt) (ptr=0x559040d00f50)
+
+
+*** Subtest "https-server": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 httpout:port=8080:quit:rdirs=./media:cert=./media/tls/localhost.crt:pkey=./media/tls/localhost.key" ***
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 2ADE9A289E04FF9C4C1DE7297E3ACB3AD898D93D
+Hash OK for ./results/temp/inspect.txt

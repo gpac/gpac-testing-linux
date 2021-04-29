@@ -1,0 +1,1299 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - media_tools/dash_segmenter.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">media_tools</a> - dash_segmenter.c<span style="font-size: 80%;"> (source / <a href="dash_segmenter.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">499</td>
+            <td class="headerCovTableEntry">609</td>
+            <td class="headerCovTableEntryMed">81.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre , Cyril Concolato
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / Media Tools sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/media_tools.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/mpd.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : struct __gf_dash_segmenter
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :         GF_FilterSession *fsess;
+<span class="lineNum">      34 </span>            :         GF_Filter *output;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :         GF_List *inputs;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :         char *title, *copyright, *moreInfoURL, *sourceInfo, *lang;
+<span class="lineNum">      39 </span>            :         char *locations, *base_urls;
+<span class="lineNum">      40 </span>            :         char *mpd_name;
+<span class="lineNum">      41 </span>            :         GF_DashProfile profile;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :         GF_DashDynamicMode dash_mode;
+<span class="lineNum">      44 </span>            :         u32 use_url_template;
+<span class="lineNum">      45 </span>            :         Bool use_segment_timeline;
+<span class="lineNum">      46 </span>            :         Bool single_segment;
+<span class="lineNum">      47 </span>            :         Bool single_file;
+<span class="lineNum">      48 </span>            :         GF_DashSwitchingMode bitstream_switching_mode;
+<span class="lineNum">      49 </span>            :         Bool segments_start_with_rap;
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :         Double segment_duration;
+<span class="lineNum">      52 </span>            :         Double fragment_duration;
+<span class="lineNum">      53 </span>            :         Double sub_duration;
+<span class="lineNum">      54 </span>            :         //has to be freed
+<span class="lineNum">      55 </span>            :         char *seg_rad_name;
+<span class="lineNum">      56 </span>            :         const char *seg_ext;
+<span class="lineNum">      57 </span>            :         const char *seg_init_ext;
+<span class="lineNum">      58 </span>            :         u32 segment_marker_4cc;
+<span class="lineNum">      59 </span>            :         Bool enable_sidx;
+<span class="lineNum">      60 </span>            :         u32 subsegs_per_sidx;
+<span class="lineNum">      61 </span>            :         Bool daisy_chain_sidx, use_ssix;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :         Bool fragments_start_with_rap;
+<span class="lineNum">      64 </span>            :         Double mpd_update_time;
+<span class="lineNum">      65 </span>            :         s32 time_shift_depth;
+<span class="lineNum">      66 </span>            :         u32 min_buffer_time;
+<span class="lineNum">      67 </span>            :         s32 ast_offset_ms;
+<span class="lineNum">      68 </span>            :         u32 dash_scale;
+<span class="lineNum">      69 </span>            :         Bool fragments_in_memory;
+<span class="lineNum">      70 </span>            :         u32 initial_moof_sn;
+<span class="lineNum">      71 </span>            :         u64 initial_tfdt;
+<span class="lineNum">      72 </span>            :         Bool no_fragments_defaults;
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :         GF_DASHPSSHMode pssh_mode;
+<span class="lineNum">      75 </span>            :         Bool samplegroups_in_traf;
+<span class="lineNum">      76 </span>            :     Bool single_traf_per_moof, single_trun_per_traf;
+<span class="lineNum">      77 </span>            :         Bool tfdt_per_traf;
+<span class="lineNum">      78 </span>            :         Double mpd_live_duration;
+<span class="lineNum">      79 </span>            :         Bool insert_utc;
+<span class="lineNum">      80 </span>            :         Bool real_time;
+<span class="lineNum">      81 </span>            :         char *utc_start_date;
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :         const char *dash_profile_extension;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :         GF_DASH_ContentLocationMode cp_location_mode;
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :         Bool no_cache;
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :         Bool disable_loop;
+<span class="lineNum">      90 </span>            :         GF_DASH_SplitMode split_mode;
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :         Bool mvex_after_traks;
+<span class="lineNum">      93 </span>            :         u32 sdtp_in_traf;
+<span class="lineNum">      94 </span>            :         
+<span class="lineNum">      95 </span>            :         //some HLS options
+<span class="lineNum">      96 </span>            :         Bool hls_clock;
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :         const char *cues_file;
+<span class="lineNum">      99 </span>            :         Bool strict_cues;
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :         //not yet exposed through API
+<span class="lineNum">     102 </span>            :         Bool disable_segment_alignment;
+<span class="lineNum">     103 </span>            :         Bool enable_mix_codecs;
+<span class="lineNum">     104 </span>            :         Bool enable_sar_mix;
+<span class="lineNum">     105 </span>            :         Bool check_duration;
+<span class="lineNum">     106 </span>            :         Bool merge_last_seg;
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :         const char *dash_state;
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :         u64 next_gen_ntp_ms;
+<span class="lineNum">     111 </span>            :         u64 mpd_time_ms;
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :         Bool dash_mode_changed;
+<span class="lineNum">     114 </span>            :         u32 print_stats_graph;
+<span class="lineNum">     115 </span>            :         s32 dash_filter_idx_plus_one;
+<span class="lineNum">     116 </span>            :         u32 last_prog;
+<span class="lineNum">     117 </span>            :         Bool keep_utc;
+<span class="lineNum">     118 </span>            : };
+<span class="lineNum">     119 </span>            : 
+<a name="120"><span class="lineNum">     120 </span>            : </a>
+<span class="lineNum">     121 </span>            : GF_EXPORT
+<span class="lineNum">     122 </span><span class="lineCov">      70446 : u32 gf_dasher_next_update_time(GF_DASHSegmenter *dasher, u64 *ms_in_session)</span>
+<span class="lineNum">     123 </span>            : {
+<span class="lineNum">     124 </span>            :         s64 diff = 0;
+<span class="lineNum">     125 </span><span class="lineCov">      70446 :         if (dasher-&gt;next_gen_ntp_ms) {</span>
+<span class="lineNum">     126 </span><span class="lineCov">      70446 :                 diff = (s64) dasher-&gt;next_gen_ntp_ms;</span>
+<span class="lineNum">     127 </span><span class="lineCov">      70446 :                 diff -= (s64) gf_net_get_ntp_ms();</span>
+<span class="lineNum">     128 </span>            :         }
+<span class="lineNum">     129 </span><span class="lineCov">      70446 :         if (ms_in_session) *ms_in_session = dasher-&gt;mpd_time_ms;</span>
+<span class="lineNum">     130 </span><span class="lineCov">      70446 :         return diff&gt;0 ? (u32) diff : 1;</span>
+<span class="lineNum">     131 </span>            : }
+<span class="lineNum">     132 </span>            : 
+<a name="133"><span class="lineNum">     133 </span>            : </a>
+<span class="lineNum">     134 </span>            : GF_EXPORT
+<span class="lineNum">     135 </span><span class="lineCov">        176 : GF_DASHSegmenter *gf_dasher_new(const char *mpdName, GF_DashProfile dash_profile, const char *tmp_dir, u32 dash_timescale, const char *dasher_context_file)</span>
+<span class="lineNum">     136 </span>            : {
+<span class="lineNum">     137 </span>            :         GF_DASHSegmenter *dasher;
+<span class="lineNum">     138 </span><span class="lineCov">        176 :         GF_SAFEALLOC(dasher, GF_DASHSegmenter);</span>
+<span class="lineNum">     139 </span><span class="lineCov">        176 :         if (!dasher) return NULL;</span>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineCov">        176 :         dasher-&gt;mpd_name = gf_strdup(mpdName);</span>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span><span class="lineCov">        176 :         dasher-&gt;dash_scale = dash_timescale ? dash_timescale : 1000;</span>
+<span class="lineNum">     144 </span><span class="lineCov">        176 :         dasher-&gt;profile = dash_profile;</span>
+<span class="lineNum">     145 </span><span class="lineCov">        176 :         dasher-&gt;dash_state = dasher_context_file;</span>
+<span class="lineNum">     146 </span><span class="lineCov">        176 :         dasher-&gt;inputs = gf_list_new();</span>
+<span class="lineNum">     147 </span><span class="lineCov">        176 :         return dasher;</span>
+<span class="lineNum">     148 </span>            : }
+<a name="149"><span class="lineNum">     149 </span>            : </a>
+<span class="lineNum">     150 </span>            : GF_EXPORT
+<span class="lineNum">     151 </span><span class="lineCov">        176 : void gf_dasher_set_start_date(GF_DASHSegmenter *dasher, const char *dash_utc_start_date)</span>
+<span class="lineNum">     152 </span>            : {
+<span class="lineNum">     153 </span><span class="lineCov">        176 :         if (!dasher) return;</span>
+<span class="lineNum">     154 </span><span class="lineCov">        176 :         if (dasher-&gt;utc_start_date) gf_free(dasher-&gt;utc_start_date);</span>
+<span class="lineNum">     155 </span><span class="lineCov">        176 :         dasher-&gt;utc_start_date = dash_utc_start_date ? gf_strdup(dash_utc_start_date) : NULL;</span>
+<span class="lineNum">     156 </span>            : }
+<a name="157"><span class="lineNum">     157 </span>            : </a>
+<span class="lineNum">     158 </span>            : GF_EXPORT
+<span class="lineNum">     159 </span><span class="lineCov">        176 : void gf_dasher_clean_inputs(GF_DASHSegmenter *dasher)</span>
+<span class="lineNum">     160 </span>            : {
+<span class="lineNum">     161 </span><span class="lineCov">        176 :         gf_list_reset(dasher-&gt;inputs);</span>
+<span class="lineNum">     162 </span><span class="lineCov">        176 :         if (dasher-&gt;fsess) {</span>
+<span class="lineNum">     163 </span><span class="lineCov">        176 :                 gf_fs_print_unused_args(dasher-&gt;fsess, &quot;smode&quot;);</span>
+<span class="lineNum">     164 </span><span class="lineCov">        176 :                 gf_fs_del(dasher-&gt;fsess);</span>
+<span class="lineNum">     165 </span><span class="lineCov">        176 :                 dasher-&gt;fsess = NULL;</span>
+<span class="lineNum">     166 </span>            :         }
+<span class="lineNum">     167 </span><span class="lineCov">        176 : }</span>
+<a name="168"><span class="lineNum">     168 </span>            : </a>
+<span class="lineNum">     169 </span>            : GF_EXPORT
+<span class="lineNum">     170 </span><span class="lineCov">        176 : void gf_dasher_del(GF_DASHSegmenter *dasher)</span>
+<span class="lineNum">     171 </span>            : {
+<span class="lineNum">     172 </span><span class="lineCov">        176 :         if (dasher-&gt;seg_rad_name) gf_free(dasher-&gt;seg_rad_name);</span>
+<span class="lineNum">     173 </span><span class="lineCov">        176 :         gf_dasher_clean_inputs(dasher);</span>
+<span class="lineNum">     174 </span><span class="lineCov">        176 :         gf_free(dasher-&gt;mpd_name);</span>
+<span class="lineNum">     175 </span><span class="lineCov">        176 :         if (dasher-&gt;title) gf_free(dasher-&gt;title);</span>
+<span class="lineNum">     176 </span><span class="lineCov">        176 :         if (dasher-&gt;moreInfoURL) gf_free(dasher-&gt;moreInfoURL);</span>
+<span class="lineNum">     177 </span><span class="lineCov">        176 :         if (dasher-&gt;sourceInfo) gf_free(dasher-&gt;sourceInfo);</span>
+<span class="lineNum">     178 </span><span class="lineCov">        176 :         if (dasher-&gt;copyright) gf_free(dasher-&gt;copyright);</span>
+<span class="lineNum">     179 </span><span class="lineCov">        176 :         if (dasher-&gt;lang) gf_free(dasher-&gt;lang);</span>
+<span class="lineNum">     180 </span><span class="lineCov">        176 :         if (dasher-&gt;locations) gf_free(dasher-&gt;locations);</span>
+<span class="lineNum">     181 </span><span class="lineCov">        176 :         if (dasher-&gt;base_urls) gf_free(dasher-&gt;base_urls);</span>
+<span class="lineNum">     182 </span><span class="lineCov">        176 :         if (dasher-&gt;utc_start_date) gf_free(dasher-&gt;utc_start_date);</span>
+<span class="lineNum">     183 </span><span class="lineCov">        176 :         gf_list_del(dasher-&gt;inputs);</span>
+<span class="lineNum">     184 </span><span class="lineCov">        176 :         gf_free(dasher);</span>
+<span class="lineNum">     185 </span><span class="lineCov">        176 : }</span>
+<a name="186"><span class="lineNum">     186 </span>            : </a>
+<span class="lineNum">     187 </span>            : GF_EXPORT
+<span class="lineNum">     188 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_info(GF_DASHSegmenter *dasher, const char *title, const char *copyright, const char *moreInfoURL, const char *sourceInfo, const char *lang)</span>
+<span class="lineNum">     189 </span>            : {
+<span class="lineNum">     190 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : #define DOSET(_field) \
+<span class="lineNum">     193 </span>            :         if (dasher-&gt;_field) gf_free(dasher-&gt;_field);\
+<span class="lineNum">     194 </span>            :         dasher-&gt;_field = _field ? gf_strdup(_field) : NULL;\
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineCov">        176 :         DOSET(title)</span>
+<span class="lineNum">     197 </span><span class="lineCov">        176 :         DOSET(copyright)</span>
+<span class="lineNum">     198 </span><span class="lineCov">        176 :         DOSET(moreInfoURL)</span>
+<span class="lineNum">     199 </span><span class="lineCov">        176 :         DOSET(sourceInfo);</span>
+<span class="lineNum">     200 </span><span class="lineCov">        176 :         DOSET(lang);</span>
+<span class="lineNum">     201 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     202 </span>            : }
+<a name="203"><span class="lineNum">     203 </span>            : </a>
+<span class="lineNum">     204 </span>            : GF_EXPORT
+<span class="lineNum">     205 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_location(GF_DASHSegmenter *dasher, const char *location)</span>
+<span class="lineNum">     206 </span>            : {
+<span class="lineNum">     207 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span><span class="lineCov">        176 :         if (!location) return GF_OK;</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :         return gf_dynstrcat(&amp;dasher-&gt;locations, location, &quot;,&quot;);</span>
+<span class="lineNum">     211 </span>            : }
+<a name="212"><span class="lineNum">     212 </span>            : </a>
+<span class="lineNum">     213 </span>            : GF_EXPORT
+<span class="lineNum">     214 </span><span class="lineCov">          1 : GF_Err gf_dasher_add_base_url(GF_DASHSegmenter *dasher, const char *base_url)</span>
+<span class="lineNum">     215 </span>            : {
+<span class="lineNum">     216 </span><span class="lineCov">          1 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineCov">          1 :         if (!base_url) return GF_OK;</span>
+<span class="lineNum">     219 </span><span class="lineCov">          1 :         return gf_dynstrcat(&amp;dasher-&gt;base_urls, base_url, &quot;,&quot;);</span>
+<a name="220"><span class="lineNum">     220 </span>            : }</a>
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">        176 : static void dasher_format_seg_name(GF_DASHSegmenter *dasher, const char *inName)</span>
+<span class="lineNum">     223 </span>            : {
+<span class="lineNum">     224 </span><span class="lineCov">        176 :         if (dasher-&gt;seg_rad_name) gf_free(dasher-&gt;seg_rad_name);</span>
+<span class="lineNum">     225 </span><span class="lineCov">        176 :         dasher-&gt;seg_rad_name = NULL;</span>
+<span class="lineNum">     226 </span><span class="lineCov">        176 :         if (inName) dasher-&gt;seg_rad_name = gf_strdup(inName);</span>
+<span class="lineNum">     227 </span><span class="lineCov">        176 : }</span>
+<a name="228"><span class="lineNum">     228 </span>            : </a>
+<span class="lineNum">     229 </span>            : GF_EXPORT
+<span class="lineNum">     230 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_url_template(GF_DASHSegmenter *dasher, Bool enable, const char *default_template, const char *default_extension, const char *default_init_extension)</span>
+<span class="lineNum">     231 </span>            : {
+<span class="lineNum">     232 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     233 </span><span class="lineCov">        176 :         dasher-&gt;use_url_template = enable;</span>
+<span class="lineNum">     234 </span><span class="lineCov">        176 :         dasher-&gt;seg_ext = default_extension;</span>
+<span class="lineNum">     235 </span><span class="lineCov">        176 :         dasher-&gt;seg_init_ext = default_init_extension;</span>
+<span class="lineNum">     236 </span><span class="lineCov">        176 :         dasher_format_seg_name(dasher, default_template);</span>
+<span class="lineNum">     237 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     238 </span>            : }
+<a name="239"><span class="lineNum">     239 </span>            : </a>
+<span class="lineNum">     240 </span>            : GF_EXPORT
+<span class="lineNum">     241 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_segment_timeline(GF_DASHSegmenter *dasher, Bool enable)</span>
+<span class="lineNum">     242 </span>            : {
+<span class="lineNum">     243 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     244 </span><span class="lineCov">        176 :         dasher-&gt;use_segment_timeline = enable;</span>
+<span class="lineNum">     245 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     246 </span>            : }
+<a name="247"><span class="lineNum">     247 </span>            : </a>
+<span class="lineNum">     248 </span>            : GF_EXPORT
+<span class="lineNum">     249 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_single_segment(GF_DASHSegmenter *dasher, Bool enable)</span>
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     252 </span><span class="lineCov">        176 :         dasher-&gt;single_segment = enable;</span>
+<span class="lineNum">     253 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     254 </span>            : }
+<a name="255"><span class="lineNum">     255 </span>            : </a>
+<span class="lineNum">     256 </span>            : GF_EXPORT
+<span class="lineNum">     257 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_single_file(GF_DASHSegmenter *dasher, Bool enable)</span>
+<span class="lineNum">     258 </span>            : {
+<span class="lineNum">     259 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     260 </span><span class="lineCov">        176 :         dasher-&gt;single_file = enable;</span>
+<span class="lineNum">     261 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     262 </span>            : }
+<a name="263"><span class="lineNum">     263 </span>            : </a>
+<span class="lineNum">     264 </span>            : GF_EXPORT
+<span class="lineNum">     265 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_switch_mode(GF_DASHSegmenter *dasher, GF_DashSwitchingMode bitstream_switching)</span>
+<span class="lineNum">     266 </span>            : {
+<span class="lineNum">     267 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     268 </span><span class="lineCov">        176 :         dasher-&gt;bitstream_switching_mode = bitstream_switching;</span>
+<span class="lineNum">     269 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     270 </span>            : }
+<a name="271"><span class="lineNum">     271 </span>            : </a>
+<span class="lineNum">     272 </span>            : GF_EXPORT
+<span class="lineNum">     273 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_durations(GF_DASHSegmenter *dasher, Double default_segment_duration, Double default_fragment_duration, Double sub_duration)</span>
+<span class="lineNum">     274 </span>            : {
+<span class="lineNum">     275 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     276 </span><span class="lineCov">        176 :         dasher-&gt;segment_duration = default_segment_duration;</span>
+<span class="lineNum">     277 </span><span class="lineCov">        176 :         if (default_fragment_duration)</span>
+<span class="lineNum">     278 </span><span class="lineCov">        176 :                 dasher-&gt;fragment_duration = default_fragment_duration;</span>
+<span class="lineNum">     279 </span>            :         else
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                 dasher-&gt;fragment_duration = dasher-&gt;segment_duration;</span>
+<span class="lineNum">     281 </span><span class="lineCov">        176 :         dasher-&gt;sub_duration = sub_duration;</span>
+<span class="lineNum">     282 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     283 </span>            : }
+<a name="284"><span class="lineNum">     284 </span>            : </a>
+<span class="lineNum">     285 </span>            : GF_EXPORT
+<span class="lineNum">     286 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_rap_splitting(GF_DASHSegmenter *dasher, Bool segments_start_with_rap, Bool fragments_start_with_rap)</span>
+<span class="lineNum">     287 </span>            : {
+<span class="lineNum">     288 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     289 </span><span class="lineCov">        176 :         dasher-&gt;segments_start_with_rap = segments_start_with_rap;</span>
+<span class="lineNum">     290 </span><span class="lineCov">        176 :         dasher-&gt;fragments_start_with_rap = fragments_start_with_rap;</span>
+<span class="lineNum">     291 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     292 </span>            : }
+<a name="293"><span class="lineNum">     293 </span>            : </a>
+<span class="lineNum">     294 </span>            : GF_EXPORT
+<span class="lineNum">     295 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_segment_marker(GF_DASHSegmenter *dasher, u32 segment_marker_4cc)</span>
+<span class="lineNum">     296 </span>            : {
+<span class="lineNum">     297 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     298 </span><span class="lineCov">        176 :         dasher-&gt;segment_marker_4cc = segment_marker_4cc;</span>
+<span class="lineNum">     299 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     300 </span>            : }
+<a name="301"><span class="lineNum">     301 </span>            : </a>
+<span class="lineNum">     302 </span>            : GF_EXPORT
+<span class="lineNum">     303 </span><span class="lineCov">        176 : GF_Err gf_dasher_print_session_info(GF_DASHSegmenter *dasher, u32 fs_print_flags)</span>
+<span class="lineNum">     304 </span>            : {
+<span class="lineNum">     305 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     306 </span><span class="lineCov">        176 :         dasher-&gt;print_stats_graph = fs_print_flags;</span>
+<span class="lineNum">     307 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            : }
+<a name="310"><span class="lineNum">     310 </span>            : </a>
+<span class="lineNum">     311 </span>            : GF_EXPORT
+<span class="lineNum">     312 </span><span class="lineCov">        176 : GF_Err gf_dasher_keep_source_utc(GF_DASHSegmenter *dasher, Bool keep_utc)</span>
+<span class="lineNum">     313 </span>            : {
+<span class="lineNum">     314 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     315 </span><span class="lineCov">        176 :         dasher-&gt;keep_utc = keep_utc;</span>
+<span class="lineNum">     316 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            : }
+<a name="319"><span class="lineNum">     319 </span>            : </a>
+<span class="lineNum">     320 </span>            : GF_EXPORT
+<span class="lineNum">     321 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_sidx(GF_DASHSegmenter *dasher, Bool enable_sidx, u32 subsegs_per_sidx, Bool daisy_chain_sidx, Bool use_ssix)</span>
+<span class="lineNum">     322 </span>            : {
+<span class="lineNum">     323 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     324 </span><span class="lineCov">        176 :         dasher-&gt;enable_sidx = enable_sidx;</span>
+<span class="lineNum">     325 </span><span class="lineCov">        176 :         dasher-&gt;subsegs_per_sidx = subsegs_per_sidx;</span>
+<span class="lineNum">     326 </span><span class="lineCov">        176 :         dasher-&gt;daisy_chain_sidx = daisy_chain_sidx;</span>
+<span class="lineNum">     327 </span><span class="lineCov">        176 :         dasher-&gt;use_ssix = use_ssix;</span>
+<span class="lineNum">     328 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     329 </span>            : }
+<a name="330"><span class="lineNum">     330 </span>            : </a>
+<span class="lineNum">     331 </span>            : GF_EXPORT
+<span class="lineNum">     332 </span><span class="lineCov">        184 : GF_Err gf_dasher_set_dynamic_mode(GF_DASHSegmenter *dasher, GF_DashDynamicMode dash_mode, Double mpd_update_time, s32 time_shift_depth, Double mpd_live_duration)</span>
+<span class="lineNum">     333 </span>            : {
+<span class="lineNum">     334 </span><span class="lineCov">        184 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     335 </span><span class="lineCov">        184 :         if (dasher-&gt;dash_mode != dash_mode) {</span>
+<span class="lineNum">     336 </span><span class="lineCov">         19 :                 dasher-&gt;dash_mode = dash_mode;</span>
+<span class="lineNum">     337 </span><span class="lineCov">         19 :                 dasher-&gt;dash_mode_changed = GF_TRUE;</span>
+<span class="lineNum">     338 </span>            :         }
+<span class="lineNum">     339 </span><span class="lineCov">        184 :         dasher-&gt;time_shift_depth = time_shift_depth;</span>
+<span class="lineNum">     340 </span><span class="lineCov">        184 :         dasher-&gt;mpd_update_time = mpd_update_time;</span>
+<span class="lineNum">     341 </span><span class="lineCov">        184 :         dasher-&gt;mpd_live_duration = mpd_live_duration;</span>
+<span class="lineNum">     342 </span><span class="lineCov">        184 :         return GF_OK;</span>
+<span class="lineNum">     343 </span>            : }
+<a name="344"><span class="lineNum">     344 </span>            : </a>
+<span class="lineNum">     345 </span>            : GF_EXPORT
+<span class="lineNum">     346 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_min_buffer(GF_DASHSegmenter *dasher, Double min_buffer)</span>
+<span class="lineNum">     347 </span>            : {
+<span class="lineNum">     348 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     349 </span><span class="lineCov">        176 :         dasher-&gt;min_buffer_time = (u32)(min_buffer*1000);</span>
+<span class="lineNum">     350 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     351 </span>            : }
+<a name="352"><span class="lineNum">     352 </span>            : </a>
+<span class="lineNum">     353 </span>            : GF_EXPORT
+<span class="lineNum">     354 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_ast_offset(GF_DASHSegmenter *dasher, s32 ast_offset_ms)</span>
+<span class="lineNum">     355 </span>            : {
+<span class="lineNum">     356 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     357 </span><span class="lineCov">        176 :         dasher-&gt;ast_offset_ms = ast_offset_ms;</span>
+<span class="lineNum">     358 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     359 </span>            : }
+<a name="360"><span class="lineNum">     360 </span>            : </a>
+<span class="lineNum">     361 </span>            : GF_EXPORT
+<span class="lineNum">     362 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_memory_fragmenting(GF_DASHSegmenter *dasher, Bool fragments_in_memory)</span>
+<span class="lineNum">     363 </span>            : {
+<span class="lineNum">     364 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     365 </span><span class="lineCov">        176 :         dasher-&gt;fragments_in_memory = fragments_in_memory;</span>
+<span class="lineNum">     366 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     367 </span>            : }
+<a name="368"><span class="lineNum">     368 </span>            : </a>
+<span class="lineNum">     369 </span>            : GF_EXPORT
+<span class="lineNum">     370 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_initial_isobmf(GF_DASHSegmenter *dasher, u32 initial_moof_sn, u64 initial_tfdt)</span>
+<span class="lineNum">     371 </span>            : {
+<span class="lineNum">     372 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     373 </span><span class="lineCov">        176 :         dasher-&gt;initial_moof_sn = initial_moof_sn;</span>
+<span class="lineNum">     374 </span><span class="lineCov">        176 :         dasher-&gt;initial_tfdt = initial_tfdt;</span>
+<span class="lineNum">     375 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     376 </span>            : }
+<a name="377"><span class="lineNum">     377 </span>            : </a>
+<span class="lineNum">     378 </span>            : GF_EXPORT
+<span class="lineNum">     379 </span><span class="lineCov">        176 : GF_Err gf_dasher_configure_isobmf_default(GF_DASHSegmenter *dasher, Bool no_fragments_defaults, GF_DASHPSSHMode pssh_mode, Bool samplegroups_in_traf, Bool single_traf_per_moof, Bool tfdt_per_traf, Bool mvex_after_traks, u32 sdtp_in_traf)</span>
+<span class="lineNum">     380 </span>            : {
+<span class="lineNum">     381 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     382 </span><span class="lineCov">        176 :         dasher-&gt;no_fragments_defaults = no_fragments_defaults;</span>
+<span class="lineNum">     383 </span><span class="lineCov">        176 :         dasher-&gt;pssh_mode = pssh_mode;</span>
+<span class="lineNum">     384 </span><span class="lineCov">        176 :         dasher-&gt;samplegroups_in_traf = samplegroups_in_traf;</span>
+<span class="lineNum">     385 </span><span class="lineCov">        176 :         dasher-&gt;single_traf_per_moof = single_traf_per_moof;</span>
+<span class="lineNum">     386 </span><span class="lineCov">        176 :     dasher-&gt;tfdt_per_traf = tfdt_per_traf;</span>
+<span class="lineNum">     387 </span><span class="lineCov">        176 :     dasher-&gt;mvex_after_traks = mvex_after_traks;</span>
+<span class="lineNum">     388 </span><span class="lineCov">        176 :     dasher-&gt;sdtp_in_traf = sdtp_in_traf;</span>
+<span class="lineNum">     389 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     390 </span>            : }
+<a name="391"><span class="lineNum">     391 </span>            : </a>
+<span class="lineNum">     392 </span>            : GF_EXPORT
+<span class="lineNum">     393 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_utc_ref(GF_DASHSegmenter *dasher, Bool insert_utc)</span>
+<span class="lineNum">     394 </span>            : {
+<span class="lineNum">     395 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     396 </span><span class="lineCov">        176 :         dasher-&gt;insert_utc = insert_utc;</span>
+<span class="lineNum">     397 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     398 </span>            : }
+<a name="399"><span class="lineNum">     399 </span>            : </a>
+<span class="lineNum">     400 </span>            : GF_EXPORT
+<span class="lineNum">     401 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_real_time(GF_DASHSegmenter *dasher, Bool real_time)</span>
+<span class="lineNum">     402 </span>            : {
+<span class="lineNum">     403 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     404 </span><span class="lineCov">        176 :         dasher-&gt;real_time = real_time;</span>
+<span class="lineNum">     405 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     406 </span>            : }
+<a name="407"><span class="lineNum">     407 </span>            : </a>
+<span class="lineNum">     408 </span>            : GF_EXPORT
+<span class="lineNum">     409 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_content_protection_location_mode(GF_DASHSegmenter *dasher, GF_DASH_ContentLocationMode mode)</span>
+<span class="lineNum">     410 </span>            : {
+<span class="lineNum">     411 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     412 </span><span class="lineCov">        176 :         dasher-&gt;cp_location_mode = mode;</span>
+<span class="lineNum">     413 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     414 </span>            : }
+<a name="415"><span class="lineNum">     415 </span>            : </a>
+<span class="lineNum">     416 </span>            : GF_EXPORT
+<span class="lineNum">     417 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_profile_extension(GF_DASHSegmenter *dasher, const char *dash_profile_extension)</span>
+<span class="lineNum">     418 </span>            : {
+<span class="lineNum">     419 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     420 </span><span class="lineCov">        176 :         dasher-&gt;dash_profile_extension = dash_profile_extension;</span>
+<span class="lineNum">     421 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     422 </span>            : }
+<a name="423"><span class="lineNum">     423 </span>            : </a>
+<span class="lineNum">     424 </span>            : GF_EXPORT
+<span class="lineNum">     425 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_cached_inputs(GF_DASHSegmenter *dasher, Bool no_cache)</span>
+<span class="lineNum">     426 </span>            : {
+<span class="lineNum">     427 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     428 </span><span class="lineCov">        176 :         dasher-&gt;no_cache = no_cache;</span>
+<span class="lineNum">     429 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     430 </span>            : }
+<a name="431"><span class="lineNum">     431 </span>            : </a>
+<span class="lineNum">     432 </span>            : GF_EXPORT
+<span class="lineNum">     433 </span><span class="lineCov">        176 : GF_Err gf_dasher_enable_loop_inputs(GF_DASHSegmenter *dasher, Bool do_loop)</span>
+<span class="lineNum">     434 </span>            : {
+<span class="lineNum">     435 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     436 </span><span class="lineCov">        176 :         dasher-&gt;disable_loop = do_loop ? GF_FALSE : GF_TRUE;</span>
+<span class="lineNum">     437 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     438 </span>            : }
+<a name="439"><span class="lineNum">     439 </span>            : </a>
+<span class="lineNum">     440 </span>            : GF_EXPORT
+<span class="lineNum">     441 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_hls_clock(GF_DASHSegmenter *dasher, Bool insert_clock)</span>
+<span class="lineNum">     442 </span>            : {
+<span class="lineNum">     443 </span><span class="lineCov">        176 :        if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     444 </span><span class="lineCov">        176 :        dasher-&gt;hls_clock = insert_clock;</span>
+<span class="lineNum">     445 </span><span class="lineCov">        176 :        return GF_OK;</span>
+<span class="lineNum">     446 </span>            : }
+<a name="447"><span class="lineNum">     447 </span>            : </a>
+<span class="lineNum">     448 </span>            : GF_EXPORT
+<span class="lineNum">     449 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_split_mode(GF_DASHSegmenter *dasher, GF_DASH_SplitMode split_mode)</span>
+<span class="lineNum">     450 </span>            : {
+<span class="lineNum">     451 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     452 </span><span class="lineCov">        176 :         dasher-&gt;split_mode = split_mode;</span>
+<span class="lineNum">     453 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     454 </span>            : }
+<a name="455"><span class="lineNum">     455 </span>            : </a>
+<span class="lineNum">     456 </span>            : GF_EXPORT
+<span class="lineNum">     457 </span><span class="lineCov">        176 : GF_Err gf_dasher_set_last_segment_merge(GF_DASHSegmenter *dasher, Bool merge_last_seg)</span>
+<span class="lineNum">     458 </span>            : {
+<span class="lineNum">     459 </span><span class="lineCov">        176 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     460 </span><span class="lineCov">        176 :         dasher-&gt;merge_last_seg = merge_last_seg;</span>
+<span class="lineNum">     461 </span><span class="lineCov">        176 :         return GF_OK;</span>
+<span class="lineNum">     462 </span>            : }
+<a name="463"><span class="lineNum">     463 </span>            : </a>
+<span class="lineNum">     464 </span>            : GF_EXPORT
+<span class="lineNum">     465 </span><span class="lineCov">         10 : GF_Err gf_dasher_set_cues(GF_DASHSegmenter *dasher, const char *cues_file, Bool strict_cues)</span>
+<span class="lineNum">     466 </span>            : {
+<span class="lineNum">     467 </span><span class="lineCov">         10 :         dasher-&gt;cues_file = cues_file;</span>
+<span class="lineNum">     468 </span><span class="lineCov">         10 :         dasher-&gt;strict_cues = strict_cues;</span>
+<span class="lineNum">     469 </span><span class="lineCov">         10 :         return GF_OK;</span>
+<span class="lineNum">     470 </span>            : }
+<a name="471"><span class="lineNum">     471 </span>            : </a>
+<span class="lineNum">     472 </span>            : GF_EXPORT
+<span class="lineNum">     473 </span><span class="lineCov">        209 : GF_Err gf_dasher_add_input(GF_DASHSegmenter *dasher, const GF_DashSegmenterInput *input)</span>
+<span class="lineNum">     474 </span>            : {
+<span class="lineNum">     475 </span><span class="lineCov">        209 :         if (!dasher) return GF_BAD_PARAM;</span>
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span><span class="lineCov">        209 :         if (!stricmp(input-&gt;file_name, &quot;NULL&quot;) || !strcmp(input-&gt;file_name, &quot;&quot;) || !input-&gt;file_name) {</span>
+<span class="lineNum">     478 </span><span class="lineCov">          1 :                 if (!input-&gt;xlink || !strcmp(input-&gt;xlink, &quot;&quot;)) {</span>
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[DASH] No input file specified and no xlink set - cannot dash\n&quot;));</span>
+<span class="lineNum">     480 </span>            :                         return GF_BAD_PARAM;
+<span class="lineNum">     481 </span>            :                 }
+<span class="lineNum">     482 </span>            :         }
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span><span class="lineCov">        209 :         gf_list_add(dasher-&gt;inputs, (void *) input);</span>
+<span class="lineNum">     485 </span><span class="lineCov">        209 :         return GF_OK;</span>
+<span class="lineNum">     486 </span>            : }
+<span class="lineNum">     487 </span>            : 
+<a name="488"><span class="lineNum">     488 </span>            : extern char gf_prog_lf;</a>
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span><span class="lineCov">        191 : static Bool on_dasher_event(void *_udta, GF_Event *evt)</span>
+<span class="lineNum">     491 </span>            : {
+<span class="lineNum">     492 </span>            :         u32 i, count;
+<span class="lineNum">     493 </span>            :         GF_FilterStats stats;
+<span class="lineNum">     494 </span>            :         GF_DASHSegmenter *dasher = (GF_DASHSegmenter *)_udta;
+<span class="lineNum">     495 </span><span class="lineCov">        191 :         if (evt &amp;&amp; (evt-&gt;type != GF_EVENT_PROGRESS)) return GF_FALSE;</span>
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span><span class="lineCov">        191 :         stats.report_updated = GF_FALSE;</span>
+<span class="lineNum">     498 </span><span class="lineCov">        191 :         if (!dasher-&gt;dash_filter_idx_plus_one) {</span>
+<span class="lineNum">     499 </span><span class="lineCov">        174 :                 count = gf_fs_get_filters_count(dasher-&gt;fsess);</span>
+<span class="lineNum">     500 </span><span class="lineCov">        772 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     501 </span><span class="lineCov">        772 :                         if (gf_fs_get_filter_stats(dasher-&gt;fsess, i, &amp;stats) != GF_OK) continue;</span>
+<span class="lineNum">     502 </span><span class="lineCov">        772 :                         if (strcmp(stats.reg_name, &quot;dasher&quot;)) continue;</span>
+<span class="lineNum">     503 </span><span class="lineCov">        174 :                         dasher-&gt;dash_filter_idx_plus_one = i+1;</span>
+<span class="lineNum">     504 </span><span class="lineCov">        174 :                         break;</span>
+<span class="lineNum">     505 </span>            :                 }
+<span class="lineNum">     506 </span><span class="lineCov">        174 :                 if (!dasher-&gt;dash_filter_idx_plus_one) return GF_FALSE;</span>
+<span class="lineNum">     507 </span>            :         } else {
+<span class="lineNum">     508 </span><span class="lineCov">         17 :                 if (gf_fs_get_filter_stats(dasher-&gt;fsess, dasher-&gt;dash_filter_idx_plus_one-1, &amp;stats) != GF_OK)</span>
+<span class="lineNum">     509 </span>            :                         return GF_FALSE;
+<span class="lineNum">     510 </span>            :         }
+<span class="lineNum">     511 </span><span class="lineCov">        191 :         if (! stats.report_updated) return GF_FALSE;</span>
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :         if (stats.percent/100 == dasher-&gt;last_prog) return GF_FALSE;</span>
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :         dasher-&gt;last_prog = stats.percent / 100;</span>
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 :         if ( stats.status) {</span>
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_APP, (&quot;Dashing %s%c&quot;, stats.status, gf_prog_lf));</span>
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :         } else if (stats.percent&gt;0) {</span>
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_APP, (&quot;Dashing: % 2.2f %%%c&quot;, ((Double)stats.percent) / 100, gf_prog_lf));</span>
+<span class="lineNum">     519 </span>            :         }
+<span class="lineNum">     520 </span>            :         return GF_FALSE;
+<span class="lineNum">     521 </span>            : }
+<a name="522"><span class="lineNum">     522 </span>            : </a>
+<span class="lineNum">     523 </span>            : /*create filter session, setup destination options and setup sources options*/
+<span class="lineNum">     524 </span><span class="lineCov">        176 : static GF_Err gf_dasher_setup(GF_DASHSegmenter *dasher)</span>
+<span class="lineNum">     525 </span>            : {
+<span class="lineNum">     526 </span>            :         GF_Err e;
+<span class="lineNum">     527 </span>            :         u32 i, count;
+<span class="lineNum">     528 </span>            :         char *sep_ext;
+<span class="lineNum">     529 </span><span class="lineCov">        176 :         char *args=NULL, szArg[1024];</span>
+<span class="lineNum">     530 </span>            :         Bool multi_period = GF_FALSE;
+<span class="lineNum">     531 </span>            :         Bool use_filter_chains = GF_FALSE;
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span><span class="lineCov">        176 :         if (!dasher-&gt;mpd_name) {</span>
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[DASH] Missing MPD name\n&quot;));</span>
+<span class="lineNum">     535 </span>            :                 return GF_OUT_OF_MEM;
+<span class="lineNum">     536 </span>            :         }
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span><span class="lineCov">        176 :         dasher-&gt;fsess = gf_fs_new_defaults(0);</span>
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     541 </span><span class="lineCov">        176 :         if (!gf_sys_is_test_mode() &amp;&amp; (gf_log_get_tool_level(GF_LOG_APP)!=GF_LOG_QUIET) &amp;&amp; !gf_sys_is_quiet() ) {</span>
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :                 gf_fs_enable_reporting(dasher-&gt;fsess, GF_TRUE);</span>
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :                 gf_fs_set_ui_callback(dasher-&gt;fsess, on_dasher_event, dasher);</span>
+<span class="lineNum">     544 </span>            :         }
+<span class="lineNum">     545 </span>            : #endif
+<span class="lineNum">     546 </span>            : 
+<span class="lineNum">     547 </span><span class="lineCov">        176 :         if (!dasher-&gt;fsess) {</span>
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[DASH] Failed to create filter session\n&quot;));</span>
+<span class="lineNum">     549 </span>            :                 return GF_OUT_OF_MEM;
+<span class="lineNum">     550 </span>            :         }
+<span class="lineNum">     551 </span>            : 
+<span class="lineNum">     552 </span><span class="lineCov">        176 :         sep_ext = gf_url_colon_suffix(dasher-&gt;mpd_name);</span>
+<span class="lineNum">     553 </span><span class="lineCov">        176 :         if (sep_ext) {</span>
+<span class="lineNum">     554 </span><span class="lineCov">          3 :                 if (sep_ext[1] == '\\') sep_ext = strchr(sep_ext+1, ':');</span>
+<span class="lineNum">     555 </span><span class="lineCov">          3 :                 else if (sep_ext[1]=='/') {</span>
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :                         sep_ext = strchr(sep_ext+1, '/');</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :                         if (sep_ext) sep_ext = strchr(sep_ext, ':');</span>
+<span class="lineNum">     558 </span>            :                 }
+<span class="lineNum">     559 </span>            :         }
+<span class="lineNum">     560 </span><span class="lineCov">        176 :         if (sep_ext) {</span>
+<span class="lineNum">     561 </span><span class="lineCov">          3 :                 sep_ext[0] = 0;</span>
+<span class="lineNum">     562 </span>            :         }
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span><span class="lineCov">        176 :         if (dasher-&gt;segment_duration == (u32) dasher-&gt;segment_duration) {</span>
+<span class="lineNum">     565 </span><span class="lineCov">        176 :                 sprintf(szArg, &quot;segdur=%u/%u&quot;, (u32) dasher-&gt;segment_duration, dasher-&gt;dash_scale);</span>
+<span class="lineNum">     566 </span>            :         } else {
+<span class="lineNum">     567 </span><span class="lineNoCov">          0 :                 sprintf(szArg, &quot;segdur=%g&quot;, dasher-&gt;segment_duration/dasher-&gt;dash_scale);</span>
+<span class="lineNum">     568 </span>            :         }
+<span class="lineNum">     569 </span><span class="lineCov">        176 :         e = gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     570 </span>            : 
+<span class="lineNum">     571 </span><span class="lineCov">        176 :         if (sep_ext)</span>
+<span class="lineNum">     572 </span><span class="lineCov">          3 :                 e |= gf_dynstrcat(&amp;args, sep_ext+1, &quot;:&quot;);</span>
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span><span class="lineCov">        176 :         if (dasher-&gt;single_segment) e |= gf_dynstrcat(&amp;args, &quot;sseg&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     575 </span><span class="lineCov">        176 :         if (dasher-&gt;single_file) e |= gf_dynstrcat(&amp;args, &quot;sfile&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     576 </span><span class="lineCov">        176 :         if (dasher-&gt;use_url_template) e |= gf_dynstrcat(&amp;args, &quot;tpl&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     577 </span><span class="lineCov">        176 :         if (dasher-&gt;use_segment_timeline) e |= gf_dynstrcat(&amp;args, &quot;stl&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     578 </span><span class="lineCov">        176 :         if (dasher-&gt;dash_mode) {</span>
+<span class="lineNum">     579 </span><span class="lineCov">         11 :                 e |= gf_dynstrcat(&amp;args, (dasher-&gt;dash_mode == GF_DASH_DYNAMIC_LAST) ? &quot;dynlast&quot; : &quot;dynamic&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     580 </span>            :                 //make dasher reschedule by default for MP4Box
+<span class="lineNum">     581 </span><span class="lineCov">         11 :                 e |= gf_dynstrcat(&amp;args, &quot;reschedule&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     582 </span>            :         }
+<span class="lineNum">     583 </span><span class="lineCov">        176 :         if (dasher-&gt;disable_segment_alignment) e |= gf_dynstrcat(&amp;args, &quot;!align&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     584 </span><span class="lineCov">        176 :         if (dasher-&gt;enable_mix_codecs) e |= gf_dynstrcat(&amp;args, &quot;mix_codecs&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     585 </span><span class="lineCov">        176 :         if (dasher-&gt;insert_utc) e |= gf_dynstrcat(&amp;args, &quot;ntp=yes&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     586 </span><span class="lineCov">        176 :         if (dasher-&gt;enable_sar_mix) e |= gf_dynstrcat(&amp;args, &quot;no_sar&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     587 </span>            :         //forcep not mapped
+<span class="lineNum">     588 </span><span class="lineCov">        176 :         switch (dasher-&gt;bitstream_switching_mode) {</span>
+<span class="lineNum">     589 </span>            :         case GF_DASH_BSMODE_DEFAULT:
+<span class="lineNum">     590 </span>            :                 break;
+<span class="lineNum">     591 </span><span class="lineCov">          2 :         case GF_DASH_BSMODE_NONE:</span>
+<span class="lineNum">     592 </span><span class="lineCov">          2 :                 e |= gf_dynstrcat(&amp;args, &quot;bs_switch=off&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     593 </span><span class="lineCov">          2 :                 break;</span>
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 :         case GF_DASH_BSMODE_INBAND:</span>
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;bs_switch=inband&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     596 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     597 </span><span class="lineNoCov">          0 :         case GF_DASH_BSMODE_MERGED:</span>
+<span class="lineNum">     598 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;bs_switch=on&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     600 </span><span class="lineNoCov">          0 :         case GF_DASH_BSMODE_MULTIPLE_ENTRIES:</span>
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;bs_switch=multi&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     603 </span><span class="lineCov">          1 :         case GF_DASH_BSMODE_SINGLE:</span>
+<span class="lineNum">     604 </span><span class="lineCov">          1 :                 e |= gf_dynstrcat(&amp;args, &quot;bs_switch=force&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     605 </span><span class="lineCov">          1 :                 break;</span>
+<span class="lineNum">     606 </span>            :         }
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span><span class="lineCov">        176 :         if (dasher-&gt;seg_rad_name) {</span>
+<span class="lineNum">     609 </span>            :                 sprintf(szArg, &quot;template=%s&quot;, dasher-&gt;seg_rad_name);
+<span class="lineNum">     610 </span><span class="lineCov">         11 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     611 </span>            :         }
+<span class="lineNum">     612 </span><span class="lineCov">        176 :         if (dasher-&gt;seg_ext) {</span>
+<span class="lineNum">     613 </span>            :                 sprintf(szArg, &quot;segext=%s&quot;, dasher-&gt;seg_ext);
+<span class="lineNum">     614 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     615 </span>            :         }
+<span class="lineNum">     616 </span><span class="lineCov">        176 :         if (dasher-&gt;seg_init_ext) {</span>
+<span class="lineNum">     617 </span>            :                 sprintf(szArg, &quot;initext=%s&quot;, dasher-&gt;seg_init_ext);
+<span class="lineNum">     618 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     619 </span>            :         }
+<span class="lineNum">     620 </span><span class="lineCov">        176 :         if (dasher-&gt;ast_offset_ms) {</span>
+<span class="lineNum">     621 </span><span class="lineNoCov">          0 :                 sprintf(szArg, &quot;asto=%d&quot;, -dasher-&gt;ast_offset_ms);</span>
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     623 </span>            :         }
+<span class="lineNum">     624 </span><span class="lineCov">        176 :         switch (dasher-&gt;profile) {</span>
+<span class="lineNum">     625 </span>            :         case GF_DASH_PROFILE_AUTO:
+<span class="lineNum">     626 </span>            :                 break;
+<span class="lineNum">     627 </span><span class="lineCov">        134 :         case GF_DASH_PROFILE_LIVE:</span>
+<span class="lineNum">     628 </span><span class="lineCov">        134 :                 e |= gf_dynstrcat(&amp;args, &quot;profile=live&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     629 </span><span class="lineCov">        134 :                 break;</span>
+<span class="lineNum">     630 </span><span class="lineCov">         11 :         case GF_DASH_PROFILE_ONDEMAND:</span>
+<span class="lineNum">     631 </span><span class="lineCov">         11 :                 e |= gf_dynstrcat(&amp;args, &quot;profile=onDemand&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     632 </span><span class="lineCov">         11 :                 break;</span>
+<span class="lineNum">     633 </span><span class="lineCov">          5 :         case GF_DASH_PROFILE_MAIN:</span>
+<span class="lineNum">     634 </span><span class="lineCov">          5 :                 e |= gf_dynstrcat(&amp;args, &quot;profile=main&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     635 </span><span class="lineCov">          5 :                 break;</span>
+<span class="lineNum">     636 </span><span class="lineCov">         21 :         case GF_DASH_PROFILE_FULL:</span>
+<span class="lineNum">     637 </span><span class="lineCov">         21 :                 e |= gf_dynstrcat(&amp;args, &quot;profile=full&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     638 </span><span class="lineCov">         21 :                 if (!dasher-&gt;segments_start_with_rap) e |= gf_dynstrcat(&amp;args, &quot;!sap&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     639 </span>            :                 break;
+<span class="lineNum">     640 </span><span class="lineNoCov">          0 :         case GF_DASH_PROFILE_HBBTV_1_5_ISOBMF_LIVE:</span>
+<span class="lineNum">     641 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;profile=hbbtv1.5.live&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     642 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     643 </span><span class="lineCov">          3 :         case GF_DASH_PROFILE_AVC264_LIVE:</span>
+<span class="lineNum">     644 </span><span class="lineCov">          3 :                 e |= gf_dynstrcat(&amp;args, &quot;profile=dashavc264.live&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     645 </span><span class="lineCov">          3 :                 break;</span>
+<span class="lineNum">     646 </span><span class="lineCov">          2 :         case GF_DASH_PROFILE_AVC264_ONDEMAND:</span>
+<span class="lineNum">     647 </span><span class="lineCov">          2 :                 e |= gf_dynstrcat(&amp;args, &quot;profile=dashavc264.onDemand&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     648 </span><span class="lineCov">          2 :                 break;</span>
+<span class="lineNum">     649 </span><span class="lineNoCov">          0 :         case GF_DASH_PROFILE_DASHIF_LL:</span>
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;profile=dashif.ll&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     651 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     652 </span>            :         }
+<span class="lineNum">     653 </span><span class="lineCov">        176 :         if (dasher-&gt;cp_location_mode==GF_DASH_CPMODE_REPRESENTATION) e |= gf_dynstrcat(&amp;args, &quot;cp=rep&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     654 </span><span class="lineCov">        176 :         else if (dasher-&gt;cp_location_mode==GF_DASH_CPMODE_BOTH) e |= gf_dynstrcat(&amp;args, &quot;cp=both&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     655 </span>            : 
+<span class="lineNum">     656 </span><span class="lineCov">        176 :         if (dasher-&gt;min_buffer_time) {</span>
+<span class="lineNum">     657 </span>            :                 sprintf(szArg, &quot;buf=%d&quot;, dasher-&gt;min_buffer_time);
+<span class="lineNum">     658 </span><span class="lineCov">        176 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     659 </span>            :         }
+<span class="lineNum">     660 </span><span class="lineCov">        176 :         if (dasher-&gt;dash_scale != 1000) {</span>
+<span class="lineNum">     661 </span>            :                 sprintf(szArg, &quot;timescale=%d&quot;, dasher-&gt;dash_scale);
+<span class="lineNum">     662 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     663 </span>            :         }
+<span class="lineNum">     664 </span><span class="lineCov">        176 :         if (!dasher-&gt;check_duration) e |= gf_dynstrcat(&amp;args, &quot;!check_dur&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     665 </span>            :         //skip_seg not exposed
+<span class="lineNum">     666 </span>            : 
+<span class="lineNum">     667 </span>            : 
+<span class="lineNum">     668 </span>            : 
+<span class="lineNum">     669 </span><span class="lineCov">        176 :         if (dasher-&gt;dash_mode &gt;= GF_DASH_DYNAMIC) {</span>
+<span class="lineNum">     670 </span><span class="lineCov">         11 :                 if (dasher-&gt;time_shift_depth&lt;0) e |= gf_dynstrcat(&amp;args, &quot;tsb=-1&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     671 </span>            :                 else {
+<span class="lineNum">     672 </span><span class="lineCov">          4 :                         sprintf(szArg, &quot;tsb=%u&quot;, (u32) dasher-&gt;time_shift_depth);</span>
+<span class="lineNum">     673 </span><span class="lineCov">          4 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     674 </span>            :                 }
+<span class="lineNum">     675 </span>            : 
+<span class="lineNum">     676 </span><span class="lineCov">         11 :                 if (dasher-&gt;utc_start_date) {</span>
+<span class="lineNum">     677 </span>            :                         sprintf(szArg, &quot;ast=%s&quot;, dasher-&gt;utc_start_date);
+<span class="lineNum">     678 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     679 </span>            :                 }
+<span class="lineNum">     680 </span><span class="lineCov">         11 :                 if (dasher-&gt;mpd_update_time) {</span>
+<span class="lineNum">     681 </span>            :                         sprintf(szArg, &quot;refresh=%g&quot;, dasher-&gt;mpd_update_time);
+<span class="lineNum">     682 </span><span class="lineCov">         10 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     683 </span>            :                 }
+<span class="lineNum">     684 </span>            :                 else {
+<span class="lineNum">     685 </span><span class="lineCov">          1 :                         sprintf(szArg, &quot;refresh=-%g&quot;, dasher-&gt;mpd_live_duration);</span>
+<span class="lineNum">     686 </span><span class="lineCov">          1 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     687 </span>            :                 }
+<span class="lineNum">     688 </span>            :         }
+<span class="lineNum">     689 </span><span class="lineCov">        176 :         if (dasher-&gt;sub_duration) {</span>
+<span class="lineNum">     690 </span>            :                 //subdur is in seconds in dasher filter
+<span class="lineNum">     691 </span><span class="lineCov">         13 :                 sprintf(szArg, &quot;subdur=%g&quot;, dasher-&gt;sub_duration/dasher-&gt;dash_scale);</span>
+<span class="lineNum">     692 </span><span class="lineCov">         13 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     693 </span>            :         }
+<span class="lineNum">     694 </span><span class="lineCov">        176 :         if (dasher-&gt;dash_state) {</span>
+<span class="lineNum">     695 </span>            :                 sprintf(szArg, &quot;state=%s&quot;, dasher-&gt;dash_state);
+<span class="lineNum">     696 </span><span class="lineCov">         14 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     697 </span>            :         }
+<span class="lineNum">     698 </span><span class="lineCov">        176 :         if (! dasher-&gt;disable_loop &amp;&amp; dasher-&gt;dash_state) e |= gf_dynstrcat(&amp;args, &quot;loop&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     699 </span><span class="lineCov">        176 :         if (dasher-&gt;hls_clock) e |= gf_dynstrcat(&amp;args, &quot;hlsc&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     700 </span>            : 
+<span class="lineNum">     701 </span>            :         //the rest is not yet exposed through the old api, but can be set through output file name
+<span class="lineNum">     702 </span>            : 
+<span class="lineNum">     703 </span><span class="lineCov">        176 :         if (dasher-&gt;dash_mode&gt;=GF_DASH_DYNAMIC) {</span>
+<span class="lineNum">     704 </span><span class="lineCov">         11 :                 sprintf(szArg, &quot;_p_gentime=%p&quot;, &amp;dasher-&gt;next_gen_ntp_ms);</span>
+<span class="lineNum">     705 </span><span class="lineCov">         11 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     706 </span><span class="lineCov">         11 :                 sprintf(szArg, &quot;_p_mpdtime=%p&quot;, &amp;dasher-&gt;mpd_time_ms);</span>
+<span class="lineNum">     707 </span><span class="lineCov">         11 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     708 </span>            :         }
+<span class="lineNum">     709 </span>            : 
+<span class="lineNum">     710 </span>            :         //append ISOBMFF options
+<span class="lineNum">     711 </span><span class="lineCov">        176 :         if (dasher-&gt;fragment_duration) {</span>
+<span class="lineNum">     712 </span>            :                 Double diff = dasher-&gt;fragment_duration;
+<span class="lineNum">     713 </span><span class="lineCov">        176 :                 diff -= dasher-&gt;segment_duration;</span>
+<span class="lineNum">     714 </span><span class="lineCov">        176 :                 if (diff&lt;0) diff = -diff;</span>
+<span class="lineNum">     715 </span><span class="lineCov">        176 :                 if (diff &gt; 0.01) {</span>
+<span class="lineNum">     716 </span><span class="lineCov">          4 :                         if (dasher-&gt;fragment_duration == (u32) dasher-&gt;fragment_duration) {</span>
+<span class="lineNum">     717 </span><span class="lineCov">          4 :                                 sprintf(szArg, &quot;cdur=%u/%u&quot;, (u32) dasher-&gt;fragment_duration, dasher-&gt;dash_scale);</span>
+<span class="lineNum">     718 </span>            :                         } else {
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :                                 sprintf(szArg, &quot;cdur=%g&quot;, dasher-&gt;fragment_duration/dasher-&gt;dash_scale);</span>
+<span class="lineNum">     720 </span>            :                         }
+<span class="lineNum">     721 </span><span class="lineCov">          4 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     722 </span>            :                 }
+<span class="lineNum">     723 </span>            :         }
+<span class="lineNum">     724 </span><span class="lineCov">        176 :         if (dasher-&gt;segment_marker_4cc) {</span>
+<span class="lineNum">     725 </span><span class="lineNoCov">          0 :                 sprintf(szArg, &quot;m4cc=%s&quot;, gf_4cc_to_str(dasher-&gt;segment_marker_4cc) );</span>
+<span class="lineNum">     726 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     727 </span>            :         }
+<span class="lineNum">     728 </span><span class="lineCov">        176 :         if (dasher-&gt;daisy_chain_sidx) e |= gf_dynstrcat(&amp;args, &quot;chain_sidx&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     729 </span><span class="lineCov">        176 :         if (dasher-&gt;use_ssix) e |= gf_dynstrcat(&amp;args, &quot;ssix&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     730 </span><span class="lineCov">        176 :         if (dasher-&gt;initial_moof_sn) {</span>
+<span class="lineNum">     731 </span>            :                 sprintf(szArg, &quot;msn=%d&quot;, dasher-&gt;initial_moof_sn );
+<span class="lineNum">     732 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     733 </span>            :         }
+<span class="lineNum">     734 </span><span class="lineCov">        176 :         if (dasher-&gt;initial_tfdt) {</span>
+<span class="lineNum">     735 </span>            :                 sprintf(szArg, &quot;tfdt=&quot;LLU&quot;&quot;, dasher-&gt;initial_tfdt );
+<span class="lineNum">     736 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     737 </span>            :         }
+<span class="lineNum">     738 </span><span class="lineCov">        176 :         if (dasher-&gt;no_fragments_defaults) e |= gf_dynstrcat(&amp;args, &quot;nofragdef&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     739 </span><span class="lineCov">        176 :         if (dasher-&gt;single_traf_per_moof) e |= gf_dynstrcat(&amp;args, &quot;straf&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     740 </span><span class="lineCov">        176 :         if (dasher-&gt;single_trun_per_traf) e |= gf_dynstrcat(&amp;args, &quot;strun&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     741 </span><span class="lineCov">        176 :         switch (dasher-&gt;pssh_mode) {</span>
+<span class="lineNum">     742 </span><span class="lineCov">        176 :         case GF_DASH_PSSH_MOOV:</span>
+<span class="lineNum">     743 </span><span class="lineCov">        176 :                 e |= gf_dynstrcat(&amp;args, &quot;pssh=v&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     744 </span><span class="lineCov">        176 :                 break;</span>
+<span class="lineNum">     745 </span><span class="lineNoCov">          0 :         case GF_DASH_PSSH_MOOV_MPD:</span>
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;pssh=mv&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     747 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     748 </span><span class="lineNoCov">          0 :         case GF_DASH_PSSH_MOOF:</span>
+<span class="lineNum">     749 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;pssh=f&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     750 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :         case GF_DASH_PSSH_MOOF_MPD:</span>
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;pssh=mf&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     753 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :         case GF_DASH_PSSH_MPD:</span>
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;pssh=m&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     756 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     757 </span>            :         }
+<span class="lineNum">     758 </span>            : 
+<span class="lineNum">     759 </span>            : 
+<span class="lineNum">     760 </span><span class="lineCov">        176 :         if (dasher-&gt;samplegroups_in_traf) e |= gf_dynstrcat(&amp;args, &quot;sgpd_traf&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     761 </span><span class="lineCov">        176 :         if (dasher-&gt;enable_sidx) {</span>
+<span class="lineNum">     762 </span><span class="lineCov">        176 :                 sprintf(szArg, &quot;subs_sidx=%d&quot;, dasher-&gt;subsegs_per_sidx );</span>
+<span class="lineNum">     763 </span><span class="lineCov">        176 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     764 </span>            :         }
+<span class="lineNum">     765 </span>            : 
+<span class="lineNum">     766 </span><span class="lineCov">        176 :         if (dasher-&gt;fragments_start_with_rap) e |= gf_dynstrcat(&amp;args, &quot;sfrag&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     767 </span>            : 
+<span class="lineNum">     768 </span><span class="lineCov">        176 :         if (dasher-&gt;cues_file) {</span>
+<span class="lineNum">     769 </span>            :                 sprintf(szArg, &quot;cues=%s&quot;, dasher-&gt;cues_file );
+<span class="lineNum">     770 </span><span class="lineCov">         10 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     771 </span>            :         }
+<span class="lineNum">     772 </span><span class="lineCov">        176 :         if (dasher-&gt;strict_cues) e |= gf_dynstrcat(&amp;args, &quot;strict_cues&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     773 </span>            : 
+<span class="lineNum">     774 </span><span class="lineCov">        176 :         if (dasher-&gt;mvex_after_traks) e |= gf_dynstrcat(&amp;args, &quot;mvex&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     775 </span><span class="lineCov">        176 :         if (dasher-&gt;sdtp_in_traf==1) e |= gf_dynstrcat(&amp;args, &quot;sdtp_traf=sdtp&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     776 </span><span class="lineCov">        176 :         else if (dasher-&gt;sdtp_in_traf==2) e |= gf_dynstrcat(&amp;args, &quot;sdtp_traf=both&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     777 </span>            : 
+<span class="lineNum">     778 </span><span class="lineCov">        176 :         if (dasher-&gt;split_mode==GF_DASH_SPLIT_CLOSEST)</span>
+<span class="lineNum">     779 </span><span class="lineCov">          2 :                 e |= gf_dynstrcat(&amp;args, &quot;sbound=closest&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     780 </span><span class="lineCov">        174 :         else if (dasher-&gt;split_mode==GF_DASH_SPLIT_IN)</span>
+<span class="lineNum">     781 </span><span class="lineCov">          2 :                 e |= gf_dynstrcat(&amp;args, &quot;sbound=in&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     782 </span>            : 
+<span class="lineNum">     783 </span><span class="lineCov">        176 :         if (dasher-&gt;merge_last_seg)</span>
+<span class="lineNum">     784 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;last_seg_merge&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     785 </span>            : 
+<span class="lineNum">     786 </span><span class="lineCov">        176 :         if (dasher-&gt;keep_utc)</span>
+<span class="lineNum">     787 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;keep_utc&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     788 </span>            : 
+<span class="lineNum">     789 </span>            :         //finally append profiles/info/etc with double separators as these may contain ':'
+<span class="lineNum">     790 </span><span class="lineCov">        176 :         if (dasher-&gt;dash_profile_extension) {</span>
+<span class="lineNum">     791 </span>            :                 sprintf(szArg, &quot;profX=%s&quot;, dasher-&gt;dash_profile_extension);
+<span class="lineNum">     792 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;::&quot;);</span>
+<span class="lineNum">     793 </span>            :         }
+<span class="lineNum">     794 </span><span class="lineCov">        176 :         if (dasher-&gt;title) {</span>
+<span class="lineNum">     795 </span>            :                 sprintf(szArg, &quot;title=%s&quot;, dasher-&gt;title);
+<span class="lineNum">     796 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;::&quot;);</span>
+<span class="lineNum">     797 </span>            :         }
+<span class="lineNum">     798 </span><span class="lineCov">        176 :         if (dasher-&gt;sourceInfo) {</span>
+<span class="lineNum">     799 </span>            :                 sprintf(szArg, &quot;source=%s&quot;, dasher-&gt;sourceInfo);
+<span class="lineNum">     800 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;::&quot;);</span>
+<span class="lineNum">     801 </span>            :         }
+<span class="lineNum">     802 </span><span class="lineCov">        176 :         if (dasher-&gt;moreInfoURL) {</span>
+<span class="lineNum">     803 </span>            :                 sprintf(szArg, &quot;info=%s&quot;, dasher-&gt;moreInfoURL);
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;::&quot;);</span>
+<span class="lineNum">     805 </span>            :         }
+<span class="lineNum">     806 </span><span class="lineCov">        176 :         if (dasher-&gt;copyright) {</span>
+<span class="lineNum">     807 </span>            :                 sprintf(szArg, &quot;cprt=%s&quot;, dasher-&gt;copyright);
+<span class="lineNum">     808 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;::&quot;);</span>
+<span class="lineNum">     809 </span>            :         }
+<span class="lineNum">     810 </span><span class="lineCov">        176 :         if (dasher-&gt;lang) {</span>
+<span class="lineNum">     811 </span>            :                 sprintf(szArg, &quot;lang=%s&quot;, dasher-&gt;lang);
+<span class="lineNum">     812 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;::&quot;);</span>
+<span class="lineNum">     813 </span>            :         }
+<span class="lineNum">     814 </span><span class="lineCov">        176 :         if (dasher-&gt;locations) {</span>
+<span class="lineNum">     815 </span>            :                 sprintf(szArg, &quot;location=%s&quot;, dasher-&gt;locations);
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;::&quot;);</span>
+<span class="lineNum">     817 </span>            :         }
+<span class="lineNum">     818 </span><span class="lineCov">        176 :         if (dasher-&gt;base_urls) {</span>
+<span class="lineNum">     819 </span>            :                 sprintf(szArg, &quot;base=%s&quot;, dasher-&gt;base_urls);
+<span class="lineNum">     820 </span><span class="lineCov">          1 :                 e |= gf_dynstrcat(&amp;args, szArg, &quot;::&quot;);</span>
+<span class="lineNum">     821 </span>            :         }
+<span class="lineNum">     822 </span>            : 
+<span class="lineNum">     823 </span><span class="lineCov">        176 :         dasher-&gt;dash_mode_changed = GF_FALSE;</span>
+<span class="lineNum">     824 </span><span class="lineCov">        176 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, (&quot;[DASH] Instantiating dasher filter for dst %s with args %s\n&quot;, dasher-&gt;mpd_name, args));</span>
+<span class="lineNum">     825 </span>            : 
+<span class="lineNum">     826 </span><span class="lineCov">        176 :         if (e) {</span>
+<span class="lineNum">     827 </span><span class="lineNoCov">          0 :                 if (args) gf_free(args);</span>
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[DASH] Failed to setup DASH filter arguments\n&quot;));</span>
+<span class="lineNum">     829 </span><span class="lineNoCov">          0 :                 return e;</span>
+<span class="lineNum">     830 </span>            :         }
+<span class="lineNum">     831 </span><span class="lineCov">        176 :         dasher-&gt;output = gf_fs_load_destination(dasher-&gt;fsess, dasher-&gt;mpd_name, args, NULL, &amp;e);</span>
+<span class="lineNum">     832 </span>            : 
+<span class="lineNum">     833 </span><span class="lineCov">        176 :         if (args) gf_free(args);</span>
+<span class="lineNum">     834 </span>            : 
+<span class="lineNum">     835 </span><span class="lineCov">        176 :         if (sep_ext) {</span>
+<span class="lineNum">     836 </span><span class="lineCov">          3 :                 sep_ext[0] = ':';</span>
+<span class="lineNum">     837 </span>            :         }
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span><span class="lineCov">        176 :         if (!dasher-&gt;output) {</span>
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[DASH] Failed to load DASH filter\n&quot;));</span>
+<span class="lineNum">     841 </span><span class="lineNoCov">          0 :                 return e;</span>
+<span class="lineNum">     842 </span>            :         }
+<span class="lineNum">     843 </span>            : 
+<span class="lineNum">     844 </span>            :         //and setup sources
+<span class="lineNum">     845 </span><span class="lineCov">        176 :         count = gf_list_count(dasher-&gt;inputs);</span>
+<span class="lineNum">     846 </span>            : 
+<span class="lineNum">     847 </span><span class="lineCov">        385 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     848 </span><span class="lineCov">        209 :                 GF_DashSegmenterInput *di = gf_list_get(dasher-&gt;inputs, i);</span>
+<span class="lineNum">     849 </span><span class="lineCov">        209 :                 if (di-&gt;periodID || (di-&gt;period_duration.num &amp;&amp; di-&gt;period_duration.den) || di-&gt;xlink) {</span>
+<span class="lineNum">     850 </span>            :                         multi_period = GF_TRUE;
+<span class="lineNum">     851 </span>            :                 }
+<span class="lineNum">     852 </span><span class="lineCov">        209 :                 di-&gt;period_order=0;</span>
+<span class="lineNum">     853 </span>            :         }
+<span class="lineNum">     854 </span><span class="lineCov">        176 :         if (multi_period) {</span>
+<span class="lineNum">     855 </span>            :                 u32 cur_period_order = 1;
+<span class="lineNum">     856 </span><span class="lineCov">          7 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     857 </span>            :                         u32 j;
+<span class="lineNum">     858 </span>            :                         GF_DashSegmenterInput *a_di = NULL;
+<span class="lineNum">     859 </span><span class="lineCov">          7 :                         GF_DashSegmenterInput *di = gf_list_get(dasher-&gt;inputs, i);</span>
+<span class="lineNum">     860 </span><span class="lineCov">          7 :                         if (!di-&gt;periodID) {</span>
+<span class="lineNum">     861 </span><span class="lineNoCov">          0 :                                 di-&gt;period_order = 0;</span>
+<span class="lineNum">     862 </span><span class="lineNoCov">          0 :                                 continue;</span>
+<span class="lineNum">     863 </span>            :                         }
+<span class="lineNum">     864 </span><span class="lineCov">         15 :                         for (j=0; j&lt;count; j++) {</span>
+<span class="lineNum">     865 </span><span class="lineCov">         19 :                                 a_di = gf_list_get(dasher-&gt;inputs, j);</span>
+<span class="lineNum">     866 </span><span class="lineCov">         19 :                                 if ((a_di != di) &amp;&amp; a_di-&gt;periodID &amp;&amp; !strcmp(a_di-&gt;periodID, di-&gt;periodID))</span>
+<span class="lineNum">     867 </span>            :                                         break;
+<span class="lineNum">     868 </span>            :                                 a_di = NULL;
+<span class="lineNum">     869 </span>            :                         }
+<span class="lineNum">     870 </span><span class="lineCov">          7 :                         if (a_di) {</span>
+<span class="lineNum">     871 </span><span class="lineCov">          4 :                                 di-&gt;period_order = a_di-&gt;period_order;</span>
+<span class="lineNum">     872 </span><span class="lineCov">          4 :                                 continue;</span>
+<span class="lineNum">     873 </span>            :                         }
+<span class="lineNum">     874 </span><span class="lineCov">          3 :                         di-&gt;period_order = cur_period_order;</span>
+<span class="lineNum">     875 </span><span class="lineCov">          3 :                         cur_period_order++;</span>
+<span class="lineNum">     876 </span>            :                 }
+<span class="lineNum">     877 </span>            :         }
+<span class="lineNum">     878 </span><span class="lineCov">        206 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     879 </span><span class="lineCov">        208 :                 GF_DashSegmenterInput *di = gf_list_get(dasher-&gt;inputs, i);</span>
+<span class="lineNum">     880 </span><span class="lineCov">        208 :                 if (di-&gt;filter_chain) {</span>
+<span class="lineNum">     881 </span>            :                         use_filter_chains = GF_TRUE;
+<span class="lineNum">     882 </span>            :                         break;
+<span class="lineNum">     883 </span>            :                 }
+<span class="lineNum">     884 </span>            :         }
+<span class="lineNum">     885 </span>            : 
+<span class="lineNum">     886 </span><span class="lineCov">        385 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     887 </span>            :                 u32 j;
+<span class="lineNum">     888 </span>            :                 GF_Filter *src = NULL;
+<span class="lineNum">     889 </span>            :                 GF_Filter *rt = NULL;
+<span class="lineNum">     890 </span>            :                 const char *url = NULL;
+<span class="lineNum">     891 </span>            :                 char *frag=NULL;
+<span class="lineNum">     892 </span><span class="lineCov">        209 :                 GF_DashSegmenterInput *di = gf_list_get(dasher-&gt;inputs, i);</span>
+<span class="lineNum">     893 </span>            : 
+<span class="lineNum">     894 </span><span class="lineCov">        209 :                 if (dasher-&gt;real_time) {</span>
+<span class="lineNum">     895 </span><span class="lineNoCov">          0 :                         rt = gf_fs_load_filter(dasher-&gt;fsess, &quot;reframer:rt=sync&quot;, NULL);</span>
+<span class="lineNum">     896 </span>            :                 }
+<span class="lineNum">     897 </span><span class="lineCov">        209 :                 if (di-&gt;file_name &amp;&amp; strlen(di-&gt;file_name) &amp;&amp; stricmp(di-&gt;file_name, &quot;null&quot;) )</span>
+<span class="lineNum">     898 </span>            :                         url = di-&gt;file_name;
+<span class="lineNum">     899 </span>            : 
+<span class="lineNum">     900 </span>            :                 if (url) {
+<span class="lineNum">     901 </span><span class="lineCov">        208 :                         frag = strrchr(di-&gt;file_name, '#');</span>
+<span class="lineNum">     902 </span><span class="lineCov">        208 :                         if (frag) frag[0] = 0;</span>
+<span class="lineNum">     903 </span>            :                 }
+<span class="lineNum">     904 </span>            : 
+<span class="lineNum">     905 </span><span class="lineCov">        209 :                 args = NULL;</span>
+<span class="lineNum">     906 </span>            :                 //if source is isobmf using extractors, we want to keep the extractors
+<span class="lineNum">     907 </span><span class="lineCov">        209 :                 e = gf_dynstrcat(&amp;args, &quot;smode=splitx&quot;, &quot;:&quot;);</span>
+<span class="lineNum">     908 </span>            : 
+<span class="lineNum">     909 </span><span class="lineCov">        209 :                 if (frag) {</span>
+<span class="lineNum">     910 </span><span class="lineCov">         35 :                         if (!strncmp(frag+1, &quot;trackID=&quot;, 8)) {</span>
+<span class="lineNum">     911 </span><span class="lineNoCov">          0 :                                 sprintf(szArg, &quot;tkid=%s&quot;, frag+9 );</span>
+<span class="lineNum">     912 </span>            :                         } else {
+<span class="lineNum">     913 </span>            :                                 sprintf(szArg, &quot;tkid=%s&quot;, frag+1);
+<span class="lineNum">     914 </span>            :                         }
+<span class="lineNum">     915 </span><span class="lineCov">         35 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     916 </span><span class="lineCov">        174 :                 } else if (di-&gt;track_id) {</span>
+<span class="lineNum">     917 </span>            :                         sprintf(szArg, &quot;tkid=%d&quot;, di-&gt;track_id );
+<span class="lineNum">     918 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     919 </span>            :                 }
+<span class="lineNum">     920 </span>            : 
+<span class="lineNum">     921 </span><span class="lineCov">        209 :                 if (di-&gt;source_opts) {</span>
+<span class="lineNum">     922 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, di-&gt;source_opts, &quot;:&quot;);</span>
+<span class="lineNum">     923 </span>            :                 }
+<span class="lineNum">     924 </span>            : 
+<span class="lineNum">     925 </span>            :                 //set all args
+<span class="lineNum">     926 </span><span class="lineCov">        209 :                 if (!use_filter_chains &amp;&amp; di-&gt;representationID &amp;&amp; strcmp(di-&gt;representationID, &quot;NULL&quot;)) {</span>
+<span class="lineNum">     927 </span>            :                         sprintf(szArg, &quot;#Representation=%s&quot;, di-&gt;representationID );
+<span class="lineNum">     928 </span><span class="lineCov">        206 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     929 </span>            :                 }
+<span class="lineNum">     930 </span><span class="lineCov">        209 :                 if (di-&gt;periodID) {</span>
+<span class="lineNum">     931 </span>            :                         sprintf(szArg, &quot;#Period=%s&quot;, di-&gt;periodID );
+<span class="lineNum">     932 </span><span class="lineCov">          7 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     933 </span>            :                 }
+<span class="lineNum">     934 </span><span class="lineCov">        209 :                 if (di-&gt;asID)  {</span>
+<span class="lineNum">     935 </span>            :                         sprintf(szArg, &quot;#ASID=%d&quot;, di-&gt;asID );
+<span class="lineNum">     936 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     937 </span>            :                 }
+<span class="lineNum">     938 </span>            :                 //period start as negative to keep declaration order
+<span class="lineNum">     939 </span><span class="lineCov">        209 :                 if (multi_period &amp;&amp; di-&gt;period_order) {</span>
+<span class="lineNum">     940 </span>            :                         sprintf(szArg, &quot;#PStart=-%d&quot;, di-&gt;period_order);
+<span class="lineNum">     941 </span><span class="lineCov">          3 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     942 </span>            :                 }
+<span class="lineNum">     943 </span>            : 
+<span class="lineNum">     944 </span><span class="lineCov">        209 :                 if (di-&gt;period_duration.num &amp;&amp; di-&gt;period_duration.den) {</span>
+<span class="lineNum">     945 </span><span class="lineCov">          1 :                         if (di-&gt;period_duration.den==1)</span>
+<span class="lineNum">     946 </span>            :                                 sprintf(szArg, &quot;#PDur=%d&quot;, di-&gt;period_duration.num );
+<span class="lineNum">     947 </span>            :                         else
+<span class="lineNum">     948 </span>            :                                 sprintf(szArg, &quot;#PDur=%d/%u&quot;, di-&gt;period_duration.num, di-&gt;period_duration.den );
+<span class="lineNum">     949 </span><span class="lineCov">          1 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     950 </span>            :                 }
+<span class="lineNum">     951 </span>            : 
+<span class="lineNum">     952 </span><span class="lineCov">        209 :                 if (di-&gt;dash_duration.num &amp;&amp; di-&gt;dash_duration.den) {</span>
+<span class="lineNum">     953 </span><span class="lineNoCov">          0 :                         if (di-&gt;dash_duration.den==1)</span>
+<span class="lineNum">     954 </span>            :                                 sprintf(szArg, &quot;#DashDur=%d&quot;, di-&gt;dash_duration.num );
+<span class="lineNum">     955 </span>            :                         else
+<span class="lineNum">     956 </span>            :                                 sprintf(szArg, &quot;#DashDur=%d/%u&quot;, di-&gt;dash_duration.num, di-&gt;dash_duration.den);
+<span class="lineNum">     957 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     958 </span>            :                 }
+<span class="lineNum">     959 </span><span class="lineCov">        209 :                 if (url &amp;&amp; di-&gt;media_duration.num &amp;&amp; di-&gt;media_duration.den) {</span>
+<span class="lineNum">     960 </span>            :                         sprintf(szArg, &quot;#ClampDur=&quot;LLU&quot;/&quot;LLD&quot;&quot;, di-&gt;media_duration.num, di-&gt;media_duration.den );
+<span class="lineNum">     961 </span><span class="lineCov">         19 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     962 </span>            :                 }
+<span class="lineNum">     963 </span>            : 
+<span class="lineNum">     964 </span><span class="lineCov">        209 :                 if (di-&gt;xlink) {</span>
+<span class="lineNum">     965 </span>            :                         sprintf(szArg, &quot;#xlink=%s&quot;, di-&gt;xlink );
+<span class="lineNum">     966 </span><span class="lineCov">          1 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     967 </span>            :                 }
+<span class="lineNum">     968 </span><span class="lineCov">        209 :                 if (di-&gt;bandwidth)  {</span>
+<span class="lineNum">     969 </span>            :                         sprintf(szArg, &quot;#Bitrate=%d&quot;, di-&gt;bandwidth );
+<span class="lineNum">     970 </span><span class="lineCov">         12 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     971 </span><span class="lineCov">         12 :                         sprintf(szArg, &quot;#Maxrate=%d&quot;, di-&gt;bandwidth );</span>
+<span class="lineNum">     972 </span><span class="lineCov">         12 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     973 </span>            :                 }
+<span class="lineNum">     974 </span>            : 
+<span class="lineNum">     975 </span><span class="lineCov">          1 :                 for (j=0;j&lt;di-&gt;nb_baseURL; j++) {</span>
+<span class="lineNum">     976 </span><span class="lineCov">          1 :                         if (!j) {</span>
+<span class="lineNum">     977 </span><span class="lineCov">          1 :                                 sprintf(szArg, &quot;#BUrl=%s&quot;, di-&gt;baseURL[j] );</span>
+<span class="lineNum">     978 </span><span class="lineCov">          1 :                                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     979 </span>            :                         } else {
+<span class="lineNum">     980 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, di-&gt;baseURL[j], &quot;,&quot;);</span>
+<span class="lineNum">     981 </span>            :                         }
+<span class="lineNum">     982 </span>            :                 }
+<span class="lineNum">     983 </span><span class="lineNoCov">          0 :                 for (j=0;j&lt;di-&gt;nb_roles; j++) {</span>
+<span class="lineNum">     984 </span><span class="lineNoCov">          0 :                         if (!j) {</span>
+<span class="lineNum">     985 </span><span class="lineNoCov">          0 :                                 sprintf(szArg, &quot;#Role=%s&quot;, di-&gt;roles[j] );</span>
+<span class="lineNum">     986 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     987 </span>            :                         } else {
+<span class="lineNum">     988 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, di-&gt;roles[j], &quot;,&quot;);</span>
+<span class="lineNum">     989 </span>            :                         }
+<span class="lineNum">     990 </span>            :                 }
+<span class="lineNum">     991 </span>            : 
+<span class="lineNum">     992 </span><span class="lineCov">          1 :                 for (j=0;j&lt;di-&gt;nb_rep_descs; j++) {</span>
+<span class="lineNum">     993 </span><span class="lineCov">          1 :                         if (!j) {</span>
+<span class="lineNum">     994 </span><span class="lineCov">          1 :                                 sprintf(szArg, &quot;#RDesc=%s&quot;, di-&gt;rep_descs[j] );</span>
+<span class="lineNum">     995 </span><span class="lineCov">          1 :                                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">     996 </span>            :                         } else {
+<span class="lineNum">     997 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, di-&gt;rep_descs[j], &quot;,&quot;);</span>
+<span class="lineNum">     998 </span>            :                         }
+<span class="lineNum">     999 </span>            :                 }
+<span class="lineNum">    1000 </span>            : 
+<span class="lineNum">    1001 </span><span class="lineCov">          3 :                 for (j=0;j&lt;di-&gt;nb_p_descs; j++) {</span>
+<span class="lineNum">    1002 </span><span class="lineCov">          3 :                         if (!j) {</span>
+<span class="lineNum">    1003 </span><span class="lineCov">          3 :                                 sprintf(szArg, &quot;#PDesc=%s&quot;, di-&gt;p_descs[j] );</span>
+<span class="lineNum">    1004 </span><span class="lineCov">          3 :                                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">    1005 </span>            :                         } else {
+<span class="lineNum">    1006 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, di-&gt;p_descs[j], &quot;,&quot;);</span>
+<span class="lineNum">    1007 </span>            :                         }
+<span class="lineNum">    1008 </span>            :                 }
+<span class="lineNum">    1009 </span>            : 
+<span class="lineNum">    1010 </span><span class="lineCov">          6 :                 for (j=0;j&lt;di-&gt;nb_as_descs; j++) {</span>
+<span class="lineNum">    1011 </span><span class="lineCov">          6 :                         if (!j) {</span>
+<span class="lineNum">    1012 </span><span class="lineCov">          6 :                                 sprintf(szArg, &quot;#ASDesc=%s&quot;, di-&gt;as_descs[j] );</span>
+<span class="lineNum">    1013 </span><span class="lineCov">          6 :                                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">    1014 </span>            :                         } else {
+<span class="lineNum">    1015 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, di-&gt;as_descs[j], &quot;,&quot;);</span>
+<span class="lineNum">    1016 </span>            :                         }
+<span class="lineNum">    1017 </span>            :                 }
+<span class="lineNum">    1018 </span>            : 
+<span class="lineNum">    1019 </span><span class="lineNoCov">          0 :                 for (j=0;j&lt;di-&gt;nb_as_c_descs; j++) {</span>
+<span class="lineNum">    1020 </span><span class="lineNoCov">          0 :                         if (!j) {</span>
+<span class="lineNum">    1021 </span><span class="lineNoCov">          0 :                                 sprintf(szArg, &quot;#ASCDesc=%s&quot;, di-&gt;as_c_descs[j] );</span>
+<span class="lineNum">    1022 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">    1023 </span>            :                         } else {
+<span class="lineNum">    1024 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, di-&gt;as_c_descs[j], &quot;,&quot;);</span>
+<span class="lineNum">    1025 </span>            :                         }
+<span class="lineNum">    1026 </span>            :                 }
+<span class="lineNum">    1027 </span>            : 
+<span class="lineNum">    1028 </span><span class="lineCov">        209 :                 if (di-&gt;startNumber) {</span>
+<span class="lineNum">    1029 </span>            :                         sprintf(szArg, &quot;#StartNumber=%d&quot;, di-&gt;startNumber );
+<span class="lineNum">    1030 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">    1031 </span>            :                 }
+<span class="lineNum">    1032 </span><span class="lineCov">        209 :                 if (di-&gt;seg_template) {</span>
+<span class="lineNum">    1033 </span>            :                         sprintf(szArg, &quot;#Template=%s&quot;, di-&gt;seg_template );
+<span class="lineNum">    1034 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">    1035 </span>            :                 }
+<span class="lineNum">    1036 </span><span class="lineCov">        209 :                 if (di-&gt;hls_pl) {</span>
+<span class="lineNum">    1037 </span>            :                         sprintf(szArg, &quot;#HLSPL=%s&quot;, di-&gt;hls_pl );
+<span class="lineNum">    1038 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szArg, &quot;:&quot;);</span>
+<span class="lineNum">    1039 </span>            :                 }
+<span class="lineNum">    1040 </span>            : 
+<span class="lineNum">    1041 </span><span class="lineCov">        209 :                 if (di-&gt;sscale) e |= gf_dynstrcat(&amp;args, &quot;#SingleScale=true&quot;, &quot;:&quot;);</span>
+<span class="lineNum">    1042 </span>            : 
+<span class="lineNum">    1043 </span><span class="lineCov">        209 :                 if (e) {</span>
+<span class="lineNum">    1044 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[DASH] Failed to setup source arguments for %s\n&quot;, di-&gt;file_name));</span>
+<span class="lineNum">    1045 </span><span class="lineNoCov">          0 :                         if (frag) frag[0] = '#';</span>
+<span class="lineNum">    1046 </span><span class="lineNoCov">          0 :                         if (args) gf_free(args);</span>
+<span class="lineNum">    1047 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">    1048 </span>            :                 }
+<span class="lineNum">    1049 </span>            : 
+<span class="lineNum">    1050 </span><span class="lineCov">        209 :                 if (!url) url = &quot;null&quot;;</span>
+<span class="lineNum">    1051 </span><span class="lineCov">        209 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, (&quot;[DASH] Instantiating dasher source %s with args %s\n&quot;, url, args));</span>
+<span class="lineNum">    1052 </span><span class="lineCov">        209 :                 src = gf_fs_load_source(dasher-&gt;fsess, url, args, NULL, &amp;e);</span>
+<span class="lineNum">    1053 </span><span class="lineCov">        209 :                 if (args) gf_free(args);</span>
+<span class="lineNum">    1054 </span><span class="lineCov">        209 :                 if (frag) frag[0] = '#';</span>
+<span class="lineNum">    1055 </span>            : 
+<span class="lineNum">    1056 </span><span class="lineCov">        209 :                 if (!src) {</span>
+<span class="lineNum">    1057 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[DASH] Failed to load source filter for %s\n&quot;, di-&gt;file_name));</span>
+<span class="lineNum">    1058 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">    1059 </span>            :                 }
+<span class="lineNum">    1060 </span>            : 
+<span class="lineNum">    1061 </span><span class="lineCov">        209 :                 if (rt) {</span>
+<span class="lineNum">    1062 </span><span class="lineNoCov">          0 :                         gf_filter_set_source(rt, src, NULL);</span>
+<span class="lineNum">    1063 </span>            :                         src = rt;
+<span class="lineNum">    1064 </span>            :                 }
+<span class="lineNum">    1065 </span>            : 
+<span class="lineNum">    1066 </span><span class="lineCov">        209 :                 if (!di-&gt;filter_chain) {</span>
+<span class="lineNum">    1067 </span>            :                         //assign this source 
+<span class="lineNum">    1068 </span><span class="lineCov">        207 :                         gf_filter_set_source(dasher-&gt;output, src, NULL);</span>
+<span class="lineNum">    1069 </span><span class="lineCov">        207 :                         continue;</span>
+<span class="lineNum">    1070 </span>            :                 }
+<span class="lineNum">    1071 </span>            :                 //create the filter chain between source (or rt if it was set) and dasher
+<span class="lineNum">    1072 </span>            : 
+<span class="lineNum">    1073 </span>            :                 //filter chain
+<span class="lineNum">    1074 </span>            :                 GF_Filter *prev_filter=src;
+<span class="lineNum">    1075 </span>            :                 char *fargs = (char *) di-&gt;filter_chain;
+<span class="lineNum">    1076 </span><span class="lineCov">          2 :                 char *sep1 = strstr(fargs, &quot;@@&quot;);</span>
+<span class="lineNum">    1077 </span><span class="lineCov">          2 :                 char *sep2 = strstr(fargs, &quot;@&quot;);</span>
+<span class="lineNum">    1078 </span>            :                 Bool old_syntax = GF_FALSE;
+<span class="lineNum">    1079 </span><span class="lineCov">          2 :                 if (sep1 &amp;&amp; sep2 &amp;&amp; (sep1==sep2))</span>
+<span class="lineNum">    1080 </span>            :                         old_syntax = GF_TRUE;
+<span class="lineNum">    1081 </span>            : 
+<span class="lineNum">    1082 </span><span class="lineCov">          5 :                 while (fargs) {</span>
+<span class="lineNum">    1083 </span>            :                         GF_Filter *f;
+<span class="lineNum">    1084 </span>            :                         char *sep;
+<span class="lineNum">    1085 </span>            :                         Bool end_of_sub_chain = GF_FALSE;
+<span class="lineNum">    1086 </span><span class="lineCov">          5 :                         if (old_syntax) {</span>
+<span class="lineNum">    1087 </span><span class="lineNoCov">          0 :                                 sep = strstr(fargs, &quot;@@&quot;);</span>
+<span class="lineNum">    1088 </span>            :                         } else {
+<span class="lineNum">    1089 </span><span class="lineCov">          5 :                                 sep = strstr(fargs, &quot;@&quot;);</span>
+<span class="lineNum">    1090 </span><span class="lineCov">          5 :                                 if (sep &amp;&amp; (sep[1] == '@'))</span>
+<span class="lineNum">    1091 </span>            :                                         end_of_sub_chain = GF_TRUE;
+<span class="lineNum">    1092 </span>            :                         }
+<span class="lineNum">    1093 </span><span class="lineCov">          5 :                         if (sep) sep[0] = 0;</span>
+<span class="lineNum">    1094 </span>            : 
+<span class="lineNum">    1095 </span><span class="lineCov">          5 :                         f = gf_fs_load_filter(dasher-&gt;fsess, fargs, &amp;e);</span>
+<span class="lineNum">    1096 </span><span class="lineCov">          5 :                         if (!f) {</span>
+<span class="lineNum">    1097 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, (&quot;[DASH] Failed to load filter %s: %s\n&quot;, fargs, gf_error_to_string(e) ));</span>
+<span class="lineNum">    1098 </span><span class="lineNoCov">          0 :                                 return e;</span>
+<span class="lineNum">    1099 </span>            :                         }
+<span class="lineNum">    1100 </span><span class="lineCov">          5 :                         if (prev_filter) {</span>
+<span class="lineNum">    1101 </span><span class="lineCov">          5 :                                 gf_filter_set_source(f, prev_filter, NULL);</span>
+<span class="lineNum">    1102 </span>            :                         }
+<span class="lineNum">    1103 </span>            :                         prev_filter = f;
+<span class="lineNum">    1104 </span><span class="lineCov">          5 :                         if (!sep) break;</span>
+<span class="lineNum">    1105 </span><span class="lineCov">          3 :                         sep[0] = '@';</span>
+<span class="lineNum">    1106 </span><span class="lineCov">          3 :                         if (old_syntax || end_of_sub_chain) {</span>
+<span class="lineNum">    1107 </span><span class="lineCov">          1 :                                 fargs = sep+2;</span>
+<span class="lineNum">    1108 </span><span class="lineCov">          1 :                                 if (end_of_sub_chain &amp;&amp; prev_filter) {</span>
+<span class="lineNum">    1109 </span><span class="lineCov">          1 :                                         gf_filter_set_source(dasher-&gt;output, prev_filter, NULL);</span>
+<span class="lineNum">    1110 </span>            :                                         prev_filter = src;
+<span class="lineNum">    1111 </span>            :                                 }
+<span class="lineNum">    1112 </span>            :                         } else {
+<span class="lineNum">    1113 </span><span class="lineCov">          2 :                                 fargs = sep+1;</span>
+<span class="lineNum">    1114 </span>            :                         }
+<span class="lineNum">    1115 </span>            :                 }
+<span class="lineNum">    1116 </span><span class="lineCov">          2 :                 if (prev_filter) {</span>
+<span class="lineNum">    1117 </span><span class="lineCov">          2 :                         gf_filter_set_source(dasher-&gt;output, prev_filter, NULL);</span>
+<span class="lineNum">    1118 </span>            :                 }
+<span class="lineNum">    1119 </span>            :         }
+<span class="lineNum">    1120 </span>            : 
+<span class="lineNum">    1121 </span>            :         return GF_OK;
+<a name="1122"><span class="lineNum">    1122 </span>            : }</a>
+<span class="lineNum">    1123 </span>            : 
+<span class="lineNum">    1124 </span><span class="lineCov">          2 : GF_Err dash_state_check_timing(const char *dash_state, u64 *next_gen_ntp_ms, u32 *next_time_ms)</span>
+<span class="lineNum">    1125 </span>            : {
+<span class="lineNum">    1126 </span><span class="lineCov">          2 :         u64 next_gen_ntp = 0;</span>
+<span class="lineNum">    1127 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">    1128 </span>            :         GF_DOMParser *mpd_parser;
+<span class="lineNum">    1129 </span>            : 
+<span class="lineNum">    1130 </span><span class="lineCov">          2 :         *next_gen_ntp_ms = 0;</span>
+<span class="lineNum">    1131 </span><span class="lineCov">          2 :         *next_time_ms = 0;</span>
+<span class="lineNum">    1132 </span><span class="lineCov">          2 :         if (!gf_file_exists(dash_state))</span>
+<span class="lineNum">    1133 </span>            :                 return GF_OK;
+<span class="lineNum">    1134 </span>            : 
+<span class="lineNum">    1135 </span>            :         /* parse the MPD XML */
+<span class="lineNum">    1136 </span><span class="lineCov">          2 :         mpd_parser = gf_xml_dom_new();</span>
+<span class="lineNum">    1137 </span><span class="lineCov">          2 :         e = gf_xml_dom_parse(mpd_parser, dash_state, NULL, NULL);</span>
+<span class="lineNum">    1138 </span><span class="lineCov">          2 :         if (!e) {</span>
+<span class="lineNum">    1139 </span><span class="lineCov">          2 :                 GF_XMLNode *root = gf_xml_dom_get_root(mpd_parser);</span>
+<span class="lineNum">    1140 </span>            :                 GF_XMLAttribute *att;
+<span class="lineNum">    1141 </span><span class="lineCov">          2 :                 u32 i=0;</span>
+<span class="lineNum">    1142 </span>            :                 e = GF_NON_COMPLIANT_BITSTREAM;
+<span class="lineNum">    1143 </span>            :                 //extract &quot;gpac:next_gen_time&quot; but don't load a full MPD, not needed
+<span class="lineNum">    1144 </span><span class="lineCov">         24 :                 while (root &amp;&amp; (att = gf_list_enum(root-&gt;attributes, &amp;i))) {</span>
+<span class="lineNum">    1145 </span><span class="lineCov">         22 :                         if (!strcmp(att-&gt;name, &quot;gpac:next_gen_time&quot;)) {</span>
+<span class="lineNum">    1146 </span><span class="lineCov">          2 :                                 sscanf(att-&gt;value, LLU, &amp;next_gen_ntp);</span>
+<span class="lineNum">    1147 </span>            :                                 e = GF_OK;
+<span class="lineNum">    1148 </span><span class="lineCov">          2 :                                 break;</span>
+<span class="lineNum">    1149 </span>            :                         }
+<span class="lineNum">    1150 </span>            :                 }
+<span class="lineNum">    1151 </span><span class="lineCov">          2 :                 gf_xml_dom_del(mpd_parser);</span>
+<span class="lineNum">    1152 </span>            :         }
+<span class="lineNum">    1153 </span><span class="lineCov">          2 :         if (e) return e;</span>
+<span class="lineNum">    1154 </span>            : 
+<span class="lineNum">    1155 </span><span class="lineCov">          2 :         if (next_gen_ntp) {</span>
+<span class="lineNum">    1156 </span><span class="lineCov">          2 :                 u64 ntp_ms = gf_net_get_ntp_ms();</span>
+<span class="lineNum">    1157 </span><span class="lineCov">          2 :                 if (ntp_ms &lt; next_gen_ntp) {</span>
+<span class="lineNum">    1158 </span><span class="lineNoCov">          0 :                         *next_time_ms = (u32) (next_gen_ntp - ntp_ms);</span>
+<span class="lineNum">    1159 </span><span class="lineNoCov">          0 :                         return GF_EOS;</span>
+<span class="lineNum">    1160 </span>            :                 }
+<span class="lineNum">    1161 </span>            :         }
+<span class="lineNum">    1162 </span>            :         return GF_OK;
+<span class="lineNum">    1163 </span>            : }
+<a name="1164"><span class="lineNum">    1164 </span>            : </a>
+<span class="lineNum">    1165 </span>            : GF_EXPORT
+<span class="lineNum">    1166 </span><span class="lineCov">        193 : GF_Err gf_dasher_process(GF_DASHSegmenter *dasher)</span>
+<span class="lineNum">    1167 </span>            : {
+<span class="lineNum">    1168 </span>            :         GF_Err e;
+<span class="lineNum">    1169 </span>            :         Bool need_seek = GF_TRUE;
+<span class="lineNum">    1170 </span>            : 
+<span class="lineNum">    1171 </span>            :         /*first run, we need to extract the next gen time from context*/
+<span class="lineNum">    1172 </span><span class="lineCov">        193 :         if (dasher-&gt;dash_state &amp;&amp; gf_file_exists(dasher-&gt;dash_state) &amp;&amp; (dasher-&gt;dash_mode&gt;=GF_DASH_DYNAMIC) &amp;&amp; !dasher-&gt;next_gen_ntp_ms) {</span>
+<span class="lineNum">    1173 </span>            :                 u32 diff;
+<span class="lineNum">    1174 </span><span class="lineCov">          2 :                 e = dash_state_check_timing(dasher-&gt;dash_state, &amp;dasher-&gt;next_gen_ntp_ms, &amp;diff);</span>
+<span class="lineNum">    1175 </span><span class="lineCov">          2 :                 if (e&lt;0) return e;</span>
+<span class="lineNum">    1176 </span><span class="lineCov">          2 :                 if (e==GF_EOS) {</span>
+<span class="lineNum">    1177 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_DASH, (&quot;[DASH] generation called too early by %d ms\n&quot;, (s32) diff));</span>
+<span class="lineNum">    1178 </span>            :                         return e;
+<span class="lineNum">    1179 </span>            :                 }
+<span class="lineNum">    1180 </span>            :         }
+<span class="lineNum">    1181 </span>            : 
+<span class="lineNum">    1182 </span><span class="lineCov">        193 :         if (!dasher-&gt;fsess) {</span>
+<span class="lineNum">    1183 </span><span class="lineCov">        176 :                 e = gf_dasher_setup(dasher);</span>
+<span class="lineNum">    1184 </span><span class="lineCov">        176 :                 if (e) return e;</span>
+<span class="lineNum">    1185 </span>            :                 need_seek = GF_FALSE;
+<span class="lineNum">    1186 </span>            :         }
+<span class="lineNum">    1187 </span><span class="lineCov">        193 :         gf_fs_get_last_connect_error(dasher-&gt;fsess);</span>
+<span class="lineNum">    1188 </span><span class="lineCov">        193 :         gf_fs_get_last_process_error(dasher-&gt;fsess);</span>
+<span class="lineNum">    1189 </span>            : 
+<span class="lineNum">    1190 </span>            :         //send change mode before sending the resume request, as the seek checks for last mode
+<span class="lineNum">    1191 </span><span class="lineCov">        193 :         if (dasher-&gt;dash_mode_changed) {</span>
+<span class="lineNum">    1192 </span><span class="lineCov">          8 :                 gf_filter_send_update(dasher-&gt;output, NULL, &quot;dmode&quot;, (dasher-&gt;dash_mode == GF_DASH_DYNAMIC_LAST)  ? &quot;dynlast&quot; : &quot;dynamic&quot;, GF_FILTER_UPDATE_DOWNSTREAM);</span>
+<span class="lineNum">    1193 </span>            :         }
+<span class="lineNum">    1194 </span>            : 
+<span class="lineNum">    1195 </span><span class="lineCov">        193 :         if (need_seek) {</span>
+<span class="lineNum">    1196 </span>            :                 GF_FilterEvent evt;
+<span class="lineNum">    1197 </span><span class="lineCov">         17 :                 GF_FEVT_INIT(evt, GF_FEVT_RESUME, NULL);</span>
+<span class="lineNum">    1198 </span><span class="lineCov">         17 :                 evt.base.on_pid = gf_filter_get_ipid(dasher-&gt;output, 0);</span>
+<span class="lineNum">    1199 </span><span class="lineCov">         17 :                 gf_filter_send_event(dasher-&gt;output, &amp;evt, GF_FALSE);</span>
+<span class="lineNum">    1200 </span>            :         }
+<span class="lineNum">    1201 </span>            : 
+<span class="lineNum">    1202 </span><span class="lineCov">        193 :         e = gf_fs_run(dasher-&gt;fsess);</span>
+<span class="lineNum">    1203 </span><span class="lineCov">        193 :         if (e&gt;0) e = GF_OK;</span>
+<span class="lineNum">    1204 </span>            : 
+<span class="lineNum">    1205 </span><span class="lineCov">        193 :         gf_fs_print_non_connected(dasher-&gt;fsess);</span>
+<span class="lineNum">    1206 </span><span class="lineCov">        193 :         if (dasher-&gt;print_stats_graph &amp; 1) gf_fs_print_stats(dasher-&gt;fsess);</span>
+<span class="lineNum">    1207 </span><span class="lineCov">        193 :         if (dasher-&gt;print_stats_graph &amp; 2) gf_fs_print_connections(dasher-&gt;fsess);</span>
+<span class="lineNum">    1208 </span>            : 
+<span class="lineNum">    1209 </span><span class="lineCov">        193 :         if (!e) e = gf_fs_get_last_connect_error(dasher-&gt;fsess);</span>
+<span class="lineNum">    1210 </span><span class="lineCov">        193 :         if (!e) e = gf_fs_get_last_process_error(dasher-&gt;fsess);</span>
+<span class="lineNum">    1211 </span><span class="lineCov">        193 :         if (e&lt;0) return e;</span>
+<span class="lineNum">    1212 </span>            : 
+<span class="lineNum">    1213 </span><span class="lineCov">        191 :         on_dasher_event(dasher, NULL);</span>
+<span class="lineNum">    1214 </span><span class="lineCov">        191 :         GF_LOG(GF_LOG_INFO, GF_LOG_APP, (&quot;\n&quot;));</span>
+<span class="lineNum">    1215 </span>            : 
+<span class="lineNum">    1216 </span><span class="lineCov">        191 :         if (dasher-&gt;no_cache) {</span>
+<span class="lineNum">    1217 </span><span class="lineNoCov">          0 :                 if (!e) gf_fs_print_unused_args(dasher-&gt;fsess, &quot;smode&quot;);</span>
+<span class="lineNum">    1218 </span><span class="lineNoCov">          0 :                 gf_fs_del(dasher-&gt;fsess);</span>
+<span class="lineNum">    1219 </span><span class="lineNoCov">          0 :                 dasher-&gt;fsess = NULL;</span>
+<span class="lineNum">    1220 </span>            :         }
+<span class="lineNum">    1221 </span>            :         return GF_OK;
+<span class="lineNum">    1222 </span>            : }
+<span class="lineNum">    1223 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

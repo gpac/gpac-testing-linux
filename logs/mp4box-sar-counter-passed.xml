@@ -1,0 +1,18 @@
+ <test name="mp4box-sar-counter" result="OK" date="29/04/2021 23:39:36">
+
+  <stat subtest="create" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52112" cpu_percent="98%" cpu_elapsed_time="0:00.08" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/counter.hvc -par 1=16:9 -new ./results/temp/setpar.mp4</command_line>
+  </stat>
+  <stat subtest="rewrite" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52036" cpu_percent="98%" cpu_elapsed_time="0:00.08" cpu_user_time="0.05" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/counter.hvc -par 1=w16:9 -new ./results/temp/rewritepar.mp4</command_line>
+  </stat>
+  <stat subtest="remove" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45344" cpu_percent="100%" cpu_elapsed_time="0:00.06" cpu_user_time="0.05" cpu_kernel_time="0.00" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/rewritepar.mp4 -par 1=none -new ./results/temp/remove.mp4</command_line>
+  </stat>
+  <stat subtest="auto" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="45944" cpu_percent="98%" cpu_elapsed_time="0:00.06" cpu_user_time="0.03" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/remove.mp4 -par 1=auto -new ./results/temp/auto.mp4</command_line>
+  </stat>
+  <stat subtest="set-pl" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52244" cpu_percent="98%" cpu_elapsed_time="0:00.08" cpu_user_time="0.07" cpu_kernel_time="0.00" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/counter.hvc:profile=1:level:1 -new ./results/temp/set-pl.mp4</command_line>
+  </stat>
+ </test>

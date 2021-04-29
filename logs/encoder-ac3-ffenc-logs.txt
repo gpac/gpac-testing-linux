@@ -1,0 +1,114 @@
+*** encoder-ac3-ffenc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:43 ***
+
+
+*** Subtest "encoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/count_french.mp3  -o ./results/temp/test.ac3 -graph -stats " ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1172230016
+
+Filter stats - 7 filters
+	Filter fin (src=./media/auxiliary_files/count_french.mp3) : 0 input pids 1 output pids 16 tasks 604 us process time
+		13 packets sent 60060 bytes sent (21523.2 pck/sec 795.497 mbps)
+		* output PID count_french.mp3: 13 packets sent
+	Filter fout (dst=./results/temp/test.ac3) : 1 input pids 0 output pids 147 tasks 642 us process time
+		145 packets processed 242416 bytes processed (225857 pck/sec 3020.76 mbps)
+		* input PID audio: 145 packets received
+	Filter rfmp3 : 1 input pids 1 output pids 28 tasks 912 us process time
+		13 packets processed 60060 bytes processed (14254.4 pck/sec 526.842 mbps)
+		385 packets sent 60060 bytes sent (422149 pck/sec 526.842 mbps)
+		* input PID count_french.mp3: 13 packets received
+		* output PID audio: 385 packets sent
+	Filter maddec "dec_mad:MAD 0.15.1 (beta)" : 1 input pids 1 output pids 391 tasks 12818 us process time
+		385 packets processed 60060 bytes processed (30035.9 pck/sec 37.4848 mbps)
+		385 packets sent 887040 bytes sent (30035.9 pck/sec 553.621 mbps)
+		* input PID audio: 385 packets received
+		* output PID audio: 385 packets sent
+	Filter ffenc "ffenc:ac3" : 1 input pids 1 output pids 392 tasks 14897 us process time
+		385 packets processed 1774080 bytes processed (25844.1 pck/sec 952.718 mbps)
+		145 packets sent 242416 bytes sent (9733.5 pck/sec 130.182 mbps)
+		* input PID audio: 385 packets received
+		* output PID audio: 145 packets sent
+	Filter writegen : 1 input pids 1 output pids 292 tasks 302 us process time
+		145 packets processed 242416 bytes processed (480132 pck/sec 6421.62 mbps)
+		145 packets sent 242416 bytes sent (480132 pck/sec 6421.62 mbps)
+		* input PID audio: 145 packets received
+		* output PID audio: 145 packets sent
+	Filter resample : 1 input pids 1 output pids 390 tasks 9742 us process time
+		385 packets processed 887040 bytes processed (39519.6 pck/sec 728.425 mbps)
+		385 packets sent 1774080 bytes sent (39519.6 pck/sec 1456.85 mbps)
+		* input PID audio: 385 packets received
+		* output PID audio: 385 packets sent
+Session stats - threads 1
+	Thread 1: run_time 40520 us active_time 40403 us nb_tasks 1684
+
+Total: run_time 40520 us active_time 40403 us nb_tasks 1684
+
+Filters connected:
+fin (src=./media/auxiliary_files/count_french.mp3) (ptr=0x5590f563b840)
+-(PID count_french.mp3) rfmp3 (ptr=0x5590f5641b80)
+--(PID audio) maddec "dec_mad:MAD 0.15.1 (beta)" (ptr=0x5590f5646df0)
+---(PID audio) resample (ptr=0x5590f5655f00)
+----(PID audio) ffenc "ffenc:ac3" (ptr=0x5590f564d770)
+-----(PID audio) writegen (ptr=0x5590f564eb60)
+------(PID audio) fout (dst=./results/temp/test.ac3) (ptr=0x5590f563e2c0)
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.ac3 inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump.txt:test=encx" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 422ECA62C1539D8A180D5420C7C3F13850699461
+Hash fail, ref hash ./hash_refs/encoder-ac3-ffenc-inspect.hash was 2B7FF0DB3D2BE571ECBD0ADD9356A3BEE3F9CE4F
+
+*** Subtest "encoder-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4  -o ./results/temp/mp4-test.ac3 -graph -stats " ***
+System info: 7961 MB RAM - 2 cores - main thread ID -2045677696
+
+Filter stats - 7 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 5 tasks 550 us process time
+		1 packets sent 3098 bytes sent (1818.18 pck/sec 45.0618 mbps)
+		* output PID in.mp4: 1 packets sent
+	Filter fout (dst=./results/temp/mp4-test.ac3) : 1 input pids 0 output pids 8 tasks 151 us process time
+		6 packets processed 10030 bytes processed (39735.1 pck/sec 531.391 mbps)
+		* input PID in.mp4: 6 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 8 tasks 680 us process time
+		1 packets processed 3098 bytes processed (1470.59 pck/sec 36.4471 mbps)
+		16 packets sent 2496 bytes sent (23529.4 pck/sec 29.3647 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 16 packets sent
+	Filter maddec "dec_mad:MAD 0.15.1 (beta)" : 1 input pids 1 output pids 22 tasks 727 us process time
+		16 packets processed 2496 bytes processed (22008.3 pck/sec 27.4663 mbps)
+		16 packets sent 36864 bytes sent (22008.3 pck/sec 405.656 mbps)
+		* input PID in.mp4: 16 packets received
+		* output PID in.mp4: 16 packets sent
+	Filter ffenc "ffenc:ac3" : 1 input pids 1 output pids 22 tasks 1144 us process time
+		16 packets processed 73728 bytes processed (13986 pck/sec 515.58 mbps)
+		6 packets sent 10030 bytes sent (5244.76 pck/sec 70.1399 mbps)
+		* input PID in.mp4: 16 packets received
+		* output PID in.mp4: 6 packets sent
+	Filter writegen : 1 input pids 1 output pids 14 tasks 99 us process time
+		6 packets processed 10030 bytes processed (60606.1 pck/sec 810.505 mbps)
+		6 packets sent 10030 bytes sent (60606.1 pck/sec 810.505 mbps)
+		* input PID in.mp4: 6 packets received
+		* output PID in.mp4: 6 packets sent
+	Filter resample : 1 input pids 1 output pids 21 tasks 501 us process time
+		16 packets processed 36864 bytes processed (31936.1 pck/sec 588.647 mbps)
+		16 packets sent 73728 bytes sent (31936.1 pck/sec 1177.29 mbps)
+		* input PID in.mp4: 16 packets received
+		* output PID in.mp4: 16 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3914 us active_time 3894 us nb_tasks 106
+
+Total: run_time 3914 us active_time 3894 us nb_tasks 106
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x5619ac8c8840)
+-(PID in.mp4) mp4dmx (ptr=0x5619ac8cf270)
+--(PID in.mp4) maddec "dec_mad:MAD 0.15.1 (beta)" (ptr=0x5619ac8d8130)
+---(PID in.mp4) resample (ptr=0x5619ac8e76f0)
+----(PID in.mp4) ffenc "ffenc:ac3" (ptr=0x5619ac8d9180)
+-----(PID in.mp4) writegen (ptr=0x5619ac8da480)
+------(PID in.mp4) fout (dst=./results/temp/mp4-test.ac3) (ptr=0x5619ac8cb230)
+
+
+*** Subtest "inspect-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/mp4-test.ac3 inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump2.txt:test=encx" ***
+
+Computing ./results/temp/dump2.txt  (inspect-mp4) hash: 
+File hash (SHA-1): 5F6B683977C4E54AB9789DB3F075C5C382FFB7F6
+Hash fail, ref hash ./hash_refs/encoder-ac3-ffenc-inspect-mp4.hash was 77CE84F96E97421BCF0CA9079B0C19D5C27D541B

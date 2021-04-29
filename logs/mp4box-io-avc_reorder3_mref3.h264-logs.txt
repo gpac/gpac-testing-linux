@@ -1,0 +1,94 @@
+*** mp4box-io-avc_reorder3_mref3.h264 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:43 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/avc_reorder3_mref3.h264" ***
+Import probing results for ./external_media/import/avc_reorder3_mref3.h264:
+File has 1 tracks
+Duration: 1 s
+- Track 1 type: Video - Codec MPEG-4 AVC|H264 Video
+	Size 720x432 @ 25 FPS
+
+For more details, use `gpac -i avc_reorder3_mref3.h264 inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/avc_reorder3_mref3.h264.mp4  (add) hash: 
+File hash (SHA-1): A5B0C719613F663192CCC2D56FE330C7AC5BD9BD
+Hash OK for ./results/temp/avc_reorder3_mref3.h264.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/avc_reorder3_mref3.h264 -new ./results/temp/avc_reorder3_mref3.h264.mp4" ***
+Track Importing MPEG-4 AVC - Width 720 Height 432 FPS 25000/1000
+AVC|H264 Import results: 101 samples (220 NALUs) - Slices: 9 I 92 P 0 B - 0 SEI - 9 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 13154 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "NALDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 1 ./results/temp/avc_reorder3_mref3.h264.mp4 -out ./results/temp/nal.xml" ***
+
+Computing ./results/temp/nal.xml  (NALDump) hash: 
+File hash (SHA-1): 2BE15331B1FA6851904DCBC89F21A5AE151F24DB
+Hash OK for ./results/temp/nal.xml
+Computing ./results/temp/avc_reorder3_mref3.h264.1.tmp  (diso) hash: 
+File hash (SHA-1): 61D3127C2140945EC59E33D6740077ED04B3022A
+Hash OK for ./results/temp/avc_reorder3_mref3.h264.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/avc_reorder3_mref3.h264.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:04.040
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom avc1
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: AVC/H264 Profile (0x7f)
+Audio PL: No audio capability required (0xff)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 25000
+Media Duration 00:00:04.040 
+Track has 1 edits: track duration is 00:00:04.040
+Media Info: Language "Undetermined (und)" - Type "vide:avc1" - 101 samples
+Visual Sample Entry Info: width=720 height=432 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=720 height=432
+AVC/H264 Video - Visual Size 720 x 432
+	AVC Info: 1 SPS - 1 PPS - Profile Baseline @ Level 3.1
+	NAL Unit length bits: 32
+	Chroma format YUV 4:2:0 - Luma bit depth 8 - chroma bit depth 8
+	SPS#1 hash: 8AC42D08D6751508B657C0208A5069B39A3D55BE
+	PPS#1 hash: DE5CCFB17A950D17385F1511EA12D0A3E9F024C7
+	RFC6381 Codec Parameters: avc1.42801F
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 12 samples
+	Max sample duration: 1000 / 25000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/avc_reorder3_mref3.h264.mp4 -out ./results/temp/avc_reorder3_mref3.h264.1.tmp" ***
+
+Computing ./results/temp/avc_reorder3_mref3.h264.2.tmp  (dts) hash: 
+File hash (SHA-1): 86F2F3E66701CAABF13473CC65C64DD267701ADC
+Hash OK for ./results/temp/avc_reorder3_mref3.h264.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/avc_reorder3_mref3.h264.mp4 -out ./results/temp/avc_reorder3_mref3.h264.2.tmp" ***
+
+Computing ./results/temp/avc_reorder3_mref3.h264.mp4.hint  (hint) hash: 
+File hash (SHA-1): 2116129D29A11346CB068A9FE2497C299CF372E1
+Hash OK for ./results/temp/avc_reorder3_mref3.h264.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/avc_reorder3_mref3.h264.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 773C3093BCBC22166102DDEBE6237164C6DB3602
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/avc_reorder3_mref3.h264.mp4 -out ./results/temp/avc_reorder3_mref3.h264.mp4.hint" ***
+Hinting track ID 1 - Type "avc1:avc1" (H264) - BW 421 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/avc_reorder3_mref3.h264.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/avc_reorder3_mref3.h264.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 8CCDD5DEF944B11384801131EEFAAC3A9579C5D4
+Hash OK for ./results/temp/avc_reorder3_mref3.h264.mp4.hint

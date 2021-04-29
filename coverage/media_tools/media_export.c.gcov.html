@@ -1,0 +1,1553 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - media_tools/media_export.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">media_tools</a> - media_export.c<span style="font-size: 80%;"> (source / <a href="media_export.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">503</td>
+            <td class="headerCovTableEntry">773</td>
+            <td class="headerCovTableEntryLo">65.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / Media Tools sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/internal/media_dev.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/internal/isomedia_dev.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/mpegts.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      31 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #ifndef GPAC_DISABLE_MEDIA_EXPORT
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #ifndef GPAC_DISABLE_AVILIB
+<span class="lineNum">      36 </span>            : #include &lt;gpac/internal/avilib.h&gt;
+<span class="lineNum">      37 </span>            : #endif
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #ifndef GPAC_DISABLE_OGG
+<span class="lineNum">      40 </span>            : #include &lt;gpac/internal/ogg.h&gt;
+<span class="lineNum">      41 </span>            : #endif
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : #ifndef GPAC_DISABLE_VOBSUB
+<span class="lineNum">      44 </span>            : #include &lt;gpac/internal/vobsub.h&gt;
+<span class="lineNum">      45 </span>            : #endif
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : #ifndef GPAC_DISABLE_ZLIB
+<span class="lineNum">      48 </span>            : #include &lt;zlib.h&gt;
+<a name="49"><span class="lineNum">      49 </span>            : #endif</a>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineCov">          1 : static GF_Err gf_export_message(GF_MediaExporter *dumper, GF_Err e, char *format, ...)</span>
+<span class="lineNum">      52 </span>            : {
+<span class="lineNum">      53 </span><span class="lineCov">          1 :         if (dumper-&gt;flags &amp; GF_EXPORT_PROBE_ONLY) return e;</span>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">      56 </span><span class="lineCov">          1 :         if (gf_log_tool_level_on(GF_LOG_AUTHOR, e ? GF_LOG_ERROR : GF_LOG_WARNING)) {</span>
+<span class="lineNum">      57 </span>            :                 va_list args;
+<span class="lineNum">      58 </span>            :                 char szMsg[1024];
+<span class="lineNum">      59 </span><span class="lineCov">          1 :                 va_start(args, format);</span>
+<span class="lineNum">      60 </span>            :                 vsnprintf(szMsg, 1024, format, args);
+<span class="lineNum">      61 </span><span class="lineCov">          1 :                 va_end(args);</span>
+<span class="lineNum">      62 </span><span class="lineCov">          1 :                 GF_LOG((u32) (e ? GF_LOG_ERROR : GF_LOG_WARNING), GF_LOG_AUTHOR, (&quot;%s\n&quot;, szMsg) );</span>
+<span class="lineNum">      63 </span>            :         }
+<span class="lineNum">      64 </span>            : #endif
+<span class="lineNum">      65 </span>            :         return e;
+<span class="lineNum">      66 </span>            : }
+<span class="lineNum">      67 </span>            : 
+<a name="68"><span class="lineNum">      68 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS</a>
+<span class="lineNum">      69 </span>            : /*that's very very crude, we only support vorbis &amp; theora in MP4 - this will need cleanup as soon as possible*/
+<span class="lineNum">      70 </span><span class="lineCov">          2 : static GF_Err gf_dump_to_ogg(GF_MediaExporter *dumper, char *szName, u32 track)</span>
+<span class="lineNum">      71 </span>            : {
+<span class="lineNum">      72 </span>            : #ifdef GPAC_DISABLE_OGG
+<span class="lineNum">      73 </span>            :         return GF_NOT_SUPPORTED;
+<span class="lineNum">      74 </span>            : #else
+<span class="lineNum">      75 </span>            :         FILE *out;
+<span class="lineNum">      76 </span>            :         ogg_stream_state os;
+<span class="lineNum">      77 </span>            :         ogg_packet op;
+<span class="lineNum">      78 </span>            :         ogg_page og;
+<span class="lineNum">      79 </span>            :         u32 count, i, di, theora_kgs, nb_i, nb_p;
+<span class="lineNum">      80 </span>            :         Bool flush_first = GF_TRUE;
+<span class="lineNum">      81 </span>            :         GF_BitStream *bs;
+<span class="lineNum">      82 </span>            :         GF_ISOSample *samp;
+<span class="lineNum">      83 </span><span class="lineCov">          2 :         GF_ESD *esd = gf_isom_get_esd(dumper-&gt;file, track, 1);</span>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :         memset(&amp;os, 0, sizeof(ogg_stream_state));
+<span class="lineNum">      87 </span>            :         memset(&amp;og, 0, sizeof(ogg_page));
+<span class="lineNum">      88 </span>            :         memset(&amp;op, 0, sizeof(ogg_packet));
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">          2 :         if (gf_sys_is_test_mode()) {</span>
+<span class="lineNum">      91 </span><span class="lineCov">          2 :                 ogg_stream_init(&amp;os, 1);</span>
+<span class="lineNum">      92 </span>            :         } else {
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :                 gf_rand_init(GF_TRUE);</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :                 ogg_stream_init(&amp;os, gf_rand());</span>
+<span class="lineNum">      95 </span>            :         }
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">          2 :         out = szName ? gf_fopen(szName, &quot;wb&quot;) : stdout;</span>
+<span class="lineNum">      98 </span><span class="lineCov">          2 :         if (!out) return gf_export_message(dumper, GF_IO_ERR, &quot;Error opening %s for writing - check disk access &amp; permissions&quot;, szName);</span>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :         theora_kgs = 0;
+<span class="lineNum">     101 </span><span class="lineCov">          2 :         bs = gf_bs_new(esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     102 </span><span class="lineCov">          2 :         if (esd-&gt;decoderConfig-&gt;objectTypeIndication==GF_CODECID_OPUS) {</span>
+<span class="lineNum">     103 </span>            :                 GF_BitStream *bs_out;
+<span class="lineNum">     104 </span><span class="lineCov">          1 :                 GF_OpusSpecificBox *dops = (GF_OpusSpecificBox *) gf_isom_box_new(GF_ISOM_BOX_TYPE_DOPS);</span>
+<span class="lineNum">     105 </span><span class="lineCov">          1 :                 dops-&gt;size = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     106 </span><span class="lineCov">          1 :                 gf_bs_read_u32(bs);</span>
+<span class="lineNum">     107 </span><span class="lineCov">          1 :                 gf_isom_box_read((GF_Box *)dops, bs);</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :                 bs_out = gf_bs_new(NULL, 0, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     109 </span><span class="lineCov">          1 :                 gf_bs_write_data(bs_out, &quot;OpusHead&quot;, 8);</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :                 gf_bs_write_u8(bs_out, 1);//version</span>
+<span class="lineNum">     111 </span><span class="lineCov">          1 :                 gf_bs_write_u8(bs_out, dops-&gt;OutputChannelCount);</span>
+<span class="lineNum">     112 </span><span class="lineCov">          1 :                 gf_bs_write_u16_le(bs_out, dops-&gt;PreSkip);</span>
+<span class="lineNum">     113 </span><span class="lineCov">          1 :                 gf_bs_write_u32_le(bs_out, dops-&gt;InputSampleRate);</span>
+<span class="lineNum">     114 </span><span class="lineCov">          1 :                 gf_bs_write_u16_le(bs_out, dops-&gt;OutputGain);</span>
+<span class="lineNum">     115 </span><span class="lineCov">          1 :                 gf_bs_write_u8(bs_out, dops-&gt;ChannelMappingFamily);</span>
+<span class="lineNum">     116 </span><span class="lineCov">          1 :                 if (dops-&gt;ChannelMappingFamily) {</span>
+<span class="lineNum">     117 </span><span class="lineCov">          1 :                         gf_bs_write_u8(bs_out, dops-&gt;StreamCount);</span>
+<span class="lineNum">     118 </span><span class="lineCov">          1 :                         gf_bs_write_u8(bs_out, dops-&gt;CoupledCount);</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :                         gf_bs_write_data(bs, (char *) dops-&gt;ChannelMapping, dops-&gt;OutputChannelCount);</span>
+<span class="lineNum">     120 </span>            :                 }
+<span class="lineNum">     121 </span><span class="lineCov">          1 :                 gf_isom_box_del((GF_Box*)dops);</span>
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineCov">          1 :                 gf_bs_get_content(bs_out, &amp;op.packet, &amp;op.bytes);</span>
+<span class="lineNum">     124 </span><span class="lineCov">          1 :                 gf_bs_del(bs_out);</span>
+<span class="lineNum">     125 </span><span class="lineCov">          1 :                 ogg_stream_packetin(&amp;os, &amp;op);</span>
+<span class="lineNum">     126 </span><span class="lineCov">          1 :                 gf_free(op.packet);</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :                 op.packetno ++;</span>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :         } else {
+<span class="lineNum">     130 </span><span class="lineCov">          4 :                 while (gf_bs_available(bs)) {</span>
+<span class="lineNum">     131 </span><span class="lineCov">          3 :                         op.bytes = gf_bs_read_u16(bs);</span>
+<span class="lineNum">     132 </span><span class="lineCov">          3 :                         op.packet = (unsigned char*)gf_malloc(sizeof(char) * op.bytes);</span>
+<span class="lineNum">     133 </span><span class="lineCov">          3 :                         gf_bs_read_data(bs, (char*)op.packet, op.bytes);</span>
+<span class="lineNum">     134 </span><span class="lineCov">          3 :                         ogg_stream_packetin(&amp;os, &amp;op);</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">          3 :                         if (flush_first) {</span>
+<span class="lineNum">     137 </span><span class="lineCov">          1 :                                 ogg_stream_pageout(&amp;os, &amp;og);</span>
+<span class="lineNum">     138 </span><span class="lineCov">          1 :                                 gf_fwrite(og.header, og.header_len, out);</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :                                 gf_fwrite(og.body, og.body_len, out);</span>
+<span class="lineNum">     140 </span>            :                                 flush_first = 0;
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">          1 :                                 if (esd-&gt;decoderConfig-&gt;objectTypeIndication==GF_CODECID_THEORA) {</span>
+<span class="lineNum">     143 </span>            :                                         u32 kff;
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                                         GF_BitStream *vbs = gf_bs_new((char*)op.packet, op.bytes, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :                                         gf_bs_skip_bytes(vbs, 40);</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :                                         gf_bs_read_int(vbs, 6); /* quality */</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                                         kff = 1 &lt;&lt; gf_bs_read_int(vbs, 5);</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :                                         gf_bs_del(vbs);</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :                                         theora_kgs = 0;
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                                         kff--;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :                                         while (kff) {</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                                                 theora_kgs ++;</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                                                 kff &gt;&gt;= 1;</span>
+<span class="lineNum">     155 </span>            :                                         }
+<span class="lineNum">     156 </span>            :                                 }
+<span class="lineNum">     157 </span>            :                         }
+<span class="lineNum">     158 </span><span class="lineCov">          3 :                         gf_free(op.packet);</span>
+<span class="lineNum">     159 </span><span class="lineCov">          3 :                         op.packetno ++;</span>
+<span class="lineNum">     160 </span>            :                 }
+<span class="lineNum">     161 </span>            :         }
+<span class="lineNum">     162 </span><span class="lineCov">          2 :         gf_bs_del(bs);</span>
+<span class="lineNum">     163 </span><span class="lineCov">          2 :         gf_odf_desc_del((GF_Descriptor *)esd);</span>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineCov">          5 :         while (ogg_stream_pageout(&amp;os, &amp;og)&gt;0) {</span>
+<span class="lineNum">     166 </span><span class="lineCov">          1 :                 gf_fwrite(og.header, og.header_len, out);</span>
+<span class="lineNum">     167 </span><span class="lineCov">          1 :                 gf_fwrite(og.body, og.body_len, out);</span>
+<span class="lineNum">     168 </span>            :         }
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">          2 :         op.granulepos = -1;</span>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineCov">          2 :         count = gf_isom_get_sample_count(dumper-&gt;file, track);</span>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :         nb_i = nb_p = 0;
+<span class="lineNum">     175 </span><span class="lineCov">          2 :         samp = gf_isom_get_sample(dumper-&gt;file, track, 1, &amp;di);</span>
+<span class="lineNum">     176 </span><span class="lineCov">       3225 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     177 </span><span class="lineCov">       3221 :                 GF_ISOSample *next_samp = gf_isom_get_sample(dumper-&gt;file, track, i+2, &amp;di);</span>
+<span class="lineNum">     178 </span><span class="lineCov">       3221 :                 if (!samp) break;</span>
+<span class="lineNum">     179 </span><span class="lineCov">       3221 :                 op.bytes = samp-&gt;dataLength;</span>
+<span class="lineNum">     180 </span><span class="lineCov">       3221 :                 op.packet = (unsigned char*)samp-&gt;data;</span>
+<span class="lineNum">     181 </span><span class="lineCov">       3221 :                 op.packetno ++;</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">       3221 :                 if (theora_kgs) {</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                         if (samp-&gt;IsRAP) {</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                                 if (i) nb_i+=nb_p+1;</span>
+<span class="lineNum">     186 </span>            :                                 nb_p = 0;
+<span class="lineNum">     187 </span>            :                         } else {
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                                 nb_p++;</span>
+<span class="lineNum">     189 </span>            :                         }
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :                         op.granulepos = nb_i;</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :                         op.granulepos &lt;&lt;= theora_kgs;</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                         op.granulepos |= nb_p;</span>
+<span class="lineNum">     193 </span>            :                 } else {
+<span class="lineNum">     194 </span><span class="lineCov">       3221 :                         if (next_samp) op.granulepos = next_samp-&gt;DTS;</span>
+<span class="lineNum">     195 </span>            :                 }
+<span class="lineNum">     196 </span><span class="lineCov">       3221 :                 if (!next_samp) op.e_o_s = 1;</span>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span><span class="lineCov">       3221 :                 ogg_stream_packetin(&amp;os, &amp;op);</span>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineCov">       3221 :                 gf_isom_sample_del(&amp;samp);</span>
+<span class="lineNum">     201 </span><span class="lineCov">       3221 :                 samp = next_samp;</span>
+<span class="lineNum">     202 </span>            :                 next_samp = NULL;
+<span class="lineNum">     203 </span><span class="lineCov">       3221 :                 gf_set_progress(&quot;OGG Export&quot;, i+1, count);</span>
+<span class="lineNum">     204 </span><span class="lineCov">       3221 :                 if (dumper-&gt;flags &amp; GF_EXPORT_DO_ABORT) break;</span>
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span><span class="lineCov">       3461 :                 while (ogg_stream_pageout(&amp;os, &amp;og)&gt;0) {</span>
+<span class="lineNum">     207 </span><span class="lineCov">        240 :                         gf_fwrite(og.header, og.header_len, out);</span>
+<span class="lineNum">     208 </span><span class="lineCov">        240 :                         gf_fwrite(og.body, og.body_len, out);</span>
+<span class="lineNum">     209 </span>            :                 }
+<span class="lineNum">     210 </span>            :         }
+<span class="lineNum">     211 </span><span class="lineCov">          2 :         if (samp) gf_isom_sample_del(&amp;samp);</span>
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span><span class="lineCov">          2 :         while (ogg_stream_flush(&amp;os, &amp;og)&gt;0) {</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                 gf_fwrite(og.header, og.header_len, out);</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                 gf_fwrite(og.body, og.body_len, out);</span>
+<span class="lineNum">     216 </span>            :         }
+<span class="lineNum">     217 </span><span class="lineCov">          2 :         ogg_stream_clear(&amp;os);</span>
+<span class="lineNum">     218 </span><span class="lineCov">          2 :         if (szName) gf_fclose(out);</span>
+<span class="lineNum">     219 </span>            :         return GF_OK;
+<span class="lineNum">     220 </span>            : #endif
+<span class="lineNum">     221 </span>            : }
+<span class="lineNum">     222 </span>            : #endif
+<span class="lineNum">     223 </span>            : 
+<a name="224"><span class="lineNum">     224 </span>            : </a>
+<span class="lineNum">     225 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     226 </span><span class="lineCov">          1 : static GF_Err gf_dump_to_vobsub(GF_MediaExporter *dumper, char *szName, u32 track, char *dsi, u32 dsiSize)</span>
+<span class="lineNum">     227 </span>            : {
+<span class="lineNum">     228 </span>            : #ifndef GPAC_DISABLE_VOBSUB
+<span class="lineNum">     229 </span>            :         FILE *fidx, *fsub;
+<span class="lineNum">     230 </span>            :         u32 width, height, i, count, di;
+<span class="lineNum">     231 </span>            :         GF_ISOSample *samp;
+<span class="lineNum">     232 </span><span class="lineCov">          1 :         char *lang = NULL;</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineCov">          1 :         if (!szName) {</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :                 szName = gf_file_basename(gf_isom_get_filename(dumper-&gt;file));</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :                 if (!szName) return GF_BAD_PARAM;</span>
+<span class="lineNum">     237 </span>            :         }
+<span class="lineNum">     238 </span>            :         /* Check decoder specific information (palette) size - should be 64 */
+<span class="lineNum">     239 </span><span class="lineCov">          1 :         if (!dsi || (dsiSize != 64)) {</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :                 return gf_export_message(dumper, GF_CORRUPTED_DATA, &quot;Invalid decoder specific info size - must be 64 but is %d&quot;, dsiSize);</span>
+<span class="lineNum">     241 </span>            :         }
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :         /* Create an idx file */
+<span class="lineNum">     244 </span><span class="lineCov">          1 :         if (!gf_file_ext_start(szName)) {</span>
+<span class="lineNum">     245 </span>            :                 char szPath[GF_MAX_PATH];
+<span class="lineNum">     246 </span>            :                 strcpy(szPath, szName);
+<span class="lineNum">     247 </span>            :                 strcat(szPath, &quot;.idx&quot;);
+<span class="lineNum">     248 </span><span class="lineCov">          1 :                 fidx = gf_fopen(szPath, &quot;wb&quot;);</span>
+<span class="lineNum">     249 </span>            :          } else {
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :                 fidx = gf_fopen(szName, &quot;wb&quot;);</span>
+<span class="lineNum">     251 </span>            :         }
+<span class="lineNum">     252 </span><span class="lineCov">          1 :         if (!fidx) {</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :                 return gf_export_message(dumper, GF_IO_ERR, &quot;Error opening %s for writing - check disk access &amp; permissions&quot;, szName);</span>
+<span class="lineNum">     254 </span>            :         }
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :         /* Create a sub file */
+<span class="lineNum">     257 </span><span class="lineCov">          1 :         char *ext = gf_file_ext_start(szName);</span>
+<span class="lineNum">     258 </span><span class="lineCov">          1 :         if (ext &amp;&amp; (!stricmp(ext, &quot;.idx&quot;) || !stricmp(ext, &quot;.sub&quot;)) ) {</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                 ext[0] = 0;</span>
+<span class="lineNum">     260 </span>            :         }
+<span class="lineNum">     261 </span>            :         szName = strcat(szName, &quot;.sub&quot;);
+<span class="lineNum">     262 </span><span class="lineCov">          1 :         fsub = gf_fopen(szName, &quot;wb&quot;);</span>
+<span class="lineNum">     263 </span><span class="lineCov">          1 :         if (!fsub) {</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :                 gf_fclose(fidx);</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :                 return gf_export_message(dumper, GF_IO_ERR, &quot;Error opening %s for writing - check disk access &amp; permissions&quot;, szName);</span>
+<span class="lineNum">     266 </span>            :         }
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :         /* Retrieve original subpicture resolution */
+<span class="lineNum">     269 </span><span class="lineCov">          1 :         gf_isom_get_track_layout_info(dumper-&gt;file, track, &amp;width, &amp;height, NULL, NULL, NULL);</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :         /* Write header */
+<span class="lineNum">     272 </span><span class="lineCov">          1 :         gf_fputs(&quot;# VobSub index file, v7 (do not modify this line!)\n#\n&quot;, fidx);</span>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :         /* Write original subpicture resolution */
+<span class="lineNum">     275 </span><span class="lineCov">          1 :         gf_fprintf(fidx, &quot;size: %ux%u\n&quot;, width, height);</span>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :         /* Write palette */
+<span class="lineNum">     278 </span><span class="lineCov">          1 :         gf_fputs(&quot;palette:&quot;, fidx);</span>
+<span class="lineNum">     279 </span><span class="lineCov">         17 :         for (i = 0; i &lt; 16; i++) {</span>
+<span class="lineNum">     280 </span>            :                 s32 y, u, v, r, g, b;
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span><span class="lineCov">         16 :                 y = (s32)(u8)dsi[(i&lt;&lt;2)+1] - 0x10;</span>
+<span class="lineNum">     283 </span><span class="lineCov">         16 :                 u = (s32)(u8)dsi[(i&lt;&lt;2)+3] - 0x80;</span>
+<span class="lineNum">     284 </span><span class="lineCov">         16 :                 v = (s32)(u8)dsi[(i&lt;&lt;2)+2] - 0x80;</span>
+<span class="lineNum">     285 </span><span class="lineCov">         16 :                 r = (298 * y           + 409 * v + 128) &gt;&gt; 8;</span>
+<span class="lineNum">     286 </span><span class="lineCov">         16 :                 g = (298 * y - 100 * u - 208 * v + 128) &gt;&gt; 8;</span>
+<span class="lineNum">     287 </span><span class="lineCov">         16 :                 b = (298 * y + 516 * u           + 128) &gt;&gt; 8;</span>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineCov">         16 :                 if (i) gf_fputc(',', fidx);</span>
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span>            : #define CLIP(x) (((x) &gt;= 0) ? (((x) &lt; 256) ? (x) : 255) : 0)
+<span class="lineNum">     292 </span><span class="lineCov">         16 :                 gf_fprintf(fidx, &quot; %02x%02x%02x&quot;, CLIP(r), CLIP(g), CLIP(b));</span>
+<span class="lineNum">     293 </span>            : #undef CLIP
+<span class="lineNum">     294 </span>            :         }
+<span class="lineNum">     295 </span><span class="lineCov">          1 :         gf_fputc('\n', fidx);</span>
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :         /* Write some other useful values */
+<span class="lineNum">     298 </span><span class="lineCov">          1 :         gf_fputs(&quot;# ON: displays only forced subtitles, OFF: shows everything\n&quot;, fidx);</span>
+<span class="lineNum">     299 </span><span class="lineCov">          1 :         gf_fputs(&quot;forced subs: OFF\n\n&quot;, fidx);</span>
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span>            :         /* Write current language index */
+<span class="lineNum">     302 </span><span class="lineCov">          1 :         gf_fputs(&quot;# Language index in use\nlangidx: 0\n&quot;, fidx);</span>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            :         /* Write language header */
+<span class="lineNum">     305 </span><span class="lineCov">          1 :         gf_isom_get_media_language(dumper-&gt;file, track, &amp;lang);</span>
+<span class="lineNum">     306 </span><span class="lineCov">          1 :         gf_fprintf(fidx, &quot;id: %s, index: 0\n&quot;, vobsub_lang_id(lang));</span>
+<span class="lineNum">     307 </span><span class="lineCov">          1 :         gf_free(lang);</span>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :         /* Retrieve sample count */
+<span class="lineNum">     310 </span><span class="lineCov">          1 :         count = gf_isom_get_sample_count(dumper-&gt;file, track);</span>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            :         /* Process samples (skip first - because it is special) */
+<span class="lineNum">     313 </span><span class="lineCov">         16 :         for (i = 2; i &lt;= count; i++)</span>
+<span class="lineNum">     314 </span>            :         {
+<span class="lineNum">     315 </span>            :                 u64 dts;
+<span class="lineNum">     316 </span>            :                 u32 hh, mm, ss, ms;
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span><span class="lineCov">         14 :                 samp = gf_isom_get_sample(dumper-&gt;file, track, i, &amp;di);</span>
+<span class="lineNum">     319 </span><span class="lineCov">         14 :                 if (!samp) {</span>
+<span class="lineNum">     320 </span>            :                         break;
+<span class="lineNum">     321 </span>            :                 }
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span><span class="lineCov">         14 :                 dts = samp-&gt;DTS / 90;</span>
+<span class="lineNum">     324 </span><span class="lineCov">         14 :                 ms  = (u32)(dts % 1000);</span>
+<span class="lineNum">     325 </span><span class="lineCov">         14 :                 dts = dts / 1000;</span>
+<span class="lineNum">     326 </span><span class="lineCov">         14 :                 ss  = (u32)(dts % 60);</span>
+<span class="lineNum">     327 </span><span class="lineCov">         14 :                 dts = dts / 60;</span>
+<span class="lineNum">     328 </span><span class="lineCov">         14 :                 mm  = (u32)(dts % 60);</span>
+<span class="lineNum">     329 </span><span class="lineCov">         14 :                 hh  = (u32)(dts / 60);</span>
+<span class="lineNum">     330 </span><span class="lineCov">         14 :                 gf_fprintf(fidx, &quot;timestamp: %02u:%02u:%02u:%03u, filepos: %09&quot;LLX_SUF&quot;\n&quot;, hh, mm, ss, ms, gf_ftell(fsub));</span>
+<span class="lineNum">     331 </span><span class="lineCov">         14 :                 if (vobsub_packetize_subpicture(fsub, samp-&gt;DTS, samp-&gt;data, samp-&gt;dataLength) != GF_OK) {</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :                         gf_isom_sample_del(&amp;samp);</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :                         gf_fclose(fsub);</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :                         gf_fclose(fidx);</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :                         return gf_export_message(dumper, GF_IO_ERR, &quot;Unable packetize subpicture into file %s\n&quot;, szName);</span>
+<span class="lineNum">     336 </span>            :                 }
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineCov">         14 :                 gf_isom_sample_del(&amp;samp);</span>
+<span class="lineNum">     339 </span><span class="lineCov">         14 :                 gf_set_progress(&quot;VobSub Export&quot;, i + 1, count);</span>
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span><span class="lineCov">         14 :                 if (dumper-&gt;flags &amp; GF_EXPORT_DO_ABORT) {</span>
+<span class="lineNum">     342 </span>            :                         break;
+<span class="lineNum">     343 </span>            :                 }
+<span class="lineNum">     344 </span>            :         }
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span>            :         /* Delete sample if any */
+<span class="lineNum">     347 </span><span class="lineCov">          1 :         if (samp) {</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                 gf_isom_sample_del(&amp;samp);</span>
+<span class="lineNum">     349 </span>            :         }
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span><span class="lineCov">          1 :         gf_fclose(fsub);</span>
+<span class="lineNum">     352 </span><span class="lineCov">          1 :         gf_fclose(fidx);</span>
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span><span class="lineCov">          1 :         return GF_OK;</span>
+<span class="lineNum">     355 </span>            : #else
+<span class="lineNum">     356 </span>            :         return GF_NOT_SUPPORTED;
+<span class="lineNum">     357 </span>            : #endif
+<span class="lineNum">     358 </span>            : }
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            : #endif // GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     361 </span>            : 
+<a name="362"><span class="lineNum">     362 </span>            : </a>
+<span class="lineNum">     363 </span>            : #ifndef GPAC_DISABLE_ISOM_WRITE
+<span class="lineNum">     364 </span><span class="lineCov">          1 : static GF_Err gf_export_isom_copy_track(GF_MediaExporter *dumper, GF_ISOFile *infile, u32 inTrackNum, GF_ISOFile *outfile, Bool ResetDependencies, Bool AddToIOD)</span>
+<span class="lineNum">     365 </span>            : {
+<span class="lineNum">     366 </span>            :         GF_ESD *esd;
+<span class="lineNum">     367 </span>            :         GF_InitialObjectDescriptor *iod;
+<span class="lineNum">     368 </span>            :         GF_ISOTrackID TrackID;
+<span class="lineNum">     369 </span>            :         u32 newTk, descIndex, i, ts, rate, pos, di, count, msubtype;
+<span class="lineNum">     370 </span>            :         u64 dur;
+<span class="lineNum">     371 </span>            :         GF_ISOSample *samp;
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span><span class="lineCov">          1 :         if (!inTrackNum) {</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :                 if (gf_isom_get_track_count(infile) != 1) return gf_export_message(dumper, GF_BAD_PARAM, &quot;Please specify trackID to export&quot;);</span>
+<span class="lineNum">     375 </span>            :                 inTrackNum = 1;
+<span class="lineNum">     376 </span>            :         }
+<span class="lineNum">     377 </span>            :         //check the ID is available
+<span class="lineNum">     378 </span><span class="lineCov">          1 :         TrackID = gf_isom_get_track_id(infile, inTrackNum);</span>
+<span class="lineNum">     379 </span><span class="lineCov">          1 :         newTk = gf_isom_get_track_by_id(outfile, TrackID);</span>
+<span class="lineNum">     380 </span><span class="lineCov">          1 :         if (newTk) TrackID = 0;</span>
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span>            :         //get the ESD and remove dependencies
+<span class="lineNum">     383 </span>            :         esd = NULL;
+<span class="lineNum">     384 </span><span class="lineCov">          1 :         msubtype = gf_isom_get_media_subtype(infile, inTrackNum, 1);</span>
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span><span class="lineCov">          1 :         if (msubtype == GF_ISOM_SUBTYPE_MPEG4) {</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :                 esd = gf_isom_get_esd(infile, inTrackNum, 1);</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :                 if (esd &amp;&amp; ResetDependencies) {</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :                         esd-&gt;dependsOnESID = 0;</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :                         esd-&gt;OCRESID = 0;</span>
+<span class="lineNum">     391 </span>            :                 }
+<span class="lineNum">     392 </span>            :         }
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span><span class="lineCov">          1 :         newTk = gf_isom_new_track(outfile, TrackID, gf_isom_get_media_type(infile, inTrackNum), gf_isom_get_media_timescale(infile, inTrackNum));</span>
+<span class="lineNum">     395 </span><span class="lineCov">          1 :         gf_isom_set_track_enabled(outfile, newTk, GF_TRUE);</span>
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span><span class="lineCov">          1 :         if (gf_isom_has_keep_utc_times(infile)) {</span>
+<span class="lineNum">     398 </span>            :                 u64 cdate, mdate;
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :                 gf_isom_get_track_creation_time(infile, inTrackNum, &amp;cdate, &amp;mdate);</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :                 gf_isom_set_track_creation_time(outfile, newTk, cdate, mdate);</span>
+<span class="lineNum">     401 </span>            :         }
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span><span class="lineCov">          1 :         if (esd) {</span>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :                 gf_isom_new_mpeg4_description(outfile, newTk, esd, NULL, NULL, &amp;descIndex);</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :                 if ((esd-&gt;decoderConfig-&gt;streamType == GF_STREAM_VISUAL) || (esd-&gt;decoderConfig-&gt;streamType == GF_STREAM_SCENE)) {</span>
+<span class="lineNum">     406 </span>            :                         u32 w, h;
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :                         gf_isom_get_visual_info(infile, inTrackNum, 1, &amp;w, &amp;h);</span>
+<span class="lineNum">     408 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     409 </span>            :                         /*this is because so many files have reserved values of 320x240 from v1 ... */
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :                         if (esd-&gt;decoderConfig-&gt;objectTypeIndication == GF_CODECID_MPEG4_PART2) {</span>
+<span class="lineNum">     411 </span>            :                                 GF_M4VDecSpecInfo dsi;
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :                                 gf_m4v_get_config(esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, &amp;dsi);</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :                                 w = dsi.width;</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :                                 h = dsi.height;</span>
+<span class="lineNum">     415 </span>            :                         }
+<span class="lineNum">     416 </span>            : #endif
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :                         gf_isom_set_visual_info(outfile, newTk, 1, w, h);</span>
+<span class="lineNum">     418 </span>            :                 }
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :                 else if ((esd-&gt;decoderConfig-&gt;streamType == GF_STREAM_TEXT) &amp;&amp; (esd-&gt;decoderConfig-&gt;objectTypeIndication == GF_CODECID_SUBPIC)) {</span>
+<span class="lineNum">     420 </span>            :                         u32 w, h;
+<span class="lineNum">     421 </span>            :                         s32 trans_x, trans_y;
+<span class="lineNum">     422 </span>            :                         s16 layer;
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :                         gf_isom_get_track_layout_info(infile, inTrackNum, &amp;w, &amp;h, &amp;trans_x, &amp;trans_y, &amp;layer);</span>
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :                         gf_isom_set_track_layout_info(outfile, newTk, w &lt;&lt; 16, h &lt;&lt; 16, trans_x, trans_y, layer);</span>
+<span class="lineNum">     425 </span>            :                 }
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :                 esd-&gt;decoderConfig-&gt;avgBitrate = 0;</span>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :                 esd-&gt;decoderConfig-&gt;maxBitrate = 0;</span>
+<span class="lineNum">     428 </span>            :         } else {
+<span class="lineNum">     429 </span><span class="lineCov">          1 :                 gf_isom_clone_sample_description(outfile, newTk, infile, inTrackNum, 1, NULL, NULL, &amp;descIndex);</span>
+<span class="lineNum">     430 </span>            :         }
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span>            :         pos = 0;
+<span class="lineNum">     433 </span>            :         rate = 0;
+<span class="lineNum">     434 </span><span class="lineCov">          1 :         ts = gf_isom_get_media_timescale(infile, inTrackNum);</span>
+<span class="lineNum">     435 </span><span class="lineCov">          1 :         count = gf_isom_get_sample_count(infile, inTrackNum);</span>
+<span class="lineNum">     436 </span><span class="lineCov">        175 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     437 </span><span class="lineCov">        173 :                 samp = gf_isom_get_sample(infile, inTrackNum, i+1, &amp;di);</span>
+<span class="lineNum">     438 </span><span class="lineCov">        173 :                 gf_isom_add_sample(outfile, newTk, descIndex, samp);</span>
+<span class="lineNum">     439 </span><span class="lineCov">        173 :                 if (esd) {</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :                         rate += samp-&gt;dataLength;</span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :                         esd-&gt;decoderConfig-&gt;avgBitrate += samp-&gt;dataLength;</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :                         if (esd-&gt;decoderConfig-&gt;bufferSizeDB&lt;samp-&gt;dataLength) esd-&gt;decoderConfig-&gt;bufferSizeDB = samp-&gt;dataLength;</span>
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :                         if (samp-&gt;DTS - pos &gt; ts) {</span>
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :                                 if (esd-&gt;decoderConfig-&gt;maxBitrate&lt;rate) esd-&gt;decoderConfig-&gt;maxBitrate = rate;</span>
+<span class="lineNum">     445 </span>            :                                 rate = 0;
+<span class="lineNum">     446 </span>            :                                 pos = 0;
+<span class="lineNum">     447 </span>            :                         }
+<span class="lineNum">     448 </span>            :                 }
+<span class="lineNum">     449 </span><span class="lineCov">        173 :                 gf_isom_sample_del(&amp;samp);</span>
+<span class="lineNum">     450 </span><span class="lineCov">        173 :                 gf_set_progress(&quot;ISO File Export&quot;, i, count);</span>
+<span class="lineNum">     451 </span>            :         }
+<span class="lineNum">     452 </span><span class="lineCov">          1 :         gf_set_progress(&quot;ISO File Export&quot;, count, count);</span>
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span><span class="lineCov">          1 :         if (msubtype == GF_ISOM_SUBTYPE_MPEG4_CRYP) {</span>
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :                 esd = gf_isom_get_esd(infile, inTrackNum, 1);</span>
+<span class="lineNum">     456 </span><span class="lineCov">          1 :         } else if ((msubtype == GF_ISOM_SUBTYPE_AVC_H264)</span>
+<span class="lineNum">     457 </span>            :                    || (msubtype == GF_ISOM_SUBTYPE_AVC2_H264)
+<span class="lineNum">     458 </span>            :                    || (msubtype == GF_ISOM_SUBTYPE_AVC3_H264)
+<span class="lineNum">     459 </span><span class="lineCov">          1 :                    || (msubtype == GF_ISOM_SUBTYPE_AVC4_H264)</span>
+<span class="lineNum">     460 </span>            :                   ) {
+<span class="lineNum">     461 </span><span class="lineCov">          1 :                 return gf_isom_set_pl_indication(outfile, GF_ISOM_PL_VISUAL, 0x0F);</span>
+<span class="lineNum">     462 </span>            :         }
+<span class="lineNum">     463 </span>            :         /*likely 3gp or any non-MPEG-4 isomedia file*/
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :         else if (!esd) return gf_isom_remove_root_od(outfile);</span>
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :         dur = gf_isom_get_media_duration(outfile, newTk);</span>
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :         if (!dur) dur = ts;</span>
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :         esd-&gt;decoderConfig-&gt;maxBitrate *= 8;</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :         esd-&gt;decoderConfig-&gt;avgBitrate = (u32) (esd-&gt;decoderConfig-&gt;avgBitrate * 8 * ts / dur);</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :         gf_isom_change_mpeg4_description(outfile, newTk, 1, esd);</span>
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :         iod = (GF_InitialObjectDescriptor *) gf_isom_get_root_od(infile);</span>
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :         switch (esd-&gt;decoderConfig-&gt;streamType) {</span>
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :         case GF_STREAM_SCENE:</span>
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :                 if (iod &amp;&amp; (iod-&gt;tag==GF_ODF_IOD_TAG)) {</span>
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_SCENE, iod-&gt;scene_profileAndLevel);</span>
+<span class="lineNum">     478 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_GRAPHICS, iod-&gt;graphics_profileAndLevel);</span>
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :                 } else if (esd-&gt;decoderConfig-&gt;objectTypeIndication==GF_CODECID_MPEG4_PART2) {</span>
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :                         gf_export_message(dumper, GF_OK, &quot;Warning: Scene PLs not found in original MP4 - defaulting to No Profile Specified&quot;);</span>
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_SCENE, 0xFE);</span>
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_GRAPHICS, 0xFE);</span>
+<span class="lineNum">     483 </span>            :                 }
+<span class="lineNum">     484 </span>            :                 break;
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :         case GF_STREAM_VISUAL:</span>
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :                 if (iod &amp;&amp; (iod-&gt;tag==GF_ODF_IOD_TAG)) {</span>
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_VISUAL, iod-&gt;visual_profileAndLevel);</span>
+<span class="lineNum">     488 </span>            :                 }
+<span class="lineNum">     489 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :                 else if (esd-&gt;decoderConfig-&gt;objectTypeIndication==GF_CODECID_MPEG4_PART2) {</span>
+<span class="lineNum">     491 </span>            :                         GF_M4VDecSpecInfo dsi;
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :                         gf_m4v_get_config(esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, &amp;dsi);</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_VISUAL, dsi.VideoPL);</span>
+<span class="lineNum">     494 </span>            :                 }
+<span class="lineNum">     495 </span>            : #endif
+<span class="lineNum">     496 </span>            :                 else {
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :                         gf_export_message(dumper, GF_OK, &quot;Warning: Visual PLs not found in original MP4 - defaulting to No Profile Specified&quot;);</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_VISUAL, 0xFE);</span>
+<span class="lineNum">     499 </span>            :                 }
+<span class="lineNum">     500 </span>            :                 break;
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :         case GF_STREAM_AUDIO:</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :                 if (iod &amp;&amp; (iod-&gt;tag==GF_ODF_IOD_TAG)) {</span>
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_AUDIO, iod-&gt;audio_profileAndLevel);</span>
+<span class="lineNum">     504 </span>            :                 }
+<span class="lineNum">     505 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :                 else if (esd-&gt;decoderConfig-&gt;objectTypeIndication==GF_CODECID_AAC_MPEG4) {</span>
+<span class="lineNum">     507 </span>            :                         GF_M4ADecSpecInfo cfg;
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :                         gf_m4a_get_config(esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, &amp;cfg);</span>
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_AUDIO, cfg.audioPL);</span>
+<span class="lineNum">     510 </span>            :                 }
+<span class="lineNum">     511 </span>            : #endif
+<span class="lineNum">     512 </span>            :                 else {
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :                         gf_export_message(dumper, GF_OK, &quot;Warning: Audio PLs not found in original MP4 - defaulting to No Profile Specified&quot;);</span>
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :                         gf_isom_set_pl_indication(outfile, GF_ISOM_PL_AUDIO, 0xFE);</span>
+<span class="lineNum">     515 </span>            :                 }
+<span class="lineNum">     516 </span>            :         default:
+<span class="lineNum">     517 </span>            :                 break;
+<span class="lineNum">     518 </span>            :         }
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 :         if (iod) gf_odf_desc_del((GF_Descriptor *) iod);</span>
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :         gf_odf_desc_del((GF_Descriptor *)esd);</span>
+<span class="lineNum">     521 </span>            : 
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :         if (AddToIOD) gf_isom_add_track_to_root_od(outfile, newTk);</span>
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            :         return GF_OK;
+<span class="lineNum">     525 </span>            : }
+<a name="526"><span class="lineNum">     526 </span>            : </a>
+<span class="lineNum">     527 </span>            : 
+<span class="lineNum">     528 </span><span class="lineCov">          1 : GF_Err gf_media_export_isom(GF_MediaExporter *dumper)</span>
+<span class="lineNum">     529 </span>            : {
+<span class="lineNum">     530 </span>            :         GF_ISOFile *outfile;
+<span class="lineNum">     531 </span>            :         GF_Err e;
+<span class="lineNum">     532 </span>            :         Bool add_to_iod, is_stdout;
+<span class="lineNum">     533 </span>            :         char szName[1000];
+<span class="lineNum">     534 </span>            :         u32 track;
+<span class="lineNum">     535 </span>            :         GF_ISOOpenMode mode;
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span><span class="lineCov">          1 :         if (!(track = gf_isom_get_track_by_id(dumper-&gt;file, dumper-&gt;trackID))) {</span>
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;Wrong track ID %d for file %s \n&quot;, dumper-&gt;trackID, gf_isom_get_filename(dumper-&gt;file)));</span>
+<span class="lineNum">     539 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     540 </span>            :         }
+<span class="lineNum">     541 </span><span class="lineCov">          1 :         if (gf_isom_get_media_type(dumper-&gt;file, dumper-&gt;trackID)==GF_ISOM_MEDIA_OD) {</span>
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :                 return gf_export_message(dumper, GF_BAD_PARAM, &quot;Cannot extract OD track, result is  meaningless&quot;);</span>
+<span class="lineNum">     543 </span>            :         }
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span><span class="lineCov">          1 :         if (dumper-&gt;flags &amp; GF_EXPORT_PROBE_ONLY) {</span>
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 :                 dumper-&gt;flags |= GF_EXPORT_MERGE;</span>
+<span class="lineNum">     547 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     548 </span>            :         }
+<span class="lineNum">     549 </span><span class="lineCov">          1 :         if (dumper-&gt;out_name &amp;&amp; gf_file_ext_start(dumper-&gt;out_name)) {</span>
+<span class="lineNum">     550 </span><span class="lineCov">          1 :                 strcpy(szName, dumper-&gt;out_name);</span>
+<span class="lineNum">     551 </span>            :         } else {
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :                 char *ext = (char *) gf_isom_get_filename(dumper-&gt;file);</span>
+<span class="lineNum">     553 </span><span class="lineNoCov">          0 :                 if (ext) ext = gf_file_ext_start(ext);</span>
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :                 sprintf(szName, &quot;%s%s&quot;, dumper-&gt;out_name, ext ? ext : &quot;.mp4&quot;);</span>
+<span class="lineNum">     555 </span>            :         }
+<span class="lineNum">     556 </span><span class="lineCov">          1 :         is_stdout = (dumper-&gt;out_name &amp;&amp; !strcmp(dumper-&gt;out_name, &quot;std&quot;)) ? 1 : 0;</span>
+<span class="lineNum">     557 </span>            :         add_to_iod = 1;
+<span class="lineNum">     558 </span>            :         mode = GF_ISOM_WRITE_EDIT;
+<span class="lineNum">     559 </span><span class="lineCov">          1 :         if (!is_stdout &amp;&amp; (dumper-&gt;flags &amp; GF_EXPORT_MERGE)) {</span>
+<span class="lineNum">     560 </span><span class="lineCov">          1 :                 FILE *t = gf_fopen(szName, &quot;rb&quot;);</span>
+<span class="lineNum">     561 </span><span class="lineCov">          1 :                 if (t) {</span>
+<span class="lineNum">     562 </span>            :                         add_to_iod = 0;
+<span class="lineNum">     563 </span>            :                         mode = GF_ISOM_OPEN_EDIT;
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :                         gf_fclose(t);</span>
+<span class="lineNum">     565 </span>            :                 }
+<span class="lineNum">     566 </span>            :         }
+<span class="lineNum">     567 </span><span class="lineCov">          1 :         outfile = gf_isom_open(is_stdout ? &quot;std&quot; : szName, mode, NULL);</span>
+<span class="lineNum">     568 </span>            : 
+<span class="lineNum">     569 </span><span class="lineCov">          1 :         if (mode == GF_ISOM_WRITE_EDIT) {</span>
+<span class="lineNum">     570 </span><span class="lineCov">          1 :                 gf_isom_set_pl_indication(outfile, GF_ISOM_PL_AUDIO, 0xFF);</span>
+<span class="lineNum">     571 </span><span class="lineCov">          1 :                 gf_isom_set_pl_indication(outfile, GF_ISOM_PL_VISUAL, 0xFF);</span>
+<span class="lineNum">     572 </span><span class="lineCov">          1 :                 gf_isom_set_pl_indication(outfile, GF_ISOM_PL_GRAPHICS, 0xFF);</span>
+<span class="lineNum">     573 </span><span class="lineCov">          1 :                 gf_isom_set_pl_indication(outfile, GF_ISOM_PL_SCENE, 0xFF);</span>
+<span class="lineNum">     574 </span><span class="lineCov">          1 :                 gf_isom_set_pl_indication(outfile, GF_ISOM_PL_OD, 0xFF);</span>
+<span class="lineNum">     575 </span><span class="lineCov">          1 :                 gf_isom_set_pl_indication(outfile, GF_ISOM_PL_MPEGJ, 0xFF);</span>
+<span class="lineNum">     576 </span>            :         }
+<span class="lineNum">     577 </span><span class="lineCov">          1 :         if (gf_isom_has_keep_utc_times(dumper-&gt;file)) {</span>
+<span class="lineNum">     578 </span>            :                 u64 cdate, mdate;
+<span class="lineNum">     579 </span><span class="lineNoCov">          0 :                 gf_isom_get_creation_time(dumper-&gt;file, &amp;cdate, &amp;mdate);</span>
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :                 gf_isom_set_creation_time(outfile, cdate, mdate);</span>
+<span class="lineNum">     581 </span>            :         }
+<span class="lineNum">     582 </span>            : 
+<span class="lineNum">     583 </span><span class="lineCov">          1 :         e = gf_export_isom_copy_track(dumper, dumper-&gt;file, track, outfile, 1, add_to_iod);</span>
+<span class="lineNum">     584 </span><span class="lineCov">          1 :         if (!add_to_iod) {</span>
+<span class="lineNum">     585 </span>            :                 u32 i;
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;gf_isom_get_track_count(outfile); i++) {</span>
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :                         gf_isom_remove_track_from_root_od(outfile, i+1);</span>
+<span class="lineNum">     588 </span>            :                 }
+<span class="lineNum">     589 </span>            :         }
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span><span class="lineCov">          1 :         if (gf_isom_has_keep_utc_times(dumper-&gt;file))</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                 gf_isom_keep_utc_times(outfile, GF_TRUE);</span>
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span><span class="lineCov">          1 :         if (e) gf_isom_delete(outfile);</span>
+<span class="lineNum">     595 </span><span class="lineCov">          1 :         else gf_isom_close(outfile);</span>
+<span class="lineNum">     596 </span>            : 
+<span class="lineNum">     597 </span>            :         return e;
+<span class="lineNum">     598 </span>            : }
+<span class="lineNum">     599 </span>            : #endif /*GPAC_DISABLE_ISOM_WRITE*/
+<span class="lineNum">     600 </span>            : 
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            : /* Required for base64 encoding of DecoderSpecificInfo */
+<span class="lineNum">     603 </span>            : #include &lt;gpac/base_coding.h&gt;
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span>            : #ifndef GPAC_DISABLE_VTT
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span>            : /* Required for timestamp generation */
+<a name="608"><span class="lineNum">     608 </span>            : #include &lt;gpac/webvtt.h&gt;</a>
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span><span class="lineCov">          1 : GF_Err gf_media_export_webvtt_metadata(GF_MediaExporter *dumper)</span>
+<span class="lineNum">     611 </span>            : {
+<span class="lineNum">     612 </span>            :         GF_ESD *esd;
+<span class="lineNum">     613 </span>            :         char szName[1000], szMedia[1000];
+<span class="lineNum">     614 </span>            :         FILE *med, *vtt;
+<span class="lineNum">     615 </span>            :         u32 w, h;
+<span class="lineNum">     616 </span>            :         u32 track, i, di, count, pos;
+<span class="lineNum">     617 </span>            :         u32 mtype, mstype;
+<span class="lineNum">     618 </span>            :         Bool isText;
+<span class="lineNum">     619 </span>            :         char *mime = NULL;
+<span class="lineNum">     620 </span>            :         Bool useBase64 = GF_FALSE;
+<span class="lineNum">     621 </span><span class="lineCov">          1 :         u32 headerLength = 0;</span>
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span><span class="lineCov">          1 :         if (!(track = gf_isom_get_track_by_id(dumper-&gt;file, dumper-&gt;trackID))) {</span>
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;Wrong track ID %d for file %s \n&quot;, dumper-&gt;trackID, gf_isom_get_filename(dumper-&gt;file)));</span>
+<span class="lineNum">     625 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     626 </span>            :         }
+<span class="lineNum">     627 </span>            :         if (!track) return gf_export_message(dumper, GF_BAD_PARAM, &quot;Invalid track ID %d&quot;, dumper-&gt;trackID);
+<span class="lineNum">     628 </span>            : 
+<span class="lineNum">     629 </span><span class="lineCov">          1 :         if (dumper-&gt;flags &amp; GF_EXPORT_PROBE_ONLY) {</span>
+<span class="lineNum">     630 </span>            :                 return GF_OK;
+<span class="lineNum">     631 </span>            :         }
+<span class="lineNum">     632 </span><span class="lineCov">          1 :         esd = gf_isom_get_esd(dumper-&gt;file, track, 1);</span>
+<span class="lineNum">     633 </span>            :         med = NULL;
+<span class="lineNum">     634 </span><span class="lineCov">          1 :         if (dumper-&gt;flags &amp; GF_EXPORT_WEBVTT_META_EMBEDDED) {</span>
+<span class="lineNum">     635 </span>            :         } else {
+<span class="lineNum">     636 </span><span class="lineCov">          1 :                 sprintf(szMedia, &quot;%s.media&quot;, dumper-&gt;out_name);</span>
+<span class="lineNum">     637 </span><span class="lineCov">          1 :                 med = gf_fopen(szMedia, &quot;wb&quot;);</span>
+<span class="lineNum">     638 </span><span class="lineCov">          1 :                 if (!med) {</span>
+<span class="lineNum">     639 </span><span class="lineNoCov">          0 :                         if (esd) gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">     640 </span><span class="lineNoCov">          0 :                         return gf_export_message(dumper, GF_IO_ERR, &quot;Error opening %s for writing - check disk access &amp; permissions&quot;, szMedia);</span>
+<span class="lineNum">     641 </span>            :                 }
+<span class="lineNum">     642 </span>            :         }
+<span class="lineNum">     643 </span>            : 
+<span class="lineNum">     644 </span><span class="lineCov">          1 :         sprintf(szName, &quot;%s.vtt&quot;, dumper-&gt;out_name);</span>
+<span class="lineNum">     645 </span><span class="lineCov">          1 :         vtt = gf_fopen(szName, &quot;wt&quot;);</span>
+<span class="lineNum">     646 </span><span class="lineCov">          1 :         if (!vtt) {</span>
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 :                 gf_fclose(med);</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :                 if (esd) gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">     649 </span><span class="lineNoCov">          0 :                 return gf_export_message(dumper, GF_IO_ERR, &quot;Error opening %s for writing - check disk access &amp; permissions&quot;, szName);</span>
+<span class="lineNum">     650 </span>            :         }
+<span class="lineNum">     651 </span>            : 
+<span class="lineNum">     652 </span><span class="lineCov">          1 :         mtype = gf_isom_get_media_type(dumper-&gt;file, track);</span>
+<span class="lineNum">     653 </span><span class="lineCov">          1 :         if (mtype==GF_ISOM_MEDIA_TEXT || mtype == GF_ISOM_MEDIA_MPEG_SUBT || mtype == GF_ISOM_MEDIA_SUBT) {</span>
+<span class="lineNum">     654 </span>            :                 isText = GF_TRUE;
+<span class="lineNum">     655 </span>            :         } else {
+<span class="lineNum">     656 </span>            :                 isText = GF_FALSE;
+<span class="lineNum">     657 </span>            :         }
+<span class="lineNum">     658 </span><span class="lineCov">          1 :         mstype = gf_isom_get_media_subtype(dumper-&gt;file, track, 1);</span>
+<span class="lineNum">     659 </span>            : 
+<span class="lineNum">     660 </span>            :         /*write header*/
+<span class="lineNum">     661 </span><span class="lineCov">          1 :         gf_fprintf(vtt, &quot;WEBVTT Metadata track generated by GPAC MP4Box %s\n&quot;, gf_sys_is_test_mode() ? &quot;&quot; : gf_gpac_version());</span>
+<span class="lineNum">     662 </span>            : 
+<span class="lineNum">     663 </span><span class="lineCov">          1 :         gf_fprintf(vtt, &quot;kind:metadata\n&quot;);</span>
+<span class="lineNum">     664 </span>            :         {
+<span class="lineNum">     665 </span>            :                 char *lang;
+<span class="lineNum">     666 </span><span class="lineCov">          1 :                 gf_isom_get_media_language(dumper-&gt;file, track, &amp;lang);</span>
+<span class="lineNum">     667 </span><span class="lineCov">          1 :                 gf_fprintf(vtt, &quot;language:%s\n&quot;, lang);</span>
+<span class="lineNum">     668 </span><span class="lineCov">          1 :                 gf_free(lang);</span>
+<span class="lineNum">     669 </span>            :         }
+<span class="lineNum">     670 </span>            :         {
+<span class="lineNum">     671 </span>            :                 const char *handler;
+<span class="lineNum">     672 </span><span class="lineCov">          1 :                 gf_isom_get_handler_name(dumper-&gt;file, track, &amp;handler);</span>
+<span class="lineNum">     673 </span><span class="lineCov">          1 :                 gf_fprintf(vtt, &quot;label: %s\n&quot;, handler);</span>
+<span class="lineNum">     674 </span>            :         }
+<span class="lineNum">     675 </span><span class="lineCov">          1 :         if (gf_isom_is_track_in_root_od(dumper-&gt;file, track)) gf_fprintf(vtt, &quot;inRootOD: yes\n&quot;);</span>
+<span class="lineNum">     676 </span><span class="lineCov">          1 :         gf_fprintf(vtt, &quot;trackID: %d\n&quot;, dumper-&gt;trackID);</span>
+<span class="lineNum">     677 </span><span class="lineCov">          1 :         if (med) {</span>
+<span class="lineNum">     678 </span><span class="lineCov">          1 :                 gf_fprintf(vtt, &quot;baseMediaFile: %s\n&quot;, gf_file_basename(szMedia));</span>
+<span class="lineNum">     679 </span>            :         }
+<span class="lineNum">     680 </span><span class="lineCov">          1 :         if (esd) {</span>
+<span class="lineNum">     681 </span>            :                 /* TODO: export the MPEG-4 Stream type only if it is not a GPAC internal value */
+<span class="lineNum">     682 </span><span class="lineCov">          1 :                 gf_fprintf(vtt, &quot;MPEG-4-streamType: %d\n&quot;, esd-&gt;decoderConfig-&gt;streamType);</span>
+<span class="lineNum">     683 </span>            :                 /* TODO: export the MPEG-4 Object Type Indication only if it is not a GPAC internal value */
+<span class="lineNum">     684 </span><span class="lineCov">          1 :                 gf_fprintf(vtt, &quot;MPEG-4-objectTypeIndication: %d\n&quot;, esd-&gt;decoderConfig-&gt;objectTypeIndication);</span>
+<span class="lineNum">     685 </span><span class="lineCov">          1 :                 if (gf_isom_is_video_handler_type(mtype) ) {</span>
+<span class="lineNum">     686 </span><span class="lineNoCov">          0 :                         gf_isom_get_visual_info(dumper-&gt;file, track, 1, &amp;w, &amp;h);</span>
+<span class="lineNum">     687 </span><span class="lineNoCov">          0 :                         gf_fprintf(vtt, &quot;width:%d\n&quot;, w);</span>
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 :                         gf_fprintf(vtt, &quot;height:%d\n&quot;, h);</span>
+<span class="lineNum">     689 </span>            :                 }
+<span class="lineNum">     690 </span><span class="lineCov">          1 :                 else if (mtype==GF_ISOM_MEDIA_AUDIO) {</span>
+<span class="lineNum">     691 </span>            :                         u32 sr, nb_ch, bps;
+<span class="lineNum">     692 </span><span class="lineNoCov">          0 :                         gf_isom_get_audio_info(dumper-&gt;file, track, 1, &amp;sr, &amp;nb_ch, &amp;bps);</span>
+<span class="lineNum">     693 </span><span class="lineNoCov">          0 :                         gf_fprintf(vtt, &quot;sampleRate: %d\n&quot;, sr);</span>
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 :                         gf_fprintf(vtt, &quot;numChannels: %d\n&quot;, nb_ch);</span>
+<span class="lineNum">     695 </span><span class="lineCov">          1 :                 } else if (isText) {</span>
+<span class="lineNum">     696 </span>            :                         s32 tx, ty;
+<span class="lineNum">     697 </span>            :                         s16 layer;
+<span class="lineNum">     698 </span><span class="lineCov">          1 :                         gf_isom_get_track_layout_info(dumper-&gt;file, track, &amp;w, &amp;h, &amp;tx, &amp;ty, &amp;layer);</span>
+<span class="lineNum">     699 </span><span class="lineCov">          1 :                         gf_fprintf(vtt, &quot;width:%d\n&quot;, w);</span>
+<span class="lineNum">     700 </span><span class="lineCov">          1 :                         gf_fprintf(vtt, &quot;height:%d\n&quot;, h);</span>
+<span class="lineNum">     701 </span><span class="lineCov">          1 :                         if (tx || ty) gf_fprintf(vtt, &quot;translation:%d,%d\n&quot;, tx, ty);</span>
+<span class="lineNum">     702 </span><span class="lineCov">          1 :                         if (layer) gf_fprintf(vtt, &quot;layer:%d\n&quot;, layer);</span>
+<span class="lineNum">     703 </span>            :                 }
+<span class="lineNum">     704 </span><span class="lineCov">          1 :                 if (esd-&gt;decoderConfig-&gt;decoderSpecificInfo  &amp;&amp; esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data) {</span>
+<span class="lineNum">     705 </span><span class="lineCov">          1 :                         if (isText) {</span>
+<span class="lineNum">     706 </span><span class="lineCov">          1 :                                 if (mstype == GF_ISOM_SUBTYPE_WVTT) {</span>
+<span class="lineNum">     707 </span>            :                                         /* Warning: Just use -raw export */
+<span class="lineNum">     708 </span>            :                                         mime = &quot;text/vtt&quot;;
+<span class="lineNum">     709 </span><span class="lineNoCov">          0 :                                 } else if (mstype == GF_ISOM_SUBTYPE_STXT) {</span>
+<span class="lineNum">     710 </span>            :                                         /* TODO: find the mime type from the ESD, assume SVG for now */
+<span class="lineNum">     711 </span>            :                                         mime = &quot;image/svg+xml&quot;;
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :                                 } else if (mstype == GF_ISOM_SUBTYPE_STPP) {</span>
+<span class="lineNum">     713 </span>            :                                         /* TODO: find the mime type from the ESD, assume TTML for now */
+<span class="lineNum">     714 </span>            :                                         mime = &quot;application/ttml+xml&quot;;
+<span class="lineNum">     715 </span>            :                                 }
+<span class="lineNum">     716 </span><span class="lineCov">          1 :                                 if (dumper-&gt;flags &amp; GF_EXPORT_WEBVTT_META_EMBEDDED) {</span>
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 :                                         if (mstype == GF_ISOM_SUBTYPE_STXT) {</span>
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :                                                 if (esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength) {</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :                                                         gf_fprintf(vtt, &quot;text-header: \n&quot;);</span>
+<span class="lineNum">     720 </span><span class="lineNoCov">          0 :                                                         gf_webvtt_dump_header_boxed(vtt, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data+4, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, &amp;headerLength);</span>
+<span class="lineNum">     721 </span>            :                                                 }
+<span class="lineNum">     722 </span>            :                                         }
+<span class="lineNum">     723 </span>            :                                 } else {
+<span class="lineNum">     724 </span><span class="lineCov">          1 :                                         gf_webvtt_dump_header_boxed(med, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data+4, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, &amp;headerLength);</span>
+<span class="lineNum">     725 </span><span class="lineCov">          1 :                                         gf_fprintf(vtt, &quot;text-header-length: %d\n&quot;, headerLength);</span>
+<span class="lineNum">     726 </span>            :                                 }
+<span class="lineNum">     727 </span>            :                         } else {
+<span class="lineNum">     728 </span>            :                                 char b64[200];
+<span class="lineNum">     729 </span><span class="lineNoCov">          0 :                                 u32 size = gf_base64_encode(esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, b64, 200);</span>
+<span class="lineNum">     730 </span>            :                                 useBase64 = GF_TRUE;
+<span class="lineNum">     731 </span><span class="lineNoCov">          0 :                                 if (size != (u32)-1 &amp;&amp; size != 0) {</span>
+<span class="lineNum">     732 </span><span class="lineNoCov">          0 :                                         b64[size] = 0;</span>
+<span class="lineNum">     733 </span><span class="lineNoCov">          0 :                                         gf_fprintf(vtt, &quot;MPEG-4-DecoderSpecificInfo: %s\n&quot;, b64);</span>
+<span class="lineNum">     734 </span>            :                                 }
+<span class="lineNum">     735 </span>            :                         }
+<span class="lineNum">     736 </span>            :                 }
+<span class="lineNum">     737 </span><span class="lineCov">          1 :                 gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">     738 </span>            :         } else {
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :                 GF_GenericSampleDescription *sdesc = gf_isom_get_generic_sample_description(dumper-&gt;file, track, 1);</span>
+<span class="lineNum">     740 </span><span class="lineNoCov">          0 :                 gf_fprintf(vtt, &quot;mediaType: %s\n&quot;, gf_4cc_to_str(mtype));</span>
+<span class="lineNum">     741 </span><span class="lineNoCov">          0 :                 gf_fprintf(vtt, &quot;mediaSubType: %s\n&quot;, gf_4cc_to_str(mstype ));</span>
+<span class="lineNum">     742 </span><span class="lineNoCov">          0 :                 if (sdesc) {</span>
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 :                         if (gf_isom_is_video_handler_type(mtype) ) {</span>
+<span class="lineNum">     744 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;codecVendor: %s\n&quot;, gf_4cc_to_str(sdesc-&gt;vendor_code));</span>
+<span class="lineNum">     745 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;codecVersion: %d\n&quot;, sdesc-&gt;version);</span>
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;codecRevision: %d\n&quot;, sdesc-&gt;revision);</span>
+<span class="lineNum">     747 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;width: %d\n&quot;, sdesc-&gt;width);</span>
+<span class="lineNum">     748 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;height: %d\n&quot;, sdesc-&gt;height);</span>
+<span class="lineNum">     749 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;compressorName: %s\n&quot;, sdesc-&gt;compressor_name);</span>
+<span class="lineNum">     750 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;temporalQuality: %d\n&quot;, sdesc-&gt;temporal_quality);</span>
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;spatialQuality: %d\n&quot;, sdesc-&gt;spatial_quality);</span>
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;horizontalResolution: %d\n&quot;, sdesc-&gt;h_res);</span>
+<span class="lineNum">     753 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;verticalResolution: %d\n&quot;, sdesc-&gt;v_res);</span>
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;bitDepth: %d\n&quot;, sdesc-&gt;depth);</span>
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :                         } else if (mtype==GF_ISOM_MEDIA_AUDIO) {</span>
+<span class="lineNum">     756 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;codecVendor: %s\n&quot;, gf_4cc_to_str(sdesc-&gt;vendor_code));</span>
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;codecVersion: %d\n&quot;, sdesc-&gt;version);</span>
+<span class="lineNum">     758 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;codecRevision: %d\n&quot;, sdesc-&gt;revision);</span>
+<span class="lineNum">     759 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;sampleRate: %d\n&quot;, sdesc-&gt;samplerate);</span>
+<span class="lineNum">     760 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;numChannels: %d\n&quot;, sdesc-&gt;nb_channels);</span>
+<span class="lineNum">     761 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;bitsPerSample: %d\n&quot;, sdesc-&gt;bits_per_sample);</span>
+<span class="lineNum">     762 </span>            :                         }
+<span class="lineNum">     763 </span><span class="lineNoCov">          0 :                         if (sdesc-&gt;extension_buf) {</span>
+<span class="lineNum">     764 </span>            :                                 char b64[200];
+<span class="lineNum">     765 </span><span class="lineNoCov">          0 :                                 u32 size = gf_base64_encode(sdesc-&gt;extension_buf, sdesc-&gt;extension_buf_size, b64, 200);</span>
+<span class="lineNum">     766 </span>            :                                 useBase64 = GF_TRUE;
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :                                 if (size != (u32)-1) {</span>
+<span class="lineNum">     768 </span><span class="lineNoCov">          0 :                                         b64[size] = 0;</span>
+<span class="lineNum">     769 </span><span class="lineNoCov">          0 :                                         gf_fprintf(vtt, &quot;specificInfo: %s\n&quot;, b64);</span>
+<span class="lineNum">     770 </span><span class="lineNoCov">          0 :                                         gf_free(sdesc-&gt;extension_buf);</span>
+<span class="lineNum">     771 </span>            :                                 }
+<span class="lineNum">     772 </span>            :                         }
+<span class="lineNum">     773 </span><span class="lineNoCov">          0 :                         gf_free(sdesc);</span>
+<span class="lineNum">     774 </span>            :                 }
+<span class="lineNum">     775 </span>            :         }
+<span class="lineNum">     776 </span><span class="lineCov">          1 :         gf_fprintf(vtt, &quot;inBandMetadataTrackDispatchType: %s\n&quot;, (mime ? mime : (isText? &quot;text/plain&quot; : &quot;application/octet-stream&quot;)));</span>
+<span class="lineNum">     777 </span><span class="lineCov">          1 :         if (useBase64) gf_fprintf(vtt, &quot;encoding: base64\n&quot;);</span>
+<span class="lineNum">     778 </span>            : 
+<span class="lineNum">     779 </span><span class="lineCov">          1 :         gf_fprintf(vtt, &quot;\n&quot;);</span>
+<span class="lineNum">     780 </span>            : 
+<span class="lineNum">     781 </span>            :         pos = 0;
+<span class="lineNum">     782 </span><span class="lineCov">          1 :         count = gf_isom_get_sample_count(dumper-&gt;file, track);</span>
+<span class="lineNum">     783 </span><span class="lineCov">          1 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     784 </span><span class="lineCov">         17 :                 GF_ISOSample *samp = gf_isom_get_sample(dumper-&gt;file, track, i+1, &amp;di);</span>
+<span class="lineNum">     785 </span><span class="lineCov">         17 :                 if (!samp) break;</span>
+<span class="lineNum">     786 </span>            : 
+<span class="lineNum">     787 </span>            :                 {
+<span class="lineNum">     788 </span>            :                         GF_WebVTTTimestamp start, end;
+<span class="lineNum">     789 </span><span class="lineCov">         17 :                         u64 dur = gf_isom_get_sample_duration(dumper-&gt;file, track, i+1);</span>
+<span class="lineNum">     790 </span><span class="lineCov">         17 :                         gf_webvtt_timestamp_set(&amp;start, samp-&gt;DTS);</span>
+<span class="lineNum">     791 </span><span class="lineCov">         17 :                         gf_webvtt_timestamp_set(&amp;end, samp-&gt;DTS+dur);</span>
+<span class="lineNum">     792 </span><span class="lineCov">         17 :                         gf_webvtt_timestamp_dump(&amp;start, vtt, GF_TRUE);</span>
+<span class="lineNum">     793 </span><span class="lineCov">         17 :                         gf_fprintf(vtt, &quot; --&gt; &quot;);</span>
+<span class="lineNum">     794 </span><span class="lineCov">         17 :                         gf_webvtt_timestamp_dump(&amp;end, vtt, GF_TRUE);</span>
+<span class="lineNum">     795 </span><span class="lineCov">         17 :                         gf_fprintf(vtt, &quot; &quot;);</span>
+<span class="lineNum">     796 </span><span class="lineCov">         17 :                         if (med) {</span>
+<span class="lineNum">     797 </span><span class="lineCov">         17 :                                 gf_fprintf(vtt, &quot;mediaOffset:%d &quot;, pos+headerLength);</span>
+<span class="lineNum">     798 </span><span class="lineCov">         17 :                                 gf_fprintf(vtt, &quot;dataLength:%d &quot;, samp-&gt;dataLength);</span>
+<span class="lineNum">     799 </span>            :                         }
+<span class="lineNum">     800 </span><span class="lineCov">         17 :                         if (samp-&gt;CTS_Offset) gf_fprintf(vtt, &quot;CTS: &quot;LLD&quot;&quot;, samp-&gt;DTS+samp-&gt;CTS_Offset);</span>
+<span class="lineNum">     801 </span><span class="lineCov">         17 :                         if (samp-&gt;IsRAP==RAP) gf_fprintf(vtt, &quot;isRAP:true &quot;);</span>
+<span class="lineNum">     802 </span><span class="lineNoCov">          0 :                         else if (samp-&gt;IsRAP==RAP_REDUNDANT) gf_fprintf(vtt, &quot;isSyncShadow: true &quot;);</span>
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :                         else gf_fprintf(vtt, &quot;isRAP:false &quot;);</span>
+<span class="lineNum">     804 </span><span class="lineCov">         17 :                         gf_fprintf(vtt, &quot;\n&quot;);</span>
+<span class="lineNum">     805 </span>            :                 }
+<span class="lineNum">     806 </span><span class="lineCov">         17 :                 if (med) {</span>
+<span class="lineNum">     807 </span><span class="lineCov">         17 :                         gf_fwrite(samp-&gt;data, samp-&gt;dataLength, med);</span>
+<span class="lineNum">     808 </span><span class="lineNoCov">          0 :                 } else if (dumper-&gt;flags &amp; GF_EXPORT_WEBVTT_META_EMBEDDED) {</span>
+<span class="lineNum">     809 </span><span class="lineNoCov">          0 :                         if (isText) {</span>
+<span class="lineNum">     810 </span><span class="lineNoCov">          0 :                                 samp-&gt;data = (char *)gf_realloc(samp-&gt;data, samp-&gt;dataLength+1);</span>
+<span class="lineNum">     811 </span><span class="lineNoCov">          0 :                                 samp-&gt;data[samp-&gt;dataLength] = 0;</span>
+<span class="lineNum">     812 </span><span class="lineNoCov">          0 :                                 gf_fprintf(vtt, &quot;%s\n&quot;, samp-&gt;data);</span>
+<span class="lineNum">     813 </span>            :                         } else {
+<span class="lineNum">     814 </span>            :                                 u32 b64_size;
+<span class="lineNum">     815 </span>            :                                 char *b64;
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :                                 b64 = (char *)gf_malloc(samp-&gt;dataLength*3);</span>
+<span class="lineNum">     817 </span><span class="lineNoCov">          0 :                                 b64_size = gf_base64_encode(samp-&gt;data, samp-&gt;dataLength, b64, samp-&gt;dataLength*3);</span>
+<span class="lineNum">     818 </span><span class="lineNoCov">          0 :                                 if (b64_size != (u32)-1) {</span>
+<span class="lineNum">     819 </span><span class="lineNoCov">          0 :                                         b64[b64_size] = 0;</span>
+<span class="lineNum">     820 </span><span class="lineNoCov">          0 :                                         gf_fprintf(vtt, &quot;%s\n&quot;, b64);</span>
+<span class="lineNum">     821 </span>            :                                 }
+<span class="lineNum">     822 </span><span class="lineNoCov">          0 :                                 gf_free(b64);</span>
+<span class="lineNum">     823 </span>            :                         }
+<span class="lineNum">     824 </span>            :                 }
+<span class="lineNum">     825 </span><span class="lineCov">         17 :                 gf_fprintf(vtt, &quot;\n&quot;);</span>
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span><span class="lineCov">         17 :                 pos += samp-&gt;dataLength;</span>
+<span class="lineNum">     828 </span><span class="lineCov">         17 :                 gf_isom_sample_del(&amp;samp);</span>
+<span class="lineNum">     829 </span><span class="lineCov">         17 :                 gf_set_progress(&quot;WebVTT metadata Export&quot;, i+1, count);</span>
+<span class="lineNum">     830 </span><span class="lineCov">         17 :                 if (dumper-&gt;flags &amp; GF_EXPORT_DO_ABORT) break;</span>
+<span class="lineNum">     831 </span>            :         }
+<span class="lineNum">     832 </span><span class="lineCov">          1 :         if (med) gf_fclose(med);</span>
+<span class="lineNum">     833 </span><span class="lineCov">          1 :         gf_fclose(vtt);</span>
+<span class="lineNum">     834 </span><span class="lineCov">          1 :         return GF_OK;</span>
+<span class="lineNum">     835 </span>            : }
+<span class="lineNum">     836 </span>            : 
+<span class="lineNum">     837 </span>            : #endif /*GPAC_DISABLE_VTT*/
+<a name="838"><span class="lineNum">     838 </span>            : </a>
+<span class="lineNum">     839 </span>            : /* Experimental Streaming Instructions XML export */
+<span class="lineNum">     840 </span><span class="lineCov">          1 : GF_Err gf_media_export_six(GF_MediaExporter *dumper)</span>
+<span class="lineNum">     841 </span>            : {
+<span class="lineNum">     842 </span>            :         GF_ESD *esd;
+<span class="lineNum">     843 </span>            :         char szName[1000], szMedia[1000];
+<span class="lineNum">     844 </span>            :         FILE *media, *six;
+<span class="lineNum">     845 </span>            :         u32 track, i, di, count, pos, header_size;
+<span class="lineNum">     846 </span>            :         //u32 mtype;
+<span class="lineNum">     847 </span>            : #if !defined(GPAC_DISABLE_TTXT) &amp;&amp; !defined(GPAC_DISABLE_VTT)
+<span class="lineNum">     848 </span>            :         u32 mstype;
+<span class="lineNum">     849 </span>            : #endif
+<span class="lineNum">     850 </span>            :         const char *szRootName;
+<span class="lineNum">     851 </span>            :         //Bool isText;
+<span class="lineNum">     852 </span>            : 
+<span class="lineNum">     853 </span><span class="lineCov">          1 :         if (!(track = gf_isom_get_track_by_id(dumper-&gt;file, dumper-&gt;trackID))) {</span>
+<span class="lineNum">     854 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;Wrong track ID %d for file %s \n&quot;, dumper-&gt;trackID, gf_isom_get_filename(dumper-&gt;file)));</span>
+<span class="lineNum">     855 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     856 </span>            :         }
+<span class="lineNum">     857 </span>            :         if (!track) return gf_export_message(dumper, GF_BAD_PARAM, &quot;Invalid track ID %d&quot;, dumper-&gt;trackID);
+<span class="lineNum">     858 </span>            : 
+<span class="lineNum">     859 </span><span class="lineCov">          1 :         if (dumper-&gt;flags &amp; GF_EXPORT_PROBE_ONLY) {</span>
+<span class="lineNum">     860 </span><span class="lineNoCov">          0 :                 dumper-&gt;flags |= GF_EXPORT_NHML_FULL;</span>
+<span class="lineNum">     861 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     862 </span>            :         }
+<span class="lineNum">     863 </span><span class="lineCov">          1 :         esd = gf_isom_get_esd(dumper-&gt;file, track, 1);</span>
+<span class="lineNum">     864 </span>            : 
+<span class="lineNum">     865 </span><span class="lineCov">          1 :         sprintf(szMedia, &quot;%s.media&quot;, dumper-&gt;out_name);</span>
+<span class="lineNum">     866 </span><span class="lineCov">          1 :         media = gf_fopen(szMedia, &quot;wb&quot;);</span>
+<span class="lineNum">     867 </span><span class="lineCov">          1 :         if (!media) {</span>
+<span class="lineNum">     868 </span><span class="lineNoCov">          0 :                 if (esd) gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">     869 </span><span class="lineNoCov">          0 :                 return gf_export_message(dumper, GF_IO_ERR, &quot;Error opening %s for writing - check disk access &amp; permissions&quot;, szMedia);</span>
+<span class="lineNum">     870 </span>            :         }
+<span class="lineNum">     871 </span>            : 
+<span class="lineNum">     872 </span><span class="lineCov">          1 :         sprintf(szName, &quot;%s.six&quot;, dumper-&gt;out_name);</span>
+<span class="lineNum">     873 </span>            :         szRootName = &quot;stream&quot;;
+<span class="lineNum">     874 </span>            : 
+<span class="lineNum">     875 </span><span class="lineCov">          1 :         six = gf_fopen(szName, &quot;wt&quot;);</span>
+<span class="lineNum">     876 </span><span class="lineCov">          1 :         if (!six) {</span>
+<span class="lineNum">     877 </span><span class="lineNoCov">          0 :                 gf_fclose(media);</span>
+<span class="lineNum">     878 </span><span class="lineNoCov">          0 :                 if (esd) gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">     879 </span><span class="lineNoCov">          0 :                 return gf_export_message(dumper, GF_IO_ERR, &quot;Error opening %s for writing - check disk access &amp; permissions&quot;, szName);</span>
+<span class="lineNum">     880 </span>            :         }
+<span class="lineNum">     881 </span>            :         /*
+<span class="lineNum">     882 </span>            :                 mtype = gf_isom_get_media_type(dumper-&gt;file, track);
+<span class="lineNum">     883 </span>            :                 if (mtype==GF_ISOM_MEDIA_TEXT || mtype == GF_ISOM_MEDIA_SUBM || mtype == GF_ISOM_MEDIA_SUBT) {
+<span class="lineNum">     884 </span>            :                         isText = GF_TRUE;
+<span class="lineNum">     885 </span>            :                 } else {
+<span class="lineNum">     886 </span>            :                         isText = GF_FALSE;
+<span class="lineNum">     887 </span>            :                 }
+<span class="lineNum">     888 </span>            :         */
+<span class="lineNum">     889 </span>            : #if !defined(GPAC_DISABLE_TTXT) &amp;&amp; !defined(GPAC_DISABLE_VTT)
+<span class="lineNum">     890 </span><span class="lineCov">          1 :         mstype = gf_isom_get_media_subtype(dumper-&gt;file, track, 1);</span>
+<span class="lineNum">     891 </span>            : #endif
+<span class="lineNum">     892 </span>            : 
+<span class="lineNum">     893 </span>            :         /*write header*/
+<span class="lineNum">     894 </span><span class="lineCov">          1 :         gf_fprintf(six, &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot; ?&gt;\n&quot;);</span>
+<span class="lineNum">     895 </span><span class="lineCov">          1 :         gf_fprintf(six, &quot;&lt;%s timescale=\&quot;%d\&quot; &quot;, szRootName, gf_isom_get_media_timescale(dumper-&gt;file, track) );</span>
+<span class="lineNum">     896 </span><span class="lineCov">          1 :         gf_fprintf(six, &quot;file=\&quot;%s\&quot; &quot;, szMedia);</span>
+<span class="lineNum">     897 </span><span class="lineCov">          1 :         gf_fprintf(six, &quot;&gt;\n&quot;);</span>
+<span class="lineNum">     898 </span><span class="lineCov">          1 :         header_size = 0;</span>
+<span class="lineNum">     899 </span><span class="lineCov">          1 :         if (esd) {</span>
+<span class="lineNum">     900 </span><span class="lineCov">          1 :                 if (esd-&gt;decoderConfig-&gt;decoderSpecificInfo  &amp;&amp; esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data) {</span>
+<span class="lineNum">     901 </span>            : #if !defined(GPAC_DISABLE_TTXT) &amp;&amp; !defined(GPAC_DISABLE_VTT)
+<span class="lineNum">     902 </span><span class="lineCov">          1 :                         if (mstype == GF_ISOM_SUBTYPE_WVTT || mstype == GF_ISOM_SUBTYPE_STXT) {</span>
+<span class="lineNum">     903 </span><span class="lineCov">          2 :                                 gf_webvtt_dump_header_boxed(media,</span>
+<span class="lineNum">     904 </span><span class="lineCov">          1 :                                                             esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data+4,</span>
+<span class="lineNum">     905 </span>            :                                                             esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength,
+<span class="lineNum">     906 </span>            :                                                             &amp;header_size);
+<span class="lineNum">     907 </span>            :                         } else
+<span class="lineNum">     908 </span>            : #endif
+<span class="lineNum">     909 </span>            :                         {
+<span class="lineNum">     910 </span><span class="lineNoCov">          0 :                                 gf_fwrite(esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, media);</span>
+<span class="lineNum">     911 </span><span class="lineNoCov">          0 :                                 header_size = esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength;</span>
+<span class="lineNum">     912 </span>            :                         }
+<span class="lineNum">     913 </span>            :                 }
+<span class="lineNum">     914 </span><span class="lineCov">          1 :                 gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">     915 </span>            :         } else {
+<span class="lineNum">     916 </span><span class="lineNoCov">          0 :                 GF_GenericSampleDescription *sdesc = gf_isom_get_generic_sample_description(dumper-&gt;file, track, 1);</span>
+<span class="lineNum">     917 </span><span class="lineNoCov">          0 :                 if (sdesc) {</span>
+<span class="lineNum">     918 </span><span class="lineNoCov">          0 :                         header_size = sdesc-&gt;extension_buf_size;</span>
+<span class="lineNum">     919 </span><span class="lineNoCov">          0 :                         gf_free(sdesc);</span>
+<span class="lineNum">     920 </span>            :                 }
+<span class="lineNum">     921 </span>            :         }
+<span class="lineNum">     922 </span><span class="lineCov">          1 :         gf_fprintf(six, &quot;&lt;header range-begin=\&quot;0\&quot; range-end=\&quot;%d\&quot;/&gt;\n&quot;, header_size-1);</span>
+<span class="lineNum">     923 </span>            : 
+<span class="lineNum">     924 </span><span class="lineCov">          1 :         pos = header_size;</span>
+<span class="lineNum">     925 </span><span class="lineCov">          1 :         count = gf_isom_get_sample_count(dumper-&gt;file, track);</span>
+<span class="lineNum">     926 </span><span class="lineCov">          1 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     927 </span><span class="lineCov">         17 :                 GF_ISOSample *samp = gf_isom_get_sample(dumper-&gt;file, track, i+1, &amp;di);</span>
+<span class="lineNum">     928 </span><span class="lineCov">         17 :                 if (!samp) break;</span>
+<span class="lineNum">     929 </span>            : 
+<span class="lineNum">     930 </span>            :                 if (media) {
+<span class="lineNum">     931 </span><span class="lineCov">         17 :                         gf_fwrite(samp-&gt;data, samp-&gt;dataLength, media);</span>
+<span class="lineNum">     932 </span>            :                 }
+<span class="lineNum">     933 </span>            : 
+<span class="lineNum">     934 </span><span class="lineCov">         17 :                 gf_fprintf(six, &quot;&lt;unit time=\&quot;&quot;LLU&quot;\&quot; &quot;, samp-&gt;DTS);</span>
+<span class="lineNum">     935 </span><span class="lineCov">         17 :                 if (samp-&gt;IsRAP==RAP) gf_fprintf(six, &quot;rap=\&quot;1\&quot; &quot;);</span>
+<span class="lineNum">     936 </span><span class="lineNoCov">          0 :                 else if (samp-&gt;IsRAP==RAP_NO) gf_fprintf(six, &quot;rap=\&quot;0\&quot; &quot;);</span>
+<span class="lineNum">     937 </span><span class="lineCov">         17 :                 gf_fprintf(six, &quot;range-begin=\&quot;%d\&quot; &quot;, pos);</span>
+<span class="lineNum">     938 </span><span class="lineCov">         17 :                 gf_fprintf(six, &quot;range-end=\&quot;%d\&quot; &quot;, pos+samp-&gt;dataLength-1);</span>
+<span class="lineNum">     939 </span><span class="lineCov">         17 :                 gf_fprintf(six, &quot;/&gt;\n&quot;);</span>
+<span class="lineNum">     940 </span>            : 
+<span class="lineNum">     941 </span><span class="lineCov">         17 :                 pos += samp-&gt;dataLength;</span>
+<span class="lineNum">     942 </span><span class="lineCov">         17 :                 gf_isom_sample_del(&amp;samp);</span>
+<span class="lineNum">     943 </span><span class="lineCov">         17 :                 gf_set_progress(&quot;SIX Export&quot;, i+1, count);</span>
+<span class="lineNum">     944 </span><span class="lineCov">         17 :                 if (dumper-&gt;flags &amp; GF_EXPORT_DO_ABORT) break;</span>
+<span class="lineNum">     945 </span>            :         }
+<span class="lineNum">     946 </span><span class="lineCov">          1 :         gf_fprintf(six, &quot;&lt;/%s&gt;\n&quot;, szRootName);</span>
+<span class="lineNum">     947 </span><span class="lineCov">          1 :         if (media) gf_fclose(media);</span>
+<span class="lineNum">     948 </span><span class="lineCov">          1 :         gf_fclose(six);</span>
+<span class="lineNum">     949 </span><span class="lineCov">          1 :         return GF_OK;</span>
+<span class="lineNum">     950 </span>            : 
+<span class="lineNum">     951 </span>            : }
+<span class="lineNum">     952 </span>            : 
+<span class="lineNum">     953 </span>            : typedef struct
+<span class="lineNum">     954 </span>            : {
+<span class="lineNum">     955 </span>            :         u32 track_num, stream_id, last_sample, nb_samp;
+<a name="956"><span class="lineNum">     956 </span>            : } SAFInfo;</a>
+<span class="lineNum">     957 </span>            : 
+<span class="lineNum">     958 </span><span class="lineCov">          1 : GF_Err gf_media_export_saf(GF_MediaExporter *dumper)</span>
+<span class="lineNum">     959 </span>            : {
+<span class="lineNum">     960 </span>            : #ifndef GPAC_DISABLE_SAF
+<span class="lineNum">     961 </span>            :         u32 count, i, s_count, di, tot_samp, samp_done;
+<span class="lineNum">     962 </span>            :         char out_file[GF_MAX_PATH];
+<span class="lineNum">     963 </span>            :         GF_SAFMuxer *mux;
+<span class="lineNum">     964 </span>            :         u8 *data;
+<span class="lineNum">     965 </span>            :         u32 size;
+<span class="lineNum">     966 </span>            :         Bool is_stdout = 0;
+<span class="lineNum">     967 </span>            :         FILE *saf_f;
+<span class="lineNum">     968 </span>            :         SAFInfo safs[1024];
+<span class="lineNum">     969 </span>            : 
+<span class="lineNum">     970 </span><span class="lineCov">          1 :         if (dumper-&gt;flags &amp; GF_EXPORT_PROBE_ONLY) return GF_OK;</span>
+<span class="lineNum">     971 </span>            : 
+<span class="lineNum">     972 </span>            :         s_count = tot_samp = 0;
+<span class="lineNum">     973 </span>            : 
+<span class="lineNum">     974 </span><span class="lineCov">          1 :         mux = gf_saf_mux_new();</span>
+<span class="lineNum">     975 </span><span class="lineCov">          1 :         count = gf_isom_get_track_count(dumper-&gt;file);</span>
+<span class="lineNum">     976 </span><span class="lineCov">          4 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     977 </span>            :                 u32 time_scale, mtype, stream_id;
+<span class="lineNum">     978 </span>            :                 GF_ESD *esd;
+<span class="lineNum">     979 </span><span class="lineCov">          2 :                 mtype = gf_isom_get_media_type(dumper-&gt;file, i+1);</span>
+<span class="lineNum">     980 </span><span class="lineCov">          2 :                 if (mtype==GF_ISOM_MEDIA_OD) continue;</span>
+<span class="lineNum">     981 </span><span class="lineCov">          1 :                 if (mtype==GF_ISOM_MEDIA_HINT) continue;</span>
+<span class="lineNum">     982 </span>            : 
+<span class="lineNum">     983 </span><span class="lineCov">          1 :                 time_scale = gf_isom_get_media_timescale(dumper-&gt;file, i+1);</span>
+<span class="lineNum">     984 </span><span class="lineCov">          1 :                 esd = gf_isom_get_esd(dumper-&gt;file, i+1, 1);</span>
+<span class="lineNum">     985 </span><span class="lineCov">          1 :                 if (esd) {</span>
+<span class="lineNum">     986 </span><span class="lineCov">          1 :                         stream_id = gf_isom_find_od_id_for_track(dumper-&gt;file, i+1);</span>
+<span class="lineNum">     987 </span><span class="lineCov">          1 :                         if (!stream_id) stream_id = esd-&gt;ESID;</span>
+<span class="lineNum">     988 </span>            : 
+<span class="lineNum">     989 </span>            :                         /*translate OD IDs to ESIDs !!*/
+<span class="lineNum">     990 </span><span class="lineCov">          1 :                         if (esd-&gt;decoderConfig-&gt;decoderSpecificInfo) {</span>
+<span class="lineNum">     991 </span><span class="lineCov">          1 :                                 gf_saf_mux_stream_add(mux, stream_id, time_scale, esd-&gt;decoderConfig-&gt;bufferSizeDB, esd-&gt;decoderConfig-&gt;streamType, esd-&gt;decoderConfig-&gt;objectTypeIndication, NULL, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, esd-&gt;URLString);</span>
+<span class="lineNum">     992 </span>            :                         } else {
+<span class="lineNum">     993 </span><span class="lineNoCov">          0 :                                 gf_saf_mux_stream_add(mux, stream_id, time_scale, esd-&gt;decoderConfig-&gt;bufferSizeDB, esd-&gt;decoderConfig-&gt;streamType, esd-&gt;decoderConfig-&gt;objectTypeIndication, NULL, NULL, 0, esd-&gt;URLString);</span>
+<span class="lineNum">     994 </span>            :                         }
+<span class="lineNum">     995 </span><span class="lineCov">          1 :                         gf_odf_desc_del((GF_Descriptor *)esd);</span>
+<span class="lineNum">     996 </span>            :                 } else {
+<span class="lineNum">     997 </span>            :                         char *mime = NULL;
+<span class="lineNum">     998 </span><span class="lineNoCov">          0 :                         switch (gf_isom_get_media_subtype(dumper-&gt;file, i+1, 1)) {</span>
+<span class="lineNum">     999 </span>            :                         case GF_ISOM_SUBTYPE_3GP_H263:
+<span class="lineNum">    1000 </span>            :                                 mime = &quot;video/h263&quot;;
+<span class="lineNum">    1001 </span>            :                                 break;
+<span class="lineNum">    1002 </span><span class="lineNoCov">          0 :                         case GF_ISOM_SUBTYPE_3GP_AMR:</span>
+<span class="lineNum">    1003 </span>            :                                 mime = &quot;audio/amr&quot;;
+<span class="lineNum">    1004 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">    1005 </span><span class="lineNoCov">          0 :                         case GF_ISOM_SUBTYPE_3GP_AMR_WB:</span>
+<span class="lineNum">    1006 </span>            :                                 mime = &quot;audio/amr-wb&quot;;
+<span class="lineNum">    1007 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">    1008 </span><span class="lineNoCov">          0 :                         case GF_ISOM_SUBTYPE_3GP_EVRC:</span>
+<span class="lineNum">    1009 </span>            :                                 mime = &quot;audio/evrc&quot;;
+<span class="lineNum">    1010 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">    1011 </span><span class="lineNoCov">          0 :                         case GF_ISOM_SUBTYPE_3GP_QCELP:</span>
+<span class="lineNum">    1012 </span>            :                                 mime = &quot;audio/qcelp&quot;;
+<span class="lineNum">    1013 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">    1014 </span><span class="lineNoCov">          0 :                         case GF_ISOM_SUBTYPE_3GP_SMV:</span>
+<span class="lineNum">    1015 </span>            :                                 mime = &quot;audio/smv&quot;;
+<span class="lineNum">    1016 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">    1017 </span>            :                         }
+<span class="lineNum">    1018 </span><span class="lineNoCov">          0 :                         if (!mime) continue;</span>
+<span class="lineNum">    1019 </span><span class="lineNoCov">          0 :                         stream_id = gf_isom_get_track_id(dumper-&gt;file, i+1);</span>
+<span class="lineNum">    1020 </span><span class="lineNoCov">          0 :                         gf_saf_mux_stream_add(mux, stream_id, time_scale, 0, 0xFF, 0xFF, mime, NULL, 0, NULL);</span>
+<span class="lineNum">    1021 </span>            :                 }
+<span class="lineNum">    1022 </span>            : 
+<span class="lineNum">    1023 </span><span class="lineCov">          1 :                 safs[s_count].track_num = i+1;</span>
+<span class="lineNum">    1024 </span><span class="lineCov">          1 :                 safs[s_count].stream_id = stream_id;</span>
+<span class="lineNum">    1025 </span><span class="lineCov">          1 :                 safs[s_count].nb_samp = gf_isom_get_sample_count(dumper-&gt;file, i+1);</span>
+<span class="lineNum">    1026 </span><span class="lineCov">          1 :                 safs[s_count].last_sample = 0;</span>
+<span class="lineNum">    1027 </span>            : 
+<span class="lineNum">    1028 </span><span class="lineCov">          1 :                 tot_samp += safs[s_count].nb_samp;</span>
+<span class="lineNum">    1029 </span>            : 
+<span class="lineNum">    1030 </span><span class="lineCov">          1 :                 s_count++;</span>
+<span class="lineNum">    1031 </span>            :         }
+<span class="lineNum">    1032 </span>            : 
+<span class="lineNum">    1033 </span><span class="lineCov">          1 :         if (!s_count) {</span>
+<span class="lineNum">    1034 </span><span class="lineNoCov">          0 :                 gf_export_message(dumper, GF_OK, &quot;No tracks available for SAF muxing&quot;);</span>
+<span class="lineNum">    1035 </span><span class="lineNoCov">          0 :                 gf_saf_mux_del(mux);</span>
+<span class="lineNum">    1036 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">    1037 </span>            :         }
+<span class="lineNum">    1038 </span><span class="lineCov">          1 :         gf_export_message(dumper, GF_OK, &quot;SAF: Multiplexing %d tracks&quot;, s_count);</span>
+<span class="lineNum">    1039 </span>            : 
+<span class="lineNum">    1040 </span><span class="lineCov">          1 :         if (dumper-&gt;out_name &amp;&amp; !strcmp(dumper-&gt;out_name, &quot;std&quot;))</span>
+<span class="lineNum">    1041 </span>            :                 is_stdout = 1;
+<span class="lineNum">    1042 </span><span class="lineCov">          1 :         strcpy(out_file, dumper-&gt;out_name ? dumper-&gt;out_name : &quot;&quot;);</span>
+<span class="lineNum">    1043 </span>            :         strcat(out_file, &quot;.saf&quot;);
+<span class="lineNum">    1044 </span><span class="lineCov">          1 :         saf_f = is_stdout ? stdout : gf_fopen(out_file, &quot;wb&quot;);</span>
+<span class="lineNum">    1045 </span>            : 
+<span class="lineNum">    1046 </span>            :         samp_done = 0;
+<span class="lineNum">    1047 </span><span class="lineCov">          5 :         while (samp_done&lt;tot_samp) {</span>
+<span class="lineNum">    1048 </span><span class="lineCov">          3 :                 for (i=0; i&lt;s_count; i++) {</span>
+<span class="lineNum">    1049 </span>            :                         GF_ISOSample *samp;
+<span class="lineNum">    1050 </span><span class="lineCov">          3 :                         if (safs[i].last_sample==safs[i].nb_samp) continue;</span>
+<span class="lineNum">    1051 </span><span class="lineCov">          3 :                         samp = gf_isom_get_sample(dumper-&gt;file, safs[i].track_num, safs[i].last_sample + 1, &amp;di);</span>
+<span class="lineNum">    1052 </span><span class="lineCov">          3 :                         gf_saf_mux_add_au(mux, safs[i].stream_id, (u32) (samp-&gt;DTS+samp-&gt;CTS_Offset), samp-&gt;data, samp-&gt;dataLength, (samp-&gt;IsRAP==RAP) ? 1 : 0);</span>
+<span class="lineNum">    1053 </span>            :                         /*data is kept by muxer!!*/
+<span class="lineNum">    1054 </span><span class="lineCov">          3 :                         gf_free(samp);</span>
+<span class="lineNum">    1055 </span><span class="lineCov">          3 :                         safs[i].last_sample++;</span>
+<span class="lineNum">    1056 </span><span class="lineCov">          3 :                         samp_done ++;</span>
+<span class="lineNum">    1057 </span>            :                 }
+<span class="lineNum">    1058 </span>            :                 while (1) {
+<span class="lineNum">    1059 </span><span class="lineCov">          9 :                         gf_saf_mux_for_time(mux, (u32) -1, 0, &amp;data, &amp;size);</span>
+<span class="lineNum">    1060 </span><span class="lineCov">          6 :                         if (!data) break;</span>
+<span class="lineNum">    1061 </span><span class="lineCov">          3 :                         gf_fwrite(data, size, saf_f);</span>
+<span class="lineNum">    1062 </span><span class="lineCov">          3 :                         gf_free(data);</span>
+<span class="lineNum">    1063 </span>            :                 }
+<span class="lineNum">    1064 </span><span class="lineCov">          3 :                 gf_set_progress(&quot;SAF Export&quot;, samp_done, tot_samp);</span>
+<span class="lineNum">    1065 </span><span class="lineCov">          3 :                 if (dumper-&gt;flags &amp; GF_EXPORT_DO_ABORT) break;</span>
+<span class="lineNum">    1066 </span>            :         }
+<span class="lineNum">    1067 </span><span class="lineCov">          1 :         gf_saf_mux_for_time(mux, (u32) -1, 1, &amp;data, &amp;size);</span>
+<span class="lineNum">    1068 </span><span class="lineCov">          1 :         if (data) {</span>
+<span class="lineNum">    1069 </span><span class="lineCov">          1 :                 gf_fwrite(data, size, saf_f);</span>
+<span class="lineNum">    1070 </span><span class="lineCov">          1 :                 gf_free(data);</span>
+<span class="lineNum">    1071 </span>            :         }
+<span class="lineNum">    1072 </span><span class="lineCov">          1 :         if (!is_stdout)</span>
+<span class="lineNum">    1073 </span><span class="lineCov">          1 :                 gf_fclose(saf_f);</span>
+<span class="lineNum">    1074 </span>            : 
+<span class="lineNum">    1075 </span><span class="lineCov">          1 :         gf_saf_mux_del(mux);</span>
+<span class="lineNum">    1076 </span><span class="lineCov">          1 :         return GF_OK;</span>
+<span class="lineNum">    1077 </span>            : #else
+<span class="lineNum">    1078 </span>            :         return GF_NOT_SUPPORTED;
+<span class="lineNum">    1079 </span>            : #endif
+<span class="lineNum">    1080 </span>            : }
+<a name="1081"><span class="lineNum">    1081 </span>            : </a>
+<span class="lineNum">    1082 </span>            : 
+<span class="lineNum">    1083 </span><span class="lineCov">         60 : static GF_Err gf_media_export_filters(GF_MediaExporter *dumper)</span>
+<span class="lineNum">    1084 </span>            : {
+<span class="lineNum">    1085 </span>            :         char *args, szSubArgs[1024], szExt[30];
+<span class="lineNum">    1086 </span>            :         GF_Filter *file_out, *reframer, *remux=NULL, *src_filter;
+<span class="lineNum">    1087 </span>            :         GF_FilterSession *fsess;
+<span class="lineNum">    1088 </span><span class="lineCov">         60 :         GF_Err e = GF_OK;</span>
+<span class="lineNum">    1089 </span>            :         u32 codec_id=0;
+<span class="lineNum">    1090 </span>            :         u32 sample_count=0;
+<span class="lineNum">    1091 </span>            :         Bool skip_write_filter = GF_FALSE;
+<span class="lineNum">    1092 </span>            :         Bool ext_forced = GF_FALSE;
+<span class="lineNum">    1093 </span>            :         Bool use_dynext = GF_FALSE;
+<span class="lineNum">    1094 </span>            : 
+<span class="lineNum">    1095 </span><span class="lineCov">         60 :         args = NULL;</span>
+<span class="lineNum">    1096 </span>            :         strcpy(szExt, &quot;&quot;);
+<span class="lineNum">    1097 </span><span class="lineCov">         60 :         if (dumper-&gt;trackID &amp;&amp; dumper-&gt;file) {</span>
+<span class="lineNum">    1098 </span>            :                 u32 msubtype = 0;
+<span class="lineNum">    1099 </span>            :                 u32 mtype = 0;
+<span class="lineNum">    1100 </span>            :                 u32 afmt = 0;
+<span class="lineNum">    1101 </span>            :                 GF_PixelFormat pfmt = 0;
+<span class="lineNum">    1102 </span>            :                 GF_ESD *esd;
+<span class="lineNum">    1103 </span><span class="lineCov">         55 :                 const char *export_ext = dumper-&gt;out_name ? gf_file_ext_start(dumper-&gt;out_name) : NULL;</span>
+<span class="lineNum">    1104 </span><span class="lineCov">         55 :                 u32 track_num = gf_isom_get_track_by_id(dumper-&gt;file, dumper-&gt;trackID);</span>
+<span class="lineNum">    1105 </span><span class="lineCov">         55 :                 if (!track_num) {</span>
+<span class="lineNum">    1106 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] No tracks with ID %d in file\n&quot;, dumper-&gt;trackID));</span>
+<span class="lineNum">    1107 </span>            :                         return GF_BAD_PARAM;
+<span class="lineNum">    1108 </span>            :                 }
+<span class="lineNum">    1109 </span><span class="lineCov">         55 :                 esd = gf_media_map_esd(dumper-&gt;file, track_num, 0);</span>
+<span class="lineNum">    1110 </span><span class="lineCov">         55 :                 sample_count = gf_isom_get_sample_count(dumper-&gt;file, dumper-&gt;trackID);</span>
+<span class="lineNum">    1111 </span><span class="lineCov">         55 :                 if (esd) {</span>
+<span class="lineNum">    1112 </span><span class="lineCov">         15 :                         if (esd-&gt;decoderConfig-&gt;objectTypeIndication&lt;GF_CODECID_LAST_MPEG4_MAPPING) {</span>
+<span class="lineNum">    1113 </span><span class="lineCov">         12 :                                 codec_id = gf_codecid_from_oti(esd-&gt;decoderConfig-&gt;streamType, esd-&gt;decoderConfig-&gt;objectTypeIndication);</span>
+<span class="lineNum">    1114 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">    1115 </span><span class="lineCov">         12 :                                 if (esd-&gt;decoderConfig-&gt;decoderSpecificInfo &amp;&amp; (codec_id==GF_CODECID_AAC_MPEG4)) {</span>
+<span class="lineNum">    1116 </span>            :                                         GF_M4ADecSpecInfo acfg;
+<span class="lineNum">    1117 </span><span class="lineCov">          1 :                                         gf_m4a_get_config(esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data, esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength, &amp;acfg);</span>
+<span class="lineNum">    1118 </span><span class="lineCov">          1 :                                         if (acfg.base_object_type == GF_M4A_USAC)</span>
+<span class="lineNum">    1119 </span>            :                                                 codec_id = GF_CODECID_USAC;
+<span class="lineNum">    1120 </span>            :                                 }
+<span class="lineNum">    1121 </span>            : #endif
+<span class="lineNum">    1122 </span>            :                         } else {
+<span class="lineNum">    1123 </span>            :                                 codec_id = esd-&gt;decoderConfig-&gt;objectTypeIndication;
+<span class="lineNum">    1124 </span>            :                         }
+<span class="lineNum">    1125 </span>            :                 }
+<span class="lineNum">    1126 </span><span class="lineCov">         15 :                 if (!codec_id) {</span>
+<span class="lineNum">    1127 </span><span class="lineCov">         40 :                         msubtype = gf_isom_get_media_subtype(dumper-&gt;file, track_num, 1);</span>
+<span class="lineNum">    1128 </span><span class="lineCov">         40 :                         codec_id = gf_codec_id_from_isobmf(msubtype);</span>
+<span class="lineNum">    1129 </span>            :                 }
+<span class="lineNum">    1130 </span><span class="lineCov">         55 :                 mtype = gf_isom_get_media_type(dumper-&gt;file, track_num);</span>
+<span class="lineNum">    1131 </span><span class="lineCov">         55 :                 if (!codec_id) {</span>
+<span class="lineNum">    1132 </span><span class="lineNoCov">          0 :                         pfmt = gf_pixel_fmt_from_qt_type(msubtype);</span>
+<span class="lineNum">    1133 </span><span class="lineNoCov">          0 :                         if (pfmt) codec_id = GF_CODECID_RAW;</span>
+<span class="lineNum">    1134 </span>            :                 }
+<span class="lineNum">    1135 </span>            : 
+<span class="lineNum">    1136 </span><span class="lineCov">         55 :                 if (!codec_id) {</span>
+<span class="lineNum">    1137 </span><span class="lineNoCov">          0 :                         strcpy(szExt, gf_4cc_to_str(msubtype));</span>
+<span class="lineNum">    1138 </span>            :                         ext_forced = GF_TRUE;
+<span class="lineNum">    1139 </span><span class="lineCov">         55 :                 } else if (codec_id==GF_CODECID_RAW) {</span>
+<span class="lineNum">    1140 </span><span class="lineNoCov">          0 :                         switch (mtype) {</span>
+<span class="lineNum">    1141 </span><span class="lineNoCov">          0 :                         case GF_ISOM_MEDIA_VISUAL:</span>
+<span class="lineNum">    1142 </span>            :                         case GF_ISOM_MEDIA_AUXV:
+<span class="lineNum">    1143 </span>            :                         case GF_ISOM_MEDIA_PICT:
+<span class="lineNum">    1144 </span><span class="lineNoCov">          0 :                                 if (pfmt)</span>
+<span class="lineNum">    1145 </span><span class="lineNoCov">          0 :                                         strcpy(szExt, gf_pixel_fmt_sname(pfmt));</span>
+<span class="lineNum">    1146 </span>            :                                 break;
+<span class="lineNum">    1147 </span><span class="lineNoCov">          0 :                         case GF_ISOM_MEDIA_AUDIO:</span>
+<span class="lineNum">    1148 </span><span class="lineNoCov">          0 :                                 afmt = gf_audio_fmt_from_isobmf(msubtype);</span>
+<span class="lineNum">    1149 </span><span class="lineNoCov">          0 :                                 if (afmt)</span>
+<span class="lineNum">    1150 </span><span class="lineNoCov">          0 :                                         strcpy(szExt, gf_audio_fmt_name(afmt));</span>
+<span class="lineNum">    1151 </span>            :                                 break;
+<span class="lineNum">    1152 </span><span class="lineNoCov">          0 :                         default:</span>
+<span class="lineNum">    1153 </span><span class="lineNoCov">          0 :                                 strcpy(szExt, gf_4cc_to_str(msubtype));</span>
+<span class="lineNum">    1154 </span>            :                                 break;
+<span class="lineNum">    1155 </span>            :                         }
+<span class="lineNum">    1156 </span>            :                 } else {
+<span class="lineNum">    1157 </span><span class="lineCov">         55 :                         const char *sname = gf_codecid_file_ext(codec_id);</span>
+<span class="lineNum">    1158 </span><span class="lineCov">         55 :                         if (export_ext &amp;&amp; strstr(sname, export_ext+1)) {</span>
+<span class="lineNum">    1159 </span><span class="lineCov">          8 :                                 szExt[0]=0;</span>
+<span class="lineNum">    1160 </span>            :                         } else {
+<span class="lineNum">    1161 </span>            :                                 char *sep;
+<span class="lineNum">    1162 </span>            :                                 strncpy(szExt, sname, 29);
+<span class="lineNum">    1163 </span><span class="lineCov">         47 :                                 szExt[29]=0;</span>
+<span class="lineNum">    1164 </span><span class="lineCov">         47 :                                 sep = strchr(szExt, '|');</span>
+<span class="lineNum">    1165 </span><span class="lineCov">         47 :                                 if (sep) sep[0] = 0;</span>
+<span class="lineNum">    1166 </span>            :                         }
+<span class="lineNum">    1167 </span>            :                 }
+<span class="lineNum">    1168 </span><span class="lineCov">         55 :                 switch (mtype) {</span>
+<span class="lineNum">    1169 </span><span class="lineCov">         14 :                 case GF_ISOM_MEDIA_VISUAL:</span>
+<span class="lineNum">    1170 </span>            :                 case GF_ISOM_MEDIA_AUXV:
+<span class="lineNum">    1171 </span>            :                 case GF_ISOM_MEDIA_PICT:
+<span class="lineNum">    1172 </span>            :                 case GF_ISOM_MEDIA_AUDIO:
+<span class="lineNum">    1173 </span><span class="lineCov">         14 :                         skip_write_filter = codec_id ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">    1174 </span><span class="lineCov">         14 :                         break;</span>
+<span class="lineNum">    1175 </span><span class="lineCov">         41 :                 default:</span>
+<span class="lineNum">    1176 </span><span class="lineCov">         41 :                         switch (codec_id) {</span>
+<span class="lineNum">    1177 </span><span class="lineCov">          3 :                         case GF_CODECID_WEBVTT:</span>
+<span class="lineNum">    1178 </span>            :                                 skip_write_filter = GF_TRUE;
+<span class="lineNum">    1179 </span><span class="lineCov">          3 :                                 break;</span>
+<span class="lineNum">    1180 </span><span class="lineCov">         35 :                         case GF_CODECID_META_TEXT:</span>
+<span class="lineNum">    1181 </span>            :                         case GF_CODECID_META_XML:
+<span class="lineNum">    1182 </span>            :                         case GF_CODECID_SUBS_TEXT:
+<span class="lineNum">    1183 </span>            :                         case GF_CODECID_SUBS_XML:
+<span class="lineNum">    1184 </span>            :                         case GF_CODECID_SIMPLE_TEXT:
+<span class="lineNum">    1185 </span>            :                                 //use dynamic extension
+<span class="lineNum">    1186 </span><span class="lineCov">         35 :                                 szExt[0] = 0;</span>
+<span class="lineNum">    1187 </span>            :                                 use_dynext = GF_TRUE;
+<span class="lineNum">    1188 </span><span class="lineCov">         35 :                                 break;</span>
+<span class="lineNum">    1189 </span>            :                         }
+<span class="lineNum">    1190 </span>            :                         break;
+<span class="lineNum">    1191 </span>            :                 }
+<span class="lineNum">    1192 </span>            :                 //TODO, move these two to filters one of these days
+<span class="lineNum">    1193 </span><span class="lineCov">         55 :                 if ((codec_id==GF_CODECID_VORBIS) || (codec_id==GF_CODECID_THEORA) || (codec_id==GF_CODECID_OPUS)) {</span>
+<span class="lineNum">    1194 </span><span class="lineCov">          2 :                         char *outname = dumper-&gt;out_name;</span>
+<span class="lineNum">    1195 </span><span class="lineCov">          2 :                         if (outname &amp;&amp; !strcmp(outname, &quot;std&quot;)) outname=NULL;</span>
+<span class="lineNum">    1196 </span><span class="lineCov">          2 :                         if (esd) gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">    1197 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">    1198 </span><span class="lineCov">          2 :                         return gf_dump_to_ogg(dumper, outname, track_num);</span>
+<span class="lineNum">    1199 </span>            : #else
+<span class="lineNum">    1200 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">    1201 </span>            : #endif
+<span class="lineNum">    1202 </span>            : 
+<span class="lineNum">    1203 </span>            :                 }
+<span class="lineNum">    1204 </span><span class="lineCov">         53 :                 if (codec_id==GF_CODECID_SUBPIC) {</span>
+<span class="lineNum">    1205 </span>            : #ifndef GPAC_DISABLE_AV_PARSERS
+<span class="lineNum">    1206 </span>            :                         char *dsi = NULL;
+<span class="lineNum">    1207 </span>            :                         u32 dsi_size = 0;
+<span class="lineNum">    1208 </span><span class="lineCov">          1 :                         if (esd &amp;&amp; esd-&gt;decoderConfig &amp;&amp; esd-&gt;decoderConfig-&gt;decoderSpecificInfo) {</span>
+<span class="lineNum">    1209 </span><span class="lineCov">          1 :                                 dsi = esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;data;</span>
+<span class="lineNum">    1210 </span><span class="lineCov">          1 :                                 dsi_size = esd-&gt;decoderConfig-&gt;decoderSpecificInfo-&gt;dataLength;</span>
+<span class="lineNum">    1211 </span>            :                         }
+<span class="lineNum">    1212 </span><span class="lineCov">          1 :                         e = gf_dump_to_vobsub(dumper, dumper-&gt;out_name, track_num, dsi, dsi_size);</span>
+<span class="lineNum">    1213 </span>            : #else
+<span class="lineNum">    1214 </span>            :                         e = GF_NOT_SUPPORTED;
+<span class="lineNum">    1215 </span>            : #endif
+<span class="lineNum">    1216 </span><span class="lineCov">          1 :                         if (esd) gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">    1217 </span><span class="lineCov">          1 :                         return e;</span>
+<span class="lineNum">    1218 </span>            :                 }
+<span class="lineNum">    1219 </span><span class="lineCov">         52 :                 if (esd) gf_odf_desc_del((GF_Descriptor *) esd);</span>
+<span class="lineNum">    1220 </span>            :         } else {
+<span class="lineNum">    1221 </span><span class="lineCov">          5 :                 const char *export_ext = dumper-&gt;out_name ? gf_file_ext_start(dumper-&gt;out_name) : NULL;</span>
+<span class="lineNum">    1222 </span>            :                 skip_write_filter = GF_TRUE;
+<span class="lineNum">    1223 </span><span class="lineCov">          5 :                 if (!export_ext)</span>
+<span class="lineNum">    1224 </span>            :                         use_dynext = GF_TRUE;
+<span class="lineNum">    1225 </span>            :         }
+<span class="lineNum">    1226 </span>            : 
+<span class="lineNum">    1227 </span><span class="lineCov">         57 :         fsess = gf_fs_new_defaults(0);</span>
+<span class="lineNum">    1228 </span><span class="lineCov">         57 :         if (!fsess) {</span>
+<span class="lineNum">    1229 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Failed to create filter session\n&quot;));</span>
+<span class="lineNum">    1230 </span>            :                 return GF_OUT_OF_MEM;
+<span class="lineNum">    1231 </span>            :         }
+<span class="lineNum">    1232 </span>            :         file_out = NULL;
+<span class="lineNum">    1233 </span><span class="lineCov">         57 :         args = NULL;</span>
+<span class="lineNum">    1234 </span>            : 
+<span class="lineNum">    1235 </span><span class="lineCov">         57 :         if (dumper-&gt;flags &amp; GF_EXPORT_REMUX) {</span>
+<span class="lineNum">    1236 </span><span class="lineNoCov">          0 :                 file_out = gf_fs_load_destination(fsess, dumper-&gt;out_name, NULL, NULL, &amp;e);</span>
+<span class="lineNum">    1237 </span><span class="lineNoCov">          0 :                 if (!file_out) {</span>
+<span class="lineNum">    1238 </span><span class="lineNoCov">          0 :                         gf_fs_del(fsess);</span>
+<span class="lineNum">    1239 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot open destination %s\n&quot;, dumper-&gt;out_name));</span>
+<span class="lineNum">    1240 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">    1241 </span>            :                 }
+<span class="lineNum">    1242 </span>            :         }
+<span class="lineNum">    1243 </span>            :         //except in nhml inband file dump, create a sink filter
+<span class="lineNum">    1244 </span><span class="lineCov">         57 :         else if (!dumper-&gt;dump_file) {</span>
+<span class="lineNum">    1245 </span><span class="lineCov">         57 :                 Bool no_ext = (dumper-&gt;flags &amp; GF_EXPORT_NO_FILE_EXT) ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">    1246 </span><span class="lineCov">         57 :                 char *ext = gf_file_ext_start(dumper-&gt;out_name);</span>
+<span class="lineNum">    1247 </span>            :                 //mux args, for now we only dump to file
+<span class="lineNum">    1248 </span><span class="lineCov">         57 :                 e = gf_dynstrcat(&amp;args, &quot;fout:dst=&quot;, NULL);</span>
+<span class="lineNum">    1249 </span><span class="lineCov">         57 :                 e |= gf_dynstrcat(&amp;args, dumper-&gt;out_name, NULL);</span>
+<span class="lineNum">    1250 </span>            : 
+<span class="lineNum">    1251 </span><span class="lineCov">         57 :                 if (dumper-&gt;flags &amp; GF_EXPORT_NHNT) {</span>
+<span class="lineNum">    1252 </span>            :                         strcpy(szExt, &quot;nhnt&quot;);
+<span class="lineNum">    1253 </span><span class="lineCov">          1 :                         e |= gf_dynstrcat(&amp;args, &quot;:clone&quot;, NULL);</span>
+<span class="lineNum">    1254 </span>            :                         no_ext = GF_TRUE;
+<span class="lineNum">    1255 </span><span class="lineCov">          1 :                         if (!ext)</span>
+<span class="lineNum">    1256 </span><span class="lineCov">          1 :                                 e |= gf_dynstrcat(&amp;args, &quot;:dynext&quot;, NULL);</span>
+<span class="lineNum">    1257 </span><span class="lineCov">         56 :                 } else if (dumper-&gt;flags &amp; GF_EXPORT_NHML) {</span>
+<span class="lineNum">    1258 </span>            :                         strcpy(szExt, &quot;nhml&quot;);
+<span class="lineNum">    1259 </span><span class="lineCov">         13 :                         e |= gf_dynstrcat(&amp;args, &quot;:clone&quot;, NULL);</span>
+<span class="lineNum">    1260 </span>            :                         no_ext = GF_TRUE;
+<span class="lineNum">    1261 </span><span class="lineCov">         13 :                         if (!ext)</span>
+<span class="lineNum">    1262 </span><span class="lineCov">         13 :                                 e |= gf_dynstrcat(&amp;args, &quot;:dynext&quot;, NULL);</span>
+<span class="lineNum">    1263 </span>            :                 }
+<span class="lineNum">    1264 </span>            : 
+<span class="lineNum">    1265 </span><span class="lineCov">         57 :                 if (dumper-&gt;flags &amp; GF_EXPORT_RAW_SAMPLES) {</span>
+<span class="lineNum">    1266 </span><span class="lineCov">         14 :                         if (!dumper-&gt;sample_num) {</span>
+<span class="lineNum">    1267 </span>            : 
+<span class="lineNum">    1268 </span><span class="lineCov">         13 :                                 ext = gf_file_ext_start(args);</span>
+<span class="lineNum">    1269 </span><span class="lineCov">         13 :                                 if (ext) ext[0] = 0;</span>
+<span class="lineNum">    1270 </span><span class="lineCov">         13 :                                 if (sample_count&gt;=1000) {</span>
+<span class="lineNum">    1271 </span><span class="lineNoCov">          0 :                                         e |= gf_dynstrcat(&amp;args, &quot;_$num%08d$&quot;, NULL);</span>
+<span class="lineNum">    1272 </span><span class="lineCov">         13 :                                 } else if (sample_count) {</span>
+<span class="lineNum">    1273 </span><span class="lineCov">         13 :                                         e |= gf_dynstrcat(&amp;args, &quot;_$num%03d$&quot;, NULL);</span>
+<span class="lineNum">    1274 </span>            :                                 } else {
+<span class="lineNum">    1275 </span><span class="lineNoCov">          0 :                                         e |= gf_dynstrcat(&amp;args, &quot;_$num$&quot;, NULL);</span>
+<span class="lineNum">    1276 </span>            :                                 }
+<span class="lineNum">    1277 </span><span class="lineCov">         13 :                                 ext = gf_file_ext_start(dumper-&gt;out_name);</span>
+<span class="lineNum">    1278 </span><span class="lineCov">         13 :                                 if (ext) e |= gf_dynstrcat(&amp;args, ext, NULL);</span>
+<span class="lineNum">    1279 </span>            :                         }
+<span class="lineNum">    1280 </span><span class="lineCov">         14 :                         e |= gf_dynstrcat(&amp;args, &quot;:dynext&quot;, NULL);</span>
+<span class="lineNum">    1281 </span><span class="lineCov">         43 :                 } else if (dumper-&gt;trackID &amp;&amp; strlen(szExt) ) {</span>
+<span class="lineNum">    1282 </span><span class="lineCov">         19 :                         if (!no_ext &amp;&amp; !gf_file_ext_start(dumper-&gt;out_name)) {</span>
+<span class="lineNum">    1283 </span><span class="lineNoCov">          0 :                                 if (args) gf_free(args);</span>
+<span class="lineNum">    1284 </span><span class="lineNoCov">          0 :                                 args=NULL;</span>
+<span class="lineNum">    1285 </span><span class="lineNoCov">          0 :                                 e = gf_dynstrcat(&amp;args, &quot;fout:dst=&quot;, NULL);</span>
+<span class="lineNum">    1286 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, dumper-&gt;out_name, NULL);</span>
+<span class="lineNum">    1287 </span><span class="lineNoCov">          0 :                                 e |= gf_dynstrcat(&amp;args, szExt, &quot;.&quot;);</span>
+<span class="lineNum">    1288 </span>            :                         } else {
+<span class="lineNum">    1289 </span><span class="lineCov">         19 :                                 e |= gf_dynstrcat(&amp;args, &quot;:ext=&quot;, NULL);</span>
+<span class="lineNum">    1290 </span><span class="lineCov">         19 :                                 e |= gf_dynstrcat(&amp;args, szExt, NULL);</span>
+<span class="lineNum">    1291 </span>            :                         }
+<span class="lineNum">    1292 </span><span class="lineCov">         24 :                 } else if ((dumper-&gt;trackID || dumper-&gt;track_type) &amp;&amp; use_dynext) {</span>
+<span class="lineNum">    1293 </span><span class="lineCov">         12 :                         e |= gf_dynstrcat(&amp;args, &quot;:dynext&quot;, NULL);</span>
+<span class="lineNum">    1294 </span>            :                 }
+<span class="lineNum">    1295 </span><span class="lineCov">         57 :                 if (e) {</span>
+<span class="lineNum">    1296 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot load arguments for output file dumper\n&quot;));</span>
+<span class="lineNum">    1297 </span><span class="lineNoCov">          0 :                         if (args) gf_free(args);</span>
+<span class="lineNum">    1298 </span><span class="lineNoCov">          0 :                         gf_fs_del(fsess);</span>
+<span class="lineNum">    1299 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">    1300 </span>            :                 }
+<span class="lineNum">    1301 </span>            : 
+<span class="lineNum">    1302 </span><span class="lineCov">         57 :                 file_out = gf_fs_load_filter(fsess, args, &amp;e);</span>
+<span class="lineNum">    1303 </span><span class="lineCov">         57 :                 if (!file_out) {</span>
+<span class="lineNum">    1304 </span><span class="lineNoCov">          0 :                         gf_fs_del(fsess);</span>
+<span class="lineNum">    1305 </span><span class="lineNoCov">          0 :                         if (args) gf_free(args);</span>
+<span class="lineNum">    1306 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot load output file dumper\n&quot;));</span>
+<span class="lineNum">    1307 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">    1308 </span>            :                 }
+<span class="lineNum">    1309 </span>            :         }
+<span class="lineNum">    1310 </span><span class="lineCov">         57 :         if (args) gf_free(args);</span>
+<span class="lineNum">    1311 </span><span class="lineCov">         57 :         args = NULL;</span>
+<span class="lineNum">    1312 </span>            : 
+<span class="lineNum">    1313 </span>            :         //raw sample frame, force loading filter generic write in frame mode
+<span class="lineNum">    1314 </span><span class="lineCov">         57 :         if (dumper-&gt;flags &amp; GF_EXPORT_RAW_SAMPLES) {</span>
+<span class="lineNum">    1315 </span><span class="lineCov">         14 :                 e = gf_dynstrcat(&amp;args, &quot;writegen:frame&quot;, NULL);</span>
+<span class="lineNum">    1316 </span><span class="lineCov">         14 :                 if (dumper-&gt;sample_num) {</span>
+<span class="lineNum">    1317 </span>            :                         sprintf(szSubArgs, &quot;:sstart=%d:send=%d&quot;, dumper-&gt;sample_num, dumper-&gt;sample_num);
+<span class="lineNum">    1318 </span><span class="lineCov">          1 :                         e |= gf_dynstrcat(&amp;args, szSubArgs, NULL);</span>
+<span class="lineNum">    1319 </span>            :                 }
+<span class="lineNum">    1320 </span><span class="lineCov">         14 :                 remux = e ? NULL : gf_fs_load_filter(fsess, args, &amp;e);</span>
+<span class="lineNum">    1321 </span><span class="lineCov">         14 :                 if (!remux || e) {</span>
+<span class="lineNum">    1322 </span><span class="lineNoCov">          0 :                         gf_fs_del(fsess);</span>
+<span class="lineNum">    1323 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot load stream-&gt;file filter\n&quot;));</span>
+<span class="lineNum">    1324 </span><span class="lineNoCov">          0 :                         if (args) gf_free(args);</span>
+<span class="lineNum">    1325 </span><span class="lineNoCov">          0 :                         return e ? e : GF_FILTER_NOT_FOUND;</span>
+<span class="lineNum">    1326 </span>            :                 }
+<span class="lineNum">    1327 </span>            :         }
+<span class="lineNum">    1328 </span><span class="lineCov">         43 :         else if (dumper-&gt;flags &amp; GF_EXPORT_NHNT) {</span>
+<span class="lineNum">    1329 </span><span class="lineCov">          1 :                 remux = gf_fs_load_filter(fsess, &quot;nhntw:exporter&quot;, &amp;e);</span>
+<span class="lineNum">    1330 </span><span class="lineCov">          1 :                 if (!remux) {</span>
+<span class="lineNum">    1331 </span><span class="lineNoCov">          0 :                         gf_fs_del(fsess);</span>
+<span class="lineNum">    1332 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot load NHNT write filter\n&quot;));</span>
+<span class="lineNum">    1333 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">    1334 </span>            :                 }
+<span class="lineNum">    1335 </span>            :         }
+<span class="lineNum">    1336 </span><span class="lineCov">         42 :         else if (dumper-&gt;flags &amp; GF_EXPORT_NHML) {</span>
+<span class="lineNum">    1337 </span><span class="lineCov">         13 :                 e = gf_dynstrcat(&amp;args, &quot;nhmlw:exporter:name=&quot;, NULL);</span>
+<span class="lineNum">    1338 </span><span class="lineCov">         13 :                 e |= gf_dynstrcat(&amp;args, dumper-&gt;out_name, NULL);</span>
+<span class="lineNum">    1339 </span><span class="lineCov">         13 :                 if (dumper-&gt;flags &amp; GF_EXPORT_NHML_FULL)</span>
+<span class="lineNum">    1340 </span><span class="lineCov">          1 :                         e |= gf_dynstrcat(&amp;args, &quot;:pckp&quot;, NULL);</span>
+<span class="lineNum">    1341 </span><span class="lineCov">         13 :                 if (dumper-&gt;dump_file) {</span>
+<span class="lineNum">    1342 </span>            :                         sprintf(szSubArgs, &quot;:nhmlonly:filep=%p&quot;, dumper-&gt;dump_file);
+<span class="lineNum">    1343 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szSubArgs, NULL);</span>
+<span class="lineNum">    1344 </span>            :                 }
+<span class="lineNum">    1345 </span><span class="lineCov">         13 :                 remux = e ? NULL : gf_fs_load_filter(fsess, args, &amp;e);</span>
+<span class="lineNum">    1346 </span><span class="lineCov">         13 :                 if (!remux || e) {</span>
+<span class="lineNum">    1347 </span><span class="lineNoCov">          0 :                         gf_fs_del(fsess);</span>
+<span class="lineNum">    1348 </span><span class="lineNoCov">          0 :                         if (args) gf_free(args);</span>
+<span class="lineNum">    1349 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot load NHML write filter\n&quot;));</span>
+<span class="lineNum">    1350 </span><span class="lineNoCov">          0 :                         return e ? e : GF_FILTER_NOT_FOUND;</span>
+<span class="lineNum">    1351 </span>            :                 }
+<span class="lineNum">    1352 </span><span class="lineCov">         29 :         } else if (!skip_write_filter) {</span>
+<span class="lineNum">    1353 </span><span class="lineCov">         13 :                 e = gf_dynstrcat(&amp;args, &quot;writegen:exporter&quot;, NULL);</span>
+<span class="lineNum">    1354 </span>            :                 //extension has been forced, override ext at output of writegen
+<span class="lineNum">    1355 </span><span class="lineCov">         13 :                 if (ext_forced) {</span>
+<span class="lineNum">    1356 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, &quot;:#Extension=&quot;, NULL);</span>
+<span class="lineNum">    1357 </span><span class="lineNoCov">          0 :                         e |= gf_dynstrcat(&amp;args, szExt, NULL);</span>
+<span class="lineNum">    1358 </span>            :                 }
+<span class="lineNum">    1359 </span>            : 
+<span class="lineNum">    1360 </span><span class="lineCov">         13 :                 remux = e ? NULL : gf_fs_load_filter(fsess, args, &amp;e);</span>
+<span class="lineNum">    1361 </span><span class="lineCov">         13 :                 if (!remux) {</span>
+<span class="lineNum">    1362 </span><span class="lineNoCov">          0 :                         gf_fs_del(fsess);</span>
+<span class="lineNum">    1363 </span><span class="lineNoCov">          0 :                         if (args) gf_free(args);</span>
+<span class="lineNum">    1364 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot load stream-&gt;file filter\n&quot;));</span>
+<span class="lineNum">    1365 </span><span class="lineNoCov">          0 :                         return e;</span>
+<span class="lineNum">    1366 </span>            :                 }
+<span class="lineNum">    1367 </span>            :         }
+<span class="lineNum">    1368 </span><span class="lineCov">         57 :         if (args) gf_free(args);</span>
+<span class="lineNum">    1369 </span><span class="lineCov">         57 :         args = NULL;</span>
+<span class="lineNum">    1370 </span>            : 
+<span class="lineNum">    1371 </span>            :         //force a reframer filter, connected to our input
+<span class="lineNum">    1372 </span><span class="lineCov">         57 :         e = gf_dynstrcat(&amp;args, &quot;reframer:SID=1&quot;, NULL);</span>
+<span class="lineNum">    1373 </span><span class="lineCov">         57 :         if (dumper-&gt;trackID) {</span>
+<span class="lineNum">    1374 </span>            :                 sprintf(szSubArgs, &quot;#PID=%d&quot;, dumper-&gt;trackID);
+<span class="lineNum">    1375 </span><span class="lineCov">         52 :                 e |= gf_dynstrcat(&amp;args, szSubArgs, NULL);</span>
+<span class="lineNum">    1376 </span>            :         }
+<span class="lineNum">    1377 </span><span class="lineCov">         57 :         e |= gf_dynstrcat(&amp;args, &quot;:exporter&quot;, NULL);</span>
+<span class="lineNum">    1378 </span><span class="lineCov">         57 :         if (dumper-&gt;flags &amp; GF_EXPORT_SVC_LAYER)</span>
+<span class="lineNum">    1379 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;:extract=layer&quot;, NULL);</span>
+<span class="lineNum">    1380 </span><span class="lineCov">         57 :         if (dumper-&gt;flags &amp; GF_EXPORT_WEBVTT_NOMERGE)</span>
+<span class="lineNum">    1381 </span><span class="lineNoCov">          0 :                 e |= gf_dynstrcat(&amp;args, &quot;:merge&quot;, NULL);</span>
+<span class="lineNum">    1382 </span>            : 
+<span class="lineNum">    1383 </span><span class="lineCov">         57 :         reframer = gf_fs_load_filter(fsess, args, &amp;e);</span>
+<span class="lineNum">    1384 </span><span class="lineCov">         57 :         if (!reframer || e) {</span>
+<span class="lineNum">    1385 </span><span class="lineNoCov">          0 :                 gf_fs_del(fsess);</span>
+<span class="lineNum">    1386 </span><span class="lineNoCov">          0 :                 if (args) gf_free(args);</span>
+<span class="lineNum">    1387 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot load reframer filter\n&quot;));</span>
+<span class="lineNum">    1388 </span><span class="lineNoCov">          0 :                 return e ? e : GF_FILTER_NOT_FOUND;</span>
+<span class="lineNum">    1389 </span>            :         }
+<span class="lineNum">    1390 </span><span class="lineCov">         57 :         if (args) gf_free(args);</span>
+<span class="lineNum">    1391 </span><span class="lineCov">         57 :         args = NULL;</span>
+<span class="lineNum">    1392 </span>            : 
+<span class="lineNum">    1393 </span>            :         //we already have the file loaded, directly load the mp4dmx filter with this file
+<span class="lineNum">    1394 </span><span class="lineCov">         57 :         if (dumper-&gt;file) {</span>
+<span class="lineNum">    1395 </span>            :                 //we want to expose every track
+<span class="lineNum">    1396 </span><span class="lineCov">         57 :                 e = gf_dynstrcat(&amp;args, &quot;mp4dmx:FID=1:noedit:alltk:allt&quot;, NULL);</span>
+<span class="lineNum">    1397 </span><span class="lineCov">         57 :                 if (!e) {</span>
+<span class="lineNum">    1398 </span><span class="lineCov">         57 :                         sprintf(szSubArgs, &quot;:mov=%p&quot;, dumper-&gt;file);</span>
+<span class="lineNum">    1399 </span><span class="lineCov">         57 :                         e = gf_dynstrcat(&amp;args, szSubArgs, NULL);</span>
+<span class="lineNum">    1400 </span>            :                 }
+<span class="lineNum">    1401 </span>            :                 
+<span class="lineNum">    1402 </span>            :                 //we want to expose every track
+<span class="lineNum">    1403 </span><span class="lineCov">         57 :                 src_filter = gf_fs_load_filter(fsess, args, &amp;e);</span>
+<span class="lineNum">    1404 </span>            : 
+<span class="lineNum">    1405 </span><span class="lineCov">         57 :                 gf_free(args);</span>
+<span class="lineNum">    1406 </span><span class="lineCov">         57 :                 args = NULL;</span>
+<span class="lineNum">    1407 </span>            :         } else {
+<span class="lineNum">    1408 </span>            :                 //we want to expose every track
+<span class="lineNum">    1409 </span><span class="lineNoCov">          0 :                 src_filter = gf_fs_load_source(fsess, dumper-&gt;in_name, &quot;FID=1:noedit:alltk:allt&quot;, NULL, &amp;e);</span>
+<span class="lineNum">    1410 </span>            :         }
+<span class="lineNum">    1411 </span>            : 
+<span class="lineNum">    1412 </span><span class="lineCov">         57 :         if (!src_filter || e) {</span>
+<span class="lineNum">    1413 </span><span class="lineNoCov">          0 :                 gf_fs_del(fsess);</span>
+<span class="lineNum">    1414 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[Exporter] Cannot load filter for input file \&quot;%s\&quot;: %s\n&quot;, dumper-&gt;in_name, gf_error_to_string(e) ));</span>
+<span class="lineNum">    1415 </span><span class="lineNoCov">          0 :                 return e;</span>
+<span class="lineNum">    1416 </span>            :         }
+<span class="lineNum">    1417 </span>            : 
+<span class="lineNum">    1418 </span><span class="lineCov">         57 :         if (dumper-&gt;track_type) {</span>
+<span class="lineNum">    1419 </span><span class="lineNoCov">          0 :                 const char *mtype = (dumper-&gt;track_type==1) ? &quot;video&quot; : &quot;audio&quot;;</span>
+<span class="lineNum">    1420 </span><span class="lineNoCov">          0 :                 if (dumper-&gt;trackID) {</span>
+<span class="lineNum">    1421 </span>            :                         sprintf(szSubArgs, &quot;%s%d&quot;, mtype, dumper-&gt;trackID);
+<span class="lineNum">    1422 </span>            :                 } else {
+<span class="lineNum">    1423 </span>            :                         sprintf(szSubArgs, &quot;%s&quot;, mtype);
+<span class="lineNum">    1424 </span>            :                 }
+<span class="lineNum">    1425 </span>            :         }
+<span class="lineNum">    1426 </span><span class="lineCov">         57 :         else if (dumper-&gt;trackID) {</span>
+<span class="lineNum">    1427 </span>            :                 sprintf(szSubArgs, &quot;PID=%d&quot;, dumper-&gt;trackID);
+<span class="lineNum">    1428 </span>            :         }
+<span class="lineNum">    1429 </span><span class="lineCov">         57 :         if (remux) {</span>
+<span class="lineNum">    1430 </span><span class="lineCov">         41 :                 gf_filter_set_source(file_out, remux, (dumper-&gt;trackID || dumper-&gt;track_type) ? szSubArgs : NULL);</span>
+<span class="lineNum">    1431 </span><span class="lineCov">         41 :                 gf_filter_set_source(remux, reframer, (dumper-&gt;trackID || dumper-&gt;track_type) ? szSubArgs : NULL);</span>
+<span class="lineNum">    1432 </span>            :         } else {
+<span class="lineNum">    1433 </span><span class="lineCov">         16 :                 gf_filter_set_source(file_out, reframer, (dumper-&gt;trackID || dumper-&gt;track_type) ? szSubArgs : NULL);</span>
+<span class="lineNum">    1434 </span>            :         }
+<span class="lineNum">    1435 </span>            : 
+<span class="lineNum">    1436 </span><span class="lineCov">         57 :         e = gf_fs_run(fsess);</span>
+<span class="lineNum">    1437 </span><span class="lineCov">         57 :         if (e&gt;GF_OK) e = GF_OK;</span>
+<span class="lineNum">    1438 </span><span class="lineCov">         57 :         if (!e) e = gf_fs_get_last_connect_error(fsess);</span>
+<span class="lineNum">    1439 </span><span class="lineCov">         57 :         if (!e) e = gf_fs_get_last_process_error(fsess);</span>
+<span class="lineNum">    1440 </span>            : 
+<span class="lineNum">    1441 </span><span class="lineCov">         57 :         if (!e) {</span>
+<span class="lineNum">    1442 </span><span class="lineCov">         57 :                 if (dumper-&gt;file)</span>
+<span class="lineNum">    1443 </span><span class="lineCov">         57 :                         gf_fs_print_unused_args(fsess, NULL);</span>
+<span class="lineNum">    1444 </span>            :                 else
+<span class="lineNum">    1445 </span><span class="lineNoCov">          0 :                         gf_fs_print_unused_args(fsess, &quot;alltk,allt,noedit&quot;);</span>
+<span class="lineNum">    1446 </span>            :         }
+<span class="lineNum">    1447 </span><span class="lineCov">         57 :         gf_fs_print_non_connected(fsess);</span>
+<span class="lineNum">    1448 </span><span class="lineCov">         57 :         if (dumper-&gt;print_stats_graph &amp; 1) gf_fs_print_stats(fsess);</span>
+<span class="lineNum">    1449 </span><span class="lineCov">         57 :         if (dumper-&gt;print_stats_graph &amp; 2) gf_fs_print_connections(fsess);</span>
+<span class="lineNum">    1450 </span><span class="lineCov">         57 :         gf_fs_del(fsess);</span>
+<span class="lineNum">    1451 </span><span class="lineCov">         57 :         return e;</span>
+<span class="lineNum">    1452 </span>            : }
+<a name="1453"><span class="lineNum">    1453 </span>            : </a>
+<span class="lineNum">    1454 </span>            : GF_EXPORT
+<span class="lineNum">    1455 </span><span class="lineCov">         64 : GF_Err gf_media_export(GF_MediaExporter *dumper)</span>
+<span class="lineNum">    1456 </span>            : {
+<span class="lineNum">    1457 </span><span class="lineCov">         64 :         if (!dumper) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1458 </span><span class="lineCov">         64 :         if (!dumper-&gt;out_name &amp;&amp; !(dumper-&gt;flags &amp; GF_EXPORT_PROBE_ONLY) &amp;&amp; !dumper-&gt;dump_file) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1459 </span>            : 
+<span class="lineNum">    1460 </span>            :         //internal export not using filters
+<span class="lineNum">    1461 </span>            : 
+<span class="lineNum">    1462 </span>            : #ifndef GPAC_DISABLE_ISOM_WRITE
+<span class="lineNum">    1463 </span><span class="lineCov">         64 :         if (dumper-&gt;flags &amp; GF_EXPORT_MP4) return gf_media_export_isom(dumper);</span>
+<span class="lineNum">    1464 </span>            : #endif /*GPAC_DISABLE_ISOM_WRITE*/
+<span class="lineNum">    1465 </span>            : #ifndef GPAC_DISABLE_VTT
+<span class="lineNum">    1466 </span><span class="lineCov">         63 :         else if (dumper-&gt;flags &amp; GF_EXPORT_WEBVTT_META) return gf_media_export_webvtt_metadata(dumper);</span>
+<span class="lineNum">    1467 </span>            : #endif
+<span class="lineNum">    1468 </span><span class="lineCov">         62 :         else if (dumper-&gt;flags &amp; GF_EXPORT_SIX) return gf_media_export_six(dumper);</span>
+<span class="lineNum">    1469 </span>            : 
+<span class="lineNum">    1470 </span>            :         //the following ones should be moved to muxing filters
+<span class="lineNum">    1471 </span><span class="lineCov">         61 :         else if (dumper-&gt;flags &amp; GF_EXPORT_SAF) return gf_media_export_saf(dumper);</span>
+<span class="lineNum">    1472 </span>            : 
+<span class="lineNum">    1473 </span>            :         //the rest is handled by the generic exporter
+<span class="lineNum">    1474 </span><span class="lineCov">         60 :         return gf_media_export_filters(dumper);</span>
+<span class="lineNum">    1475 </span>            : }
+<span class="lineNum">    1476 </span>            : 
+<span class="lineNum">    1477 </span>            : #endif /*GPAC_DISABLE_MEDIA_EXPORT*/
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

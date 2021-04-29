@@ -1,0 +1,38 @@
+*** ffdmx-aac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:11 ***
+
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -no-reassign=no -i ./media/auxiliary_files/enst_audio.aac:gfreg=ffdmx -o ./results/temp/dump.mp4 -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1380614016
+[aac @ 0x55a1e3b4fc00] Estimating duration from bitrate, this may be inaccurate
+
+Filter stats - 4 filters
+	Filter ffdmx (src=./media/auxiliary_files/enst_audio.aac:gfreg=ffdmx) : 0 input pids 1 output pids 333 tasks 1406 us process time
+		330 packets sent 85058 bytes sent (234708 pck/sec 483.972 mbps)
+		* output PID audio1: 330 packets sent
+	Filter fout (dst=./results/temp/dump.mp4) : 1 input pids 0 output pids 19 tasks 264 us process time
+		17 packets processed 84868 bytes processed (64393.9 pck/sec 2571.76 mbps)
+		* input PID audio1: 17 packets received
+	Filter rfadts : 1 input pids 1 output pids 334 tasks 1054 us process time
+		330 packets processed 85058 bytes processed (313093 pck/sec 645.602 mbps)
+		330 packets sent 82748 bytes sent (313093 pck/sec 628.068 mbps)
+		* input PID audio1: 330 packets received
+		* output PID audio1: 330 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 334 tasks 1288 us process time
+		330 packets processed 82748 bytes processed (256211 pck/sec 513.963 mbps)
+		17 packets sent 84868 bytes sent (13198.8 pck/sec 527.13 mbps)
+		* input PID audio1: 330 packets received
+		* output PID audio1: 17 packets sent
+Session stats - threads 1
+	Thread 1: run_time 4048 us active_time 3989 us nb_tasks 1004
+
+Total: run_time 4048 us active_time 3989 us nb_tasks 1004
+
+Filters connected:
+ffdmx (src=./media/auxiliary_files/enst_audio.aac:gfreg=ffdmx) (ptr=0x55a1e3b4f880)
+-(PID audio1) rfadts (ptr=0x55a1e3b52ab0)
+--(PID audio1) mp4mx (ptr=0x55a1e3b544f0)
+---(PID audio1) fout (dst=./results/temp/dump.mp4) (ptr=0x55a1e3b57810)
+
+Computing ./results/temp/dump.mp4  (dump) hash: 
+File hash (SHA-1): 65DF8824FC3E05D12919BCF33F246B7B6C929CF2
+Hash OK for ./results/temp/dump.mp4

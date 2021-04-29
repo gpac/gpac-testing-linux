@@ -1,0 +1,102 @@
+*** encoder-mpeg1-ffenc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:38 ***
+
+
+*** Subtest "encoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264  -o ./results/temp/test.m1v -graph -stats -blacklist=vtbdec,nvdec,ohevcdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -917115008
+
+Filter stats - 6 filters
+	Filter fin (src=./media/auxiliary_files/enst_video.h264) : 0 input pids 1 output pids 13 tasks 753 us process time
+		10 packets sent 47679 bytes sent (13280.2 pck/sec 506.55 mbps)
+		* output PID enst_video.h264: 10 packets sent
+	Filter fout (dst=./results/temp/test.m1v) : 1 input pids 0 output pids 175 tasks 913 us process time
+		173 packets processed 176028 bytes processed (189485 pck/sec 1542.41 mbps)
+		* input PID enst_video.h264: 173 packets received
+	Filter rfnalu : 1 input pids 1 output pids 90 tasks 1896 us process time
+		10 packets processed 47679 bytes processed (5274.26 pck/sec 201.177 mbps)
+		174 packets sent 47611 bytes sent (91772.2 pck/sec 200.89 mbps)
+		* input PID enst_video.h264: 10 packets received
+		* output PID enst_video.h264: 174 packets sent
+	Filter ffdec "ffdec:h264" : 1 input pids 1 output pids 178 tasks 12810 us process time
+		173 packets processed 47611 bytes processed (13505.1 pck/sec 29.7336 mbps)
+		173 packets sent 4251648 bytes sent (13505.1 pck/sec 2655.21 mbps)
+		* input PID enst_video.h264: 173 frames (174 packets) received
+		* output PID enst_video.h264: 173 packets sent
+	Filter ffenc "ffenc:mpeg1video" : 1 input pids 1 output pids 178 tasks 16461 us process time
+		173 packets processed 4251648 bytes processed (10509.7 pck/sec 2066.29 mbps)
+		173 packets sent 176028 bytes sent (10509.7 pck/sec 85.5491 mbps)
+		* input PID enst_video.h264: 173 packets received
+		* output PID enst_video.h264: 173 packets sent
+	Filter writegen : 1 input pids 1 output pids 177 tasks 329 us process time
+		173 packets processed 176028 bytes processed (525836 pck/sec 4280.32 mbps)
+		173 packets sent 176028 bytes sent (525836 pck/sec 4280.32 mbps)
+		* input PID enst_video.h264: 173 packets received
+		* output PID enst_video.h264: 173 packets sent
+Session stats - threads 1
+	Thread 1: run_time 33495 us active_time 33415 us nb_tasks 885
+
+Total: run_time 33495 us active_time 33415 us nb_tasks 885
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_video.h264) (ptr=0x55ab1fff29f0)
+-(PID enst_video.h264) rfnalu (ptr=0x55ab1fff9fe0)
+--(PID enst_video.h264) ffdec "ffdec:h264" (ptr=0x55ab2000ae10)
+---(PID enst_video.h264) ffenc "ffenc:mpeg1video" (ptr=0x55ab2000bea0)
+----(PID enst_video.h264) writegen (ptr=0x55ab2000d1a0)
+-----(PID enst_video.h264) fout (dst=./results/temp/test.m1v) (ptr=0x55ab1fff5440)
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.m1v inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump.txt:test=encx" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 16EA5DD08CDA0B930763B156A998A1E72D1CF0DF
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "encoder-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4  -o ./results/temp/mp4-test.m1v -graph -stats -blacklist=vtbdec,nvdec,ohevcdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -1288867968
+
+Filter stats - 6 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 5 tasks 594 us process time
+		1 packets sent 2746 bytes sent (1683.5 pck/sec 36.9832 mbps)
+		* output PID in.mp4: 1 packets sent
+	Filter fout (dst=./results/temp/mp4-test.m1v) : 1 input pids 0 output pids 14 tasks 173 us process time
+		12 packets processed 4296 bytes processed (69364.2 pck/sec 198.659 mbps)
+		* input PID in.mp4: 12 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 8 tasks 828 us process time
+		1 packets processed 2746 bytes processed (1207.73 pck/sec 26.5314 mbps)
+		12 packets sent 1948 bytes sent (14492.8 pck/sec 18.8213 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter ffdec "ffdec:h264" : 1 input pids 1 output pids 17 tasks 1870 us process time
+		12 packets processed 1948 bytes processed (6417.11 pck/sec 8.33369 mbps)
+		12 packets sent 294912 bytes sent (6417.11 pck/sec 1261.66 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter ffenc "ffenc:mpeg1video" : 1 input pids 1 output pids 17 tasks 2346 us process time
+		12 packets processed 294912 bytes processed (5115.09 pck/sec 1005.67 mbps)
+		12 packets sent 4296 bytes sent (5115.09 pck/sec 14.6496 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter writegen : 1 input pids 1 output pids 16 tasks 94 us process time
+		12 packets processed 4296 bytes processed (127660 pck/sec 365.617 mbps)
+		12 packets sent 4296 bytes sent (127660 pck/sec 365.617 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+Session stats - threads 1
+	Thread 1: run_time 5963 us active_time 5942 us nb_tasks 82
+
+Total: run_time 5963 us active_time 5942 us nb_tasks 82
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x55f07cba99f0)
+-(PID in.mp4) mp4dmx (ptr=0x55f07cbb05e0)
+--(PID in.mp4) ffdec "ffdec:h264" (ptr=0x55f07cbbc230)
+---(PID in.mp4) ffenc "ffenc:mpeg1video" (ptr=0x55f07cbbd300)
+----(PID in.mp4) writegen (ptr=0x55f07cbbe600)
+-----(PID in.mp4) fout (dst=./results/temp/mp4-test.m1v) (ptr=0x55f07cbac3e0)
+
+
+*** Subtest "inspect-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/mp4-test.m1v inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump2.txt:test=encx" ***
+
+Computing ./results/temp/dump2.txt  (inspect-mp4) hash: 
+File hash (SHA-1): 41D474EF80393223A25708E0D18BD11DF34567AB
+Hash OK for ./results/temp/dump2.txt

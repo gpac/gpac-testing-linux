@@ -1,0 +1,1531 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - jsmods/xhr.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">jsmods</a> - xhr.c<span style="font-size: 80%;"> (source / <a href="xhr.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">417</td>
+            <td class="headerCovTableEntry">722</td>
+            <td class="headerCovTableEntryLo">57.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntry">33</td>
+            <td class="headerCovTableEntryHi">93.9 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2007-2021
+<span class="lineNum">       6 </span>            :  *                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / JavaScript XmlHttpRequest bindings
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : /*
+<span class="lineNum">      27 </span>            :         ANY CHANGE TO THE API MUST BE REFLECTED IN THE DOCUMENTATION IN gpac/share/doc/idl/xhr.idl
+<span class="lineNum">      28 </span>            :         (no way to define inline JS doc with doxygen)
+<span class="lineNum">      29 </span>            : */
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #include &lt;gpac/setup.h&gt;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #ifdef GPAC_HAS_QJS
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : /*base SVG type*/
+<span class="lineNum">      36 </span>            : #include &lt;gpac/nodes_svg.h&gt;
+<span class="lineNum">      37 </span>            : #include &lt;gpac/nodes_mpeg4.h&gt;
+<span class="lineNum">      38 </span>            : #include &lt;gpac/nodes_x3d.h&gt;
+<span class="lineNum">      39 </span>            : /*dom events*/
+<span class="lineNum">      40 </span>            : #include &lt;gpac/events.h&gt;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : #include &lt;gpac/download.h&gt;
+<span class="lineNum">      43 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      44 </span>            : #include &lt;gpac/options.h&gt;
+<span class="lineNum">      45 </span>            : #include &lt;gpac/xml.h&gt;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : #include &lt;gpac/internal/scenegraph_dev.h&gt;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : #include &quot;../quickjs/quickjs.h&quot;
+<span class="lineNum">      51 </span>            : #include &quot;../scenegraph/qjs_common.h&quot;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : typedef struct __xhr_context XMLHTTPContext;
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : /************************************************************
+<span class="lineNum">      56 </span>            :  *
+<span class="lineNum">      57 </span>            :  *      xmlHttpRequest implementation
+<span class="lineNum">      58 </span>            :  *
+<span class="lineNum">      59 </span>            :  *************************************************************/
+<span class="lineNum">      60 </span>            : typedef enum {
+<span class="lineNum">      61 </span>            :         XHR_ONABORT,
+<span class="lineNum">      62 </span>            :         XHR_ONERROR,
+<span class="lineNum">      63 </span>            :         XHR_ONLOAD,
+<span class="lineNum">      64 </span>            :         XHR_ONLOADEND,
+<span class="lineNum">      65 </span>            :         XHR_ONLOADSTART,
+<span class="lineNum">      66 </span>            :         XHR_ONPROGRESS,
+<span class="lineNum">      67 </span>            :         XHR_ONREADYSTATECHANGE,
+<span class="lineNum">      68 </span>            :         XHR_ONTIMEOUT,
+<span class="lineNum">      69 </span>            :         XHR_READYSTATE,
+<span class="lineNum">      70 </span>            :         XHR_RESPONSE,
+<span class="lineNum">      71 </span>            :         XHR_RESPONSETYPE,
+<span class="lineNum">      72 </span>            :         XHR_RESPONSETEXT,
+<span class="lineNum">      73 </span>            :         XHR_RESPONSEXML,
+<span class="lineNum">      74 </span>            :         XHR_STATUS,
+<span class="lineNum">      75 </span>            :         XHR_STATUSTEXT,
+<span class="lineNum">      76 </span>            :         XHR_TIMEOUT,
+<span class="lineNum">      77 </span>            :         XHR_UPLOAD,
+<span class="lineNum">      78 </span>            :         XHR_WITHCREDENTIALS,
+<span class="lineNum">      79 </span>            :         XHR_STATIC_UNSENT,
+<span class="lineNum">      80 </span>            :         XHR_STATIC_OPENED,
+<span class="lineNum">      81 </span>            :         XHR_STATIC_HEADERS_RECEIVED,
+<span class="lineNum">      82 </span>            :         XHR_STATIC_LOADING,
+<span class="lineNum">      83 </span>            :         XHR_STATIC_DONE,
+<span class="lineNum">      84 </span>            :         XHR_CACHE,
+<span class="lineNum">      85 </span>            : } XHR_JSProperty;
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : typedef enum {
+<span class="lineNum">      88 </span>            :         XHR_READYSTATE_UNSENT                   = 0,
+<span class="lineNum">      89 </span>            :         XHR_READYSTATE_OPENED                   = 1,
+<span class="lineNum">      90 </span>            :         XHR_READYSTATE_HEADERS_RECEIVED = 2,
+<span class="lineNum">      91 </span>            :         XHR_READYSTATE_LOADING                  = 3,
+<span class="lineNum">      92 </span>            :         XHR_READYSTATE_DONE                             = 4
+<span class="lineNum">      93 </span>            : } XHR_ReadyState;
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : typedef enum {
+<span class="lineNum">      96 </span>            :         XHR_RESPONSETYPE_NONE,
+<span class="lineNum">      97 </span>            :         XHR_RESPONSETYPE_ARRAYBUFFER,
+<span class="lineNum">      98 </span>            :         XHR_RESPONSETYPE_BLOB,
+<span class="lineNum">      99 </span>            :         XHR_RESPONSETYPE_DOCUMENT,
+<span class="lineNum">     100 </span>            :         XHR_RESPONSETYPE_JSON,
+<span class="lineNum">     101 </span>            :         XHR_RESPONSETYPE_TEXT,
+<span class="lineNum">     102 </span>            :         XHR_RESPONSETYPE_SAX,
+<span class="lineNum">     103 </span>            :         XHR_RESPONSETYPE_PUSH,
+<span class="lineNum">     104 </span>            : } XHR_ResponseType;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : typedef enum {
+<span class="lineNum">     107 </span>            :         XHR_CACHETYPE_NORMAL,
+<span class="lineNum">     108 </span>            :         XHR_CACHETYPE_NONE,
+<span class="lineNum">     109 </span>            :         XHR_CACHETYPE_MEMORY,
+<span class="lineNum">     110 </span>            : } XHR_CacheType;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : struct __xhr_context
+<span class="lineNum">     113 </span>            : {
+<span class="lineNum">     114 </span>            :         JSContext *c;
+<span class="lineNum">     115 </span>            :         JSValue _this;
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :         /* callback functions */
+<span class="lineNum">     118 </span>            :         JSValue onabort;
+<span class="lineNum">     119 </span>            :         JSValue onerror;
+<span class="lineNum">     120 </span>            :         JSValue onreadystatechange;
+<span class="lineNum">     121 </span>            :         JSValue onload;
+<span class="lineNum">     122 </span>            :         JSValue onloadstart;
+<span class="lineNum">     123 </span>            :         JSValue onloadend;
+<span class="lineNum">     124 </span>            :         JSValue onprogress;
+<span class="lineNum">     125 </span>            :         JSValue ontimeout;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :         XHR_ReadyState readyState;
+<span class="lineNum">     128 </span>            :         Bool async;
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :         /* GPAC extension to control the caching of XHR-downloaded resources */
+<span class="lineNum">     131 </span>            :         XHR_CacheType  cache;
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :         /*header/header-val, terminated by NULL*/
+<span class="lineNum">     134 </span>            :         char **headers;
+<span class="lineNum">     135 </span>            :         u32 cur_header;
+<span class="lineNum">     136 </span>            :         char **recv_headers;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :         char *method, *url;
+<span class="lineNum">     139 </span>            :         GF_DownloadSession *sess;
+<span class="lineNum">     140 </span>            :         char *data;
+<span class="lineNum">     141 </span>            :         u32 size;
+<span class="lineNum">     142 </span>            :         JSValue arraybuffer;
+<span class="lineNum">     143 </span>            :         GF_Err ret_code;
+<span class="lineNum">     144 </span>            :         u32 html_status;
+<span class="lineNum">     145 </span>            :         char *statusText;
+<span class="lineNum">     146 </span>            :         char *mime;
+<span class="lineNum">     147 </span>            :         u32 timeout;
+<span class="lineNum">     148 </span>            :         XHR_ResponseType responseType;
+<span class="lineNum">     149 </span>            :         Bool withCredentials;
+<span class="lineNum">     150 </span>            :         Bool isFile;
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            :         GF_SAXParser *sax;
+<span class="lineNum">     153 </span>            :         GF_List *node_stack;
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :         GF_DOMEventTarget *event_target;
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :         /* dom graph in which the XHR is created */
+<span class="lineNum">     158 </span>            :         GF_SceneGraph *owning_graph;
+<span class="lineNum">     159 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">     160 </span>            :         /* dom graph used to parse XML into */
+<span class="lineNum">     161 </span>            :         GF_SceneGraph *document;
+<span class="lineNum">     162 </span>            : #endif
+<span class="lineNum">     163 </span>            :         Bool js_dom_loaded;
+<span class="lineNum">     164 </span>            : };
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            : GF_JSClass xhrClass;
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            : #if 0 //unused
+<span class="lineNum">     169 </span>            : GF_SceneGraph *xml_http_get_scenegraph(XMLHTTPContext *ctx)
+<span class="lineNum">     170 </span>            : {
+<span class="lineNum">     171 </span>            :         return ctx-&gt;owning_graph;
+<span class="lineNum">     172 </span>            : }
+<a name="173"><span class="lineNum">     173 </span>            : #endif</a>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">         11 : static void xml_http_reset_recv_hdr(XMLHTTPContext *ctx)</span>
+<span class="lineNum">     176 </span>            : {
+<span class="lineNum">     177 </span>            :         u32 nb_hdr = 0;
+<span class="lineNum">     178 </span><span class="lineCov">         11 :         if (ctx-&gt;recv_headers) {</span>
+<span class="lineNum">     179 </span><span class="lineCov">         18 :                 while (ctx-&gt;recv_headers[nb_hdr]) {</span>
+<span class="lineNum">     180 </span><span class="lineCov">         12 :                         gf_free(ctx-&gt;recv_headers[nb_hdr]);</span>
+<span class="lineNum">     181 </span><span class="lineCov">         12 :                         gf_free(ctx-&gt;recv_headers[nb_hdr+1]);</span>
+<span class="lineNum">     182 </span><span class="lineCov">         12 :                         nb_hdr+=2;</span>
+<span class="lineNum">     183 </span>            :                 }
+<span class="lineNum">     184 </span><span class="lineCov">          6 :                 gf_free(ctx-&gt;recv_headers);</span>
+<span class="lineNum">     185 </span><span class="lineCov">          6 :                 ctx-&gt;recv_headers = NULL;</span>
+<span class="lineNum">     186 </span>            :         }
+<a name="187"><span class="lineNum">     187 </span><span class="lineCov">         11 : }</span></a>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">         12 : static void xml_http_append_recv_header(XMLHTTPContext *ctx, const char *hdr, const char *val)</span>
+<span class="lineNum">     190 </span>            : {
+<span class="lineNum">     191 </span>            :         u32 nb_hdr = 0;
+<span class="lineNum">     192 </span><span class="lineCov">         12 :         if (ctx-&gt;recv_headers) {</span>
+<span class="lineNum">     193 </span><span class="lineCov">          6 :                 while (ctx-&gt;recv_headers[nb_hdr]) nb_hdr+=2;</span>
+<span class="lineNum">     194 </span>            :         }
+<span class="lineNum">     195 </span><span class="lineCov">         12 :         ctx-&gt;recv_headers = (char **)gf_realloc(ctx-&gt;recv_headers, sizeof(char*)*(nb_hdr+3));</span>
+<span class="lineNum">     196 </span><span class="lineCov">         12 :         ctx-&gt;recv_headers[nb_hdr] = gf_strdup(hdr);</span>
+<span class="lineNum">     197 </span><span class="lineCov">         12 :         ctx-&gt;recv_headers[nb_hdr+1] = gf_strdup(val ? val : &quot;&quot;);</span>
+<span class="lineNum">     198 </span><span class="lineCov">         12 :         ctx-&gt;recv_headers[nb_hdr+2] = NULL;</span>
+<a name="199"><span class="lineNum">     199 </span><span class="lineCov">         12 : }</span></a>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineCov">          6 : static void xml_http_append_send_header(XMLHTTPContext *ctx, char *hdr, char *val)</span>
+<span class="lineNum">     202 </span>            : {
+<span class="lineNum">     203 </span><span class="lineCov">          6 :         if (!hdr) return;</span>
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span><span class="lineCov">          6 :         if (ctx-&gt;headers) {</span>
+<span class="lineNum">     206 </span>            :                 u32 nb_hdr = 0;
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :                 while (ctx-&gt;headers &amp;&amp; ctx-&gt;headers[nb_hdr]) {</span>
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :                         if (stricmp(ctx-&gt;headers[nb_hdr], hdr)) {</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :                                 nb_hdr+=2;</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :                                 continue;</span>
+<span class="lineNum">     211 </span>            :                         }
+<span class="lineNum">     212 </span>            :                         /*ignore these ones*/
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                         if (!stricmp(hdr, &quot;Accept-Charset&quot;)</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Accept-Encoding&quot;)</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Content-Length&quot;)</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Expect&quot;)</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Date&quot;)</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Host&quot;)</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Keep-Alive&quot;)</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Referer&quot;)</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;TE&quot;)</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Trailer&quot;)</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Transfer-Encoding&quot;)</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Upgrade&quot;)</span>
+<span class="lineNum">     225 </span>            :                            ) {
+<span class="lineNum">     226 </span>            :                                 return;
+<span class="lineNum">     227 </span>            :                         }
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            :                         /*replace content for these ones*/
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :                         if (!stricmp(hdr, &quot;Authorization&quot;)</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Content-Base&quot;)</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Content-Location&quot;)</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Content-MD5&quot;)</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Content-Range&quot;)</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Content-Type&quot;)</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Content-Version&quot;)</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Delta-Base&quot;)</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Depth&quot;)</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Destination&quot;)</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;ETag&quot;)</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;From&quot;)</span>
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;If-Modified-Since&quot;)</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;If-Range&quot;)</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;If-Unmodified-Since&quot;)</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Max-Forwards&quot;)</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;MIME-Version&quot;)</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Overwrite&quot;)</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Proxy-Authorization&quot;)</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;SOAPAction&quot;)</span>
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :                                 || !stricmp(hdr, &quot;Timeout&quot;) ) {</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :                                 gf_free(ctx-&gt;headers[nb_hdr+1]);</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :                                 ctx-&gt;headers[nb_hdr+1] = gf_strdup(val);</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :                                 return;</span>
+<span class="lineNum">     254 </span>            :                         }
+<span class="lineNum">     255 </span>            :                         /*append value*/
+<span class="lineNum">     256 </span>            :                         else {
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :                                 char *new_val = (char *)gf_malloc(sizeof(char) * (strlen(ctx-&gt;headers[nb_hdr+1])+strlen(val)+3));</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                                 sprintf(new_val, &quot;%s, %s&quot;, ctx-&gt;headers[nb_hdr+1], val);</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                                 gf_free(ctx-&gt;headers[nb_hdr+1]);</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :                                 ctx-&gt;headers[nb_hdr+1] = new_val;</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :                                 return;</span>
+<span class="lineNum">     262 </span>            :                         }
+<span class="lineNum">     263 </span>            :                 }
+<span class="lineNum">     264 </span>            :         }
+<span class="lineNum">     265 </span><span class="lineCov">          6 :         xml_http_append_recv_header(ctx, hdr, val);</span>
+<a name="266"><span class="lineNum">     266 </span>            : }</a>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">         15 : static void xml_http_del_data(XMLHTTPContext *ctx)</span>
+<span class="lineNum">     269 </span>            : {
+<span class="lineNum">     270 </span><span class="lineCov">         30 :         if (!JS_IsUndefined(ctx-&gt;arraybuffer)) {</span>
+<span class="lineNum">     271 </span><span class="lineCov">          4 :                 JS_DetachArrayBuffer(ctx-&gt;c, ctx-&gt;arraybuffer);</span>
+<span class="lineNum">     272 </span><span class="lineCov">          4 :                 JS_FreeValue(ctx-&gt;c, ctx-&gt;arraybuffer);</span>
+<span class="lineNum">     273 </span><span class="lineCov">          4 :                 ctx-&gt;arraybuffer = JS_UNDEFINED;</span>
+<span class="lineNum">     274 </span>            :         }
+<span class="lineNum">     275 </span><span class="lineCov">         15 :         if (ctx-&gt;data) {</span>
+<span class="lineNum">     276 </span><span class="lineCov">          3 :                 gf_free(ctx-&gt;data);</span>
+<span class="lineNum">     277 </span><span class="lineCov">          3 :                 ctx-&gt;data = NULL;</span>
+<span class="lineNum">     278 </span>            :         }
+<span class="lineNum">     279 </span><span class="lineCov">         15 :         ctx-&gt;size = 0;</span>
+<a name="280"><span class="lineNum">     280 </span><span class="lineCov">         15 : }</span></a>
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span><span class="lineCov">         11 : static void xml_http_reset_partial(XMLHTTPContext *ctx)</span>
+<span class="lineNum">     283 </span>            : {
+<span class="lineNum">     284 </span><span class="lineCov">         11 :         xml_http_reset_recv_hdr(ctx);</span>
+<span class="lineNum">     285 </span><span class="lineCov">         11 :         xml_http_del_data(ctx);</span>
+<span class="lineNum">     286 </span><span class="lineCov">         11 :         if (ctx-&gt;mime) {</span>
+<span class="lineNum">     287 </span><span class="lineCov">          3 :                 gf_free(ctx-&gt;mime);</span>
+<span class="lineNum">     288 </span><span class="lineCov">          3 :                 ctx-&gt;mime = NULL;</span>
+<span class="lineNum">     289 </span>            :         }
+<span class="lineNum">     290 </span><span class="lineCov">         11 :         if (ctx-&gt;statusText) {</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                 gf_free(ctx-&gt;statusText);</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :                 ctx-&gt;statusText = NULL;</span>
+<span class="lineNum">     293 </span>            :         }
+<span class="lineNum">     294 </span><span class="lineCov">         11 :         ctx-&gt;cur_header = 0;</span>
+<span class="lineNum">     295 </span><span class="lineCov">         11 :         ctx-&gt;html_status = 0;</span>
+<a name="296"><span class="lineNum">     296 </span><span class="lineCov">         11 : }</span></a>
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span><span class="lineCov">          8 : static void xml_http_reset(XMLHTTPContext *ctx)</span>
+<span class="lineNum">     299 </span>            : {
+<span class="lineNum">     300 </span><span class="lineCov">          8 :         if (ctx-&gt;method) {</span>
+<span class="lineNum">     301 </span><span class="lineCov">          4 :                 gf_free(ctx-&gt;method);</span>
+<span class="lineNum">     302 </span><span class="lineCov">          4 :                 ctx-&gt;method = NULL;</span>
+<span class="lineNum">     303 </span>            :         }
+<span class="lineNum">     304 </span><span class="lineCov">          8 :         if (ctx-&gt;url) {</span>
+<span class="lineNum">     305 </span><span class="lineCov">          4 :                 gf_free(ctx-&gt;url);</span>
+<span class="lineNum">     306 </span><span class="lineCov">          4 :                 ctx-&gt;url = NULL;</span>
+<span class="lineNum">     307 </span>            :         }
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineCov">          8 :         xml_http_reset_partial(ctx);</span>
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span><span class="lineCov">          8 :         if (ctx-&gt;sess) {</span>
+<span class="lineNum">     312 </span>            :                 GF_DownloadSession *tmp = ctx-&gt;sess;
+<span class="lineNum">     313 </span><span class="lineCov">          1 :                 ctx-&gt;sess = NULL;</span>
+<span class="lineNum">     314 </span><span class="lineCov">          1 :                 gf_dm_sess_abort(tmp);</span>
+<span class="lineNum">     315 </span><span class="lineCov">          1 :                 gf_dm_sess_del(tmp);</span>
+<span class="lineNum">     316 </span>            :         }
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span><span class="lineCov">          8 :         if (ctx-&gt;url) {</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                 gf_free(ctx-&gt;url);</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :                 ctx-&gt;url = NULL;</span>
+<span class="lineNum">     321 </span>            :         }
+<span class="lineNum">     322 </span><span class="lineCov">          8 :         if (ctx-&gt;sax) {</span>
+<span class="lineNum">     323 </span><span class="lineCov">          1 :                 gf_xml_sax_del(ctx-&gt;sax);</span>
+<span class="lineNum">     324 </span><span class="lineCov">          1 :                 ctx-&gt;sax = NULL;</span>
+<span class="lineNum">     325 </span>            :         }
+<span class="lineNum">     326 </span><span class="lineCov">          8 :         if (ctx-&gt;node_stack) {</span>
+<span class="lineNum">     327 </span><span class="lineCov">          1 :                 gf_list_del(ctx-&gt;node_stack);</span>
+<span class="lineNum">     328 </span><span class="lineCov">          1 :                 ctx-&gt;node_stack = NULL;</span>
+<span class="lineNum">     329 </span>            :         }
+<span class="lineNum">     330 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">     331 </span><span class="lineCov">          8 :         if (ctx-&gt;document) {</span>
+<span class="lineNum">     332 </span><span class="lineCov">          3 :                 if (ctx-&gt;js_dom_loaded) {</span>
+<span class="lineNum">     333 </span><span class="lineCov">          2 :                         dom_js_unload();</span>
+<span class="lineNum">     334 </span><span class="lineCov">          2 :                         ctx-&gt;js_dom_loaded = GF_FALSE;</span>
+<span class="lineNum">     335 </span>            :                 }
+<span class="lineNum">     336 </span><span class="lineCov">          3 :                 gf_node_unregister(ctx-&gt;document-&gt;RootNode, NULL);</span>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :                 /*we're sure the graph is a &quot;nomade&quot; one since we initially put the refcount to 1 ourselves*/
+<span class="lineNum">     339 </span><span class="lineCov">          3 :                 ctx-&gt;document-&gt;reference_count--;</span>
+<span class="lineNum">     340 </span><span class="lineCov">          3 :                 if (!ctx-&gt;document-&gt;reference_count) {</span>
+<span class="lineNum">     341 </span><span class="lineCov">          2 :                         gf_sg_js_dom_pre_destroy(JS_GetRuntime(ctx-&gt;c), ctx-&gt;document, NULL);</span>
+<span class="lineNum">     342 </span><span class="lineCov">          2 :                         gf_sg_del(ctx-&gt;document);</span>
+<span class="lineNum">     343 </span>            :                 }
+<span class="lineNum">     344 </span>            :         }
+<span class="lineNum">     345 </span><span class="lineCov">          8 :         ctx-&gt;document = NULL;</span>
+<span class="lineNum">     346 </span>            : #endif
+<span class="lineNum">     347 </span><span class="lineCov">          8 :         ctx-&gt;size = 0;</span>
+<span class="lineNum">     348 </span><span class="lineCov">          8 :         ctx-&gt;async = GF_FALSE;</span>
+<span class="lineNum">     349 </span><span class="lineCov">          8 :         ctx-&gt;readyState = XHR_READYSTATE_UNSENT;</span>
+<span class="lineNum">     350 </span><span class="lineCov">          8 :         ctx-&gt;ret_code = GF_OK;</span>
+<a name="351"><span class="lineNum">     351 </span><span class="lineCov">          8 : }</span></a>
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span><span class="lineCov">        415 : static void xml_http_finalize(JSRuntime *rt, JSValue obj)</span>
+<span class="lineNum">     354 </span>            : {
+<span class="lineNum">     355 </span><span class="lineCov">        415 :         XMLHTTPContext *ctx = (XMLHTTPContext *) JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">     356 </span><span class="lineCov">        415 :         if (!ctx) return;</span>
+<span class="lineNum">     357 </span>            :         JS_FreeValueRT(rt, ctx-&gt;onabort);
+<span class="lineNum">     358 </span>            :         JS_FreeValueRT(rt, ctx-&gt;onerror);
+<span class="lineNum">     359 </span>            :         JS_FreeValueRT(rt, ctx-&gt;onload);
+<span class="lineNum">     360 </span>            :         JS_FreeValueRT(rt, ctx-&gt;onloadend);
+<span class="lineNum">     361 </span>            :         JS_FreeValueRT(rt, ctx-&gt;onloadstart);
+<span class="lineNum">     362 </span>            :         JS_FreeValueRT(rt, ctx-&gt;onprogress);
+<span class="lineNum">     363 </span>            :         JS_FreeValueRT(rt, ctx-&gt;onreadystatechange);
+<span class="lineNum">     364 </span>            :         JS_FreeValueRT(rt, ctx-&gt;ontimeout);
+<span class="lineNum">     365 </span><span class="lineCov">          4 :         xml_http_reset(ctx);</span>
+<span class="lineNum">     366 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">     367 </span><span class="lineCov">          4 :         if (ctx-&gt;event_target)</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :                 gf_dom_event_target_del(ctx-&gt;event_target);</span>
+<span class="lineNum">     369 </span>            : #endif
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span><span class="lineCov">          4 :         gf_free(ctx);</span>
+<a name="372"><span class="lineNum">     372 </span>            : }</a>
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span><span class="lineCov">         12 : static GFINLINE GF_SceneGraph *xml_get_scenegraph(JSContext *c)</span>
+<span class="lineNum">     375 </span>            : {
+<span class="lineNum">     376 </span>            :         GF_SceneGraph *scene;
+<span class="lineNum">     377 </span><span class="lineCov">         12 :         JSValue global = JS_GetGlobalObject(c);</span>
+<span class="lineNum">     378 </span><span class="lineCov">         12 :         scene = (GF_SceneGraph *) JS_GetOpaque_Nocheck(global);</span>
+<span class="lineNum">     379 </span>            :         JS_FreeValue(c, global);
+<span class="lineNum">     380 </span><span class="lineCov">         12 :         return scene;</span>
+<span class="lineNum">     381 </span>            : }
+<a name="382"><span class="lineNum">     382 </span>            : </a>
+<span class="lineNum">     383 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 : void xhr_get_event_target(JSContext *c, JSValue obj, GF_SceneGraph **sg, GF_DOMEventTarget **target)</span>
+<span class="lineNum">     385 </span>            : {
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :         if (c) {</span>
+<span class="lineNum">     387 </span>            :                 /*XHR interface*/
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :                 XMLHTTPContext *ctx = JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :                 if (!ctx) return;</span>
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :                 *sg = xml_get_scenegraph(c);</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :                 *target = ctx-&gt;event_target;</span>
+<span class="lineNum">     393 </span>            :         }
+<span class="lineNum">     394 </span>            : }
+<a name="395"><span class="lineNum">     395 </span>            : #endif</a>
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span><span class="lineCov">          4 : static JSValue xml_http_constructor(JSContext *c, JSValueConst new_target, int argc, JSValueConst *argv)</span>
+<span class="lineNum">     398 </span>            : {
+<span class="lineNum">     399 </span>            :         XMLHTTPContext *p;
+<span class="lineNum">     400 </span>            :         JSValue obj;
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span><span class="lineCov">          4 :         GF_SAFEALLOC(p, XMLHTTPContext);</span>
+<span class="lineNum">     403 </span><span class="lineCov">          4 :         if (!p) {</span>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_SCRIPT, (&quot;[WHR] Failed to allocate XHR object\n&quot;));</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :                 return JS_EXCEPTION;</span>
+<span class="lineNum">     406 </span>            :         }
+<span class="lineNum">     407 </span><span class="lineCov">          4 :         obj = JS_NewObjectClass(c, xhrClass.class_id);</span>
+<span class="lineNum">     408 </span><span class="lineCov">          4 :         p-&gt;c = c;</span>
+<span class="lineNum">     409 </span><span class="lineCov">          4 :         p-&gt;_this = obj;</span>
+<span class="lineNum">     410 </span><span class="lineCov">          4 :         p-&gt;owning_graph = xml_get_scenegraph(c);</span>
+<span class="lineNum">     411 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">     412 </span><span class="lineCov">          4 :         if (p-&gt;owning_graph)</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :                 p-&gt;event_target = gf_dom_event_target_new(GF_DOM_EVENT_TARGET_XHR, p);</span>
+<span class="lineNum">     414 </span>            : #endif
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span><span class="lineCov">          4 :         p-&gt;onabort = JS_NULL;</span>
+<span class="lineNum">     417 </span><span class="lineCov">          4 :         p-&gt;onerror = JS_NULL;</span>
+<span class="lineNum">     418 </span><span class="lineCov">          4 :         p-&gt;onreadystatechange = JS_NULL;</span>
+<span class="lineNum">     419 </span><span class="lineCov">          4 :         p-&gt;onload = JS_NULL;</span>
+<span class="lineNum">     420 </span><span class="lineCov">          4 :         p-&gt;onloadstart = JS_NULL;</span>
+<span class="lineNum">     421 </span><span class="lineCov">          4 :         p-&gt;onloadend = JS_NULL;</span>
+<span class="lineNum">     422 </span><span class="lineCov">          4 :         p-&gt;onprogress = JS_NULL;</span>
+<span class="lineNum">     423 </span><span class="lineCov">          4 :         p-&gt;ontimeout = JS_NULL;</span>
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span><span class="lineCov">          4 :         JS_SetOpaque(obj, p);</span>
+<span class="lineNum">     426 </span><span class="lineCov">          4 :         return obj;</span>
+<a name="427"><span class="lineNum">     427 </span>            : }</a>
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span><span class="lineCov">         13 : static void xml_http_fire_event(XMLHTTPContext *ctx, GF_EventType evtType)</span>
+<span class="lineNum">     430 </span>            : {
+<span class="lineNum">     431 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">     432 </span>            :         GF_DOM_Event xhr_evt;
+<span class="lineNum">     433 </span><span class="lineCov">         13 :         if (!ctx-&gt;event_target)</span>
+<span class="lineNum">     434 </span><span class="lineCov">         13 :                 return;</span>
+<span class="lineNum">     435 </span>            : 
+<span class="lineNum">     436 </span>            :         memset(&amp;xhr_evt, 0, sizeof(GF_DOM_Event));
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :         xhr_evt.type = evtType;</span>
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :         xhr_evt.target = ctx-&gt;event_target-&gt;ptr;</span>
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 :         xhr_evt.target_type = ctx-&gt;event_target-&gt;ptr_type;</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :         gf_sg_fire_dom_event(ctx-&gt;event_target, &amp;xhr_evt, ctx-&gt;owning_graph, NULL);</span>
+<span class="lineNum">     441 </span>            : #endif
+<span class="lineNum">     442 </span>            : }
+<a name="443"><span class="lineNum">     443 </span>            : </a>
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span><span class="lineCov">         10 : static void xml_http_state_change(XMLHTTPContext *ctx)</span>
+<span class="lineNum">     446 </span>            : {
+<span class="lineNum">     447 </span>            : #ifndef GPAC_DISABLE_VRML
+<span class="lineNum">     448 </span>            :         GF_SceneGraph *scene;
+<span class="lineNum">     449 </span>            :         GF_Node *n;
+<span class="lineNum">     450 </span>            : #endif
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span><span class="lineCov">         10 :         gf_js_lock(ctx-&gt;c, GF_TRUE);</span>
+<span class="lineNum">     453 </span><span class="lineCov">         20 :         if (! JS_IsNull(ctx-&gt;onreadystatechange)) {</span>
+<span class="lineNum">     454 </span><span class="lineCov">         10 :                 JSValue ret = JS_Call(ctx-&gt;c, ctx-&gt;onreadystatechange, ctx-&gt;_this, 0, NULL);</span>
+<span class="lineNum">     455 </span><span class="lineCov">         10 :                 if (JS_IsException(ret))</span>
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :                         js_dump_error(ctx-&gt;c);</span>
+<span class="lineNum">     457 </span><span class="lineCov">         10 :                 JS_FreeValue(ctx-&gt;c, ret);</span>
+<span class="lineNum">     458 </span>            :         }
+<span class="lineNum">     459 </span>            : 
+<span class="lineNum">     460 </span><span class="lineCov">         10 :         js_do_loop(ctx-&gt;c);</span>
+<span class="lineNum">     461 </span><span class="lineCov">         10 :         gf_js_lock(ctx-&gt;c, GF_FALSE);</span>
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span><span class="lineCov">         10 :         if (! ctx-&gt;owning_graph) return;</span>
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            :         /*Flush BIFS eventOut events*/
+<span class="lineNum">     466 </span>            : #ifndef GPAC_DISABLE_VRML
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :         scene = (GF_SceneGraph *)JS_GetContextOpaque(ctx-&gt;c);</span>
+<span class="lineNum">     468 </span>            :         /*this is a scene, we look for a node (if scene is used, this is DOM-based scripting not VRML*/
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :         if (scene-&gt;__reserved_null == 0) return;</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :         n = (GF_Node *)JS_GetContextOpaque(ctx-&gt;c);</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :         gf_js_vrml_flush_event_out(n, (GF_ScriptPriv *)n-&gt;sgprivate-&gt;UserPrivate);</span>
+<span class="lineNum">     472 </span>            : #endif
+<span class="lineNum">     473 </span>            : }
+<a name="474"><span class="lineNum">     474 </span>            : </a>
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span><span class="lineCov">          4 : static JSValue xml_http_open(JSContext *c, JSValueConst obj, int argc, JSValueConst *argv)</span>
+<span class="lineNum">     477 </span>            : {
+<span class="lineNum">     478 </span>            :         const char *val;
+<span class="lineNum">     479 </span>            :         GF_JSAPIParam par;
+<span class="lineNum">     480 </span>            :         XMLHTTPContext *ctx;
+<span class="lineNum">     481 </span>            :         GF_SceneGraph *scene;
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span><span class="lineCov">          4 :         ctx = (XMLHTTPContext *) JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">     484 </span><span class="lineCov">          4 :         if (!ctx) return JS_EXCEPTION;</span>
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            :         /*reset*/
+<span class="lineNum">     487 </span><span class="lineCov">          4 :         if (ctx-&gt;readyState) xml_http_reset(ctx);</span>
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span><span class="lineCov">          4 :         if (argc&lt;2) return JS_EXCEPTION;</span>
+<span class="lineNum">     490 </span>            :         /*method is a string*/
+<span class="lineNum">     491 </span><span class="lineCov">          8 :         if (!JS_CHECK_STRING(argv[0])) return JS_EXCEPTION;</span>
+<span class="lineNum">     492 </span>            :         /*url is a string*/
+<span class="lineNum">     493 </span><span class="lineCov">          8 :         if (!JS_CHECK_STRING(argv[1])) return JS_EXCEPTION;</span>
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span><span class="lineCov">          4 :         xml_http_reset(ctx);</span>
+<span class="lineNum">     496 </span>            :         val = JS_ToCString(c, argv[0]);
+<span class="lineNum">     497 </span><span class="lineCov">          4 :         if (strcmp(val, &quot;GET&quot;) &amp;&amp; strcmp(val, &quot;POST&quot;) &amp;&amp; strcmp(val, &quot;HEAD&quot;)</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                 &amp;&amp; strcmp(val, &quot;PUT&quot;) &amp;&amp; strcmp(val, &quot;DELETE&quot;) &amp;&amp; strcmp(val, &quot;OPTIONS&quot;) ) {</span>
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :                 JS_FreeCString(c, val);</span>
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :                 return JS_EXCEPTION;</span>
+<span class="lineNum">     501 </span>            :         }
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineCov">          4 :         ctx-&gt;method = gf_strdup(val);</span>
+<span class="lineNum">     504 </span><span class="lineCov">          4 :         JS_FreeCString(c, val);</span>
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            :         /*concatenate URL*/
+<span class="lineNum">     507 </span><span class="lineCov">          4 :         scene = xml_get_scenegraph(c);</span>
+<span class="lineNum">     508 </span>            : #ifndef GPAC_DISABLE_VRML
+<span class="lineNum">     509 </span><span class="lineCov">          4 :         while (scene &amp;&amp; scene-&gt;pOwningProto &amp;&amp; scene-&gt;parent_scene) scene = scene-&gt;parent_scene;</span>
+<span class="lineNum">     510 </span>            : #endif
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span><span class="lineCov">          4 :         par.uri.nb_params = 0;</span>
+<span class="lineNum">     513 </span>            :         val = JS_ToCString(c, argv[1]);
+<span class="lineNum">     514 </span><span class="lineCov">          4 :         par.uri.url = (char *) val;</span>
+<span class="lineNum">     515 </span><span class="lineCov">          4 :         ctx-&gt;url = NULL;</span>
+<span class="lineNum">     516 </span><span class="lineCov">          4 :         if (scene &amp;&amp; scene-&gt;script_action) {</span>
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :                 scene-&gt;script_action(scene-&gt;script_action_cbck, GF_JSAPI_OP_RESOLVE_URI, scene-&gt;RootNode, &amp;par);</span>
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :                 ctx-&gt;url = par.uri.url;</span>
+<span class="lineNum">     519 </span>            :         } else {
+<span class="lineNum">     520 </span><span class="lineCov">          4 :                 ctx-&gt;url = gf_strdup(val);</span>
+<span class="lineNum">     521 </span>            :         }
+<span class="lineNum">     522 </span><span class="lineCov">          4 :         JS_FreeCString(c, val);</span>
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            :         /*async defaults to true*/
+<span class="lineNum">     525 </span><span class="lineCov">          4 :         ctx-&gt;async = GF_TRUE;</span>
+<span class="lineNum">     526 </span><span class="lineCov">          4 :         if (argc&gt;2) {</span>
+<span class="lineNum">     527 </span>            :                 val = NULL;
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :                 ctx-&gt;async = JS_ToBool(c, argv[2]) ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :                 if (argc&gt;3) {</span>
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :                         if (!JS_CHECK_STRING(argv[3])) return JS_EXCEPTION;</span>
+<span class="lineNum">     531 </span>            :                         /*TODO*/
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :                         if (argc&gt;4) {</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :                                 if (!JS_CHECK_STRING(argv[4])) return JS_EXCEPTION;</span>
+<span class="lineNum">     534 </span>            :                                 val = JS_ToCString(c, argv[4]);
+<span class="lineNum">     535 </span>            :                                 /*TODO*/
+<span class="lineNum">     536 </span>            :                         } else {
+<span class="lineNum">     537 </span>            :                                 val = JS_ToCString(c, argv[3]);
+<span class="lineNum">     538 </span>            :                         }
+<span class="lineNum">     539 </span>            :                 }
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :                 JS_FreeCString(c, val);</span>
+<span class="lineNum">     541 </span>            :         }
+<span class="lineNum">     542 </span>            :         /*OPEN success*/
+<span class="lineNum">     543 </span><span class="lineCov">          4 :         ctx-&gt;readyState = XHR_READYSTATE_OPENED;</span>
+<span class="lineNum">     544 </span><span class="lineCov">          4 :         xml_http_state_change(ctx);</span>
+<span class="lineNum">     545 </span><span class="lineCov">          4 :         xml_http_fire_event(ctx, GF_EVENT_MEDIA_LOAD_START);</span>
+<span class="lineNum">     546 </span><span class="lineCov">          4 :         if (JS_IsFunction(c, ctx-&gt;onloadstart) ) {</span>
+<span class="lineNum">     547 </span><span class="lineNoCov">          0 :                 return JS_Call(ctx-&gt;c, ctx-&gt;onloadstart, ctx-&gt;_this, 0, NULL);</span>
+<span class="lineNum">     548 </span>            :         }
+<span class="lineNum">     549 </span><span class="lineCov">          4 :         return JS_TRUE;</span>
+<a name="550"><span class="lineNum">     550 </span>            : }</a>
+<span class="lineNum">     551 </span>            : 
+<span class="lineNum">     552 </span><span class="lineCov">          6 : static JSValue xml_http_set_header(JSContext *c, JSValueConst obj, int argc, JSValueConst *argv)</span>
+<span class="lineNum">     553 </span>            : {
+<span class="lineNum">     554 </span>            :         const char *hdr, *val;
+<span class="lineNum">     555 </span><span class="lineCov">          6 :         XMLHTTPContext *ctx = (XMLHTTPContext *) JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">     556 </span><span class="lineCov">          6 :         if (!ctx) return JS_EXCEPTION;</span>
+<span class="lineNum">     557 </span>            : 
+<span class="lineNum">     558 </span><span class="lineCov">          6 :         if (ctx-&gt;readyState!=XHR_READYSTATE_OPENED) return JS_EXCEPTION;</span>
+<span class="lineNum">     559 </span><span class="lineCov">          6 :         if (argc!=2) return JS_EXCEPTION;</span>
+<span class="lineNum">     560 </span><span class="lineCov">         12 :         if (!JS_CHECK_STRING(argv[0])) return JS_EXCEPTION;</span>
+<span class="lineNum">     561 </span><span class="lineCov">         12 :         if (!JS_CHECK_STRING(argv[1])) return JS_EXCEPTION;</span>
+<span class="lineNum">     562 </span>            : 
+<span class="lineNum">     563 </span>            :         hdr = JS_ToCString(c, argv[0]);
+<span class="lineNum">     564 </span>            :         val = JS_ToCString(c, argv[1]);
+<span class="lineNum">     565 </span><span class="lineCov">          6 :         xml_http_append_send_header(ctx, (char *)hdr, (char *)val);</span>
+<span class="lineNum">     566 </span><span class="lineCov">          6 :         JS_FreeCString(c, hdr);</span>
+<span class="lineNum">     567 </span><span class="lineCov">          6 :         JS_FreeCString(c, val);</span>
+<span class="lineNum">     568 </span><span class="lineCov">          6 :         return JS_TRUE;</span>
+<span class="lineNum">     569 </span>            : }
+<span class="lineNum">     570 </span>            : 
+<a name="571"><span class="lineNum">     571 </span>            : #ifndef GPAC_DISABLE_SVG</a>
+<span class="lineNum">     572 </span>            : 
+<span class="lineNum">     573 </span><span class="lineCov">         22 : static void xml_http_sax_start(void *sax_cbck, const char *node_name, const char *name_space, const GF_XMLAttribute *attributes, u32 nb_attributes)</span>
+<span class="lineNum">     574 </span>            : {
+<span class="lineNum">     575 </span>            :         u32 i;
+<span class="lineNum">     576 </span>            :         GF_DOMFullAttribute *prev = NULL;
+<span class="lineNum">     577 </span>            :         GF_DOMFullNode *par;
+<span class="lineNum">     578 </span>            :         XMLHTTPContext *ctx = (XMLHTTPContext *)sax_cbck;
+<span class="lineNum">     579 </span><span class="lineCov">         22 :         GF_DOMFullNode *node = (GF_DOMFullNode *) gf_node_new(ctx-&gt;document, TAG_DOMFullNode);</span>
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span><span class="lineCov">         22 :         node-&gt;name = gf_strdup(node_name);</span>
+<span class="lineNum">     582 </span><span class="lineCov">        102 :         for (i=0; i&lt;nb_attributes; i++) {</span>
+<span class="lineNum">     583 </span>            :                 /* special case for 'xml:id' to be parsed as an ID
+<span class="lineNum">     584 </span>            :                 NOTE: we do not test for the 'id' attribute because without DTD we are not sure that it's an ID */
+<span class="lineNum">     585 </span><span class="lineCov">         80 :                 if (!stricmp(attributes[i].name, &quot;xml:id&quot;)) {</span>
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :                         u32 id = gf_sg_get_max_node_id(ctx-&gt;document) + 1;</span>
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :                         gf_node_set_id((GF_Node *)node, id, attributes[i].value);</span>
+<span class="lineNum">     588 </span>            :                 } else {
+<span class="lineNum">     589 </span>            :                         GF_DOMFullAttribute *att;
+<span class="lineNum">     590 </span><span class="lineCov">         80 :                         GF_SAFEALLOC(att, GF_DOMFullAttribute);</span>
+<span class="lineNum">     591 </span><span class="lineCov">         80 :                         if (!att) {</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_SCRIPT, (&quot;[XHR] Fail to allocate DOM attribute\n&quot;));</span>
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :                                 continue;</span>
+<span class="lineNum">     594 </span>            :                         }
+<span class="lineNum">     595 </span><span class="lineCov">         80 :                         att-&gt;tag = TAG_DOM_ATT_any;</span>
+<span class="lineNum">     596 </span><span class="lineCov">         80 :                         att-&gt;name = gf_strdup(attributes[i].name);</span>
+<span class="lineNum">     597 </span><span class="lineCov">         80 :                         att-&gt;data_type = (u16) DOM_String_datatype;</span>
+<span class="lineNum">     598 </span><span class="lineCov">         80 :                         att-&gt;data = gf_svg_create_attribute_value(att-&gt;data_type);</span>
+<span class="lineNum">     599 </span><span class="lineCov">         80 :                         *((char **)att-&gt;data) = gf_strdup(attributes[i].value);</span>
+<span class="lineNum">     600 </span><span class="lineCov">         80 :                         if (prev) prev-&gt;next = (GF_DOMAttribute*)att;</span>
+<span class="lineNum">     601 </span><span class="lineCov">         21 :                         else node-&gt;attributes = (GF_DOMAttribute*)att;</span>
+<span class="lineNum">     602 </span>            :                         prev = att;
+<span class="lineNum">     603 </span>            :                 }
+<span class="lineNum">     604 </span>            :         }
+<span class="lineNum">     605 </span><span class="lineCov">         22 :         par = (GF_DOMFullNode *)gf_list_last(ctx-&gt;node_stack);</span>
+<span class="lineNum">     606 </span><span class="lineCov">         22 :         gf_node_register((GF_Node*)node, (GF_Node*)par);</span>
+<span class="lineNum">     607 </span><span class="lineCov">         22 :         if (par) {</span>
+<span class="lineNum">     608 </span><span class="lineCov">         21 :                 gf_node_list_add_child(&amp;par-&gt;children, (GF_Node*)node);</span>
+<span class="lineNum">     609 </span>            :         } else {
+<span class="lineNum">     610 </span>            :                 assert(!ctx-&gt;document-&gt;RootNode);
+<span class="lineNum">     611 </span><span class="lineCov">          1 :                 ctx-&gt;document-&gt;RootNode = (GF_Node*)node;</span>
+<span class="lineNum">     612 </span>            :         }
+<span class="lineNum">     613 </span><span class="lineCov">         22 :         gf_list_add(ctx-&gt;node_stack, node);</span>
+<a name="614"><span class="lineNum">     614 </span><span class="lineCov">         22 : }</span></a>
+<span class="lineNum">     615 </span>            : 
+<span class="lineNum">     616 </span><span class="lineCov">         22 : static void xml_http_sax_end(void *sax_cbck, const char *node_name, const char *name_space)</span>
+<span class="lineNum">     617 </span>            : {
+<span class="lineNum">     618 </span>            :         XMLHTTPContext *ctx = (XMLHTTPContext *)sax_cbck;
+<span class="lineNum">     619 </span><span class="lineCov">         22 :         GF_DOMFullNode *par = (GF_DOMFullNode *)gf_list_last(ctx-&gt;node_stack);</span>
+<span class="lineNum">     620 </span><span class="lineCov">         22 :         if (par) {</span>
+<span class="lineNum">     621 </span>            :                 /*depth mismatch*/
+<span class="lineNum">     622 </span><span class="lineCov">         22 :                 if (strcmp(par-&gt;name, node_name)) return;</span>
+<span class="lineNum">     623 </span><span class="lineCov">         22 :                 gf_list_rem_last(ctx-&gt;node_stack);</span>
+<a name="624"><span class="lineNum">     624 </span>            :         }</a>
+<span class="lineNum">     625 </span>            : }
+<span class="lineNum">     626 </span><span class="lineCov">         30 : static void xml_http_sax_text(void *sax_cbck, const char *content, Bool is_cdata)</span>
+<span class="lineNum">     627 </span>            : {
+<span class="lineNum">     628 </span>            :         XMLHTTPContext *ctx = (XMLHTTPContext *)sax_cbck;
+<span class="lineNum">     629 </span><span class="lineCov">         30 :         GF_DOMFullNode *par = (GF_DOMFullNode *)gf_list_last(ctx-&gt;node_stack);</span>
+<span class="lineNum">     630 </span><span class="lineCov">         30 :         if (par) {</span>
+<span class="lineNum">     631 </span>            :                 u32 i, len;
+<span class="lineNum">     632 </span>            :                 GF_DOMText *txt;
+<span class="lineNum">     633 </span>            :                 /*basic check, remove all empty text nodes*/
+<span class="lineNum">     634 </span><span class="lineCov">         30 :                 len = (u32) strlen(content);</span>
+<span class="lineNum">     635 </span><span class="lineCov">         55 :                 for (i=0; i&lt;len; i++) {</span>
+<span class="lineNum">     636 </span><span class="lineCov">         30 :                         if (!strchr(&quot; \n\r\t&quot;, content[i])) break;</span>
+<span class="lineNum">     637 </span>            :                 }
+<span class="lineNum">     638 </span><span class="lineCov">         30 :                 if (i==len) return;</span>
+<span class="lineNum">     639 </span>            : 
+<span class="lineNum">     640 </span><span class="lineCov">          5 :                 txt = gf_dom_add_text_node((GF_Node *)par, gf_strdup(content) );</span>
+<span class="lineNum">     641 </span><span class="lineCov">          5 :                 txt-&gt;type = is_cdata ? GF_DOM_TEXT_CDATA : GF_DOM_TEXT_REGULAR;</span>
+<span class="lineNum">     642 </span>            :         }
+<span class="lineNum">     643 </span>            : }
+<a name="644"><span class="lineNum">     644 </span>            : #endif // GPAC_DISABLE_SVG</a>
+<span class="lineNum">     645 </span>            : 
+<span class="lineNum">     646 </span><span class="lineCov">          3 : static void xml_http_terminate(XMLHTTPContext *ctx, GF_Err error)</span>
+<span class="lineNum">     647 </span>            : {
+<span class="lineNum">     648 </span>            :         /*if we get here, destroy downloader*/
+<span class="lineNum">     649 </span><span class="lineCov">          3 :         if (ctx-&gt;sess) {</span>
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :                 gf_dm_sess_del(ctx-&gt;sess);</span>
+<span class="lineNum">     651 </span><span class="lineNoCov">          0 :                 ctx-&gt;sess = NULL;</span>
+<span class="lineNum">     652 </span>            :         }
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span>            :         /*but stay in loaded mode*/
+<span class="lineNum">     655 </span><span class="lineCov">          3 :         ctx-&gt;readyState = XHR_READYSTATE_DONE;</span>
+<span class="lineNum">     656 </span><span class="lineCov">          3 :         xml_http_state_change(ctx);</span>
+<span class="lineNum">     657 </span><span class="lineCov">          3 :         xml_http_fire_event(ctx, GF_EVENT_LOAD);</span>
+<span class="lineNum">     658 </span><span class="lineCov">          3 :         xml_http_fire_event(ctx, GF_EVENT_MEDIA_LOAD_DONE);</span>
+<span class="lineNum">     659 </span><span class="lineCov">          3 :         if (JS_IsFunction(ctx-&gt;c, ctx-&gt;onload)) {</span>
+<span class="lineNum">     660 </span><span class="lineCov">          3 :                 JSValue rval = JS_Call(ctx-&gt;c, ctx-&gt;onload, ctx-&gt;_this, 0, NULL);</span>
+<span class="lineNum">     661 </span><span class="lineCov">          3 :                 if (JS_IsException(rval)) js_dump_error(ctx-&gt;c);</span>
+<span class="lineNum">     662 </span><span class="lineCov">          3 :                 JS_FreeValue(ctx-&gt;c, rval);</span>
+<span class="lineNum">     663 </span>            :         }
+<span class="lineNum">     664 </span><span class="lineCov">          3 :         if (JS_IsFunction(ctx-&gt;c, ctx-&gt;onloadend)) {</span>
+<span class="lineNum">     665 </span><span class="lineNoCov">          0 :                 JSValue rval = JS_Call(ctx-&gt;c, ctx-&gt;onloadend, ctx-&gt;_this, 0, NULL);</span>
+<span class="lineNum">     666 </span><span class="lineNoCov">          0 :                 if (JS_IsException(rval)) js_dump_error(ctx-&gt;c);</span>
+<span class="lineNum">     667 </span><span class="lineNoCov">          0 :                 JS_FreeValue(ctx-&gt;c, rval);</span>
+<span class="lineNum">     668 </span>            :         }
+<a name="669"><span class="lineNum">     669 </span><span class="lineCov">          3 : }</span></a>
+<span class="lineNum">     670 </span>            : 
+<span class="lineNum">     671 </span><span class="lineCov">         13 : static void xml_http_on_data(void *usr_cbk, GF_NETIO_Parameter *parameter)</span>
+<span class="lineNum">     672 </span>            : {
+<span class="lineNum">     673 </span>            :         Bool locked = GF_FALSE;
+<span class="lineNum">     674 </span>            :         XMLHTTPContext *ctx = (XMLHTTPContext *)usr_cbk;
+<span class="lineNum">     675 </span>            : 
+<span class="lineNum">     676 </span>            :         /*make sure we can grab JS and the session is not destroyed*/
+<span class="lineNum">     677 </span><span class="lineCov">         26 :         while (ctx-&gt;sess) {</span>
+<span class="lineNum">     678 </span><span class="lineNoCov">          0 :                 if (gf_js_try_lock(ctx-&gt;c) ) {</span>
+<span class="lineNum">     679 </span>            :                         locked = GF_TRUE;
+<span class="lineNum">     680 </span>            :                         break;
+<span class="lineNum">     681 </span>            :                 }
+<span class="lineNum">     682 </span><span class="lineNoCov">          0 :                 gf_sleep(1);</span>
+<span class="lineNum">     683 </span>            :         }
+<span class="lineNum">     684 </span>            :         /*if session not set, we've had an abort*/
+<span class="lineNum">     685 </span><span class="lineCov">         13 :         if (!ctx-&gt;sess &amp;&amp; !ctx-&gt;isFile) {</span>
+<span class="lineNum">     686 </span><span class="lineNoCov">          0 :                 if (locked)</span>
+<span class="lineNum">     687 </span><span class="lineNoCov">          0 :                         gf_js_lock(ctx-&gt;c, GF_FALSE);</span>
+<span class="lineNum">     688 </span>            :                 return;
+<span class="lineNum">     689 </span>            :         }
+<span class="lineNum">     690 </span>            : 
+<span class="lineNum">     691 </span><span class="lineCov">         13 :         if (!ctx-&gt;isFile) {</span>
+<span class="lineNum">     692 </span>            :                 assert( locked );
+<span class="lineNum">     693 </span><span class="lineNoCov">          0 :                 gf_js_lock(ctx-&gt;c, GF_FALSE);</span>
+<span class="lineNum">     694 </span>            :                 locked = GF_FALSE;
+<span class="lineNum">     695 </span>            :         }
+<span class="lineNum">     696 </span><span class="lineCov">         13 :         switch (parameter-&gt;msg_type) {</span>
+<span class="lineNum">     697 </span>            :         case GF_NETIO_SETUP:
+<span class="lineNum">     698 </span>            :                 /*nothing to do*/
+<span class="lineNum">     699 </span>            :                 goto exit;
+<span class="lineNum">     700 </span>            :         case GF_NETIO_CONNECTED:
+<span class="lineNum">     701 </span>            :                 /*nothing to do*/
+<span class="lineNum">     702 </span>            :                 goto exit;
+<span class="lineNum">     703 </span><span class="lineCov">          3 :         case GF_NETIO_WAIT_FOR_REPLY:</span>
+<span class="lineNum">     704 </span>            :                 /*reset send() state (data, current header) and prepare recv headers*/
+<span class="lineNum">     705 </span><span class="lineCov">          3 :                 xml_http_reset_partial(ctx);</span>
+<span class="lineNum">     706 </span><span class="lineCov">          3 :                 ctx-&gt;readyState = XHR_READYSTATE_HEADERS_RECEIVED;</span>
+<span class="lineNum">     707 </span><span class="lineCov">          3 :                 xml_http_state_change(ctx);</span>
+<span class="lineNum">     708 </span><span class="lineCov">          3 :                 xml_http_fire_event(ctx, GF_EVENT_MEDIA_PROGRESS);</span>
+<span class="lineNum">     709 </span><span class="lineCov">          3 :                 if (JS_IsFunction(ctx-&gt;c, ctx-&gt;onprogress) ) {</span>
+<span class="lineNum">     710 </span><span class="lineNoCov">          0 :                         JSValue rval = JS_Call(ctx-&gt;c, ctx-&gt;onprogress, ctx-&gt;_this, 0, NULL);</span>
+<span class="lineNum">     711 </span><span class="lineNoCov">          0 :                         if (JS_IsException(rval)) js_dump_error(ctx-&gt;c);</span>
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :                         JS_FreeValue(ctx-&gt;c, rval);</span>
+<span class="lineNum">     713 </span>            :                 }
+<span class="lineNum">     714 </span>            :                 goto exit;
+<span class="lineNum">     715 </span>            :         /*this is signaled sent AFTER headers*/
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :         case GF_NETIO_PARSE_REPLY:</span>
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 :                 ctx-&gt;html_status = parameter-&gt;reply;</span>
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :                 if (parameter-&gt;value) {</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :                         ctx-&gt;statusText = gf_strdup(parameter-&gt;value);</span>
+<span class="lineNum">     720 </span>            :                 }
+<span class="lineNum">     721 </span><span class="lineNoCov">          0 :                 ctx-&gt;readyState = XHR_READYSTATE_LOADING;</span>
+<span class="lineNum">     722 </span><span class="lineNoCov">          0 :                 xml_http_state_change(ctx);</span>
+<span class="lineNum">     723 </span><span class="lineNoCov">          0 :                 ctx-&gt;readyState = XHR_READYSTATE_HEADERS_RECEIVED;</span>
+<span class="lineNum">     724 </span><span class="lineNoCov">          0 :                 xml_http_state_change(ctx);</span>
+<span class="lineNum">     725 </span><span class="lineNoCov">          0 :                 xml_http_fire_event(ctx, GF_EVENT_MEDIA_PROGRESS);</span>
+<span class="lineNum">     726 </span><span class="lineNoCov">          0 :                 if (JS_IsFunction(ctx-&gt;c, ctx-&gt;onprogress) ) {</span>
+<span class="lineNum">     727 </span><span class="lineNoCov">          0 :                         JSValue rval = JS_Call(ctx-&gt;c, ctx-&gt;onprogress, ctx-&gt;_this, 0, NULL);</span>
+<span class="lineNum">     728 </span><span class="lineNoCov">          0 :                         if (JS_IsException(rval)) js_dump_error(ctx-&gt;c);</span>
+<span class="lineNum">     729 </span><span class="lineNoCov">          0 :                         JS_FreeValue(ctx-&gt;c, rval);</span>
+<span class="lineNum">     730 </span>            :                 }
+<span class="lineNum">     731 </span>            :                 goto exit;
+<span class="lineNum">     732 </span>            : 
+<span class="lineNum">     733 </span><span class="lineNoCov">          0 :         case GF_NETIO_GET_METHOD:</span>
+<span class="lineNum">     734 </span><span class="lineNoCov">          0 :                 parameter-&gt;name = ctx-&gt;method;</span>
+<span class="lineNum">     735 </span><span class="lineNoCov">          0 :                 goto exit;</span>
+<span class="lineNum">     736 </span><span class="lineNoCov">          0 :         case GF_NETIO_GET_HEADER:</span>
+<span class="lineNum">     737 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;headers &amp;&amp; ctx-&gt;headers[2*ctx-&gt;cur_header]) {</span>
+<span class="lineNum">     738 </span><span class="lineNoCov">          0 :                         parameter-&gt;name = ctx-&gt;headers[2*ctx-&gt;cur_header];</span>
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :                         parameter-&gt;value = ctx-&gt;headers[2*ctx-&gt;cur_header+1];</span>
+<span class="lineNum">     740 </span><span class="lineNoCov">          0 :                         ctx-&gt;cur_header++;</span>
+<span class="lineNum">     741 </span>            :                 }
+<span class="lineNum">     742 </span>            :                 goto exit;
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 :         case GF_NETIO_GET_CONTENT:</span>
+<span class="lineNum">     744 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;data) {</span>
+<span class="lineNum">     745 </span><span class="lineNoCov">          0 :                         parameter-&gt;data = ctx-&gt;data;</span>
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :                         parameter-&gt;size = ctx-&gt;size;</span>
+<span class="lineNum">     747 </span>            :                 }
+<span class="lineNum">     748 </span>            :                 goto exit;
+<span class="lineNum">     749 </span><span class="lineCov">          6 :         case GF_NETIO_PARSE_HEADER:</span>
+<span class="lineNum">     750 </span><span class="lineCov">          6 :                 xml_http_append_recv_header(ctx, parameter-&gt;name, parameter-&gt;value);</span>
+<span class="lineNum">     751 </span>            :                 /*prepare SAX parser*/
+<span class="lineNum">     752 </span><span class="lineCov">          6 :                 if (ctx-&gt;responseType != XHR_RESPONSETYPE_SAX) goto exit;</span>
+<span class="lineNum">     753 </span><span class="lineCov">          2 :                 if (strcmp(parameter-&gt;name, &quot;Content-Type&quot;)) goto exit;</span>
+<span class="lineNum">     754 </span>            : 
+<span class="lineNum">     755 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">     756 </span><span class="lineCov">          1 :                 if (!strncmp(parameter-&gt;value, &quot;application/xml&quot;, 15)</span>
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :                         || !strncmp(parameter-&gt;value, &quot;text/xml&quot;, 8)</span>
+<span class="lineNum">     758 </span><span class="lineNoCov">          0 :                         || strstr(parameter-&gt;value, &quot;+xml&quot;)</span>
+<span class="lineNum">     759 </span><span class="lineNoCov">          0 :                         || strstr(parameter-&gt;value, &quot;/xml&quot;)</span>
+<span class="lineNum">     760 </span>            : //                      || !strncmp(parameter-&gt;value, &quot;text/plain&quot;, 10)
+<span class="lineNum">     761 </span>            :                    ) {
+<span class="lineNum">     762 </span>            :                         assert(!ctx-&gt;sax);
+<span class="lineNum">     763 </span><span class="lineCov">          1 :                         ctx-&gt;sax = gf_xml_sax_new(xml_http_sax_start, xml_http_sax_end, xml_http_sax_text, ctx);</span>
+<span class="lineNum">     764 </span><span class="lineCov">          1 :                         ctx-&gt;node_stack = gf_list_new();</span>
+<span class="lineNum">     765 </span><span class="lineCov">          1 :                         ctx-&gt;document = gf_sg_new();</span>
+<span class="lineNum">     766 </span>            :                         /*mark this doc as &quot;nomade&quot;, and let it leave until all references to it are destroyed*/
+<span class="lineNum">     767 </span><span class="lineCov">          1 :                         ctx-&gt;document-&gt;reference_count = 1;</span>
+<span class="lineNum">     768 </span>            :                 }
+<span class="lineNum">     769 </span>            : #endif
+<span class="lineNum">     770 </span>            : 
+<span class="lineNum">     771 </span>            :                 goto exit;
+<span class="lineNum">     772 </span><span class="lineCov">          1 :         case GF_NETIO_DATA_EXCHANGE:</span>
+<span class="lineNum">     773 </span><span class="lineCov">          1 :                 if (parameter-&gt;data &amp;&amp; parameter-&gt;size) {</span>
+<span class="lineNum">     774 </span><span class="lineCov">          1 :                         if (ctx-&gt;sax) {</span>
+<span class="lineNum">     775 </span>            :                                 GF_Err e;
+<span class="lineNum">     776 </span><span class="lineCov">          1 :                                 if (!ctx-&gt;size) e = gf_xml_sax_init(ctx-&gt;sax, (unsigned char *) parameter-&gt;data);</span>
+<span class="lineNum">     777 </span><span class="lineNoCov">          0 :                                 else e = gf_xml_sax_parse(ctx-&gt;sax, parameter-&gt;data);</span>
+<span class="lineNum">     778 </span><span class="lineCov">          1 :                                 if (e) {</span>
+<span class="lineNum">     779 </span><span class="lineNoCov">          0 :                                         gf_xml_sax_del(ctx-&gt;sax);</span>
+<span class="lineNum">     780 </span><span class="lineNoCov">          0 :                                         ctx-&gt;sax = NULL;</span>
+<span class="lineNum">     781 </span>            :                                 }
+<span class="lineNum">     782 </span>            :                                 goto exit;
+<span class="lineNum">     783 </span>            :                         }
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span>            :                         /*detach arraybuffer if any*/
+<span class="lineNum">     786 </span><span class="lineNoCov">          0 :                         if (!JS_IsUndefined(ctx-&gt;arraybuffer)) {</span>
+<span class="lineNum">     787 </span><span class="lineNoCov">          0 :                                 JS_DetachArrayBuffer(ctx-&gt;c, ctx-&gt;arraybuffer);</span>
+<span class="lineNum">     788 </span><span class="lineNoCov">          0 :                                 JS_FreeValue(ctx-&gt;c, ctx-&gt;arraybuffer);</span>
+<span class="lineNum">     789 </span><span class="lineNoCov">          0 :                                 ctx-&gt;arraybuffer = JS_UNDEFINED;</span>
+<span class="lineNum">     790 </span>            :                         }
+<span class="lineNum">     791 </span>            : 
+<span class="lineNum">     792 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;responseType!=XHR_RESPONSETYPE_PUSH) {</span>
+<span class="lineNum">     793 </span><span class="lineNoCov">          0 :                                 ctx-&gt;data = (char *)gf_realloc(ctx-&gt;data, sizeof(char)*(ctx-&gt;size+parameter-&gt;size+1));</span>
+<span class="lineNum">     794 </span><span class="lineNoCov">          0 :                                 memcpy(ctx-&gt;data + ctx-&gt;size, parameter-&gt;data, sizeof(char)*parameter-&gt;size);</span>
+<span class="lineNum">     795 </span><span class="lineNoCov">          0 :                                 ctx-&gt;size += parameter-&gt;size;</span>
+<span class="lineNum">     796 </span><span class="lineNoCov">          0 :                                 ctx-&gt;data[ctx-&gt;size] = 0;</span>
+<span class="lineNum">     797 </span>            :                         }
+<span class="lineNum">     798 </span>            : 
+<span class="lineNum">     799 </span><span class="lineNoCov">          0 :                         if (JS_IsFunction(ctx-&gt;c, ctx-&gt;onprogress) ) {</span>
+<span class="lineNum">     800 </span><span class="lineNoCov">          0 :                                 JSValue prog_evt = JS_NewObject(ctx-&gt;c);</span>
+<span class="lineNum">     801 </span><span class="lineNoCov">          0 :                                 JSValue buffer_ab=JS_UNDEFINED;</span>
+<span class="lineNum">     802 </span><span class="lineNoCov">          0 :                                 u32 bps=0;</span>
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :                                 u64 tot_size=0;</span>
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :                                 gf_dm_sess_get_stats(ctx-&gt;sess, NULL, NULL, &amp;tot_size, NULL, &amp;bps, NULL);</span>
+<span class="lineNum">     805 </span><span class="lineNoCov">          0 :                                 JS_SetPropertyStr(ctx-&gt;c, prog_evt, &quot;lengthComputable&quot;, JS_NewBool(ctx-&gt;c, tot_size ? 1 : 0));</span>
+<span class="lineNum">     806 </span><span class="lineNoCov">          0 :                                 JS_SetPropertyStr(ctx-&gt;c, prog_evt, &quot;loaded&quot;, JS_NewInt64(ctx-&gt;c, ctx-&gt;size));</span>
+<span class="lineNum">     807 </span><span class="lineNoCov">          0 :                                 JS_SetPropertyStr(ctx-&gt;c, prog_evt, &quot;total&quot;, JS_NewInt64(ctx-&gt;c, tot_size));</span>
+<span class="lineNum">     808 </span><span class="lineNoCov">          0 :                                 JS_SetPropertyStr(ctx-&gt;c, prog_evt, &quot;bps&quot;, JS_NewInt64(ctx-&gt;c, bps*8));</span>
+<span class="lineNum">     809 </span><span class="lineNoCov">          0 :                                 if (ctx-&gt;responseType==XHR_RESPONSETYPE_PUSH) {</span>
+<span class="lineNum">     810 </span><span class="lineNoCov">          0 :                                         buffer_ab = JS_NewArrayBuffer(ctx-&gt;c, (u8 *) parameter-&gt;data, parameter-&gt;size, NULL, ctx, 1);</span>
+<span class="lineNum">     811 </span><span class="lineNoCov">          0 :                                         JS_SetPropertyStr(ctx-&gt;c, prog_evt, &quot;buffer&quot;, buffer_ab);</span>
+<span class="lineNum">     812 </span>            :                                 }
+<span class="lineNum">     813 </span>            : 
+<span class="lineNum">     814 </span><span class="lineNoCov">          0 :                                 JSValue rval = JS_Call(ctx-&gt;c, ctx-&gt;onprogress, ctx-&gt;_this, 1, &amp;prog_evt);</span>
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :                                 if (JS_IsException(rval)) js_dump_error(ctx-&gt;c);</span>
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :                                 JS_FreeValue(ctx-&gt;c, rval);</span>
+<span class="lineNum">     817 </span><span class="lineNoCov">          0 :                                 if (ctx-&gt;responseType==XHR_RESPONSETYPE_PUSH) {</span>
+<span class="lineNum">     818 </span><span class="lineNoCov">          0 :                                         JS_DetachArrayBuffer(ctx-&gt;c, buffer_ab);</span>
+<span class="lineNum">     819 </span>            :                                 }
+<span class="lineNum">     820 </span><span class="lineNoCov">          0 :                                 JS_FreeValue(ctx-&gt;c, prog_evt);</span>
+<span class="lineNum">     821 </span>            :                         }
+<span class="lineNum">     822 </span>            :                 }
+<span class="lineNum">     823 </span>            :                 goto exit;
+<span class="lineNum">     824 </span>            :         case GF_NETIO_DATA_TRANSFERED:
+<span class="lineNum">     825 </span>            :                 /* No return, go till the end of the function */
+<span class="lineNum">     826 </span>            :                 break;
+<span class="lineNum">     827 </span>            :         case GF_NETIO_DISCONNECTED:
+<span class="lineNum">     828 </span>            :                 goto exit;
+<span class="lineNum">     829 </span><span class="lineNoCov">          0 :         case GF_NETIO_STATE_ERROR:</span>
+<span class="lineNum">     830 </span><span class="lineNoCov">          0 :                 ctx-&gt;ret_code = parameter-&gt;error;</span>
+<span class="lineNum">     831 </span>            :                 /* No return, go till the end of the function */
+<span class="lineNum">     832 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_SCRIPT, (&quot;[XmlHttpRequest] Download error: %s\n&quot;, gf_error_to_string(parameter-&gt;error)));</span>
+<span class="lineNum">     833 </span>            :                 break;
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :         case GF_NETIO_REQUEST_SESSION:</span>
+<span class="lineNum">     835 </span>            :         case GF_NETIO_CANCEL_STREAM:
+<span class="lineNum">     836 </span><span class="lineNoCov">          0 :                 parameter-&gt;error = GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     837 </span><span class="lineNoCov">          0 :                 return;</span>
+<span class="lineNum">     838 </span>            :         }
+<span class="lineNum">     839 </span><span class="lineCov">          3 :         if (ctx-&gt;async) {</span>
+<span class="lineNum">     840 </span><span class="lineCov">          3 :                 xml_http_terminate(ctx, parameter-&gt;error);</span>
+<span class="lineNum">     841 </span>            :         }
+<span class="lineNum">     842 </span>            : 
+<span class="lineNum">     843 </span><span class="lineCov">         18 : exit:</span>
+<span class="lineNum">     844 </span><span class="lineCov">         13 :         if (locked) {</span>
+<span class="lineNum">     845 </span><span class="lineNoCov">          0 :                 gf_js_lock(ctx-&gt;c, GF_FALSE);</span>
+<span class="lineNum">     846 </span>            :         }
+<a name="847"><span class="lineNum">     847 </span>            : }</a>
+<span class="lineNum">     848 </span>            : 
+<span class="lineNum">     849 </span><span class="lineCov">          3 : static GF_Err xml_http_process_local(XMLHTTPContext *ctx)</span>
+<span class="lineNum">     850 </span>            : {
+<span class="lineNum">     851 </span>            :         /* For XML Http Requests to files, we fake the processing by calling the HTTP callbacks */
+<span class="lineNum">     852 </span>            :         GF_NETIO_Parameter par;
+<span class="lineNum">     853 </span>            :         u64 fsize;
+<span class="lineNum">     854 </span>            :         char contentLengthHeader[256];
+<span class="lineNum">     855 </span>            :         FILE *responseFile;
+<span class="lineNum">     856 </span>            : 
+<span class="lineNum">     857 </span>            :         /*opera-style local host*/
+<span class="lineNum">     858 </span><span class="lineCov">          3 :         if (!strnicmp(ctx-&gt;url, &quot;file://localhost&quot;, 16)) responseFile = gf_fopen(ctx-&gt;url+16, &quot;rb&quot;);</span>
+<span class="lineNum">     859 </span>            :         /*regular-style local host*/
+<span class="lineNum">     860 </span><span class="lineCov">          3 :         else if (!strnicmp(ctx-&gt;url, &quot;file://&quot;, 7)) responseFile = gf_fopen(ctx-&gt;url+7, &quot;rb&quot;);</span>
+<span class="lineNum">     861 </span>            :         /* other types: e.g. &quot;C:\&quot; */
+<span class="lineNum">     862 </span><span class="lineCov">          3 :         else responseFile = gf_fopen(ctx-&gt;url, &quot;rb&quot;);</span>
+<span class="lineNum">     863 </span>            : 
+<span class="lineNum">     864 </span><span class="lineCov">          3 :         if (!responseFile) {</span>
+<span class="lineNum">     865 </span><span class="lineNoCov">          0 :                 ctx-&gt;html_status = 404;</span>
+<span class="lineNum">     866 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_SCRIPT, (&quot;[XmlHttpRequest] cannot open local file %s\n&quot;, ctx-&gt;url));</span>
+<span class="lineNum">     867 </span><span class="lineNoCov">          0 :                 xml_http_fire_event(ctx, GF_EVENT_ERROR);</span>
+<span class="lineNum">     868 </span><span class="lineNoCov">          0 :                 if (JS_IsFunction(ctx-&gt;c, ctx-&gt;onerror) ) {</span>
+<span class="lineNum">     869 </span><span class="lineNoCov">          0 :                         JSValue rval = JS_Call(ctx-&gt;c, ctx-&gt;onerror, ctx-&gt;_this, 0, NULL);</span>
+<span class="lineNum">     870 </span><span class="lineNoCov">          0 :                         if (JS_IsException(rval)) js_dump_error(ctx-&gt;c);</span>
+<span class="lineNum">     871 </span><span class="lineNoCov">          0 :                         JS_FreeValue(ctx-&gt;c, rval);</span>
+<span class="lineNum">     872 </span>            :                 }
+<span class="lineNum">     873 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     874 </span>            :         }
+<span class="lineNum">     875 </span><span class="lineCov">          3 :         ctx-&gt;isFile = GF_TRUE;</span>
+<span class="lineNum">     876 </span>            : 
+<span class="lineNum">     877 </span><span class="lineCov">          3 :         par.msg_type = GF_NETIO_WAIT_FOR_REPLY;</span>
+<span class="lineNum">     878 </span><span class="lineCov">          3 :         xml_http_on_data(ctx, &amp;par);</span>
+<span class="lineNum">     879 </span>            : 
+<span class="lineNum">     880 </span><span class="lineCov">          3 :         fsize = gf_fsize(responseFile);</span>
+<span class="lineNum">     881 </span>            : 
+<span class="lineNum">     882 </span><span class="lineCov">          3 :         ctx-&gt;html_status = 200;</span>
+<span class="lineNum">     883 </span>            : 
+<span class="lineNum">     884 </span><span class="lineCov">          3 :         ctx-&gt;data = (char *)gf_malloc(sizeof(char)*(size_t)(fsize+1));</span>
+<span class="lineNum">     885 </span><span class="lineCov">          3 :         fsize = gf_fread(ctx-&gt;data, (size_t)fsize, responseFile);</span>
+<span class="lineNum">     886 </span><span class="lineCov">          3 :         gf_fclose(responseFile);</span>
+<span class="lineNum">     887 </span><span class="lineCov">          3 :         ctx-&gt;data[fsize] = 0;</span>
+<span class="lineNum">     888 </span><span class="lineCov">          3 :         ctx-&gt;size = (u32)fsize;</span>
+<span class="lineNum">     889 </span>            : 
+<span class="lineNum">     890 </span>            :         memset(&amp;par, 0, sizeof(GF_NETIO_Parameter));
+<span class="lineNum">     891 </span><span class="lineCov">          3 :         par.msg_type = GF_NETIO_PARSE_HEADER;</span>
+<span class="lineNum">     892 </span><span class="lineCov">          3 :         par.name = &quot;Content-Type&quot;;</span>
+<span class="lineNum">     893 </span><span class="lineCov">          3 :         if (ctx-&gt;responseType == XHR_RESPONSETYPE_SAX) {</span>
+<span class="lineNum">     894 </span><span class="lineCov">          1 :                 par.value = &quot;application/xml&quot;;</span>
+<span class="lineNum">     895 </span><span class="lineCov">          2 :         } else if (ctx-&gt;responseType == XHR_RESPONSETYPE_DOCUMENT) {</span>
+<span class="lineNum">     896 </span><span class="lineCov">          2 :                 par.value = &quot;application/xml&quot;;</span>
+<span class="lineNum">     897 </span>            :         } else {
+<span class="lineNum">     898 </span><span class="lineNoCov">          0 :                 par.value = &quot;application/octet-stream&quot;;</span>
+<span class="lineNum">     899 </span>            :         }
+<span class="lineNum">     900 </span><span class="lineCov">          3 :         xml_http_on_data(ctx, &amp;par);</span>
+<span class="lineNum">     901 </span>            : 
+<span class="lineNum">     902 </span>            :         memset(&amp;par, 0, sizeof(GF_NETIO_Parameter));
+<span class="lineNum">     903 </span><span class="lineCov">          3 :         par.msg_type = GF_NETIO_PARSE_HEADER;</span>
+<span class="lineNum">     904 </span><span class="lineCov">          3 :         par.name = &quot;Content-Length&quot;;</span>
+<span class="lineNum">     905 </span><span class="lineCov">          3 :         sprintf(contentLengthHeader, &quot;%d&quot;, ctx-&gt;size);</span>
+<span class="lineNum">     906 </span><span class="lineCov">          3 :         par.value = contentLengthHeader;</span>
+<span class="lineNum">     907 </span><span class="lineCov">          3 :         xml_http_on_data(ctx, &amp;par);</span>
+<span class="lineNum">     908 </span>            : 
+<span class="lineNum">     909 </span>            : 
+<span class="lineNum">     910 </span><span class="lineCov">          3 :         if (ctx-&gt;sax) {</span>
+<span class="lineNum">     911 </span>            :                 memset(&amp;par, 0, sizeof(GF_NETIO_Parameter));
+<span class="lineNum">     912 </span><span class="lineCov">          1 :                 par.msg_type = GF_NETIO_DATA_EXCHANGE;</span>
+<span class="lineNum">     913 </span><span class="lineCov">          1 :                 par.data = ctx-&gt;data;</span>
+<span class="lineNum">     914 </span><span class="lineCov">          1 :                 par.size = ctx-&gt;size;</span>
+<span class="lineNum">     915 </span><span class="lineCov">          1 :                 ctx-&gt;size = 0;</span>
+<span class="lineNum">     916 </span><span class="lineCov">          1 :                 xml_http_on_data(ctx, &amp;par);</span>
+<span class="lineNum">     917 </span><span class="lineCov">          1 :                 ctx-&gt;size = par.size;</span>
+<span class="lineNum">     918 </span>            :         }
+<span class="lineNum">     919 </span>            : 
+<span class="lineNum">     920 </span>            :         memset(&amp;par, 0, sizeof(GF_NETIO_Parameter));
+<span class="lineNum">     921 </span><span class="lineCov">          3 :         par.msg_type = GF_NETIO_DATA_TRANSFERED;</span>
+<span class="lineNum">     922 </span><span class="lineCov">          3 :         xml_http_on_data(ctx, &amp;par);</span>
+<span class="lineNum">     923 </span>            : 
+<span class="lineNum">     924 </span><span class="lineCov">          3 :         if (!ctx-&gt;async) {</span>
+<span class="lineNum">     925 </span><span class="lineNoCov">          0 :                 xml_http_terminate(ctx, GF_OK);</span>
+<span class="lineNum">     926 </span>            :         }
+<span class="lineNum">     927 </span>            :         return GF_OK;
+<a name="928"><span class="lineNum">     928 </span>            : }</a>
+<span class="lineNum">     929 </span>            : 
+<span class="lineNum">     930 </span><span class="lineCov">          4 : static JSValue xml_http_send(JSContext *c, JSValueConst obj, int argc, JSValueConst *argv)</span>
+<span class="lineNum">     931 </span>            : {
+<span class="lineNum">     932 </span>            :         GF_Err e;
+<span class="lineNum">     933 </span>            :         GF_JSAPIParam par;
+<span class="lineNum">     934 </span>            :         GF_SceneGraph *scene;
+<span class="lineNum">     935 </span>            :         const char *data = NULL;
+<span class="lineNum">     936 </span>            :         u32 data_size = 0;
+<span class="lineNum">     937 </span><span class="lineCov">          4 :         XMLHTTPContext *ctx = (XMLHTTPContext *) JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">     938 </span><span class="lineCov">          4 :         if (!ctx) return JS_EXCEPTION;</span>
+<span class="lineNum">     939 </span>            : 
+<span class="lineNum">     940 </span><span class="lineCov">          4 :         if (ctx-&gt;readyState!=XHR_READYSTATE_OPENED) return JS_EXCEPTION;</span>
+<span class="lineNum">     941 </span><span class="lineCov">          4 :         if (ctx-&gt;sess) return JS_EXCEPTION;</span>
+<span class="lineNum">     942 </span>            : 
+<span class="lineNum">     943 </span><span class="lineCov">          4 :         scene = xml_get_scenegraph(c);</span>
+<span class="lineNum">     944 </span><span class="lineCov">          4 :         if (scene) {</span>
+<span class="lineNum">     945 </span><span class="lineNoCov">          0 :                 par.dnld_man = NULL;</span>
+<span class="lineNum">     946 </span><span class="lineNoCov">          0 :                 if (scene-&gt;script_action)</span>
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 :                         scene-&gt;script_action(scene-&gt;script_action_cbck, GF_JSAPI_OP_GET_DOWNLOAD_MANAGER, NULL, &amp;par);</span>
+<span class="lineNum">     948 </span>            :         } else {
+<span class="lineNum">     949 </span><span class="lineCov">          4 :                 par.dnld_man = jsf_get_download_manager(c);</span>
+<span class="lineNum">     950 </span>            :         }
+<span class="lineNum">     951 </span><span class="lineCov">          4 :         if (!par.dnld_man) return JS_EXCEPTION;</span>
+<span class="lineNum">     952 </span>            : 
+<span class="lineNum">     953 </span><span class="lineCov">          4 :         if (argc) {</span>
+<span class="lineNum">     954 </span><span class="lineNoCov">          0 :                 if (JS_IsNull(argv[0])) {</span>
+<span class="lineNum">     955 </span><span class="lineNoCov">          0 :                 } else if (JS_IsArrayBuffer(c, argv[0])) {</span>
+<span class="lineNum">     956 </span>            :                         size_t asize;
+<span class="lineNum">     957 </span><span class="lineNoCov">          0 :                         data = JS_GetArrayBuffer(c, &amp;asize, argv[0] );</span>
+<span class="lineNum">     958 </span><span class="lineNoCov">          0 :                         if (data) data_size = (u32) asize;</span>
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :                 } else if (JS_IsObject(argv[0])) {</span>
+<span class="lineNum">     960 </span>            :                         /*NOT SUPPORTED YET, we must serialize the sg*/
+<span class="lineNum">     961 </span><span class="lineNoCov">          0 :                         return JS_EXCEPTION;</span>
+<span class="lineNum">     962 </span>            :                 } else {
+<span class="lineNum">     963 </span><span class="lineNoCov">          0 :                         if (!JS_CHECK_STRING(argv[0])) return JS_EXCEPTION;</span>
+<span class="lineNum">     964 </span>            :                         data = JS_ToCString(c, argv[0]);
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :                         data_size = (u32) strlen(ctx-&gt;data);</span>
+<span class="lineNum">     966 </span>            :                 }
+<span class="lineNum">     967 </span>            :         }
+<span class="lineNum">     968 </span>            : 
+<span class="lineNum">     969 </span>            :         /*reset previous text*/
+<span class="lineNum">     970 </span><span class="lineCov">          4 :         xml_http_del_data(ctx);</span>
+<span class="lineNum">     971 </span><span class="lineCov">          4 :         ctx-&gt;data = data ? gf_strdup(data) : NULL;</span>
+<span class="lineNum">     972 </span><span class="lineCov">          4 :         ctx-&gt;size = data_size;</span>
+<span class="lineNum">     973 </span>            : 
+<span class="lineNum">     974 </span><span class="lineCov">          4 :         JS_FreeCString(c, data);</span>
+<span class="lineNum">     975 </span>            : 
+<span class="lineNum">     976 </span><span class="lineCov">          4 :         if (!strncmp(ctx-&gt;url, &quot;http://&quot;, 7)) {</span>
+<span class="lineNum">     977 </span>            :                 u32 flags = GF_NETIO_SESSION_NOTIFY_DATA;
+<span class="lineNum">     978 </span><span class="lineCov">          1 :                 if (!ctx-&gt;async)</span>
+<span class="lineNum">     979 </span>            :                         flags |= GF_NETIO_SESSION_NOT_THREADED;
+<span class="lineNum">     980 </span>            : 
+<span class="lineNum">     981 </span><span class="lineCov">          1 :                 if (ctx-&gt;cache != XHR_CACHETYPE_NORMAL) {</span>
+<span class="lineNum">     982 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;cache == XHR_CACHETYPE_NONE) {</span>
+<span class="lineNum">     983 </span><span class="lineNoCov">          0 :                                 flags |= GF_NETIO_SESSION_NOT_CACHED;</span>
+<span class="lineNum">     984 </span>            :                         }
+<span class="lineNum">     985 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;cache == XHR_CACHETYPE_MEMORY) {</span>
+<span class="lineNum">     986 </span><span class="lineNoCov">          0 :                                 flags |= GF_NETIO_SESSION_MEMORY_CACHE;</span>
+<span class="lineNum">     987 </span>            :                         }
+<span class="lineNum">     988 </span>            :                 }
+<span class="lineNum">     989 </span><span class="lineCov">          1 :                 ctx-&gt;sess = gf_dm_sess_new(par.dnld_man, ctx-&gt;url, flags, xml_http_on_data, ctx, &amp;e);</span>
+<span class="lineNum">     990 </span><span class="lineCov">          1 :                 if (!ctx-&gt;sess) return JS_EXCEPTION;</span>
+<span class="lineNum">     991 </span>            : 
+<span class="lineNum">     992 </span>            :                 /*start our download (whether the session is threaded or not)*/
+<span class="lineNum">     993 </span><span class="lineCov">          1 :                 e = gf_dm_sess_process(ctx-&gt;sess);</span>
+<span class="lineNum">     994 </span><span class="lineCov">          1 :                 if (e!=GF_OK) {</span>
+<span class="lineNum">     995 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_SCRIPT, (&quot;[XmlHttpRequest] Error processing %s: %s\n&quot;, ctx-&gt;url, gf_error_to_string(e) ));</span>
+<span class="lineNum">     996 </span>            :                 }
+<span class="lineNum">     997 </span><span class="lineCov">          1 :                 if (!ctx-&gt;async) {</span>
+<span class="lineNum">     998 </span><span class="lineNoCov">          0 :                         xml_http_terminate(ctx, e);</span>
+<span class="lineNum">     999 </span>            :                 }
+<span class="lineNum">    1000 </span>            :         } else {
+<span class="lineNum">    1001 </span><span class="lineCov">          3 :                 e = xml_http_process_local(ctx);</span>
+<span class="lineNum">    1002 </span><span class="lineCov">          3 :                 if (e!=GF_OK) {</span>
+<span class="lineNum">    1003 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_SCRIPT, (&quot;[XmlHttpRequest] Error processing %s: %s\n&quot;, ctx-&gt;url, gf_error_to_string(e) ));</span>
+<span class="lineNum">    1004 </span>            :                 }
+<span class="lineNum">    1005 </span>            :         }
+<span class="lineNum">    1006 </span>            : 
+<span class="lineNum">    1007 </span><span class="lineCov">          4 :         return JS_TRUE;</span>
+<a name="1008"><span class="lineNum">    1008 </span>            : }</a>
+<span class="lineNum">    1009 </span>            : 
+<span class="lineNum">    1010 </span><span class="lineNoCov">          0 : static JSValue xml_http_abort(JSContext *c, JSValueConst obj, int argc, JSValueConst *argv)</span>
+<span class="lineNum">    1011 </span>            : {
+<span class="lineNum">    1012 </span>            :         GF_DownloadSession *sess;
+<span class="lineNum">    1013 </span><span class="lineNoCov">          0 :         XMLHTTPContext *ctx = JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">    1014 </span><span class="lineNoCov">          0 :         if (!ctx) return JS_EXCEPTION;</span>
+<span class="lineNum">    1015 </span>            : 
+<span class="lineNum">    1016 </span><span class="lineNoCov">          0 :         sess = ctx-&gt;sess;</span>
+<span class="lineNum">    1017 </span><span class="lineNoCov">          0 :         ctx-&gt;sess = NULL;</span>
+<span class="lineNum">    1018 </span><span class="lineNoCov">          0 :         if (sess) {</span>
+<span class="lineNum">    1019 </span>            :                 //abort first, so that on HTTP/2 this results in RST_STREAM
+<span class="lineNum">    1020 </span><span class="lineNoCov">          0 :                 gf_dm_sess_abort(sess);</span>
+<span class="lineNum">    1021 </span><span class="lineNoCov">          0 :                 gf_dm_sess_del(sess);</span>
+<span class="lineNum">    1022 </span>            :         }
+<span class="lineNum">    1023 </span>            : 
+<span class="lineNum">    1024 </span><span class="lineNoCov">          0 :         xml_http_fire_event(ctx, GF_EVENT_ABORT);</span>
+<span class="lineNum">    1025 </span><span class="lineNoCov">          0 :         xml_http_reset(ctx);</span>
+<span class="lineNum">    1026 </span><span class="lineNoCov">          0 :         if (JS_IsFunction(c, ctx-&gt;onabort)) {</span>
+<span class="lineNum">    1027 </span><span class="lineNoCov">          0 :                 return JS_Call(ctx-&gt;c, ctx-&gt;onabort, ctx-&gt;_this, 0, NULL);</span>
+<span class="lineNum">    1028 </span>            :         }
+<span class="lineNum">    1029 </span><span class="lineNoCov">          0 :         return JS_TRUE;</span>
+<a name="1030"><span class="lineNum">    1030 </span>            : }</a>
+<span class="lineNum">    1031 </span>            : 
+<span class="lineNum">    1032 </span><span class="lineCov">          2 : static JSValue xml_http_get_all_headers(JSContext *c, JSValueConst obj, int argc, JSValueConst *argv)</span>
+<span class="lineNum">    1033 </span>            : {
+<span class="lineNum">    1034 </span>            :         u32 nb_hdr;
+<span class="lineNum">    1035 </span><span class="lineCov">          2 :         char *szVal = NULL;</span>
+<span class="lineNum">    1036 </span>            :         JSValue res;
+<span class="lineNum">    1037 </span><span class="lineCov">          2 :         XMLHTTPContext *ctx = JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">    1038 </span><span class="lineCov">          2 :         if (!ctx) return JS_EXCEPTION;</span>
+<span class="lineNum">    1039 </span>            : 
+<span class="lineNum">    1040 </span>            :         /*must be received or loaded*/
+<span class="lineNum">    1041 </span><span class="lineCov">          2 :         if (ctx-&gt;readyState&lt;XHR_READYSTATE_LOADING) return JS_EXCEPTION;</span>
+<span class="lineNum">    1042 </span>            :         nb_hdr = 0;
+<span class="lineNum">    1043 </span><span class="lineCov">          2 :         if (ctx-&gt;recv_headers) {</span>
+<span class="lineNum">    1044 </span><span class="lineCov">          6 :                 while (ctx-&gt;recv_headers[nb_hdr]) {</span>
+<span class="lineNum">    1045 </span><span class="lineCov">          4 :                         if (szVal) gf_dynstrcat(&amp;szVal, &quot;\r\n&quot;, NULL);</span>
+<span class="lineNum">    1046 </span><span class="lineCov">          4 :                         gf_dynstrcat(&amp;szVal, ctx-&gt;recv_headers[nb_hdr], NULL);</span>
+<span class="lineNum">    1047 </span><span class="lineCov">          4 :                         gf_dynstrcat(&amp;szVal, ctx-&gt;recv_headers[nb_hdr+1], &quot;: &quot;);</span>
+<span class="lineNum">    1048 </span><span class="lineCov">          4 :                         nb_hdr+=2;</span>
+<span class="lineNum">    1049 </span>            :                 }
+<span class="lineNum">    1050 </span>            :         }
+<span class="lineNum">    1051 </span>            : 
+<span class="lineNum">    1052 </span><span class="lineCov">          2 :         if (!szVal) {</span>
+<span class="lineNum">    1053 </span><span class="lineNoCov">          0 :                 return JS_NULL;</span>
+<span class="lineNum">    1054 </span>            :         }
+<span class="lineNum">    1055 </span><span class="lineCov">          2 :         res = JS_NewString(c, szVal);</span>
+<span class="lineNum">    1056 </span><span class="lineCov">          2 :         gf_free(szVal);</span>
+<span class="lineNum">    1057 </span><span class="lineCov">          2 :         return res;</span>
+<a name="1058"><span class="lineNum">    1058 </span>            : }</a>
+<span class="lineNum">    1059 </span>            : 
+<span class="lineNum">    1060 </span><span class="lineCov">          2 : static JSValue xml_http_get_header(JSContext *c, JSValueConst obj, int argc, JSValueConst *argv)</span>
+<span class="lineNum">    1061 </span>            : {
+<span class="lineNum">    1062 </span>            :         u32 nb_hdr;
+<span class="lineNum">    1063 </span>            :         const char *hdr;
+<span class="lineNum">    1064 </span><span class="lineCov">          2 :         char *szVal = NULL;</span>
+<span class="lineNum">    1065 </span><span class="lineCov">          2 :         XMLHTTPContext *ctx = JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">    1066 </span><span class="lineCov">          2 :         if (!ctx) return JS_EXCEPTION;</span>
+<span class="lineNum">    1067 </span>            : 
+<span class="lineNum">    1068 </span><span class="lineCov">          4 :         if (!JS_CHECK_STRING(argv[0])) return JS_EXCEPTION;</span>
+<span class="lineNum">    1069 </span>            :         /*must be received or loaded*/
+<span class="lineNum">    1070 </span><span class="lineCov">          2 :         if (ctx-&gt;readyState&lt;XHR_READYSTATE_LOADING) return JS_EXCEPTION;</span>
+<span class="lineNum">    1071 </span>            :         hdr = JS_ToCString(c, argv[0]);
+<span class="lineNum">    1072 </span>            : 
+<span class="lineNum">    1073 </span>            :         nb_hdr = 0;
+<span class="lineNum">    1074 </span><span class="lineCov">          2 :         if (ctx-&gt;recv_headers) {</span>
+<span class="lineNum">    1075 </span><span class="lineCov">          6 :                 while (ctx-&gt;recv_headers[nb_hdr]) {</span>
+<span class="lineNum">    1076 </span><span class="lineCov">          4 :                         if (!strcmp(ctx-&gt;recv_headers[nb_hdr], hdr)) {</span>
+<span class="lineNum">    1077 </span><span class="lineNoCov">          0 :                                 gf_dynstrcat(&amp;szVal, ctx-&gt;recv_headers[nb_hdr+1], &quot;, &quot;);</span>
+<span class="lineNum">    1078 </span>            :                         }
+<span class="lineNum">    1079 </span><span class="lineCov">          4 :                         nb_hdr+=2;</span>
+<span class="lineNum">    1080 </span>            :                 }
+<span class="lineNum">    1081 </span>            :         }
+<span class="lineNum">    1082 </span><span class="lineCov">          2 :         JS_FreeCString(c, hdr);</span>
+<span class="lineNum">    1083 </span><span class="lineCov">          2 :         if (!szVal) {</span>
+<span class="lineNum">    1084 </span><span class="lineCov">          2 :                 return JS_NULL;</span>
+<span class="lineNum">    1085 </span>            :         }
+<span class="lineNum">    1086 </span><span class="lineNoCov">          0 :         JSValue res = JS_NewString(c, szVal);</span>
+<span class="lineNum">    1087 </span><span class="lineNoCov">          0 :         gf_free(szVal);</span>
+<span class="lineNum">    1088 </span><span class="lineNoCov">          0 :         return res;</span>
+<span class="lineNum">    1089 </span>            : }
+<a name="1090"><span class="lineNum">    1090 </span>            : </a>
+<span class="lineNum">    1091 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">    1092 </span><span class="lineCov">          2 : static GF_Err xml_http_load_dom(XMLHTTPContext *ctx)</span>
+<span class="lineNum">    1093 </span>            : {
+<span class="lineNum">    1094 </span>            :         GF_Err e;
+<span class="lineNum">    1095 </span><span class="lineCov">          2 :         GF_DOMParser *parser = gf_xml_dom_new();</span>
+<span class="lineNum">    1096 </span><span class="lineCov">          2 :         e = gf_xml_dom_parse_string(parser, ctx-&gt;data);</span>
+<span class="lineNum">    1097 </span><span class="lineCov">          2 :         if (!e) {</span>
+<span class="lineNum">    1098 </span><span class="lineCov">          2 :                 e = gf_sg_init_from_xml_node(ctx-&gt;document, gf_xml_dom_get_root(parser));</span>
+<span class="lineNum">    1099 </span>            :         }
+<span class="lineNum">    1100 </span><span class="lineCov">          2 :         gf_xml_dom_del(parser);</span>
+<span class="lineNum">    1101 </span><span class="lineCov">          2 :         return e;</span>
+<span class="lineNum">    1102 </span>            : }
+<span class="lineNum">    1103 </span>            : #endif //GPAC_DISABLE_SVG
+<a name="1104"><span class="lineNum">    1104 </span>            : </a>
+<span class="lineNum">    1105 </span>            : 
+<span class="lineNum">    1106 </span><span class="lineCov">          3 : static JSValue xml_http_overrideMimeType(JSContext *c, JSValueConst obj, int argc, JSValueConst *argv)</span>
+<span class="lineNum">    1107 </span>            : {
+<span class="lineNum">    1108 </span>            :         const char *mime;
+<span class="lineNum">    1109 </span><span class="lineCov">          3 :         XMLHTTPContext *ctx = JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">    1110 </span><span class="lineCov">          3 :         if (!ctx || !argc) return JS_EXCEPTION;</span>
+<span class="lineNum">    1111 </span>            : 
+<span class="lineNum">    1112 </span><span class="lineCov">          6 :         if (!JS_CHECK_STRING(argv[0])) return JS_EXCEPTION;</span>
+<span class="lineNum">    1113 </span>            :         mime = JS_ToCString(c, argv[0]);
+<span class="lineNum">    1114 </span><span class="lineCov">          3 :         if (ctx-&gt;mime) gf_free(ctx-&gt;mime);</span>
+<span class="lineNum">    1115 </span><span class="lineCov">          3 :         ctx-&gt;mime = gf_strdup(mime);</span>
+<span class="lineNum">    1116 </span><span class="lineCov">          3 :         JS_FreeCString(c, mime);</span>
+<span class="lineNum">    1117 </span><span class="lineCov">          3 :         return JS_TRUE;</span>
+<a name="1118"><span class="lineNum">    1118 </span>            : }</a>
+<span class="lineNum">    1119 </span>            : 
+<span class="lineNum">    1120 </span><span class="lineCov">         24 : static JSValue xml_http_getProperty(JSContext *c, JSValueConst obj, int magic)</span>
+<span class="lineNum">    1121 </span>            : {
+<span class="lineNum">    1122 </span><span class="lineCov">         24 :         XMLHTTPContext *ctx = JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">    1123 </span><span class="lineCov">         24 :         if (!ctx) return JS_EXCEPTION;</span>
+<span class="lineNum">    1124 </span>            : 
+<span class="lineNum">    1125 </span><span class="lineCov">         24 :         switch (magic) {</span>
+<span class="lineNum">    1126 </span><span class="lineNoCov">          0 :         case XHR_ONABORT: return JS_DupValue(c, ctx-&gt;onabort);</span>
+<span class="lineNum">    1127 </span><span class="lineNoCov">          0 :         case XHR_ONERROR: return JS_DupValue(c, ctx-&gt;onerror);</span>
+<span class="lineNum">    1128 </span><span class="lineNoCov">          0 :         case XHR_ONLOAD: return JS_DupValue(c, ctx-&gt;onload);</span>
+<span class="lineNum">    1129 </span><span class="lineNoCov">          0 :         case XHR_ONLOADSTART: return JS_DupValue(c, ctx-&gt;onloadstart);</span>
+<span class="lineNum">    1130 </span><span class="lineNoCov">          0 :         case XHR_ONLOADEND: return JS_DupValue(c, ctx-&gt;onloadend);</span>
+<span class="lineNum">    1131 </span><span class="lineNoCov">          0 :         case XHR_ONPROGRESS: return JS_DupValue(c, ctx-&gt;onprogress);</span>
+<span class="lineNum">    1132 </span><span class="lineNoCov">          0 :         case XHR_ONREADYSTATECHANGE: return JS_DupValue(c, ctx-&gt;onreadystatechange);</span>
+<span class="lineNum">    1133 </span><span class="lineNoCov">          0 :         case XHR_ONTIMEOUT: return JS_DupValue(c, ctx-&gt;ontimeout);</span>
+<span class="lineNum">    1134 </span><span class="lineCov">         17 :         case XHR_READYSTATE: return JS_NewInt32(c, ctx-&gt;readyState);</span>
+<span class="lineNum">    1135 </span><span class="lineNoCov">          0 :         case XHR_RESPONSETEXT:</span>
+<span class="lineNum">    1136 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;readyState&lt;XHR_READYSTATE_LOADING) return JS_NULL;</span>
+<span class="lineNum">    1137 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;data) {</span>
+<span class="lineNum">    1138 </span><span class="lineNoCov">          0 :                         return JS_NewString(c, ctx-&gt;data);</span>
+<span class="lineNum">    1139 </span>            :                 } else {
+<span class="lineNum">    1140 </span><span class="lineNoCov">          0 :                         return JS_NULL;</span>
+<span class="lineNum">    1141 </span>            :                 }
+<span class="lineNum">    1142 </span>            : 
+<span class="lineNum">    1143 </span><span class="lineNoCov">          0 :         case XHR_RESPONSEXML:</span>
+<span class="lineNum">    1144 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;readyState&lt;XHR_READYSTATE_LOADING) return JS_NULL;</span>
+<span class="lineNum">    1145 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">    1146 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;data) {</span>
+<span class="lineNum">    1147 </span><span class="lineNoCov">          0 :                         if (!ctx-&gt;document) {</span>
+<span class="lineNum">    1148 </span><span class="lineNoCov">          0 :                                 ctx-&gt;document = gf_sg_new();</span>
+<span class="lineNum">    1149 </span>            :                                 /*mark this doc as &quot;nomade&quot;, and let it leave until all references to it are destroyed*/
+<span class="lineNum">    1150 </span><span class="lineNoCov">          0 :                                 ctx-&gt;document-&gt;reference_count = 1;</span>
+<span class="lineNum">    1151 </span><span class="lineNoCov">          0 :                                 xml_http_load_dom(ctx);</span>
+<span class="lineNum">    1152 </span>            :                         }
+<span class="lineNum">    1153 </span><span class="lineNoCov">          0 :                         if (!ctx-&gt;js_dom_loaded) {</span>
+<span class="lineNum">    1154 </span><span class="lineNoCov">          0 :                                 dom_js_load(ctx-&gt;document, c);</span>
+<span class="lineNum">    1155 </span><span class="lineNoCov">          0 :                                 ctx-&gt;js_dom_loaded = GF_TRUE;</span>
+<span class="lineNum">    1156 </span>            :                         }
+<span class="lineNum">    1157 </span><span class="lineNoCov">          0 :                         return dom_document_construct_external(c, ctx-&gt;document);</span>
+<span class="lineNum">    1158 </span>            :                 } else {
+<span class="lineNum">    1159 </span><span class="lineNoCov">          0 :                         return JS_NULL;</span>
+<span class="lineNum">    1160 </span>            :                 }
+<span class="lineNum">    1161 </span>            : #else
+<span class="lineNum">    1162 </span>            :                 return js_throw_err_msg(c, GF_NOT_SUPPORTED, &quot;DOM support not included in buil&quot;);
+<span class="lineNum">    1163 </span>            : #endif
+<span class="lineNum">    1164 </span>            : 
+<span class="lineNum">    1165 </span><span class="lineCov">          5 :         case XHR_RESPONSE:</span>
+<span class="lineNum">    1166 </span><span class="lineCov">          5 :                 if (ctx-&gt;readyState&lt;XHR_READYSTATE_LOADING) return JS_NULL;</span>
+<span class="lineNum">    1167 </span>            : 
+<span class="lineNum">    1168 </span><span class="lineCov">          5 :                 if (ctx-&gt;data) {</span>
+<span class="lineNum">    1169 </span><span class="lineCov">          5 :                         switch(ctx-&gt;responseType)</span>
+<span class="lineNum">    1170 </span>            :                         {
+<span class="lineNum">    1171 </span><span class="lineNoCov">          0 :                         case XHR_RESPONSETYPE_NONE:</span>
+<span class="lineNum">    1172 </span>            :                         case XHR_RESPONSETYPE_TEXT:
+<span class="lineNum">    1173 </span><span class="lineNoCov">          0 :                                 return JS_NewString(c, ctx-&gt;data);</span>
+<span class="lineNum">    1174 </span>            : 
+<span class="lineNum">    1175 </span><span class="lineNoCov">          0 :                         case XHR_RESPONSETYPE_ARRAYBUFFER:</span>
+<span class="lineNum">    1176 </span><span class="lineNoCov">          0 :                                 if (JS_IsUndefined(ctx-&gt;arraybuffer)) {</span>
+<span class="lineNum">    1177 </span><span class="lineNoCov">          0 :                                         ctx-&gt;arraybuffer = JS_NewArrayBuffer(c, ctx-&gt;data, ctx-&gt;size, NULL, ctx, 1);</span>
+<span class="lineNum">    1178 </span>            :                                 }
+<span class="lineNum">    1179 </span>            :                                 return JS_DupValue(c, ctx-&gt;arraybuffer);
+<span class="lineNum">    1180 </span>            :                                 break;
+<span class="lineNum">    1181 </span>            :                         case XHR_RESPONSETYPE_DOCUMENT:
+<span class="lineNum">    1182 </span>            : #ifndef GPAC_DISABLE_SVG
+<span class="lineNum">    1183 </span>            :                                 if (ctx-&gt;data) {
+<span class="lineNum">    1184 </span><span class="lineCov">          4 :                                         if (!ctx-&gt;document) {</span>
+<span class="lineNum">    1185 </span><span class="lineCov">          2 :                                                 ctx-&gt;document = gf_sg_new();</span>
+<span class="lineNum">    1186 </span>            :                                                 /*mark this doc as &quot;nomade&quot;, and let it leave until all references to it are destroyed*/
+<span class="lineNum">    1187 </span><span class="lineCov">          2 :                                                 ctx-&gt;document-&gt;reference_count = 1;</span>
+<span class="lineNum">    1188 </span><span class="lineCov">          2 :                                                 xml_http_load_dom(ctx);</span>
+<span class="lineNum">    1189 </span>            :                                         }
+<span class="lineNum">    1190 </span><span class="lineCov">          4 :                                         if (!ctx-&gt;js_dom_loaded) {</span>
+<span class="lineNum">    1191 </span><span class="lineCov">          2 :                                                 dom_js_load(ctx-&gt;document, c);</span>
+<span class="lineNum">    1192 </span><span class="lineCov">          2 :                                                 ctx-&gt;js_dom_loaded = GF_TRUE;</span>
+<span class="lineNum">    1193 </span>            :                                         }
+<span class="lineNum">    1194 </span><span class="lineCov">          4 :                                         return dom_document_construct_external(c, ctx-&gt;document);</span>
+<span class="lineNum">    1195 </span>            :                                 }
+<span class="lineNum">    1196 </span>            :                                 return JS_NULL;
+<span class="lineNum">    1197 </span>            : #else
+<span class="lineNum">    1198 </span>            :                                 return js_throw_err_msg(c, GF_NOT_SUPPORTED, &quot;DOM support not included in buil&quot;);
+<span class="lineNum">    1199 </span>            : #endif
+<span class="lineNum">    1200 </span><span class="lineNoCov">          0 :                         case XHR_RESPONSETYPE_JSON:</span>
+<span class="lineNum">    1201 </span><span class="lineNoCov">          0 :                                 return JS_ParseJSON(c, ctx-&gt;data, ctx-&gt;size, &quot;responseJSON&quot;);</span>
+<span class="lineNum">    1202 </span><span class="lineNoCov">          0 :                         case XHR_RESPONSETYPE_PUSH:</span>
+<span class="lineNum">    1203 </span><span class="lineNoCov">          0 :                                 return JS_EXCEPTION;</span>
+<span class="lineNum">    1204 </span>            :                         default:
+<span class="lineNum">    1205 </span>            :                                 /*other types not supported     */
+<span class="lineNum">    1206 </span>            :                                 break;
+<span class="lineNum">    1207 </span>            :                         }
+<span class="lineNum">    1208 </span><span class="lineNoCov">          0 :                 }</span>
+<span class="lineNum">    1209 </span><span class="lineCov">          1 :                 return JS_NULL;</span>
+<span class="lineNum">    1210 </span>            : 
+<span class="lineNum">    1211 </span><span class="lineCov">          2 :         case XHR_STATUS:</span>
+<span class="lineNum">    1212 </span><span class="lineCov">          2 :                 return JS_NewInt32(c, ctx-&gt;html_status);</span>
+<span class="lineNum">    1213 </span>            : 
+<span class="lineNum">    1214 </span><span class="lineNoCov">          0 :         case XHR_STATUSTEXT:</span>
+<span class="lineNum">    1215 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;statusText) {</span>
+<span class="lineNum">    1216 </span><span class="lineNoCov">          0 :                         return JS_NewString(c, ctx-&gt;statusText);</span>
+<span class="lineNum">    1217 </span>            :                 }
+<span class="lineNum">    1218 </span><span class="lineNoCov">          0 :                 return JS_NULL;</span>
+<span class="lineNum">    1219 </span><span class="lineNoCov">          0 :         case XHR_TIMEOUT:</span>
+<span class="lineNum">    1220 </span><span class="lineNoCov">          0 :                 return JS_NewInt32(c, ctx-&gt;timeout);</span>
+<span class="lineNum">    1221 </span><span class="lineNoCov">          0 :         case XHR_WITHCREDENTIALS:</span>
+<span class="lineNum">    1222 </span><span class="lineNoCov">          0 :                 return ctx-&gt;withCredentials ? JS_TRUE : JS_FALSE;</span>
+<span class="lineNum">    1223 </span><span class="lineNoCov">          0 :         case XHR_UPLOAD:</span>
+<span class="lineNum">    1224 </span>            :                 /* TODO */
+<span class="lineNum">    1225 </span><span class="lineNoCov">          0 :                 return JS_EXCEPTION;</span>
+<span class="lineNum">    1226 </span><span class="lineNoCov">          0 :         case XHR_RESPONSETYPE:</span>
+<span class="lineNum">    1227 </span><span class="lineNoCov">          0 :                 switch (ctx-&gt;responseType) {</span>
+<span class="lineNum">    1228 </span><span class="lineNoCov">          0 :                 case XHR_RESPONSETYPE_NONE: return JS_NewString(c, &quot;&quot;);</span>
+<span class="lineNum">    1229 </span><span class="lineNoCov">          0 :                 case XHR_RESPONSETYPE_ARRAYBUFFER: return JS_NewString(c, &quot;arraybuffer&quot;);</span>
+<span class="lineNum">    1230 </span><span class="lineNoCov">          0 :                 case XHR_RESPONSETYPE_BLOB: return JS_NewString(c, &quot;blob&quot;);</span>
+<span class="lineNum">    1231 </span><span class="lineNoCov">          0 :                 case XHR_RESPONSETYPE_DOCUMENT: return JS_NewString(c, &quot;document&quot;);</span>
+<span class="lineNum">    1232 </span><span class="lineNoCov">          0 :                 case XHR_RESPONSETYPE_SAX: return JS_NewString(c, &quot;sax&quot;);</span>
+<span class="lineNum">    1233 </span><span class="lineNoCov">          0 :                 case XHR_RESPONSETYPE_JSON: return JS_NewString(c, &quot;json&quot;);</span>
+<span class="lineNum">    1234 </span><span class="lineNoCov">          0 :                 case XHR_RESPONSETYPE_TEXT: return JS_NewString(c, &quot;text&quot;);</span>
+<span class="lineNum">    1235 </span><span class="lineNoCov">          0 :                 case XHR_RESPONSETYPE_PUSH: return JS_NewString(c, &quot;push&quot;);</span>
+<span class="lineNum">    1236 </span>            :                 }
+<span class="lineNum">    1237 </span><span class="lineNoCov">          0 :                 return JS_NULL;</span>
+<span class="lineNum">    1238 </span>            :         case XHR_STATIC_UNSENT:
+<span class="lineNum">    1239 </span>            :                 return JS_NewInt32(c, XHR_READYSTATE_UNSENT);
+<span class="lineNum">    1240 </span>            :         case XHR_STATIC_OPENED:
+<span class="lineNum">    1241 </span>            :                 return JS_NewInt32(c, XHR_READYSTATE_OPENED);
+<span class="lineNum">    1242 </span>            :         case XHR_STATIC_HEADERS_RECEIVED:
+<span class="lineNum">    1243 </span>            :                 return JS_NewInt32(c, XHR_READYSTATE_HEADERS_RECEIVED);
+<span class="lineNum">    1244 </span>            :         case XHR_STATIC_LOADING:
+<span class="lineNum">    1245 </span>            :                 return JS_NewInt32(c, XHR_READYSTATE_LOADING);
+<span class="lineNum">    1246 </span>            :         case XHR_STATIC_DONE:
+<span class="lineNum">    1247 </span>            :                 return JS_NewInt32(c, XHR_READYSTATE_DONE);
+<span class="lineNum">    1248 </span><span class="lineNoCov">          0 :         case XHR_CACHE:</span>
+<span class="lineNum">    1249 </span><span class="lineNoCov">          0 :                 switch (ctx-&gt;cache) {</span>
+<span class="lineNum">    1250 </span><span class="lineNoCov">          0 :                 case XHR_CACHETYPE_NORMAL: return JS_NewString(c, &quot;normal&quot;);</span>
+<span class="lineNum">    1251 </span><span class="lineNoCov">          0 :                 case XHR_CACHETYPE_NONE:  return JS_NewString(c, &quot;none&quot;);</span>
+<span class="lineNum">    1252 </span><span class="lineNoCov">          0 :                 case XHR_CACHETYPE_MEMORY: return JS_NewString(c, &quot;memory&quot;);</span>
+<span class="lineNum">    1253 </span>            :                 }
+<span class="lineNum">    1254 </span><span class="lineNoCov">          0 :                 return JS_NULL;</span>
+<span class="lineNum">    1255 </span>            :         default:
+<span class="lineNum">    1256 </span>            :                 break;
+<span class="lineNum">    1257 </span>            :         }
+<span class="lineNum">    1258 </span><span class="lineNoCov">          0 :         return JS_UNDEFINED;</span>
+<a name="1259"><span class="lineNum">    1259 </span>            : }</a>
+<span class="lineNum">    1260 </span>            : 
+<span class="lineNum">    1261 </span><span class="lineCov">         17 : static JSValue xml_http_setProperty(JSContext *c, JSValueConst obj, JSValueConst value, int magic)</span>
+<span class="lineNum">    1262 </span>            : {
+<span class="lineNum">    1263 </span><span class="lineCov">         17 :         XMLHTTPContext *ctx = JS_GetOpaque(obj, xhrClass.class_id);</span>
+<span class="lineNum">    1264 </span><span class="lineCov">         17 :         if (!ctx) return JS_EXCEPTION;</span>
+<span class="lineNum">    1265 </span>            : 
+<span class="lineNum">    1266 </span>            : #define SET_CBK(_sym) \
+<span class="lineNum">    1267 </span>            :                 if (JS_IsFunction(c, value) || JS_IsUndefined(value) || JS_IsNull(value)) {\
+<span class="lineNum">    1268 </span>            :                         JS_FreeValue(c, ctx-&gt;_sym);\
+<span class="lineNum">    1269 </span>            :                         ctx-&gt;_sym = JS_DupValue(c, value);\
+<span class="lineNum">    1270 </span>            :                         return JS_TRUE;\
+<span class="lineNum">    1271 </span>            :                 }\
+<span class="lineNum">    1272 </span>            :                 return JS_EXCEPTION;\
+<span class="lineNum">    1273 </span>            : 
+<span class="lineNum">    1274 </span><span class="lineCov">         17 :         switch (magic) {</span>
+<span class="lineNum">    1275 </span><span class="lineCov">          4 :         case XHR_ONERROR:</span>
+<span class="lineNum">    1276 </span><span class="lineCov">          8 :                 SET_CBK(onerror)</span>
+<span class="lineNum">    1277 </span>            : 
+<span class="lineNum">    1278 </span><span class="lineNoCov">          0 :         case XHR_ONABORT:</span>
+<span class="lineNum">    1279 </span><span class="lineNoCov">          0 :                 SET_CBK(onabort)</span>
+<span class="lineNum">    1280 </span>            : 
+<span class="lineNum">    1281 </span><span class="lineCov">          4 :         case XHR_ONLOAD:</span>
+<span class="lineNum">    1282 </span><span class="lineCov">          8 :                 SET_CBK(onload)</span>
+<span class="lineNum">    1283 </span>            : 
+<span class="lineNum">    1284 </span><span class="lineNoCov">          0 :         case XHR_ONLOADSTART:</span>
+<span class="lineNum">    1285 </span><span class="lineNoCov">          0 :                 SET_CBK(onloadstart)</span>
+<span class="lineNum">    1286 </span>            : 
+<span class="lineNum">    1287 </span><span class="lineNoCov">          0 :         case XHR_ONLOADEND:</span>
+<span class="lineNum">    1288 </span><span class="lineNoCov">          0 :                 SET_CBK(onloadend)</span>
+<span class="lineNum">    1289 </span>            : 
+<span class="lineNum">    1290 </span><span class="lineNoCov">          0 :         case XHR_ONPROGRESS:</span>
+<span class="lineNum">    1291 </span><span class="lineNoCov">          0 :                 SET_CBK(onprogress)</span>
+<span class="lineNum">    1292 </span>            : 
+<span class="lineNum">    1293 </span><span class="lineCov">          4 :         case XHR_ONREADYSTATECHANGE:</span>
+<span class="lineNum">    1294 </span><span class="lineCov">          8 :                 SET_CBK(onreadystatechange)</span>
+<span class="lineNum">    1295 </span>            : 
+<span class="lineNum">    1296 </span><span class="lineNoCov">          0 :         case XHR_ONTIMEOUT:</span>
+<span class="lineNum">    1297 </span><span class="lineNoCov">          0 :                 SET_CBK(ontimeout)</span>
+<span class="lineNum">    1298 </span>            : 
+<span class="lineNum">    1299 </span><span class="lineNoCov">          0 :         case XHR_TIMEOUT:</span>
+<span class="lineNum">    1300 </span><span class="lineNoCov">          0 :                 if (JS_ToInt32(c, &amp;ctx-&gt;timeout, value)) return JS_EXCEPTION;</span>
+<span class="lineNum">    1301 </span><span class="lineNoCov">          0 :                 return JS_TRUE;</span>
+<span class="lineNum">    1302 </span>            : 
+<span class="lineNum">    1303 </span><span class="lineNoCov">          0 :         case XHR_WITHCREDENTIALS:</span>
+<span class="lineNum">    1304 </span><span class="lineNoCov">          0 :                 ctx-&gt;withCredentials = JS_ToBool(c, value) ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">    1305 </span><span class="lineNoCov">          0 :                 return JS_TRUE;</span>
+<span class="lineNum">    1306 </span><span class="lineCov">          5 :         case XHR_RESPONSETYPE:</span>
+<span class="lineNum">    1307 </span>            :         {
+<span class="lineNum">    1308 </span>            :                 const char *str = JS_ToCString(c, value);
+<span class="lineNum">    1309 </span><span class="lineCov">          5 :                 if (!str || !strcmp(str, &quot;&quot;)) {</span>
+<span class="lineNum">    1310 </span><span class="lineNoCov">          0 :                         ctx-&gt;responseType = XHR_RESPONSETYPE_NONE;</span>
+<span class="lineNum">    1311 </span><span class="lineCov">          5 :                 } else if (!strcmp(str, &quot;arraybuffer&quot;)) {</span>
+<span class="lineNum">    1312 </span><span class="lineNoCov">          0 :                         ctx-&gt;responseType = XHR_RESPONSETYPE_ARRAYBUFFER;</span>
+<span class="lineNum">    1313 </span><span class="lineCov">          5 :                 } else if (!strcmp(str, &quot;blob&quot;)) {</span>
+<span class="lineNum">    1314 </span><span class="lineNoCov">          0 :                         ctx-&gt;responseType = XHR_RESPONSETYPE_BLOB;</span>
+<span class="lineNum">    1315 </span><span class="lineCov">          5 :                 } else if (!strcmp(str, &quot;document&quot;)) {</span>
+<span class="lineNum">    1316 </span><span class="lineCov">          4 :                         ctx-&gt;responseType = XHR_RESPONSETYPE_DOCUMENT;</span>
+<span class="lineNum">    1317 </span><span class="lineCov">          1 :                 } else if (!strcmp(str, &quot;json&quot;)) {</span>
+<span class="lineNum">    1318 </span><span class="lineNoCov">          0 :                         ctx-&gt;responseType = XHR_RESPONSETYPE_JSON;</span>
+<span class="lineNum">    1319 </span><span class="lineCov">          1 :                 } else if (!strcmp(str, &quot;text&quot;)) {</span>
+<span class="lineNum">    1320 </span><span class="lineNoCov">          0 :                         ctx-&gt;responseType = XHR_RESPONSETYPE_TEXT;</span>
+<span class="lineNum">    1321 </span><span class="lineCov">          1 :                 } else if (!strcmp(str, &quot;sax&quot;)) {</span>
+<span class="lineNum">    1322 </span><span class="lineCov">          1 :                         ctx-&gt;responseType = XHR_RESPONSETYPE_SAX;</span>
+<span class="lineNum">    1323 </span><span class="lineNoCov">          0 :                 } else if (!strcmp(str, &quot;push&quot;)) {</span>
+<span class="lineNum">    1324 </span><span class="lineNoCov">          0 :                         ctx-&gt;responseType = XHR_RESPONSETYPE_PUSH;</span>
+<span class="lineNum">    1325 </span>            :                 }
+<span class="lineNum">    1326 </span><span class="lineCov">          5 :                 JS_FreeCString(c, str);</span>
+<span class="lineNum">    1327 </span><span class="lineCov">          5 :                 return JS_TRUE;</span>
+<span class="lineNum">    1328 </span>            :         }
+<span class="lineNum">    1329 </span><span class="lineNoCov">          0 :         case XHR_CACHE:</span>
+<span class="lineNum">    1330 </span>            :         {
+<span class="lineNum">    1331 </span>            :                 const char *str = JS_ToCString(c, value);
+<span class="lineNum">    1332 </span><span class="lineNoCov">          0 :                 if (!str) return JS_EXCEPTION;</span>
+<span class="lineNum">    1333 </span><span class="lineNoCov">          0 :                 if (!strcmp(str, &quot;normal&quot;)) {</span>
+<span class="lineNum">    1334 </span><span class="lineNoCov">          0 :                         ctx-&gt;cache = XHR_CACHETYPE_NORMAL;</span>
+<span class="lineNum">    1335 </span><span class="lineNoCov">          0 :                 } else if (!strcmp(str, &quot;none&quot;)) {</span>
+<span class="lineNum">    1336 </span><span class="lineNoCov">          0 :                         ctx-&gt;cache = XHR_CACHETYPE_NONE;</span>
+<span class="lineNum">    1337 </span><span class="lineNoCov">          0 :                 } else if (!strcmp(str, &quot;memory&quot;)) {</span>
+<span class="lineNum">    1338 </span><span class="lineNoCov">          0 :                         ctx-&gt;cache = XHR_CACHETYPE_MEMORY;</span>
+<span class="lineNum">    1339 </span>            :                 }
+<span class="lineNum">    1340 </span><span class="lineNoCov">          0 :                 JS_FreeCString(c, str);</span>
+<span class="lineNum">    1341 </span><span class="lineNoCov">          0 :                 return JS_TRUE;</span>
+<span class="lineNum">    1342 </span>            :         }
+<span class="lineNum">    1343 </span>            :         /*all other properties are read-only*/
+<span class="lineNum">    1344 </span>            :         default:
+<span class="lineNum">    1345 </span>            :                 break;
+<span class="lineNum">    1346 </span>            :         }
+<span class="lineNum">    1347 </span><span class="lineNoCov">          0 :         return JS_FALSE;</span>
+<span class="lineNum">    1348 </span>            : }
+<span class="lineNum">    1349 </span>            : 
+<span class="lineNum">    1350 </span>            : static const JSCFunctionListEntry xhr_Funcs[] =
+<span class="lineNum">    1351 </span>            : {
+<span class="lineNum">    1352 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;onabort&quot;, xml_http_getProperty, xml_http_setProperty, XHR_ONABORT),
+<span class="lineNum">    1353 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;onerror&quot;, xml_http_getProperty, xml_http_setProperty, XHR_ONERROR),
+<span class="lineNum">    1354 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;onload&quot;, xml_http_getProperty, xml_http_setProperty, XHR_ONLOAD),
+<span class="lineNum">    1355 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;onloadend&quot;, xml_http_getProperty, xml_http_setProperty, XHR_ONLOADEND),
+<span class="lineNum">    1356 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;onloadstart&quot;, xml_http_getProperty, xml_http_setProperty, XHR_ONLOADSTART),
+<span class="lineNum">    1357 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;onprogress&quot;, xml_http_getProperty, xml_http_setProperty, XHR_ONPROGRESS),
+<span class="lineNum">    1358 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;onreadystatechange&quot;, xml_http_getProperty, xml_http_setProperty, XHR_ONREADYSTATECHANGE),
+<span class="lineNum">    1359 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;ontimeout&quot;, xml_http_getProperty, xml_http_setProperty, XHR_ONTIMEOUT),
+<span class="lineNum">    1360 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;readyState&quot;, xml_http_getProperty, NULL, XHR_READYSTATE),
+<span class="lineNum">    1361 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;response&quot;, xml_http_getProperty, NULL, XHR_RESPONSE),
+<span class="lineNum">    1362 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;responseType&quot;, xml_http_getProperty, xml_http_setProperty, XHR_RESPONSETYPE),
+<span class="lineNum">    1363 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;responseText&quot;, xml_http_getProperty, NULL, XHR_RESPONSETEXT),
+<span class="lineNum">    1364 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;responseXML&quot;, xml_http_getProperty, NULL, XHR_RESPONSEXML),
+<span class="lineNum">    1365 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;status&quot;, xml_http_getProperty, NULL, XHR_STATUS),
+<span class="lineNum">    1366 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;statusText&quot;, xml_http_getProperty, NULL, XHR_STATUSTEXT),
+<span class="lineNum">    1367 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;timeout&quot;, xml_http_getProperty, xml_http_setProperty, XHR_TIMEOUT),
+<span class="lineNum">    1368 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;upload&quot;, xml_http_getProperty, NULL, XHR_UPLOAD),
+<span class="lineNum">    1369 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;withCredentials&quot;, xml_http_getProperty, xml_http_setProperty, XHR_WITHCREDENTIALS),
+<span class="lineNum">    1370 </span>            :         JS_CGETSET_MAGIC_DEF(&quot;cache&quot;, xml_http_getProperty, xml_http_setProperty, XHR_CACHE),
+<span class="lineNum">    1371 </span>            : 
+<span class="lineNum">    1372 </span>            :         JS_CFUNC_DEF(&quot;abort&quot;, 0, xml_http_abort),
+<span class="lineNum">    1373 </span>            :         JS_CFUNC_DEF(&quot;getAllResponseHeaders&quot;, 0, xml_http_get_all_headers),
+<span class="lineNum">    1374 </span>            :         JS_CFUNC_DEF(&quot;getResponseHeader&quot;, 1, xml_http_get_header),
+<span class="lineNum">    1375 </span>            :         JS_CFUNC_DEF(&quot;open&quot;, 2, xml_http_open),
+<span class="lineNum">    1376 </span>            :         JS_CFUNC_DEF(&quot;overrideMimeType&quot;, 1, xml_http_overrideMimeType),
+<span class="lineNum">    1377 </span>            :         JS_CFUNC_DEF(&quot;send&quot;, 0, xml_http_send),
+<span class="lineNum">    1378 </span>            :         JS_CFUNC_DEF(&quot;setRequestHeader&quot;, 2, xml_http_set_header),
+<span class="lineNum">    1379 </span>            : 
+<span class="lineNum">    1380 </span>            :         /*eventTarget interface*/
+<span class="lineNum">    1381 </span>            :         JS_DOM3_EVENT_TARGET_INTERFACE
+<a name="1382"><span class="lineNum">    1382 </span>            : };</a>
+<span class="lineNum">    1383 </span>            : 
+<span class="lineNum">    1384 </span><span class="lineCov">     133412 : static void xml_http_gc_mark(JSRuntime *rt, JSValueConst val, JS_MarkFunc *mark_func)</span>
+<span class="lineNum">    1385 </span>            : {
+<span class="lineNum">    1386 </span><span class="lineCov">     133412 :     XMLHTTPContext *ctx = JS_GetOpaque(val, xhrClass.class_id);</span>
+<span class="lineNum">    1387 </span><span class="lineCov">     133412 :     if (!ctx) return;</span>
+<span class="lineNum">    1388 </span>            : 
+<span class="lineNum">    1389 </span><span class="lineCov">          4 :         JS_MarkValue(rt, ctx-&gt;onabort, mark_func);</span>
+<span class="lineNum">    1390 </span><span class="lineCov">          4 :         JS_MarkValue(rt, ctx-&gt;onerror, mark_func);</span>
+<span class="lineNum">    1391 </span><span class="lineCov">          4 :         JS_MarkValue(rt, ctx-&gt;onload, mark_func);</span>
+<span class="lineNum">    1392 </span><span class="lineCov">          4 :         JS_MarkValue(rt, ctx-&gt;onloadend, mark_func);</span>
+<span class="lineNum">    1393 </span><span class="lineCov">          4 :         JS_MarkValue(rt, ctx-&gt;onloadstart, mark_func);</span>
+<span class="lineNum">    1394 </span><span class="lineCov">          4 :         JS_MarkValue(rt, ctx-&gt;onprogress, mark_func);</span>
+<span class="lineNum">    1395 </span><span class="lineCov">          4 :         JS_MarkValue(rt, ctx-&gt;onreadystatechange, mark_func);</span>
+<span class="lineNum">    1396 </span><span class="lineCov">          4 :         JS_MarkValue(rt, ctx-&gt;ontimeout, mark_func);</span>
+<a name="1397"><span class="lineNum">    1397 </span>            : }</a>
+<span class="lineNum">    1398 </span>            : 
+<span class="lineNum">    1399 </span><span class="lineCov">        411 : static JSValue xhr_load_class(JSContext *c)</span>
+<span class="lineNum">    1400 </span>            : {
+<span class="lineNum">    1401 </span><span class="lineCov">        411 :         if (! xhrClass.class_id) {</span>
+<span class="lineNum">    1402 </span><span class="lineCov">         48 :                 JS_NewClassID(&amp;xhrClass.class_id);</span>
+<span class="lineNum">    1403 </span><span class="lineCov">         48 :                 xhrClass.class.class_name = &quot;XMLHttpRequest&quot;;</span>
+<span class="lineNum">    1404 </span><span class="lineCov">         48 :                 xhrClass.class.finalizer = xml_http_finalize;</span>
+<span class="lineNum">    1405 </span><span class="lineCov">         48 :                 xhrClass.class.gc_mark = xml_http_gc_mark;</span>
+<span class="lineNum">    1406 </span><span class="lineCov">         48 :                 JS_NewClass(JS_GetRuntime(c), xhrClass.class_id, &amp;xhrClass.class);</span>
+<span class="lineNum">    1407 </span>            :         }
+<span class="lineNum">    1408 </span><span class="lineCov">        411 :         JSValue proto = JS_NewObjectClass(c, xhrClass.class_id);</span>
+<span class="lineNum">    1409 </span><span class="lineCov">        411 :         JS_SetPropertyFunctionList(c, proto, xhr_Funcs, countof(xhr_Funcs));</span>
+<span class="lineNum">    1410 </span><span class="lineCov">        411 :         JS_SetClassProto(c, xhrClass.class_id, proto);</span>
+<span class="lineNum">    1411 </span><span class="lineCov">        411 :         JS_SetPropertyStr(c, proto, &quot;UNSENT&quot;, JS_NewInt32(c, XHR_STATIC_UNSENT));</span>
+<span class="lineNum">    1412 </span><span class="lineCov">        411 :         JS_SetPropertyStr(c, proto, &quot;OPENED&quot;, JS_NewInt32(c, XHR_STATIC_OPENED));</span>
+<span class="lineNum">    1413 </span><span class="lineCov">        411 :         JS_SetPropertyStr(c, proto, &quot;HEADERS_RECEIVED&quot;,       JS_NewInt32(c, XHR_STATIC_HEADERS_RECEIVED));</span>
+<span class="lineNum">    1414 </span><span class="lineCov">        411 :         JS_SetPropertyStr(c, proto, &quot;LOADING&quot;,        JS_NewInt32(c, XHR_STATIC_LOADING));</span>
+<span class="lineNum">    1415 </span><span class="lineCov">        411 :         JS_SetPropertyStr(c, proto, &quot;DONE&quot;,   JS_NewInt32(c, XHR_STATIC_DONE));</span>
+<span class="lineNum">    1416 </span>            : 
+<span class="lineNum">    1417 </span><span class="lineCov">        411 :         return JS_NewCFunction2(c, xml_http_constructor, &quot;XMLHttpRequest&quot;, 1, JS_CFUNC_constructor, 0);</span>
+<a name="1418"><span class="lineNum">    1418 </span>            : }</a>
+<span class="lineNum">    1419 </span>            : 
+<span class="lineNum">    1420 </span><span class="lineCov">        407 : void qjs_module_init_xhr_global(JSContext *c, JSValue global)</span>
+<span class="lineNum">    1421 </span>            : {
+<span class="lineNum">    1422 </span><span class="lineCov">        407 :         if (c) {</span>
+<span class="lineNum">    1423 </span><span class="lineCov">        407 :                 JSValue ctor = xhr_load_class(c);</span>
+<span class="lineNum">    1424 </span><span class="lineCov">        407 :                 JS_SetPropertyStr(c, global, &quot;XMLHttpRequest&quot;, ctor);</span>
+<span class="lineNum">    1425 </span>            :         }
+<a name="1426"><span class="lineNum">    1426 </span><span class="lineCov">        407 : }</span></a>
+<span class="lineNum">    1427 </span>            : 
+<span class="lineNum">    1428 </span><span class="lineCov">          4 : static int js_xhr_load_module(JSContext *c, JSModuleDef *m)</span>
+<span class="lineNum">    1429 </span>            : {
+<span class="lineNum">    1430 </span><span class="lineCov">          4 :         JSValue global = JS_GetGlobalObject(c);</span>
+<span class="lineNum">    1431 </span><span class="lineCov">          4 :         JSValue ctor = xhr_load_class(c);</span>
+<span class="lineNum">    1432 </span>            :         JS_FreeValue(c, global);
+<span class="lineNum">    1433 </span><span class="lineCov">          4 :     JS_SetModuleExport(c, m, &quot;XMLHttpRequest&quot;, ctor);</span>
+<a name="1434"><span class="lineNum">    1434 </span><span class="lineCov">          4 :         return 0;</span></a>
+<span class="lineNum">    1435 </span>            : }
+<span class="lineNum">    1436 </span><span class="lineCov">         64 : void qjs_module_init_xhr(JSContext *ctx)</span>
+<span class="lineNum">    1437 </span>            : {
+<span class="lineNum">    1438 </span>            :         JSModuleDef *m;
+<span class="lineNum">    1439 </span><span class="lineCov">         64 :         m = JS_NewCModule(ctx, &quot;xhr&quot;, js_xhr_load_module);</span>
+<span class="lineNum">    1440 </span><span class="lineCov">         64 :         if (!m) return;</span>
+<span class="lineNum">    1441 </span>            : 
+<span class="lineNum">    1442 </span><span class="lineCov">         64 :         JS_AddModuleExport(ctx, m, &quot;XMLHttpRequest&quot;);</span>
+<span class="lineNum">    1443 </span>            : 
+<span class="lineNum">    1444 </span>            : #ifdef GPAC_ENABLE_COVERAGE
+<span class="lineNum">    1445 </span><span class="lineCov">         64 :         if (gf_sys_is_cov_mode()) {</span>
+<span class="lineNum">    1446 </span>            :                 qjs_module_init_xhr_global(NULL, JS_TRUE);
+<span class="lineNum">    1447 </span>            :                 xhr_get_event_target(NULL, JS_TRUE, NULL, NULL);
+<span class="lineNum">    1448 </span>            :         }
+<span class="lineNum">    1449 </span>            : #endif
+<span class="lineNum">    1450 </span>            :         return;
+<span class="lineNum">    1451 </span>            : }
+<span class="lineNum">    1452 </span>            : 
+<span class="lineNum">    1453 </span>            : 
+<span class="lineNum">    1454 </span>            : #endif
+<span class="lineNum">    1455 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

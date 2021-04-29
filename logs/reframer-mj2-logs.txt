@@ -1,0 +1,43 @@
+*** reframer-mj2 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:56 ***
+
+
+*** Subtest "rewrite": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/import/speedway.mj2 reframer @ -o ./results/temp/speedway.mj2  -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 371339136
+
+Filter stats - 5 filters
+	Filter fin (src=./external_media/import/speedway.mj2) : 0 input pids 1 output pids 6 tasks 676 us process time
+		1 packets sent 5000 bytes sent (1479.29 pck/sec 59.1716 mbps)
+		* output PID speedway.mj2: 2 packets sent
+	Filter reframer ID _0x564e9ebaf040_ : 1 input pids 1 output pids 56 tasks 539 us process time
+		52 packets processed 2791670 bytes processed (96475 pck/sec 41434.8 mbps)
+		52 packets sent 2791670 bytes sent (96475 pck/sec 41434.8 mbps)
+		* input PID speedway.mj2: 52 packets received
+		* output PID speedway.mj2: 52 packets sent
+	Filter fout (dst=./results/temp/speedway.mj2) : 1 input pids 0 output pids 56 tasks 1680 us process time
+		54 packets processed 2792667 bytes processed (32142.9 pck/sec 13298.4 mbps)
+		* input PID speedway.mj2: 54 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 60 tasks 1623 us process time
+		2 packets processed 5000 bytes processed (1232.29 pck/sec 24.6457 mbps)
+		52 packets sent 2791670 bytes sent (32039.4 pck/sec 13760.5 mbps)
+		* input PID speedway.mj2: 2 packets received
+		* output PID speedway.mj2: 52 packets sent
+	Filter mp4mx : 1 input pids 1 output pids 56 tasks 4620 us process time
+		52 packets processed 2791670 bytes processed (11255.4 pck/sec 4834.06 mbps)
+		54 packets sent 2792667 bytes sent (11688.3 pck/sec 4835.79 mbps)
+		* input PID speedway.mj2: 52 packets received
+		* output PID speedway.mj2: 54 packets sent
+Session stats - threads 1
+	Thread 1: run_time 7547 us active_time 7524 us nb_tasks 184
+
+Total: run_time 7547 us active_time 7524 us nb_tasks 184
+
+Filters connected:
+fin (src=./external_media/import/speedway.mj2) (ptr=0x564e9ebac7f0)
+-(PID speedway.mj2) mp4dmx (ptr=0x564e9ebb5330)
+--(PID speedway.mj2) reframer (ID=_0x564e9ebaf040_)
+---(PID speedway.mj2) mp4mx (ptr=0x564e9ebc1630)
+----(PID speedway.mj2) fout (dst=./results/temp/speedway.mj2) (ptr=0x564e9ebb0260)
+
+Computing ./results/temp/speedway.mj2  (rewrite) hash: 
+File hash (SHA-1): 13FECB3309A242785290AF533DF220E2B6517047
+Hash OK for ./results/temp/speedway.mj2

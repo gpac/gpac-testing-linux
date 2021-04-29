@@ -1,0 +1,66 @@
+*** mp4box-io-vp80-00-comprehensive-017.ivf logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:39:10 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/vp80-00-comprehensive-017.ivf" ***
+Import probing results for ./external_media/import/vp80-00-comprehensive-017.ivf:
+File has 1 tracks
+- Track 1 type: Video - Codec VP8 Video
+	Size 176x144 @ 30 FPS
+
+For more details, use `gpac -i vp80-00-comprehensive-017.ivf inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/vp80-00-comprehensive-017.ivf.mp4  (add) hash: 
+File hash (SHA-1): 6D35217167F8ED9DBC427D0FB995C182EEB52021
+Hash OK for ./results/temp/vp80-00-comprehensive-017.ivf.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/vp80-00-comprehensive-017.ivf -new ./results/temp/vp80-00-comprehensive-017.ivf.mp4" ***
+Track Importing VP8 Video - Width 176 Height 144 FPS 30000/1000
+
+
+*** Subtest "NALDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 1 ./results/temp/vp80-00-comprehensive-017.ivf.mp4 -out ./results/temp/nal.xml" ***
+Error: Track #1 is not NALU or OBU based!
+
+Computing ./results/temp/nal.xml  (NALDump) hash: 
+File hash (SHA-1): D5C832ECEAB24863B6169BB0F8B6F1C3C98295CF
+Hash OK for ./results/temp/nal.xml
+Computing ./results/temp/vp80-00-comprehensive-017.ivf.1.tmp  (diso) hash: 
+File hash (SHA-1): 36BFEF64CF214BE01C3429784D5655A80EBBF66F
+Hash OK for ./results/temp/vp80-00-comprehensive-017.ivf.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/vp80-00-comprehensive-017.ivf.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:00.000
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 30000
+Media Duration 00:00:00.000 
+Media Info: Language "Undetermined (und)" - Type "vide:vp08" - 29 samples
+Visual Sample Entry Info: width=176 height=144 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=176 height=144
+Unknown track type
+	RFC6381 Codec Parameters: vp08.01.0a.08.00.00.00.00.00
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 1 samples
+	Max sample duration: 1 / 30000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/vp80-00-comprehensive-017.ivf.mp4 -out ./results/temp/vp80-00-comprehensive-017.ivf.1.tmp" ***
+
+Computing ./results/temp/vp80-00-comprehensive-017.ivf.2.tmp  (dts) hash: 
+File hash (SHA-1): 6DE126894770B584B5C37AC59B4FB4B17F01D9C8
+Hash OK for ./results/temp/vp80-00-comprehensive-017.ivf.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/vp80-00-comprehensive-017.ivf.mp4 -out ./results/temp/vp80-00-comprehensive-017.ivf.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/vp80-00-comprehensive-017.ivf.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): B6C8236CDCEDB1E5D59C3BEC8FAC973616A37AB2
+Hash OK for ./results/temp/inspect.txt

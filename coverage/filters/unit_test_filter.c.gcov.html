@@ -1,0 +1,1067 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/unit_test_filter.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - unit_test_filter.c<span style="font-size: 80%;"> (source / <a href="unit_test_filter.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">441</td>
+            <td class="headerCovTableEntry">483</td>
+            <td class="headerCovTableEntryHi">91.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / unit test filters
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/list.h&gt;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : typedef struct
+<span class="lineNum">      30 </span>            : {
+<span class="lineNum">      31 </span>            :         GF_FilterPid *src_pid;
+<span class="lineNum">      32 </span>            :         GF_FilterPid *dst_pid;
+<span class="lineNum">      33 </span>            :         GF_SHA1Context *sha_ctx;
+<span class="lineNum">      34 </span>            :         u32 nb_packets, pck_del;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :         GF_FilterFrameInterface frame_ifce;
+<span class="lineNum">      37 </span>            :         u8 ifce_data[10];
+<span class="lineNum">      38 </span>            : } PIDCtx;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : enum
+<span class="lineNum">      41 </span>            : {
+<span class="lineNum">      42 </span>            :         UTF_MODE_SOURCE=0,
+<span class="lineNum">      43 </span>            :         UTF_MODE_SINK,
+<span class="lineNum">      44 </span>            :         UTF_MODE_FILTER,
+<span class="lineNum">      45 </span>            : };
+<span class="lineNum">      46 </span>            : typedef struct
+<span class="lineNum">      47 </span>            : {
+<span class="lineNum">      48 </span>            :         GF_List *pids;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         //0: source, 1: sink, 2: filter
+<span class="lineNum">      51 </span>            :         u32 mode;
+<span class="lineNum">      52 </span>            :         u32 max_pck;
+<span class="lineNum">      53 </span>            :         s32 max_out;
+<span class="lineNum">      54 </span>            :         const char *pid_att;
+<span class="lineNum">      55 </span>            :         Bool alloc;
+<span class="lineNum">      56 </span>            :         u32 nb_pids;
+<span class="lineNum">      57 </span>            :         u32 fwd;
+<span class="lineNum">      58 </span>            :         u32 framing;
+<span class="lineNum">      59 </span>            :         Bool cov;
+<span class="lineNum">      60 </span>            :         Bool norecfg;
+<span class="lineNum">      61 </span>            :         const char *update;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :         Bool gsftest;
+<span class="lineNum">      64 </span>            :         GF_Fraction64 dummy1;
+<a name="65"><span class="lineNum">      65 </span>            : } GF_UnitTestFilter;</a>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">      23418 : static void test_pck_del(GF_Filter *filter, GF_FilterPid *pid, GF_FilterPacket *pck)</span>
+<span class="lineNum">      68 </span>            : {
+<span class="lineNum">      69 </span><span class="lineCov">      23418 :         PIDCtx *stack = (PIDCtx *) gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">      70 </span><span class="lineCov">      23416 :         stack-&gt;pck_del++;</span>
+<span class="lineNum">      71 </span>            :         assert(stack-&gt;nb_packets &gt;= stack-&gt;pck_del);
+<span class="lineNum">      72 </span><span class="lineCov">      23416 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_APP, (&quot;%s: Packet deleted - %d out there (%d sent %d destroyed)\n&quot;, gf_filter_get_name(filter), stack-&gt;nb_packets - stack-&gt;pck_del, stack-&gt;nb_packets, stack-&gt;pck_del));</span>
+<span class="lineNum">      73 </span><span class="lineCov">      23417 : }</span>
+<a name="74"><span class="lineNum">      74 </span>            : </a>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">      25640 : void dump_properties(GF_FilterPacket *pck, u32 nb_pck)</span>
+<span class="lineNum">      77 </span>            : {
+<span class="lineNum">      78 </span><span class="lineCov">      25640 :         u32 idx = 0;</span>
+<span class="lineNum">      79 </span><span class="lineCov">      30280 :         while (1) {</span>
+<span class="lineNum">      80 </span>            :                 u32 p4cc;
+<span class="lineNum">      81 </span>            :                 const char *pname;
+<span class="lineNum">      82 </span><span class="lineCov">      55920 :                 const GF_PropertyValue *p = gf_filter_pck_enum_properties(pck, &amp;idx, &amp;p4cc, &amp;pname);</span>
+<span class="lineNum">      83 </span><span class="lineCov">      55919 :                 if (!p) break;</span>
+<span class="lineNum">      84 </span>            :                 //dump_property(pck, nb_pck, p4cc, pname, p);
+<span class="lineNum">      85 </span>            :         }
+<span class="lineNum">      86 </span><span class="lineCov">      25639 :         if (nb_pck==1) {</span>
+<span class="lineNum">      87 </span><span class="lineCov">        212 :                 gf_filter_pck_get_property(pck, GF_4CC('c','u','s','t'));</span>
+<span class="lineNum">      88 </span><span class="lineCov">        209 :                 gf_filter_pck_get_property_str(pck, &quot;custom&quot;);</span>
+<span class="lineNum">      89 </span>            :         }
+<a name="90"><span class="lineNum">      90 </span><span class="lineCov">      25640 : }</span></a>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span><span class="lineCov">        385 : static void ut_filter_finalize(GF_Filter *filter)</span>
+<span class="lineNum">      93 </span>            : {
+<span class="lineNum">      94 </span>            :         u32 i, count;
+<span class="lineNum">      95 </span>            :         u8 digest[GF_SHA1_DIGEST_SIZE];
+<span class="lineNum">      96 </span><span class="lineCov">        385 :         GF_UnitTestFilter *stack = (GF_UnitTestFilter *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineCov">        385 :         count = gf_list_count(stack-&gt;pids);</span>
+<span class="lineNum">      99 </span><span class="lineCov">        825 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     100 </span><span class="lineCov">        440 :                 PIDCtx *pidctx = gf_list_get(stack-&gt;pids, i);</span>
+<span class="lineNum">     101 </span><span class="lineCov">        440 :                 if (pidctx-&gt;sha_ctx &amp;&amp; (stack-&gt;mode!=UTF_MODE_SOURCE) ) {</span>
+<span class="lineNum">     102 </span><span class="lineCov">        281 :                         gf_sha1_finish(pidctx-&gt;sha_ctx, digest);</span>
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineCov">        281 :                         if (!pidctx-&gt;src_pid) {</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[%s] Pid %d Source PID not available while dumping SHA1\n&quot;, gf_filter_get_name(filter), i+1 ));</span>
+<span class="lineNum">     106 </span>            :                         } else {
+<span class="lineNum">     107 </span><span class="lineCov">        281 :                                 const GF_PropertyValue *p = gf_filter_pid_get_property(pidctx-&gt;src_pid, GF_4CC('s','h','a','1') );</span>
+<span class="lineNum">     108 </span><span class="lineCov">        281 :                                 if (!p) {</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[%s] Pid %d sha1 property not found on input pid\n&quot;, gf_filter_get_name(filter), i+1 ));</span>
+<span class="lineNum">     110 </span><span class="lineCov">        281 :                                 } else if (p-&gt;value.data.size != GF_SHA1_DIGEST_SIZE) {</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[%s] Pid %d wrong size for sha1 property\n&quot;, gf_filter_get_name(filter), i+1 ));</span>
+<span class="lineNum">     112 </span><span class="lineCov">        281 :                                 } else if (memcmp(p-&gt;value.data.ptr, digest, p-&gt;value.data.size )) {</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[%s] Pid %d wrong hash after execution\n&quot;, gf_filter_get_name(filter), i+1 ));</span>
+<span class="lineNum">     114 </span>            :                                 } else {
+<span class="lineNum">     115 </span><span class="lineCov">        281 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_APP, (&quot;[%s] Pid %d hash OK after execution\n&quot;, gf_filter_get_name(filter), i+1 ));</span>
+<span class="lineNum">     116 </span>            :                                 }
+<span class="lineNum">     117 </span>            :                         }
+<span class="lineNum">     118 </span>            :                 }
+<span class="lineNum">     119 </span><span class="lineCov">        440 :                 gf_free(pidctx);</span>
+<span class="lineNum">     120 </span>            :         }
+<span class="lineNum">     121 </span><span class="lineCov">        385 :         gf_list_del(stack-&gt;pids);</span>
+<a name="122"><span class="lineNum">     122 </span><span class="lineCov">        385 : }</span></a>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineCov">      21952 : static void ut_filter_send_update(GF_Filter *filter, u32 nb_pck)</span>
+<span class="lineNum">     125 </span>            : {
+<span class="lineNum">     126 </span><span class="lineCov">      21952 :         GF_UnitTestFilter *stack = (GF_UnitTestFilter *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">      21952 :         if (stack-&gt;update &amp;&amp; (nb_pck==stack-&gt;max_pck/2) ) {</span>
+<span class="lineNum">     129 </span>            :                 char *sep, *fid;
+<span class="lineNum">     130 </span><span class="lineCov">          9 :                 char *cmd = gf_strdup(stack-&gt;update);</span>
+<span class="lineNum">     131 </span>            :                 fid = cmd;
+<span class="lineNum">     132 </span><span class="lineCov">          9 :                 sep = strchr(cmd, ',');</span>
+<span class="lineNum">     133 </span><span class="lineCov">          9 :                 if (sep) {</span>
+<span class="lineNum">     134 </span>            :                         char *name, *val;
+<span class="lineNum">     135 </span><span class="lineCov">          9 :                         sep[0]=0;</span>
+<span class="lineNum">     136 </span><span class="lineCov">          9 :                         sep+=1;</span>
+<span class="lineNum">     137 </span>            :                         name=sep;
+<span class="lineNum">     138 </span><span class="lineCov">          9 :                         sep = strchr(name, ',');</span>
+<span class="lineNum">     139 </span><span class="lineCov">          9 :                         if (sep) {</span>
+<span class="lineNum">     140 </span><span class="lineCov">          9 :                                 sep[0]=0;</span>
+<span class="lineNum">     141 </span><span class="lineCov">          9 :                                 val = sep+1;</span>
+<span class="lineNum">     142 </span>            :                         } else {
+<span class="lineNum">     143 </span>            :                                 val=NULL;
+<span class="lineNum">     144 </span>            :                         }
+<span class="lineNum">     145 </span><span class="lineCov">          9 :                         gf_filter_send_update(filter, fid, name, val, 0);</span>
+<span class="lineNum">     146 </span>            :                 }
+<span class="lineNum">     147 </span><span class="lineCov">          9 :                 gf_free(cmd);</span>
+<span class="lineNum">     148 </span>            :         }
+<span class="lineNum">     149 </span><span class="lineCov">      21952 : }</span>
+<a name="150"><span class="lineNum">     150 </span>            : </a>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">      12823 : static GF_Err ut_filter_process_filter(GF_Filter *filter)</span>
+<span class="lineNum">     153 </span>            : {
+<span class="lineNum">     154 </span>            :         u32 size, i, j, count, nb_loops;
+<span class="lineNum">     155 </span>            :         u32 fwd;
+<span class="lineNum">     156 </span>            :         GF_FilterPacket *pck_dst;
+<span class="lineNum">     157 </span><span class="lineCov">      12823 :         GF_UnitTestFilter *stack = (GF_UnitTestFilter *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineCov">      12823 :         count = gf_list_count(stack-&gt;pids);</span>
+<span class="lineNum">     160 </span><span class="lineCov">      20131 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     161 </span><span class="lineCov">      12823 :                 PIDCtx *pidctx = gf_list_get(stack-&gt;pids, i);</span>
+<span class="lineNum">     162 </span><span class="lineCov">      12823 :                 GF_FilterPacket *pck = gf_filter_pid_get_packet(pidctx-&gt;src_pid);</span>
+<span class="lineNum">     163 </span><span class="lineCov">      12823 :                 if (!pck)</span>
+<span class="lineNum">     164 </span>            :                         return GF_OK;
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineCov">       7308 :                 if ((stack-&gt; max_out&gt;=0) &amp;&amp; (pidctx-&gt;nb_packets - pidctx-&gt;pck_del &gt;= (u32) stack-&gt;max_out) ) {</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_APP, (&quot;TestSource: No packets to emit, waiting for destruction\n&quot;));</span>
+<span class="lineNum">     168 </span>            :                         return GF_OK;
+<span class="lineNum">     169 </span>            :                 }
+<span class="lineNum">     170 </span>            :         }
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            :         //loop on each PID
+<span class="lineNum">     173 </span><span class="lineCov">       7308 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     174 </span>            :                 const u8 *data;
+<span class="lineNum">     175 </span>            :                 u32 pck_size;
+<span class="lineNum">     176 </span>            :                 u8 *data_ptr;
+<span class="lineNum">     177 </span>            :                 u32 data_offset=0;
+<span class="lineNum">     178 </span><span class="lineCov">       7308 :                 PIDCtx *pidctx = gf_list_get(stack-&gt;pids, i);</span>
+<span class="lineNum">     179 </span><span class="lineCov">       7308 :                 GF_FilterPacket *pck = gf_filter_pid_get_packet(pidctx-&gt;src_pid);</span>
+<span class="lineNum">     180 </span>            :                 assert (pck);
+<span class="lineNum">     181 </span>            :                 assert(pidctx == gf_filter_pid_get_udta(pidctx-&gt;src_pid));
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">       7308 :                 data = gf_filter_pck_get_data(pck, &amp;size);</span>
+<span class="lineNum">     184 </span><span class="lineCov">       7308 :                 gf_sha1_update(pidctx-&gt;sha_ctx, (u8*)data, size);</span>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">       7308 :                 nb_loops = stack-&gt;framing ? 3 : 1;</span>
+<span class="lineNum">     187 </span><span class="lineCov">       7308 :                 pck_size = stack-&gt;framing ? size/nb_loops : size;</span>
+<span class="lineNum">     188 </span>            :                 data_ptr = (u8 *)data;
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineCov">      14632 :                 for (j=0; j&lt;nb_loops; j++) {</span>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :                 //adjust last packet size
+<span class="lineNum">     193 </span><span class="lineCov">       7324 :                 if ((j+1) == nb_loops) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">       7308 :                         pck_size = size - j*pck_size;</span>
+<span class="lineNum">     195 </span>            :                 }
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineCov">       7324 :                 fwd = stack-&gt;fwd;</span>
+<span class="lineNum">     198 </span><span class="lineCov">       7324 :                 if (fwd==3) fwd = pidctx-&gt;nb_packets % 3;</span>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            :                 //shared memory
+<span class="lineNum">     201 </span><span class="lineCov">       7324 :                 if (fwd==0) {</span>
+<span class="lineNum">     202 </span><span class="lineCov">       3269 :                         pck_dst = gf_filter_pck_new_shared(pidctx-&gt;dst_pid, data_ptr, pck_size, test_pck_del);</span>
+<span class="lineNum">     203 </span>            :                 }
+<span class="lineNum">     204 </span>            :                 //copy memory
+<span class="lineNum">     205 </span><span class="lineCov">       4055 :                 else if (fwd==1) {</span>
+<span class="lineNum">     206 </span>            :                         u8 *data_dst;
+<span class="lineNum">     207 </span><span class="lineCov">       2256 :                         pck_dst = gf_filter_pck_new_alloc(pidctx-&gt;dst_pid, pck_size, &amp;data_dst);</span>
+<span class="lineNum">     208 </span><span class="lineCov">       2256 :                         if (pck_dst) {</span>
+<span class="lineNum">     209 </span><span class="lineCov">       2256 :                                 memcpy(data_dst, data_ptr, pck_size);</span>
+<span class="lineNum">     210 </span>            :                         }
+<span class="lineNum">     211 </span>            :                 }
+<span class="lineNum">     212 </span>            :                 //packet reference
+<span class="lineNum">     213 </span>            :                 else {
+<span class="lineNum">     214 </span><span class="lineCov">       1799 :                         if (stack-&gt;framing) {</span>
+<span class="lineNum">     215 </span><span class="lineCov">          8 :                                 pck_dst = gf_filter_pck_new_ref(pidctx-&gt;dst_pid, data_offset, pck_size, pck);</span>
+<span class="lineNum">     216 </span>            :                         } else {
+<span class="lineNum">     217 </span><span class="lineCov">       1791 :                                 pck_dst = gf_filter_pck_new_ref(pidctx-&gt;dst_pid, 0, 0, pck);</span>
+<span class="lineNum">     218 </span>            :                         }
+<span class="lineNum">     219 </span>            :                 }
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">       7324 :                 if (pck_dst) {</span>
+<span class="lineNum">     223 </span>            :                         Bool is_start, is_end;
+<span class="lineNum">     224 </span>            :                         //get source packet framing
+<span class="lineNum">     225 </span><span class="lineCov">       7324 :                         gf_filter_pck_get_framing(pck, &amp;is_start, &amp;is_end);</span>
+<span class="lineNum">     226 </span>            :                         //adjust flags given our framing
+<span class="lineNum">     227 </span><span class="lineCov">       7324 :                         if (is_start &amp;&amp; j) is_start = GF_FALSE;</span>
+<span class="lineNum">     228 </span><span class="lineCov">       7324 :                         if (is_end &amp;&amp; (j+1 &lt; nb_loops) ) is_end = GF_FALSE;</span>
+<span class="lineNum">     229 </span><span class="lineCov">       7324 :                         if (stack-&gt;framing==2) is_start = GF_FALSE;</span>
+<span class="lineNum">     230 </span><span class="lineCov">       7324 :                         if (stack-&gt;framing==3) is_end = GF_FALSE;</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineCov">       7324 :                         gf_filter_pck_set_framing(pck_dst, is_start, is_end);</span>
+<span class="lineNum">     233 </span>            :                         
+<span class="lineNum">     234 </span><span class="lineCov">       7324 :                         pidctx-&gt;nb_packets++;</span>
+<span class="lineNum">     235 </span>            :                         //copy over src props to dst
+<span class="lineNum">     236 </span><span class="lineCov">       7324 :                         gf_filter_pck_merge_properties(pck, pck_dst);</span>
+<span class="lineNum">     237 </span><span class="lineCov">       7324 :                         gf_filter_pck_send(pck_dst);</span>
+<span class="lineNum">     238 </span>            :                 }
+<span class="lineNum">     239 </span>            :                 //move our data pointer
+<span class="lineNum">     240 </span><span class="lineCov">       7324 :                 data_ptr += pck_size;</span>
+<span class="lineNum">     241 </span><span class="lineCov">       7324 :                 data_offset += pck_size;</span>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :                 } //end framing loop
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">       7308 :                 gf_filter_pid_drop_packet(pidctx-&gt;src_pid);</span>
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            :         } //end PID loop
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :         return GF_OK;
+<span class="lineNum">     250 </span>            : 
+<a name="251"><span class="lineNum">     251 </span>            : }</a>
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span><span class="lineCov">          1 : static void ut_source_pck_del(GF_Filter *filter, GF_FilterPid *pid, GF_FilterPacket *pck)</span>
+<span class="lineNum">     254 </span>            : {
+<span class="lineNum">     255 </span>            : 
+<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span><span class="lineCov">          1 : static GF_Err ut_source_ifce_get_plane(struct _gf_filter_frame_interface *frame, u32 plane_idx, const u8 **outPlane, u32 *outStride)</span>
+<span class="lineNum">     259 </span>            : {
+<span class="lineNum">     260 </span><span class="lineCov">          1 :         PIDCtx *pctx = frame-&gt;user_data;</span>
+<span class="lineNum">     261 </span><span class="lineCov">          1 :         memset(pctx-&gt;ifce_data, 0, 10);</span>
+<span class="lineNum">     262 </span><span class="lineCov">          1 :         if (plane_idx) return GF_BAD_PARAM;</span>
+<span class="lineNum">     263 </span><span class="lineCov">          1 :         *outPlane = pctx-&gt;ifce_data;</span>
+<span class="lineNum">     264 </span><span class="lineCov">          1 :         *outStride = 5;</span>
+<span class="lineNum">     265 </span><span class="lineCov">          1 :         return GF_OK;</span>
+<a name="266"><span class="lineNum">     266 </span>            : }</a>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">      22083 : static GF_Err ut_filter_process_source(GF_Filter *filter)</span>
+<span class="lineNum">     269 </span>            : {
+<span class="lineNum">     270 </span>            :         GF_PropertyValue p;
+<span class="lineNum">     271 </span>            :         GF_FilterPacket *pck;
+<span class="lineNum">     272 </span>            :         u32 i, count, nb_eos;
+<span class="lineNum">     273 </span><span class="lineCov">      22083 :         GF_UnitTestFilter *stack = (GF_UnitTestFilter *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            :         nb_eos = 0;
+<span class="lineNum">     276 </span><span class="lineCov">      22083 :         count = gf_list_count(stack-&gt;pids);</span>
+<span class="lineNum">     277 </span><span class="lineCov">      44317 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     278 </span><span class="lineCov">      22234 :                 PIDCtx *pidctx=gf_list_get(stack-&gt;pids, i);</span>
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span><span class="lineCov">      22234 :                 if (pidctx-&gt;nb_packets==stack-&gt;max_pck) {</span>
+<span class="lineNum">     281 </span><span class="lineCov">        282 :                         if (stack-&gt;gsftest) {</span>
+<span class="lineNum">     282 </span><span class="lineCov">          2 :                                 if (pidctx-&gt;dst_pid) {</span>
+<span class="lineNum">     283 </span><span class="lineCov">          1 :                                         gf_filter_pid_remove(pidctx-&gt;dst_pid);</span>
+<span class="lineNum">     284 </span><span class="lineCov">          1 :                                         pidctx-&gt;dst_pid = NULL;</span>
+<span class="lineNum">     285 </span>            :                                 }
+<span class="lineNum">     286 </span>            :                         }
+<span class="lineNum">     287 </span><span class="lineCov">        282 :                         nb_eos++;</span>
+<span class="lineNum">     288 </span><span class="lineCov">        282 :                         continue;</span>
+<span class="lineNum">     289 </span>            :                 }
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineCov">      21952 :                 if ((stack-&gt;max_out&gt;=0) &amp;&amp; (pidctx-&gt;nb_packets - pidctx-&gt;pck_del &gt;= (u32) stack-&gt;max_out) ) {</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_APP, (&quot;TestSource: No packets to emit, waiting for destruction\n&quot;));</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     294 </span>            :                 }
+<span class="lineNum">     295 </span><span class="lineCov">      21952 :                 pidctx-&gt;nb_packets++;</span>
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span><span class="lineCov">      21952 :                 if (stack-&gt;gsftest &amp;&amp; pidctx-&gt;nb_packets==4) {</span>
+<span class="lineNum">     298 </span><span class="lineCov">          1 :                         pidctx-&gt;frame_ifce.get_plane = ut_source_ifce_get_plane;</span>
+<span class="lineNum">     299 </span><span class="lineCov">          1 :                         pidctx-&gt;frame_ifce.user_data = pidctx;</span>
+<span class="lineNum">     300 </span><span class="lineCov">          1 :                         pck = gf_filter_pck_new_frame_interface(pidctx-&gt;dst_pid, &amp;pidctx-&gt;frame_ifce, ut_source_pck_del);</span>
+<span class="lineNum">     301 </span><span class="lineCov">      21951 :                 } else if (stack-&gt;alloc) {</span>
+<span class="lineNum">     302 </span>            :                         u8 *data;
+<span class="lineNum">     303 </span><span class="lineCov">       1800 :                         pck = gf_filter_pck_new_alloc(pidctx-&gt;dst_pid, 10, &amp;data);</span>
+<span class="lineNum">     304 </span><span class="lineCov">       1800 :                         memcpy(data, &quot;PacketCopy&quot;, 10);</span>
+<span class="lineNum">     305 </span><span class="lineCov">       1800 :                         gf_sha1_update(pidctx-&gt;sha_ctx, &quot;PacketCopy&quot;, 10);</span>
+<span class="lineNum">     306 </span>            :                 } else {
+<span class="lineNum">     307 </span><span class="lineCov">      20151 :                         pck = gf_filter_pck_new_shared(pidctx-&gt;dst_pid, &quot;PacketShared&quot;, 12, test_pck_del);</span>
+<span class="lineNum">     308 </span><span class="lineCov">      20151 :                         gf_sha1_update(pidctx-&gt;sha_ctx, &quot;PacketShared&quot;, 12);</span>
+<span class="lineNum">     309 </span>            :                 }
+<span class="lineNum">     310 </span><span class="lineCov">      21952 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_APP, (&quot;TestSource: pck %d PacketShared\n&quot;, pidctx-&gt;nb_packets));</span>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span><span class="lineCov">      21952 :                 gf_filter_pck_set_cts(pck, pidctx-&gt;nb_packets);</span>
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span><span class="lineCov">      21952 :                 p.type = GF_PROP_NAME;</span>
+<span class="lineNum">     315 </span><span class="lineCov">      21952 :                 p.value.string = &quot;custom_value&quot;;</span>
+<span class="lineNum">     316 </span><span class="lineCov">      21952 :                 gf_filter_pck_set_property(pck, GF_4CC('c','u','s','t'), &amp;p);</span>
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            :                 //try all our properties
+<span class="lineNum">     319 </span><span class="lineCov">      21952 :                 if (pidctx-&gt;nb_packets==1) {</span>
+<span class="lineNum">     320 </span><span class="lineCov">        159 :                         u32 val=1;</span>
+<span class="lineNum">     321 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','1'), &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     322 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','2'), &amp;PROP_SINT(-1));</span>
+<span class="lineNum">     323 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','3'), &amp;PROP_UINT(1));</span>
+<span class="lineNum">     324 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','4'), &amp;PROP_LONGSINT(-1));</span>
+<span class="lineNum">     325 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','5'), &amp;PROP_LONGUINT(1));</span>
+<span class="lineNum">     326 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','6'), &amp;PROP_FLOAT(1.0f));</span>
+<span class="lineNum">     327 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','7'), &amp;PROP_DOUBLE(1.0));</span>
+<span class="lineNum">     328 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','8'), &amp;PROP_FRAC_INT(1,1));</span>
+<span class="lineNum">     329 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','8'), &amp;PROP_FRAC64_INT(1,1));</span>
+<span class="lineNum">     330 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','9'), &amp;PROP_POINTER(pck));</span>
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineCov">        159 :                         if (stack-&gt;gsftest) {</span>
+<span class="lineNum">     333 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_property(pck, GF_4CC('c','u','s','a'), &amp;PROP_DATA(pidctx-&gt;ifce_data, 8));</span>
+<span class="lineNum">     334 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_property(pck, GF_4CC('c','u','s','b'), &amp;PROP_CONST_DATA(pidctx-&gt;ifce_data, 8));</span>
+<span class="lineNum">     335 </span>            :                         } else {
+<span class="lineNum">     336 </span><span class="lineCov">        158 :                                 gf_filter_pck_set_property(pck, GF_4CC('c','u','s','a'), &amp;PROP_DATA((char *) pidctx, sizeof(pidctx)));</span>
+<span class="lineNum">     337 </span><span class="lineCov">        158 :                                 gf_filter_pck_set_property(pck, GF_4CC('c','u','s','b'), &amp;PROP_CONST_DATA((char *) pidctx, sizeof(pidctx)));</span>
+<span class="lineNum">     338 </span>            :                         }
+<span class="lineNum">     339 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','c'), &amp;PROP_STRING(&quot;custom&quot;));</span>
+<span class="lineNum">     340 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','d'), &amp;PROP_STRING(&quot;custom&quot;));</span>
+<span class="lineNum">     341 </span>            :                         memset(&amp;p, 0, sizeof(GF_PropertyValue));
+<span class="lineNum">     342 </span><span class="lineCov">        159 :                         p.type = GF_PROP_VEC2;</span>
+<span class="lineNum">     343 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','e'), &amp;p);</span>
+<span class="lineNum">     344 </span><span class="lineCov">        159 :                         p.type = GF_PROP_VEC2I;</span>
+<span class="lineNum">     345 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','f'), &amp;p);</span>
+<span class="lineNum">     346 </span><span class="lineCov">        159 :                         p.type = GF_PROP_VEC3I;</span>
+<span class="lineNum">     347 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','h'), &amp;p);</span>
+<span class="lineNum">     348 </span><span class="lineCov">        159 :                         p.type = GF_PROP_VEC4I;</span>
+<span class="lineNum">     349 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','j'), &amp;p);</span>
+<span class="lineNum">     350 </span><span class="lineCov">        159 :                         p.type = GF_PROP_STRING_LIST;</span>
+<span class="lineNum">     351 </span><span class="lineCov">        159 :                         p.value.string_list.nb_items = 1;</span>
+<span class="lineNum">     352 </span><span class="lineCov">        159 :                         p.value.string_list.vals = gf_malloc(sizeof(char *));</span>
+<span class="lineNum">     353 </span><span class="lineCov">        159 :                         p.value.string_list.vals[0] = gf_strdup(&quot;custom&quot;);</span>
+<span class="lineNum">     354 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','k'), &amp;p);</span>
+<span class="lineNum">     355 </span><span class="lineCov">        159 :                         p.type = GF_PROP_UINT_LIST;</span>
+<span class="lineNum">     356 </span><span class="lineCov">        159 :                         p.value.uint_list.nb_items = 1;</span>
+<span class="lineNum">     357 </span><span class="lineCov">        159 :                         p.value.uint_list.vals = &amp;val;</span>
+<span class="lineNum">     358 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property(pck, GF_4CC('c','u','s','l'), &amp;p);</span>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property_str(pck, &quot;cusd&quot;, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     361 </span><span class="lineCov">        159 :                         gf_filter_pck_set_property_dyn(pck, &quot;cuse&quot;, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     362 </span>            :                 }
+<span class="lineNum">     363 </span><span class="lineCov">      21952 :                 if (stack-&gt;gsftest) {</span>
+<span class="lineNum">     364 </span><span class="lineCov">       1000 :                         gf_filter_pck_set_dts(pck, pidctx-&gt;nb_packets-1);</span>
+<span class="lineNum">     365 </span><span class="lineCov">       1000 :                         gf_filter_pck_set_cts(pck, pidctx-&gt;nb_packets-1);</span>
+<span class="lineNum">     366 </span><span class="lineCov">       1000 :                         gf_filter_pck_set_duration(pck, 1);</span>
+<span class="lineNum">     367 </span><span class="lineCov">       1000 :                         if (pidctx-&gt;nb_packets==2) {</span>
+<span class="lineNum">     368 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_seek_flag(pck, GF_TRUE);</span>
+<span class="lineNum">     369 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_carousel_version(pck, 1);</span>
+<span class="lineNum">     370 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_interlaced(pck, GF_TRUE);</span>
+<span class="lineNum">     371 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_sap(pck, GF_FILTER_SAP_3);</span>
+<span class="lineNum">     372 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_dependency_flags(pck, 0xFF);</span>
+<span class="lineNum">     373 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_property(pck, GF_PROP_PCK_SENDER_NTP, &amp;PROP_LONGUINT(0) );</span>
+<span class="lineNum">     374 </span>            :                         }
+<span class="lineNum">     375 </span><span class="lineCov">        999 :                         else if (pidctx-&gt;nb_packets==3) {</span>
+<span class="lineNum">     376 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_sap(pck, GF_FILTER_SAP_4);</span>
+<span class="lineNum">     377 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_roll_info(pck, 1);</span>
+<span class="lineNum">     378 </span><span class="lineCov">          1 :                                 gf_filter_pck_set_byte_offset(pck, 20);</span>
+<span class="lineNum">     379 </span>            :                         }
+<span class="lineNum">     380 </span>            :                 }
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span><span class="lineCov">      21952 :                 ut_filter_send_update(filter, pidctx-&gt;nb_packets);</span>
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span><span class="lineCov">      21952 :                 if (pidctx-&gt;nb_packets==stack-&gt;max_pck) {</span>
+<span class="lineNum">     385 </span><span class="lineCov">        159 :                         if (pidctx-&gt;sha_ctx) {</span>
+<span class="lineNum">     386 </span>            :                                 u8 digest[GF_SHA1_DIGEST_SIZE];
+<span class="lineNum">     387 </span><span class="lineCov">        159 :                                 gf_sha1_finish(pidctx-&gt;sha_ctx, digest);</span>
+<span class="lineNum">     388 </span><span class="lineCov">        159 :                                 pidctx-&gt;sha_ctx = NULL;</span>
+<span class="lineNum">     389 </span><span class="lineCov">        159 :                                 p.type = GF_PROP_DATA;</span>
+<span class="lineNum">     390 </span><span class="lineCov">        159 :                                 p.value.data.size = GF_SHA1_DIGEST_SIZE;</span>
+<span class="lineNum">     391 </span><span class="lineCov">        159 :                                 p.value.data.ptr = (char *) digest;</span>
+<span class="lineNum">     392 </span>            :                                 //with this we test both:
+<span class="lineNum">     393 </span>            :                                 //- SHA of send data is correct at the receiver side
+<span class="lineNum">     394 </span>            :                                 //- property update on a PID
+<span class="lineNum">     395 </span><span class="lineCov">        159 :                                 gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_4CC('s','h','a','1'), &amp;p);</span>
+<span class="lineNum">     396 </span>            :                         }
+<span class="lineNum">     397 </span>            :                 }
+<span class="lineNum">     398 </span>            :                 //just for coverage: check keeping a reference to the packet
+<span class="lineNum">     399 </span><span class="lineCov">      21952 :                 gf_filter_pck_ref(&amp; pck);</span>
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span><span class="lineCov">      21952 :                 gf_filter_pck_send(pck);</span>
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            :                 //and destroy the reference
+<span class="lineNum">     404 </span><span class="lineCov">      21952 :                 gf_filter_pck_unref(pck);</span>
+<span class="lineNum">     405 </span>            : 
+<span class="lineNum">     406 </span>            :         }
+<span class="lineNum">     407 </span><span class="lineCov">      22083 :         if (nb_eos==count) return GF_EOS;</span>
+<span class="lineNum">     408 </span><span class="lineCov">      21880 :         return GF_OK;</span>
+<span class="lineNum">     409 </span>            : }
+<a name="410"><span class="lineNum">     410 </span>            : </a>
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span><span class="lineCov">      25850 : static GF_Err ut_filter_process_sink(GF_Filter *filter)</span>
+<span class="lineNum">     413 </span>            : {
+<span class="lineNum">     414 </span>            :         u32 size, i, count, nb_eos;
+<span class="lineNum">     415 </span>            :         const char *data;
+<span class="lineNum">     416 </span><span class="lineCov">      25850 :         GF_UnitTestFilter *stack = (GF_UnitTestFilter *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span><span class="lineCov">      25850 :         count = gf_list_count(stack-&gt;pids);</span>
+<span class="lineNum">     419 </span>            :         nb_eos=0;
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span><span class="lineCov">      55719 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     422 </span><span class="lineCov">      29869 :         PIDCtx *pidctx=gf_list_get(stack-&gt;pids, i);</span>
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span><span class="lineCov">      29869 :         GF_FilterPacket *pck = gf_filter_pid_get_packet(pidctx-&gt;src_pid);</span>
+<span class="lineNum">     425 </span><span class="lineCov">      29869 :         if (!pck) {</span>
+<span class="lineNum">     426 </span><span class="lineCov">       4230 :                 if (gf_filter_pid_is_eos(pidctx-&gt;src_pid)) nb_eos++;</span>
+<span class="lineNum">     427 </span><span class="lineCov">       4230 :                 continue;</span>
+<span class="lineNum">     428 </span>            :         }
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span><span class="lineCov">      25639 :         data = gf_filter_pck_get_data(pck, &amp;size);</span>
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span><span class="lineCov">      25639 :         if (stack-&gt;cov &amp;&amp; !pidctx-&gt;nb_packets) {</span>
+<span class="lineNum">     433 </span>            :                 GF_PropertyValue p;
+<span class="lineNum">     434 </span><span class="lineCov">          2 :                 Bool old_strict = gf_log_set_strict_error(GF_FALSE);</span>
+<span class="lineNum">     435 </span><span class="lineCov">          2 :                 gf_filter_pck_send(pck);</span>
+<span class="lineNum">     436 </span><span class="lineCov">          2 :                 gf_filter_pck_set_property(pck, GF_4CC('c','u','s','t'), &amp;p);</span>
+<span class="lineNum">     437 </span><span class="lineCov">          2 :                 gf_filter_pck_merge_properties(pck, pck);</span>
+<span class="lineNum">     438 </span><span class="lineCov">          2 :                 gf_filter_pck_set_framing(pck, GF_TRUE, GF_FALSE);</span>
+<span class="lineNum">     439 </span><span class="lineCov">          2 :                 gf_log_set_strict_error(old_strict);</span>
+<span class="lineNum">     440 </span>            :         }
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span><span class="lineCov">      25639 :         gf_sha1_update(pidctx-&gt;sha_ctx, (u8*)data, size);</span>
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span><span class="lineCov">      25640 :         pidctx-&gt;nb_packets++;</span>
+<span class="lineNum">     445 </span><span class="lineCov">      25640 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_APP, (&quot;TestSink: Consuming packet %d bytes\n&quot;, size));</span>
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span><span class="lineCov">      25640 :         dump_properties(pck, pidctx-&gt;nb_packets);</span>
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span><span class="lineCov">      25640 :         gf_filter_pid_drop_packet(pidctx-&gt;src_pid);</span>
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            :         } //end PID loop
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span><span class="lineCov">      25850 :         if (nb_eos==count) return GF_EOS;</span>
+<span class="lineNum">     454 </span>            :         
+<span class="lineNum">     455 </span><span class="lineCov">      25850 :         return GF_OK;</span>
+<span class="lineNum">     456 </span>            : }
+<a name="457"><span class="lineNum">     457 </span>            : </a>
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span><span class="lineCov">        558 : static GF_Err ut_filter_config_input(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     460 </span>            : {
+<span class="lineNum">     461 </span>            :         const GF_PropertyValue *format;
+<span class="lineNum">     462 </span>            :         GF_PropertyValue p;
+<span class="lineNum">     463 </span>            :         PIDCtx *pidctx;
+<span class="lineNum">     464 </span>            :         u32 i, count;
+<span class="lineNum">     465 </span><span class="lineCov">        558 :         GF_UnitTestFilter  *stack = (GF_UnitTestFilter *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span><span class="lineCov">        559 :         if (stack-&gt;mode==UTF_MODE_SOURCE) {</span>
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error: Attempt to connect PID on source filter\n&quot;));</span>
+<span class="lineNum">     469 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     470 </span>            :         }
+<span class="lineNum">     471 </span>            :         //for both filter and sink modes, check input format
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineCov">        559 :         count = gf_list_count(stack-&gt;pids);</span>
+<span class="lineNum">     474 </span><span class="lineCov">        632 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     475 </span><span class="lineCov">        351 :                 pidctx = gf_list_get(stack-&gt;pids, i);</span>
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :                 //something is being reconfigured. We check we have the same custum arg, otherwise we do not support
+<span class="lineNum">     478 </span><span class="lineCov">        353 :                 if (pidctx-&gt;src_pid == pid) {</span>
+<span class="lineNum">     479 </span><span class="lineCov">        279 :                         format = gf_filter_pid_get_property(pidctx-&gt;src_pid, GF_4CC('c','u','s','t') );</span>
+<span class="lineNum">     480 </span><span class="lineCov">        279 :                         if (!format || !format-&gt;value.string || strcmp(format-&gt;value.string, stack-&gt;pid_att)) {</span>
+<span class="lineNum">     481 </span>            :                                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     482 </span>            :                         }
+<span class="lineNum">     483 </span>            :                         //filter mode, set properties on output
+<span class="lineNum">     484 </span><span class="lineCov">        279 :                         if (stack-&gt;mode==UTF_MODE_FILTER) {</span>
+<span class="lineNum">     485 </span>            :                                 //this is not needed since copy_properties does that, used for coverage/tests
+<span class="lineNum">     486 </span><span class="lineCov">         68 :                                 gf_filter_pid_reset_properties(pidctx-&gt;dst_pid);</span>
+<span class="lineNum">     487 </span><span class="lineCov">         68 :                                 gf_filter_pid_copy_properties(pidctx-&gt;dst_pid, pidctx-&gt;src_pid);</span>
+<span class="lineNum">     488 </span>            :                         }
+<span class="lineNum">     489 </span>            :                         return GF_OK;
+<span class="lineNum">     490 </span>            :                 }
+<span class="lineNum">     491 </span>            :         }
+<span class="lineNum">     492 </span>            : 
+<span class="lineNum">     493 </span>            :         //check our functions
+<span class="lineNum">     494 </span><span class="lineCov">        281 :         format = gf_filter_pid_get_property_str(pid, &quot;custom1&quot;);</span>
+<span class="lineNum">     495 </span><span class="lineCov">        281 :         if (!format) {</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;%s: expecting property string custom1 on PID\n&quot;, gf_filter_get_name(filter) ));</span>
+<span class="lineNum">     497 </span>            :         }
+<span class="lineNum">     498 </span><span class="lineCov">        281 :         format = gf_filter_pid_get_property_str(pid, &quot;custom2&quot;);</span>
+<span class="lineNum">     499 </span><span class="lineCov">        281 :         if (!format) {</span>
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;%s: expecting property string custom2 on PID\n&quot;, gf_filter_get_name(filter) ));</span>
+<span class="lineNum">     501 </span>            :         }
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineCov">        281 :         format = gf_filter_pid_get_property(pid, GF_4CC('c','u','s','t') );</span>
+<span class="lineNum">     504 </span><span class="lineCov">        281 :         if (!format || !format-&gt;value.string || strcmp(format-&gt;value.string, stack-&gt;pid_att)) {</span>
+<span class="lineNum">     505 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     506 </span>            :         }
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            :         //new PID
+<span class="lineNum">     509 </span><span class="lineCov">        281 :         GF_SAFEALLOC(pidctx, PIDCtx);</span>
+<span class="lineNum">     510 </span><span class="lineCov">        281 :         if (!pidctx) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     511 </span><span class="lineCov">        281 :         pidctx-&gt;src_pid = pid;</span>
+<span class="lineNum">     512 </span><span class="lineCov">        281 :         gf_list_add(stack-&gt;pids, pidctx);</span>
+<span class="lineNum">     513 </span>            :         assert(pidctx-&gt;src_pid);
+<span class="lineNum">     514 </span>            :         
+<span class="lineNum">     515 </span>            :         //coverage mode
+<span class="lineNum">     516 </span><span class="lineCov">        281 :         if (stack-&gt;cov) {</span>
+<span class="lineNum">     517 </span>            :                 u8 *data;
+<span class="lineNum">     518 </span><span class="lineCov">          3 :                 Bool old_strict = gf_log_set_strict_error(GF_FALSE);</span>
+<span class="lineNum">     519 </span><span class="lineCov">          3 :                 gf_filter_pid_set_property(pidctx-&gt;src_pid, GF_4CC('s','h','a','1'), format);</span>
+<span class="lineNum">     520 </span><span class="lineCov">          3 :                 gf_filter_pid_reset_properties(pidctx-&gt;src_pid);</span>
+<span class="lineNum">     521 </span><span class="lineCov">          3 :                 gf_filter_pck_new_alloc(pidctx-&gt;src_pid, 20, &amp;data);</span>
+<span class="lineNum">     522 </span><span class="lineCov">          3 :                 gf_filter_pck_new_shared(pidctx-&gt;src_pid, &quot;foo&quot;, 3, NULL);</span>
+<span class="lineNum">     523 </span><span class="lineCov">          3 :                 gf_filter_pck_new_ref(pidctx-&gt;src_pid, 0, 3, NULL);</span>
+<span class="lineNum">     524 </span><span class="lineCov">          3 :                 gf_log_set_strict_error(old_strict);</span>
+<span class="lineNum">     525 </span>            :         }
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span>            :         //filter mode, setup output
+<span class="lineNum">     528 </span><span class="lineCov">        281 :         if (stack-&gt;mode==UTF_MODE_FILTER) {</span>
+<span class="lineNum">     529 </span><span class="lineCov">         68 :                 pidctx-&gt;dst_pid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     530 </span><span class="lineCov">         68 :                 p.type=GF_PROP_NAME;</span>
+<span class="lineNum">     531 </span><span class="lineCov">         68 :                 p.value.string = (char *) stack-&gt;pid_att;</span>
+<span class="lineNum">     532 </span><span class="lineCov">         68 :                 gf_filter_pid_copy_properties(pidctx-&gt;dst_pid, pidctx-&gt;src_pid);</span>
+<span class="lineNum">     533 </span>            : 
+<span class="lineNum">     534 </span><span class="lineCov">         68 :                 if (stack-&gt;cov) {</span>
+<span class="lineNum">     535 </span><span class="lineCov">          1 :                         Bool old_strict = gf_log_set_strict_error(GF_FALSE);</span>
+<span class="lineNum">     536 </span><span class="lineCov">          1 :                         gf_filter_pid_copy_properties(pidctx-&gt;src_pid, pidctx-&gt;dst_pid);</span>
+<span class="lineNum">     537 </span><span class="lineCov">          1 :                         gf_filter_pid_get_packet(pidctx-&gt;dst_pid);</span>
+<span class="lineNum">     538 </span><span class="lineCov">          1 :                         gf_filter_pid_drop_packet(pidctx-&gt;dst_pid);</span>
+<span class="lineNum">     539 </span><span class="lineCov">          1 :                         gf_filter_pid_drop_packet(pidctx-&gt;src_pid);</span>
+<span class="lineNum">     540 </span><span class="lineCov">          1 :                         gf_log_set_strict_error(old_strict);</span>
+<span class="lineNum">     541 </span>            :                 }
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span><span class="lineCov">         68 :                 gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_4CC('c','u','s','t'), &amp;p);</span>
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span><span class="lineCov">         68 :                 gf_filter_pid_set_udta(pidctx-&gt;dst_pid, pidctx);</span>
+<span class="lineNum">     546 </span><span class="lineCov">         68 :                 gf_filter_pid_set_udta(pidctx-&gt;src_pid, pidctx);</span>
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span><span class="lineCov">         68 :                 gf_filter_pid_set_framing_mode(pidctx-&gt;src_pid, GF_TRUE);</span>
+<span class="lineNum">     549 </span><span class="lineCov">         68 :                 pidctx-&gt;sha_ctx = gf_sha1_starts();</span>
+<span class="lineNum">     550 </span>            :         }
+<span class="lineNum">     551 </span>            :         //sink mode, request full reconstruction of input blocks or not depending on framing mode 
+<span class="lineNum">     552 </span>            :         else {
+<span class="lineNum">     553 </span>            :                 GF_FilterEvent evt;
+<span class="lineNum">     554 </span><span class="lineCov">        213 :                 gf_filter_pid_set_framing_mode(pidctx-&gt;src_pid, stack-&gt;framing ? GF_FALSE : GF_TRUE);</span>
+<span class="lineNum">     555 </span><span class="lineCov">        212 :                 pidctx-&gt;sha_ctx = gf_sha1_starts();</span>
+<span class="lineNum">     556 </span><span class="lineCov">        213 :                 GF_FEVT_INIT(evt, GF_FEVT_PLAY, pid);</span>
+<span class="lineNum">     557 </span><span class="lineCov">        213 :                 gf_filter_pid_send_event(pid, &amp;evt);</span>
+<span class="lineNum">     558 </span>            :         }
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span>            :         return GF_OK;
+<span class="lineNum">     561 </span>            : }
+<a name="562"><span class="lineNum">     562 </span>            : </a>
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span><span class="lineCov">        141 : static GF_Err ut_filter_config_source(GF_Filter *filter)</span>
+<span class="lineNum">     565 </span>            : {
+<span class="lineNum">     566 </span>            :         GF_PropertyValue p;
+<span class="lineNum">     567 </span>            :         PIDCtx *pidctx;
+<span class="lineNum">     568 </span>            :         u32 i;
+<span class="lineNum">     569 </span><span class="lineCov">        141 :         GF_UnitTestFilter *stack = (GF_UnitTestFilter *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     570 </span>            : 
+<span class="lineNum">     571 </span><span class="lineCov">        300 :         for (i=0; i&lt;stack-&gt;nb_pids; i++) {</span>
+<span class="lineNum">     572 </span>            :                 //create a pid
+<span class="lineNum">     573 </span><span class="lineCov">        159 :                 GF_SAFEALLOC(pidctx, PIDCtx);</span>
+<span class="lineNum">     574 </span><span class="lineCov">        159 :                 if (!pidctx) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     575 </span><span class="lineCov">        159 :                 gf_list_add(stack-&gt;pids, pidctx);</span>
+<span class="lineNum">     576 </span><span class="lineCov">        159 :                 pidctx-&gt;dst_pid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     577 </span><span class="lineCov">        159 :                 gf_filter_pid_set_udta(pidctx-&gt;dst_pid, pidctx);</span>
+<span class="lineNum">     578 </span>            : 
+<span class="lineNum">     579 </span>            :                 //set a custum property
+<span class="lineNum">     580 </span><span class="lineCov">        159 :                 p.type = GF_PROP_NAME;</span>
+<span class="lineNum">     581 </span><span class="lineCov">        159 :                 p.value.string = (char *) stack-&gt;pid_att;</span>
+<span class="lineNum">     582 </span><span class="lineCov">        159 :                 gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_4CC('c','u','s','t'), &amp;p);</span>
+<span class="lineNum">     583 </span>            : 
+<span class="lineNum">     584 </span>            :                 //for coverage
+<span class="lineNum">     585 </span><span class="lineCov">        159 :                 gf_filter_pid_set_property_str(pidctx-&gt;dst_pid, &quot;custom1&quot;, &amp;p);</span>
+<span class="lineNum">     586 </span><span class="lineCov">        159 :                 gf_filter_pid_set_property_dyn(pidctx-&gt;dst_pid, &quot;custom2&quot;, &amp;p);</span>
+<span class="lineNum">     587 </span>            : 
+<span class="lineNum">     588 </span><span class="lineCov">        159 :                 if (stack-&gt;cov) {</span>
+<span class="lineNum">     589 </span><span class="lineCov">          1 :                         Bool old_strict = gf_log_set_strict_error(GF_FALSE);</span>
+<span class="lineNum">     590 </span><span class="lineCov">          1 :                         gf_filter_pid_set_framing_mode(pidctx-&gt;dst_pid, GF_TRUE);</span>
+<span class="lineNum">     591 </span><span class="lineCov">          1 :                         gf_log_set_strict_error(old_strict);</span>
+<span class="lineNum">     592 </span>            :                 }
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span><span class="lineCov">        159 :                 pidctx-&gt;sha_ctx = gf_sha1_starts();</span>
+<span class="lineNum">     595 </span>            : 
+<span class="lineNum">     596 </span><span class="lineCov">        159 :                 if (stack-&gt;gsftest) {</span>
+<span class="lineNum">     597 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_PROP_PID_STREAM_TYPE, &amp;PROP_UINT(GF_STREAM_VISUAL) );</span>
+<span class="lineNum">     598 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_PROP_PID_WIDTH, &amp;PROP_UINT(5) );</span>
+<span class="lineNum">     599 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(2) );</span>
+<span class="lineNum">     600 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_PROP_PID_FPS, &amp;PROP_FRAC_INT(25,1) );</span>
+<span class="lineNum">     601 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_PROP_PID_CODECID, &amp;PROP_UINT(GF_CODECID_RAW) );</span>
+<span class="lineNum">     602 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_PROP_PID_PIXFMT, &amp;PROP_UINT(GF_PIXEL_GREYSCALE) );</span>
+<span class="lineNum">     603 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property_str(pidctx-&gt;dst_pid, &quot;gsfdummy&quot;, &amp;p);</span>
+<span class="lineNum">     604 </span><span class="lineCov">          1 :                         gf_filter_pid_set_property(pidctx-&gt;dst_pid, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(25) );</span>
+<span class="lineNum">     605 </span>            :                 }
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span>            :         }
+<span class="lineNum">     608 </span>            :         return GF_OK;
+<span class="lineNum">     609 </span>            : }
+<a name="610"><span class="lineNum">     610 </span>            : </a>
+<span class="lineNum">     611 </span>            : 
+<span class="lineNum">     612 </span><span class="lineCov">          9 : static GF_Err ut_filter_update_arg(GF_Filter *filter, const char *arg_name, const GF_PropertyValue *arg_val)</span>
+<span class="lineNum">     613 </span>            : {
+<span class="lineNum">     614 </span><span class="lineCov">          9 :         return GF_OK;</span>
+<a name="615"><span class="lineNum">     615 </span>            : }</a>
+<span class="lineNum">     616 </span>            : 
+<span class="lineNum">     617 </span><span class="lineCov">        385 : GF_Err utfilter_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     618 </span>            : {
+<span class="lineNum">     619 </span>            :         GF_PropertyValue p;
+<span class="lineNum">     620 </span><span class="lineCov">        385 :         GF_UnitTestFilter *stack = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     621 </span>            : 
+<span class="lineNum">     622 </span><span class="lineCov">        385 :         stack-&gt;pids = gf_list_new();</span>
+<span class="lineNum">     623 </span>            : 
+<span class="lineNum">     624 </span><span class="lineCov">        385 :         if (stack-&gt;cov) {</span>
+<span class="lineNum">     625 </span>            :                 Bool old_strict;
+<span class="lineNum">     626 </span>            :                 char szFmt[40];
+<span class="lineNum">     627 </span>            :                 s64 val;
+<span class="lineNum">     628 </span>            :                 u32 i;
+<span class="lineNum">     629 </span>            :                 GF_PropertyValue p2;
+<span class="lineNum">     630 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_BOOL, &quot;prop&quot;, &quot;true&quot;, NULL, 0);</span>
+<span class="lineNum">     631 </span><span class="lineCov">          3 :                 if (p.value.boolean != GF_TRUE) {</span>
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing boolean value\n&quot;));</span>
+<span class="lineNum">     633 </span>            :                 }
+<span class="lineNum">     634 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_BOOL, &quot;prop&quot;, &quot;yes&quot;, NULL, 0);</span>
+<span class="lineNum">     635 </span><span class="lineCov">          3 :                 if (p.value.boolean != GF_TRUE) {</span>
+<span class="lineNum">     636 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing boolean value\n&quot;));</span>
+<span class="lineNum">     637 </span>            :                 }
+<span class="lineNum">     638 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_BOOL, &quot;prop&quot;, &quot;no&quot;, NULL, 0);</span>
+<span class="lineNum">     639 </span><span class="lineCov">          3 :                 if (p.value.boolean != GF_FALSE) {</span>
+<span class="lineNum">     640 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing boolean value\n&quot;));</span>
+<span class="lineNum">     641 </span>            :                 }
+<span class="lineNum">     642 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_BOOL, &quot;prop&quot;, &quot;false&quot;, NULL, 0);</span>
+<span class="lineNum">     643 </span><span class="lineCov">          3 :                 if (p.value.boolean != GF_FALSE) {</span>
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing boolean value\n&quot;));</span>
+<span class="lineNum">     645 </span>            :                 }
+<span class="lineNum">     646 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_SINT, &quot;prop&quot;, &quot;-1&quot;, NULL, 0);</span>
+<span class="lineNum">     647 </span><span class="lineCov">          3 :                 if (p.value.sint != -1) {</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing sint value\n&quot;));</span>
+<span class="lineNum">     649 </span>            :                 }
+<span class="lineNum">     650 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_SINT, &quot;prop&quot;, &quot;-1k&quot;, NULL, 0);</span>
+<span class="lineNum">     651 </span><span class="lineCov">          3 :                 if (p.value.sint != -1000) {</span>
+<span class="lineNum">     652 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing sint value\n&quot;));</span>
+<span class="lineNum">     653 </span>            :                 }
+<span class="lineNum">     654 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_UINT, &quot;prop&quot;, &quot;1&quot;, NULL, 0);</span>
+<span class="lineNum">     655 </span><span class="lineCov">          3 :                 if (p.value.uint != 1) {</span>
+<span class="lineNum">     656 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing uint value\n&quot;));</span>
+<span class="lineNum">     657 </span>            :                 }
+<span class="lineNum">     658 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_UINT, &quot;prop&quot;, &quot;1m&quot;, NULL, 0);</span>
+<span class="lineNum">     659 </span><span class="lineCov">          3 :                 if (p.value.uint != 1000000) {</span>
+<span class="lineNum">     660 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing uint 1m value\n&quot;));</span>
+<span class="lineNum">     661 </span>            :                 }
+<span class="lineNum">     662 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_UINT, &quot;prop&quot;, &quot;0x10000000&quot;, NULL, 0);</span>
+<span class="lineNum">     663 </span><span class="lineCov">          3 :                 if (p.value.uint != 0x10000000) {</span>
+<span class="lineNum">     664 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing uint hex value\n&quot;));</span>
+<span class="lineNum">     665 </span>            :                 }
+<span class="lineNum">     666 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_UINT, &quot;prop&quot;, &quot;moof&quot;, NULL, 0);</span>
+<span class="lineNum">     667 </span><span class="lineCov">          3 :                 if (p.value.uint != GF_4CC('m','o','o','f')) {</span>
+<span class="lineNum">     668 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing uint 4CC value\n&quot;));</span>
+<span class="lineNum">     669 </span>            :                 }
+<span class="lineNum">     670 </span>            :                 val = 0xFFFFFFFF;
+<span class="lineNum">     671 </span>            :                 val *= 2;
+<span class="lineNum">     672 </span>            :                 sprintf(szFmt, &quot;&quot;LLD, -val);
+<span class="lineNum">     673 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_LSINT, &quot;prop&quot;, szFmt, NULL, 0);</span>
+<span class="lineNum">     674 </span><span class="lineCov">          3 :                 if (p.value.longsint != -val) {</span>
+<span class="lineNum">     675 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing longsint value\n&quot;));</span>
+<span class="lineNum">     676 </span>            :                 }
+<span class="lineNum">     677 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_LSINT, &quot;prop&quot;, &quot;-1m&quot;, NULL, 0);</span>
+<span class="lineNum">     678 </span><span class="lineCov">          3 :                 if (p.value.longsint != -1000000) {</span>
+<span class="lineNum">     679 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing longsint value\n&quot;));</span>
+<span class="lineNum">     680 </span>            :                 }
+<span class="lineNum">     681 </span>            :                 sprintf(szFmt, &quot;&quot;LLU, val);
+<span class="lineNum">     682 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_LUINT, &quot;prop&quot;, szFmt, NULL, 0);</span>
+<span class="lineNum">     683 </span><span class="lineCov">          3 :                 if (p.value.longuint != val) {</span>
+<span class="lineNum">     684 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing longuint value\n&quot;));</span>
+<span class="lineNum">     685 </span>            :                 }
+<span class="lineNum">     686 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_LUINT, &quot;prop&quot;, &quot;1k&quot;, NULL, 0);</span>
+<span class="lineNum">     687 </span><span class="lineCov">          3 :                 if (p.value.longuint != 1000) {</span>
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing longuint value\n&quot;));</span>
+<span class="lineNum">     689 </span>            :                 }
+<span class="lineNum">     690 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_FLOAT, &quot;prop&quot;, &quot;1.0&quot;, NULL, 0);</span>
+<span class="lineNum">     691 </span><span class="lineCov">          3 :                 if (p.value.fnumber != FIX_ONE) {</span>
+<span class="lineNum">     692 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing float value\n&quot;));</span>
+<span class="lineNum">     693 </span>            :                 }
+<span class="lineNum">     694 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_DOUBLE, &quot;prop&quot;, &quot;1.0&quot;, NULL, 0);</span>
+<span class="lineNum">     695 </span><span class="lineCov">          3 :                 if (p.value.number != 1.0) {</span>
+<span class="lineNum">     696 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing double value\n&quot;));</span>
+<span class="lineNum">     697 </span>            :                 }
+<span class="lineNum">     698 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_DOUBLE, &quot;prop&quot;, &quot;1.0m&quot;, NULL, 0);</span>
+<span class="lineNum">     699 </span><span class="lineCov">          3 :                 if (p.value.number != 1000000.0) {</span>
+<span class="lineNum">     700 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing double value\n&quot;));</span>
+<span class="lineNum">     701 </span>            :                 }
+<span class="lineNum">     702 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_FRACTION, &quot;prop&quot;, &quot;1000/1&quot;, NULL, 0);</span>
+<span class="lineNum">     703 </span><span class="lineCov">          3 :                 if ((p.value.frac.den != 1) || (p.value.frac.num != 1000)) {</span>
+<span class="lineNum">     704 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing fraction value\n&quot;));</span>
+<span class="lineNum">     705 </span>            :                 }
+<span class="lineNum">     706 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_FRACTION, &quot;prop&quot;, &quot;1000&quot;, NULL, 0);</span>
+<span class="lineNum">     707 </span><span class="lineCov">          3 :                 if ((p.value.frac.den != 1) || (p.value.frac.num != 1000)) {</span>
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing fraction value\n&quot;));</span>
+<span class="lineNum">     709 </span>            :                 }
+<span class="lineNum">     710 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_FRACTION, &quot;prop&quot;, &quot;1.001&quot;, NULL, 0);</span>
+<span class="lineNum">     711 </span><span class="lineCov">          3 :                 if (p.value.frac.num * 1000 != 1001 * p.value.frac.den) {</span>
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing fraction fp value\n&quot;));</span>
+<span class="lineNum">     713 </span>            :                 }
+<span class="lineNum">     714 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_STRING, &quot;prop&quot;, &quot;test&quot;, NULL, 0);</span>
+<span class="lineNum">     715 </span><span class="lineCov">          3 :                 if (!p.value.string || strcmp(p.value.string, &quot;test&quot;)) {</span>
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing fraction value\n&quot;));</span>
+<span class="lineNum">     717 </span>            :                 }
+<span class="lineNum">     718 </span><span class="lineCov">          3 :                 if (p.value.string) gf_free(p.value.string);</span>
+<span class="lineNum">     719 </span>            : 
+<span class="lineNum">     720 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_FRACTION64, &quot;prop&quot;, &quot;1.001&quot;, NULL, 0);</span>
+<span class="lineNum">     721 </span><span class="lineCov">          3 :                 if (p.value.lfrac.num * 1000 != p.value.lfrac.den * 1001) {</span>
+<span class="lineNum">     722 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing fraction64 fp value\n&quot;));</span>
+<span class="lineNum">     723 </span>            :                 }
+<span class="lineNum">     724 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_VEC2I, &quot;prop&quot;, &quot;1x1&quot;, NULL, 0);</span>
+<span class="lineNum">     725 </span><span class="lineCov">          3 :                 if ((p.value.vec2i.x != 1) || (p.value.vec2i.y != 1) ) {</span>
+<span class="lineNum">     726 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing vec2i value\n&quot;));</span>
+<span class="lineNum">     727 </span>            :                 }
+<span class="lineNum">     728 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_VEC2, &quot;prop&quot;, &quot;1x1&quot;, NULL, 0);</span>
+<span class="lineNum">     729 </span><span class="lineCov">          3 :                 if ((p.value.vec2.x != 1.0) || (p.value.vec2.y != 1.0) ) {</span>
+<span class="lineNum">     730 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing vec2 value\n&quot;));</span>
+<span class="lineNum">     731 </span>            :                 }
+<span class="lineNum">     732 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_VEC3I, &quot;prop&quot;, &quot;1x1x1&quot;, NULL, 0);</span>
+<span class="lineNum">     733 </span><span class="lineCov">          3 :                 if ((p.value.vec3i.x != 1) || (p.value.vec3i.y != 1) || (p.value.vec3i.z != 1)) {</span>
+<span class="lineNum">     734 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing vec3i value\n&quot;));</span>
+<span class="lineNum">     735 </span>            :                 }
+<span class="lineNum">     736 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_VEC4I, &quot;prop&quot;, &quot;1x1x1x1&quot;, NULL, 0);</span>
+<span class="lineNum">     737 </span><span class="lineCov">          3 :                 if ((p.value.vec4i.x != 1) || (p.value.vec4i.y != 1) || (p.value.vec4i.z != 1) || (p.value.vec4i.w != 1)) {</span>
+<span class="lineNum">     738 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing vec4i value\n&quot;));</span>
+<span class="lineNum">     739 </span>            :                 }
+<span class="lineNum">     740 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_PIXFMT, &quot;prop&quot;, &quot;rgb&quot;, NULL, 0);</span>
+<span class="lineNum">     741 </span><span class="lineCov">          3 :                 if (p.value.uint != GF_PIXEL_RGB) {</span>
+<span class="lineNum">     742 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing pixfmt value\n&quot;));</span>
+<span class="lineNum">     743 </span>            :                 }
+<span class="lineNum">     744 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_PCMFMT, &quot;prop&quot;, &quot;pcm&quot;, NULL, 0);</span>
+<span class="lineNum">     745 </span><span class="lineCov">          3 :                 if (p.value.uint != GF_AUDIO_FMT_S16) {</span>
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing pcmfmt value\n&quot;));</span>
+<span class="lineNum">     747 </span>            :                 }
+<span class="lineNum">     748 </span>            : 
+<span class="lineNum">     749 </span>            :                 sprintf(szFmt, &quot;%d@%p&quot;, (u32) sizeof(stack), stack);
+<span class="lineNum">     750 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_DATA, &quot;prop&quot;, szFmt, NULL, 0);</span>
+<span class="lineNum">     751 </span><span class="lineCov">          3 :                 if ((p.value.data.size != (u32) sizeof(stack)) || memcmp(p.value.data.ptr, (char *) stack, sizeof(stack))) {</span>
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing data value\n&quot;));</span>
+<span class="lineNum">     753 </span>            :                 }
+<span class="lineNum">     754 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_CONST_DATA, &quot;prop&quot;, szFmt, NULL, 0);</span>
+<span class="lineNum">     755 </span><span class="lineCov">          3 :                 if ((p.value.data.ptr != (u8 *) stack) || (p.value.data.size != (u32) sizeof(stack))) {</span>
+<span class="lineNum">     756 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing data value\n&quot;));</span>
+<span class="lineNum">     757 </span>            :                 }
+<span class="lineNum">     758 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_CONST_DATA, &quot;prop&quot;, &quot;0xABCDEF&quot;, NULL, 0);</span>
+<span class="lineNum">     759 </span><span class="lineCov">          3 :                 if (!p.value.data.ptr || (p.value.data.size != 3) || (p.value.data.ptr[0] != 0xAB) ) {</span>
+<span class="lineNum">     760 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing data value\n&quot;));</span>
+<span class="lineNum">     761 </span>            :                 }
+<span class="lineNum">     762 </span><span class="lineCov">          3 :                 if (p.value.data.ptr) gf_free(p.value.data.ptr);</span>
+<span class="lineNum">     763 </span>            : 
+<span class="lineNum">     764 </span>            :                 sprintf(szFmt, &quot;%p&quot;, stack);
+<span class="lineNum">     765 </span><span class="lineCov">          3 :                 p = gf_props_parse_value(GF_PROP_POINTER, &quot;prop&quot;, szFmt, NULL, 0);</span>
+<span class="lineNum">     766 </span><span class="lineCov">          3 :                 if (p.value.ptr != stack) {</span>
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_APP, (&quot;[UTFilter] Error parsing data value\n&quot;));</span>
+<span class="lineNum">     768 </span>            :                 }
+<span class="lineNum">     769 </span>            : 
+<span class="lineNum">     770 </span><span class="lineCov">          3 :                 old_strict = gf_log_set_strict_error(GF_FALSE);</span>
+<span class="lineNum">     771 </span>            :                 //negative tests
+<span class="lineNum">     772 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_STRING, &quot;prop&quot;, &quot;file@_no_exist&quot;, NULL, 0);</span>
+<span class="lineNum">     773 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_STRING, &quot;prop&quot;, &quot;bxml@_no_exist&quot;, NULL, 0);</span>
+<span class="lineNum">     774 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_DATA, &quot;prop&quot;, &quot;file@_no_exist&quot;, NULL, 0);</span>
+<span class="lineNum">     775 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_DATA, &quot;prop&quot;, &quot;bxml@_no_exist&quot;, NULL, 0);</span>
+<span class="lineNum">     776 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_BOOL, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     777 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_SINT, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     778 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_UINT, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     779 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_LSINT, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     780 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_LUINT, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     781 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_FLOAT, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     782 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_DOUBLE, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     783 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_FRACTION, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     784 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_FRACTION, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     785 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_STRING, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     786 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_DATA, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     787 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_CONST_DATA, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     788 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_POINTER, &quot;prop&quot;, &quot;&quot;, NULL, 0);</span>
+<span class="lineNum">     789 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_BOOL, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     790 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_SINT, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     791 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_UINT, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     792 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_LSINT, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     793 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_LUINT, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     794 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_FLOAT, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     795 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_DOUBLE, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     796 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_FRACTION, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     797 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_FRACTION64, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     798 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_VEC2I, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     799 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_VEC2, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     800 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_VEC3I, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     801 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_VEC4I, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     802 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_STRING, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     803 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_DATA, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     804 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_CONST_DATA, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     805 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_POINTER, &quot;prop&quot;, NULL, NULL, 0);</span>
+<span class="lineNum">     806 </span><span class="lineCov">          3 :                 gf_props_parse_value(GF_PROP_UINT, &quot;prop&quot;, &quot;test&quot;, &quot;foo|bar&quot;, 0);</span>
+<span class="lineNum">     807 </span><span class="lineCov">          3 :                 gf_props_parse_value(100, &quot;prop&quot;, &quot;test&quot;, NULL, 0);</span>
+<span class="lineNum">     808 </span>            : 
+<span class="lineNum">     809 </span>            :                 memset(&amp;p, 0, sizeof(GF_PropertyValue));
+<span class="lineNum">     810 </span><span class="lineCov">          3 :                 p2=p;</span>
+<span class="lineNum">     811 </span><span class="lineCov">        138 :                 for (i=GF_PROP_FORBIDEN; i&lt;GF_PROP_LAST_DEFINED; i++) {</span>
+<span class="lineNum">     812 </span>            :                         char dump[GF_PROP_DUMP_ARG_SIZE];
+<span class="lineNum">     813 </span><span class="lineCov">        135 :                         gf_props_get_type_name(i);</span>
+<span class="lineNum">     814 </span><span class="lineCov">        135 :                         p.type = p2.type = i;</span>
+<span class="lineNum">     815 </span><span class="lineCov">        135 :                         gf_props_equal(&amp;p, &amp;p2);</span>
+<span class="lineNum">     816 </span><span class="lineCov">        135 :                         gf_props_dump_val(&amp;p, dump, GF_PROP_DUMP_DATA_NONE, NULL);</span>
+<span class="lineNum">     817 </span>            :                 }
+<span class="lineNum">     818 </span><span class="lineCov">          3 :                 p.type = GF_PROP_DATA;</span>
+<span class="lineNum">     819 </span><span class="lineCov">          3 :                 p.value.data.size = 4;</span>
+<span class="lineNum">     820 </span><span class="lineCov">          3 :                 p.value.data.ptr = &quot;test&quot;;</span>
+<span class="lineNum">     821 </span><span class="lineCov">          3 :                 p2 = p;</span>
+<span class="lineNum">     822 </span><span class="lineCov">          3 :                 p2.value.data.ptr = NULL;</span>
+<span class="lineNum">     823 </span><span class="lineCov">          3 :                 gf_props_equal(&amp;p, &amp;p2);</span>
+<span class="lineNum">     824 </span><span class="lineCov">          3 :                 p2.value.data.size = 3;</span>
+<span class="lineNum">     825 </span><span class="lineCov">          3 :                 p2.value.data.ptr = &quot;test&quot;;</span>
+<span class="lineNum">     826 </span><span class="lineCov">          3 :                 gf_props_equal(&amp;p, &amp;p2);</span>
+<span class="lineNum">     827 </span><span class="lineCov">          3 :                 p2.value.data.size = 4;</span>
+<span class="lineNum">     828 </span><span class="lineCov">          3 :                 gf_props_equal(&amp;p, &amp;p2);</span>
+<span class="lineNum">     829 </span>            : 
+<span class="lineNum">     830 </span><span class="lineCov">          3 :                 p.type = GF_PROP_UINT_LIST;</span>
+<span class="lineNum">     831 </span><span class="lineCov">          3 :                 i=0;</span>
+<span class="lineNum">     832 </span><span class="lineCov">          3 :                 p.value.uint_list.nb_items=1;</span>
+<span class="lineNum">     833 </span><span class="lineCov">          3 :                 p.value.uint_list.vals = &amp;i;</span>
+<span class="lineNum">     834 </span><span class="lineCov">          3 :                 p2 = p;</span>
+<span class="lineNum">     835 </span><span class="lineCov">          3 :                 gf_props_equal(&amp;p, &amp;p2);</span>
+<span class="lineNum">     836 </span>            : 
+<span class="lineNum">     837 </span>            : 
+<span class="lineNum">     838 </span><span class="lineCov">          3 :                 gf_log_set_strict_error(old_strict);</span>
+<span class="lineNum">     839 </span>            :         }
+<span class="lineNum">     840 </span>            : 
+<span class="lineNum">     841 </span><span class="lineCov">        385 :         if (! strcmp( &quot;UTSink&quot;, gf_filter_get_name(filter))) {</span>
+<span class="lineNum">     842 </span><span class="lineCov">        176 :                 stack-&gt;mode=UTF_MODE_SINK;</span>
+<span class="lineNum">     843 </span><span class="lineCov">        176 :                 gf_filter_set_max_extra_input_pids(filter, 10);</span>
+<span class="lineNum">     844 </span>            :         }
+<span class="lineNum">     845 </span><span class="lineCov">        209 :         else if (! strcmp( &quot;UTFilter&quot;, gf_filter_get_name(filter))) stack-&gt;mode=UTF_MODE_FILTER;</span>
+<span class="lineNum">     846 </span>            :         else {
+<span class="lineNum">     847 </span><span class="lineCov">        141 :                 stack-&gt;mode=UTF_MODE_SOURCE;</span>
+<span class="lineNum">     848 </span><span class="lineCov">        141 :                 return ut_filter_config_source(filter);</span>
+<span class="lineNum">     849 </span>            :         }
+<span class="lineNum">     850 </span>            :         return GF_OK;
+<span class="lineNum">     851 </span>            : }
+<span class="lineNum">     852 </span>            : 
+<span class="lineNum">     853 </span>            : #define OFFS(_n)        #_n, offsetof(GF_UnitTestFilter, _n)
+<span class="lineNum">     854 </span>            : static const GF_FilterArgs UTFilterArgs[] =
+<span class="lineNum">     855 </span>            : {
+<span class="lineNum">     856 </span>            :         { OFFS(pid_att), &quot;set default value for PID `cust` attribute&quot;, GF_PROP_NAME, &quot;UTSourceData&quot;, NULL, 0},
+<span class="lineNum">     857 </span>            :         { OFFS(max_pck), &quot;maximum number of packets to send in source mode&quot;, GF_PROP_UINT, &quot;1000&quot;, NULL, 0},
+<span class="lineNum">     858 </span>            :         { OFFS(nb_pids), &quot;number of PIDs in source mode&quot;, GF_PROP_UINT, &quot;1&quot;, &quot;1-+I&quot;, 0},
+<span class="lineNum">     859 </span>            :         { OFFS(max_out), &quot;maximum number of shared packets not yet released in source/filter mode, no limit if -1&quot;, GF_PROP_SINT, &quot;-1&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     860 </span>            :         { OFFS(alloc), &quot;use allocated memory packets in source mode&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     861 </span>            :         { OFFS(fwd), &quot;indicate packet forward mode for filter.\n&quot;
+<span class="lineNum">     862 </span>            :         &quot;- shared: use shared memory (dangerous)\n&quot;
+<span class="lineNum">     863 </span>            :         &quot;- copy: use copy\n&quot;
+<span class="lineNum">     864 </span>            :         &quot;- ref: use references to source packet\n&quot;
+<span class="lineNum">     865 </span>            :         &quot;- mix: change mode at each packet sent&quot;, GF_PROP_UINT, &quot;shared&quot;, &quot;shared|copy|ref|mix&quot;, GF_FS_ARG_UPDATE},
+<span class="lineNum">     866 </span>            :         { OFFS(framing), &quot;packet framing.\n&quot;
+<span class="lineNum">     867 </span>            :         &quot;- none: disable packet split\n&quot;
+<span class="lineNum">     868 </span>            :         &quot;- default: divide packets in 3 for filter mode and allows partial blocks for sink mode\n&quot;
+<span class="lineNum">     869 </span>            :         &quot;- nostart: same as default but does not signal packet start flag\n&quot;
+<span class="lineNum">     870 </span>            :         &quot;- noend: same as default but does not signal packet end flag&quot;
+<span class="lineNum">     871 </span>            :         &quot;&quot;, GF_PROP_UINT, &quot;none&quot;, &quot;none|default|nostart|noend&quot;, GF_FS_ARG_UPDATE},
+<span class="lineNum">     872 </span>            :         { OFFS(update), &quot;send update message after half packet send. Update format is FID,argname,argval&quot;, GF_PROP_STRING, NULL, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     873 </span>            :         { OFFS(cov), &quot;dump options and exercise error cases for code coverage&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     874 </span>            :         { OFFS(norecfg), &quot;disable reconfig on input pid in filter/sink mode&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     875 </span>            :         { OFFS(gsftest), &quot;dispatch a fake single video pid with props and packet props for GSF testing&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     876 </span>            : 
+<span class="lineNum">     877 </span>            :         { OFFS(dummy1), &quot;dummy for coverage&quot;, GF_PROP_LSINT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     878 </span>            :         { OFFS(dummy1), &quot;dummy for coverage&quot;, GF_PROP_LUINT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     879 </span>            :         { OFFS(dummy1), &quot;dummy for coverage&quot;, GF_PROP_FLOAT, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     880 </span>            :         { OFFS(dummy1), &quot;dummy for coverage&quot;, GF_PROP_DOUBLE, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     881 </span>            :         { OFFS(dummy1), &quot;dummy for coverage&quot;, GF_PROP_FRACTION, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     882 </span>            :         { OFFS(dummy1), &quot;dummy for coverage&quot;, GF_PROP_POINTER, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     883 </span>            :         { OFFS(dummy1), &quot;dummy for coverage&quot;, GF_PROP_FRACTION64, &quot;0&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     884 </span>            :         { NULL }
+<span class="lineNum">     885 </span>            : };
+<span class="lineNum">     886 </span>            : 
+<span class="lineNum">     887 </span>            : #define UT_CAP_CODE             GF_4CC('c','u','s','t')
+<span class="lineNum">     888 </span>            : static const GF_FilterCapability UTFilterCaps[] =
+<span class="lineNum">     889 </span>            : {
+<span class="lineNum">     890 </span>            :         CAP_STRING(GF_CAPS_INPUT, UT_CAP_CODE, &quot;UTSourceData&quot;),
+<span class="lineNum">     891 </span>            :         CAP_STRING(GF_CAPS_INPUT, UT_CAP_CODE, &quot;UTFilterData&quot;),
+<span class="lineNum">     892 </span>            :         CAP_STRING(GF_CAPS_OUTPUT, UT_CAP_CODE, &quot;UTSourceData&quot;),
+<span class="lineNum">     893 </span>            :         CAP_STRING(GF_CAPS_OUTPUT, UT_CAP_CODE, &quot;UTFilterData&quot;),
+<span class="lineNum">     894 </span>            : };
+<span class="lineNum">     895 </span>            : 
+<span class="lineNum">     896 </span>            : static const GF_FilterCapability UTSinkInputs[] =
+<span class="lineNum">     897 </span>            : {
+<span class="lineNum">     898 </span>            :         CAP_STRING(GF_CAPS_INPUT, UT_CAP_CODE, &quot;UTSourceData&quot;),
+<span class="lineNum">     899 </span>            : };
+<span class="lineNum">     900 </span>            : 
+<span class="lineNum">     901 </span>            : static const GF_FilterCapability UTSink2Inputs[] =
+<span class="lineNum">     902 </span>            : {
+<span class="lineNum">     903 </span>            :         CAP_STRING(GF_CAPS_INPUT, UT_CAP_CODE, &quot;UTFilterData&quot;),
+<span class="lineNum">     904 </span>            : };
+<span class="lineNum">     905 </span>            : 
+<span class="lineNum">     906 </span>            : static const GF_FilterCapability UTSourceOutputs[] =
+<span class="lineNum">     907 </span>            : {
+<span class="lineNum">     908 </span>            :         CAP_STRING(GF_CAPS_OUTPUT, UT_CAP_CODE, &quot;UTSourceData&quot;),
+<span class="lineNum">     909 </span>            : };
+<span class="lineNum">     910 </span>            : 
+<span class="lineNum">     911 </span>            : 
+<span class="lineNum">     912 </span>            : const GF_FilterRegister UTFilterRegister = {
+<span class="lineNum">     913 </span>            :         .name = &quot;UTFilter&quot;,
+<span class="lineNum">     914 </span>            :         GF_FS_SET_DESCRIPTION(&quot;Unit Test Filter&quot;)
+<span class="lineNum">     915 </span>            :         GF_FS_SET_HELP(&quot;This filter is only used for unit testing of filter framework&quot;)
+<span class="lineNum">     916 </span>            :         .private_size = sizeof(GF_UnitTestFilter),
+<span class="lineNum">     917 </span>            :         .flags = GF_FS_REG_EXPLICIT_ONLY,
+<span class="lineNum">     918 </span>            :         SETCAPS( UTFilterCaps),
+<span class="lineNum">     919 </span>            :         .args = UTFilterArgs,
+<span class="lineNum">     920 </span>            :         .initialize = utfilter_initialize,
+<span class="lineNum">     921 </span>            :         .finalize = ut_filter_finalize,
+<span class="lineNum">     922 </span>            :         .process = ut_filter_process_filter,
+<span class="lineNum">     923 </span>            :         .configure_pid = ut_filter_config_input,
+<span class="lineNum">     924 </span>            :         .update_arg = ut_filter_update_arg
+<span class="lineNum">     925 </span>            : };
+<span class="lineNum">     926 </span>            : 
+<span class="lineNum">     927 </span>            : 
+<span class="lineNum">     928 </span>            : const GF_FilterRegister UTSinkRegister = {
+<span class="lineNum">     929 </span>            :         .name = &quot;UTSink&quot;,
+<span class="lineNum">     930 </span>            :         GF_FS_SET_DESCRIPTION(&quot;Unit Test Sink&quot;)
+<span class="lineNum">     931 </span>            :         GF_FS_SET_HELP(&quot;This filter is only used for unit testing of filter framework&quot;)
+<span class="lineNum">     932 </span>            :         .private_size = sizeof(GF_UnitTestFilter),
+<span class="lineNum">     933 </span>            :         .flags = GF_FS_REG_EXPLICIT_ONLY,
+<span class="lineNum">     934 </span>            :         SETCAPS(UTSinkInputs),
+<span class="lineNum">     935 </span>            :         .args = UTFilterArgs,
+<span class="lineNum">     936 </span>            :         .initialize = utfilter_initialize,
+<span class="lineNum">     937 </span>            :         .finalize = ut_filter_finalize,
+<span class="lineNum">     938 </span>            :         .process = ut_filter_process_sink,
+<span class="lineNum">     939 </span>            :         .configure_pid = ut_filter_config_input,
+<span class="lineNum">     940 </span>            :         .update_arg = ut_filter_update_arg
+<span class="lineNum">     941 </span>            : };
+<span class="lineNum">     942 </span>            : 
+<span class="lineNum">     943 </span>            : const GF_FilterRegister UTSink2Register = {
+<span class="lineNum">     944 </span>            :         .name = &quot;UTSink2&quot;,
+<span class="lineNum">     945 </span>            :         GF_FS_SET_DESCRIPTION(&quot;Unit Test Sink2&quot;)
+<span class="lineNum">     946 </span>            :         GF_FS_SET_HELP(&quot;This filter is only used for unit testing of filter framework&quot;)
+<span class="lineNum">     947 </span>            :         .private_size = sizeof(GF_UnitTestFilter),
+<span class="lineNum">     948 </span>            :         .flags = GF_FS_REG_EXPLICIT_ONLY,
+<span class="lineNum">     949 </span>            :         SETCAPS(UTSink2Inputs),
+<span class="lineNum">     950 </span>            :         .args = UTFilterArgs,
+<span class="lineNum">     951 </span>            :         .initialize = utfilter_initialize,
+<span class="lineNum">     952 </span>            :         .finalize = ut_filter_finalize,
+<span class="lineNum">     953 </span>            :         .process = ut_filter_process_sink,
+<span class="lineNum">     954 </span>            :         .configure_pid = ut_filter_config_input,
+<span class="lineNum">     955 </span>            :         .update_arg = ut_filter_update_arg
+<span class="lineNum">     956 </span>            : };
+<span class="lineNum">     957 </span>            : 
+<span class="lineNum">     958 </span>            : const GF_FilterRegister UTSourceRegister = {
+<span class="lineNum">     959 </span>            :         .name = &quot;UTSource&quot;,
+<span class="lineNum">     960 </span>            :         GF_FS_SET_DESCRIPTION(&quot;Unit Test Source&quot;)
+<span class="lineNum">     961 </span>            :         GF_FS_SET_HELP(&quot;This filter is only used for unit testing of filter framework&quot;)
+<span class="lineNum">     962 </span>            :         .private_size = sizeof(GF_UnitTestFilter),
+<span class="lineNum">     963 </span>            :         .flags = GF_FS_REG_EXPLICIT_ONLY,
+<span class="lineNum">     964 </span>            :         SETCAPS(UTSourceOutputs),
+<span class="lineNum">     965 </span>            :         .args = UTFilterArgs,
+<span class="lineNum">     966 </span>            :         .initialize = utfilter_initialize,
+<span class="lineNum">     967 </span>            :         .finalize = ut_filter_finalize,
+<span class="lineNum">     968 </span>            :         .process = ut_filter_process_source,
+<span class="lineNum">     969 </span>            :         .update_arg = ut_filter_update_arg
+<span class="lineNum">     970 </span>            : };
+<a name="971"><span class="lineNum">     971 </span>            : </a>
+<span class="lineNum">     972 </span>            : 
+<span class="lineNum">     973 </span><span class="lineCov">        142 : const GF_FilterRegister *ut_filter_register(GF_FilterSession *session, Bool load_meta_filters)</span>
+<span class="lineNum">     974 </span>            : {
+<a name="975"><span class="lineNum">     975 </span><span class="lineCov">        142 :         return &amp;UTFilterRegister;</span></a>
+<span class="lineNum">     976 </span>            : }
+<span class="lineNum">     977 </span><span class="lineCov">        142 : const GF_FilterRegister *ut_source_register(GF_FilterSession *session, Bool load_meta_filters)</span>
+<span class="lineNum">     978 </span>            : {
+<a name="979"><span class="lineNum">     979 </span><span class="lineCov">        142 :         return &amp;UTSourceRegister;</span></a>
+<span class="lineNum">     980 </span>            : }
+<span class="lineNum">     981 </span><span class="lineCov">        142 : const GF_FilterRegister *ut_sink_register(GF_FilterSession *session, Bool load_meta_filters)</span>
+<span class="lineNum">     982 </span>            : {
+<a name="983"><span class="lineNum">     983 </span><span class="lineCov">        142 :         return &amp;UTSinkRegister;</span></a>
+<span class="lineNum">     984 </span>            : }
+<span class="lineNum">     985 </span><span class="lineCov">        142 : const GF_FilterRegister *ut_sink2_register(GF_FilterSession *session, Bool load_meta_filters)</span>
+<span class="lineNum">     986 </span>            : {
+<span class="lineNum">     987 </span><span class="lineCov">        142 :         return &amp;UTSink2Register;</span>
+<span class="lineNum">     988 </span>            : }
+<span class="lineNum">     989 </span>            : 
+<span class="lineNum">     990 </span>            : 
+<span class="lineNum">     991 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

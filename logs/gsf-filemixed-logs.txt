@@ -1,0 +1,30 @@
+*** gsf-filemixed logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:44 ***
+
+
+*** Subtest "gsf-mux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264 gsfmx:dst=manifest.mpd:mixed @ -o ./results/temp/dump.gsf -graph -logs=container@debug" ***
+[Dasher] Segment 1 duration 6.48 more than 3/2 DASH duration, consider reencoding or using segment timeline
+[Dasher] First CTS 25920000 in segment 2 drifting by 5.48 (more than half a segment duration) from segment time, consider reencoding or using segment timeline
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_video.h264) (ptr=0x555f7e90fe90)
+-(PID enst_video.h264) rfnalu (ptr=0x555f7e918600)
+--(PID enst_video.h264) dasher (ID=_0x555f7e9294e0_)
+---(PID manifest_mpd) gsfmx (dst=manifest.mpd:mixed) (ID=_0x555f7e9126e0_)
+----(PID manifest_mpd) fout (dst=./results/temp/dump.gsf) (ptr=0x555f7e913e30)
+---(PID enst_video.h264) gsfmx (dst=manifest.mpd:mixed) (ID=_0x555f7e9126e0_)
+
+Computing ./results/temp/dump.gsf  (gsf-mux) hash: 
+File hash (SHA-1): F842ACC2D23A397F2169A41166E953E89B564364
+Hash fail, ref hash ./hash_refs/gsf-filemixed-gsf-mux.hash was D70FC5CEF5258EB1B7517820A5536ED535843CEA
+
+*** Subtest "gsf-demux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/dump.gsf gsfdmx @ inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt:raw -graph" ***
+
+Filters connected:
+fin (src=./results/temp/dump.gsf) (ptr=0x556b61604ec0)
+-(PID dump.gsf) gsfdmx (ID=_0x556b61607770_)
+--(PID manifest.mpd) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt:raw) (ptr=0x556b61608a40)
+--(PID dump.gsf) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt:raw) (ptr=0x556b61608a40)
+
+Computing ./results/temp/inspect.txt  (gsf-demux) hash: 
+File hash (SHA-1): E7C079107EEDC339D2AEE1AABB834746F35CCB1C
+Hash fail, ref hash ./hash_refs/gsf-filemixed-gsf-demux.hash was 07FC41B024DE446A72354A8C0A45F881216E07C9

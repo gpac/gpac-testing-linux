@@ -1,0 +1,61 @@
+*** dash-template-baseurl-global-path logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:21 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264 -new ./results/temp/file.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+AVC|H264 Import results: 750 samples (840 NALUs) - Slices: 30 I 720 P 0 B - 1 SEI - 30 IDR
+AVC|H264 Max NALU size is 32815 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "dash-template-baseurl-global-path-dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -out ./results/temp/file.mpd ./results/temp/file.mp4:id=myrep -base-url some_dir/ -profile live -segment-name $Path=some_dir/$test-$RepresentationID$-$Number%d$" ***
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 8 end 9
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 9 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 10 end 11
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 11 end 12
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 12 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 13 end 14
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 14 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 15 end 16
+[MP4Mux] Done writing segment 16 - estimated next fragment times start 16 end 17
+[MP4Mux] Done writing segment 17 - estimated next fragment times start 17 end 18
+[MP4Mux] Done writing segment 18 - estimated next fragment times start 18 end 19
+[MP4Mux] Done writing segment 19 - estimated next fragment times start 19 end 20
+[MP4Mux] Done writing segment 20 - estimated next fragment times start 20 end 21
+[MP4Mux] Done writing segment 21 - estimated next fragment times start 21 end 22
+[MP4Mux] Done writing segment 22 - estimated next fragment times start 22 end 23
+[MP4Mux] Done writing segment 23 - estimated next fragment times start 23 end 24
+[MP4Mux] Done writing segment 24 - estimated next fragment times start 24 end 25
+[MP4Mux] Done writing segment 25 - estimated next fragment times start 25 end 26
+[MP4Mux] Done writing segment 26 - estimated next fragment times start 26 end 27
+[MP4Mux] Done writing segment 27 - estimated next fragment times start 27 end 28
+[MP4Mux] Done writing segment 28 - estimated next fragment times start 28 end 29
+[MP4Mux] Done writing segment 29 - estimated next fragment times start 29 end 30
+[MPD] Generating MPD at time 2021-04-29T23:33:21.484Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 30 - estimated next fragment times start 30 end 31
+
+
+Computing ./results/temp/some_dir/test-myrep-.mp4  (dash-template-baseurl-global-path-hash-init) hash: 
+File hash (SHA-1): A4BD885AB6DB4C7D0CA69047C79DD4BC2D828B88
+Hash OK for ./results/temp/some_dir/test-myrep-.mp4
+Computing ./results/temp/file.mpd  (dash-template-baseurl-global-path-hash-mpd) hash: 
+File hash (SHA-1): 77CD1BF67ACD0A302EB985C55BB5178D60931A07
+Hash fail, ref hash ./hash_refs/dash-template-baseurl-global-path-dash-template-baseurl-global-path-hash-mpd.hash was 960F2F5A18D843F16EC5E1F50079A222467DF519
+Computing ./results/temp/some_dir/test-myrep-10.m4s  (dash-template-baseurl-global-path-hash-seg) hash: 
+File hash (SHA-1): 1A0107C189848D8AD80A1B30373BF487AFF5FA86
+Hash OK for ./results/temp/some_dir/test-myrep-10.m4s
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 4960C72E04F7D5BC10D9BA41ADD6679AC4D55479
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd --algo=none inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt" ***
+

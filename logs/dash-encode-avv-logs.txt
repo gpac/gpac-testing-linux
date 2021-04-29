@@ -1,0 +1,50 @@
+*** dash-encode-avv logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:21 ***
+
+Computing ./results/temp/count_english_dashinit.mp4  (init-a) hash: 
+File hash (SHA-1): D8B7F5ED56DF8E5FDE058B06A759BE282F0AB6F4
+Hash fail, ref hash ./hash_refs/dash-encode-avv-init-a.hash was 73172278DB607A68FA02C8F0978F33A07013D4D3
+Computing ./results/temp/count_video_dashinit_rep1.mp4  (init-v1) hash: 
+File hash (SHA-1): C4ED76FB3DAB24F45B5255B63960CD7EBFC248CB
+Hash fail, ref hash ./hash_refs/dash-encode-avv-init-v1.hash was B4AC00FC9CBDEE3BB51BEDF8CB5FFFA3E3BFF478
+Computing ./results/temp/count_video_dashinit_rep2.mp4  (init-v2) hash: 
+File hash (SHA-1): DB042367C7664D6E7ED2BDA08C5B4DB1D2AB07FE
+Hash fail, ref hash ./hash_refs/dash-encode-avv-init-v2.hash was 110E7C0528C4AFEAC96BB43413A1DCCFF7196B99
+Computing ./results/temp/file.mpd  (mpd) hash: 
+File hash (SHA-1): 57549DA3EF4528A8B3E7C36E0E3ED256C1C2112D
+Hash fail, ref hash ./hash_refs/dash-encode-avv-mpd.hash was BB4670675651D3CDD31112B8D2C7F3829C11EC28
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/count_video.cmp:FID=1 ffsws:osize=512x512:SID=1 @ enc:c=avc:fintra=1:FID=EV1 ffsws:osize=256x256:SID=1 @ enc:c=avc:fintra=1:FID=EV2 -i ./media/auxiliary_files/count_english.mp3:FID=2  @ enc:c=aac:FID=EA -o ./results/temp/file.mpd:profile=live:SID=EV1,EV2,EA -graph -blacklist=vtbdec" ***
+[swscaler @ 0x55ecc7c05c80] Warning: data is not aligned! This can lead to a speed loss
+
+Filters connected:
+fin (src=./media/auxiliary_files/count_video.cmp:FID=1) (ID=1)
+-(PID count_video.cmp) rfmpgvid (ptr=0x55ecc7b5fb40)
+--(PID count_video.cmp) xviddec (ptr=0x55ecc7b698d0)
+---(PID count_video.cmp) ffsws (osize=512x512:SID=1) (ID=_0x55ecc7b50c50_)
+----(PID count_video.cmp) ffenc "ffenc:libx264" (c=avc:fintra=1:FID=EV1) (ID=EV1)
+-----(PID count_video.cmp) rfnalu (ptr=0x55ecc7d53530)
+------(PID count_video.cmp) dasher (ID=_0x55ecc7c41df0_)
+-------(PID manifest_mpd) fout (dst=./results/temp/file.mpd:profile=live:SID=EV1,EV2,EA) (ptr=0x55ecc7b5af90)
+-------(PID audio) mp4mx (ptr=0x55ecc8c9abf0)
+--------(PID audio) fout (dst=./results/temp/count_english_dashinit.mp4:gfopt:profile=live:SID=EV1,EV2,EA:frag:xps_inband=no:psshs=moov:mime=audio/mp4) (ptr=0x55ecc8c8de10)
+-------(PID count_video.cmp) mp4mx (ptr=0x55ecc8c9d8f0)
+--------(PID count_video.cmp) fout (dst=./results/temp/count_video_dashinit_rep1.mp4:gfopt:profile=live:SID=EV1,EV2,EA:frag:xps_inband=no:psshs=moov:mime=video/mp4) (ptr=0x55ecc8c916a0)
+-------(PID count_video.cmp) mp4mx (ptr=0x55ecc8ca0ab0)
+--------(PID count_video.cmp) fout (dst=./results/temp/count_video_dashinit_rep2.mp4:gfopt:profile=live:SID=EV1,EV2,EA:frag:xps_inband=no:psshs=moov:mime=video/mp4) (ptr=0x55ecc8c95120)
+---(PID count_video.cmp) ffsws (osize=256x256:SID=1) (ID=_0x55ecc7b53610_)
+----(PID count_video.cmp) ffenc "ffenc:libx264" (c=avc:fintra=1:FID=EV2) (ID=EV2)
+-----(PID count_video.cmp) rfnalu (ptr=0x55ecc7e2eb40)
+------(PID count_video.cmp) dasher (ID=_0x55ecc7c41df0_)
+fin (src=./media/auxiliary_files/count_english.mp3:FID=2) (ID=2)
+-(PID count_english.mp3) rfmp3 (ptr=0x55ecc7b64ba0)
+--(PID audio) maddec "dec_mad:MAD 0.15.1 (beta)" (ptr=0x55ecc7b6f860)
+---(PID audio) resample (ptr=0x55ecc7e30100)
+----(PID audio) ffenc "ffenc:aac" (c=aac:FID=EA) (ID=EA)
+-----(PID audio) dasher (ID=_0x55ecc7c41df0_)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): B2A00427F4A755FD1A48181B261AD8CB42DE79EC
+Hash fail, ref hash ./hash_refs/dash-encode-avv-inspect.hash was 118B6A9DD42B1F584899C88A18A5957863CF0169
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd --auto_switch=1 inspect:allp:interleave=false:fmt=%pn%-%dts%%lf%:log=./results/temp/inspect.txt" ***
+

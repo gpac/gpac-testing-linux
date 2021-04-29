@@ -1,0 +1,9 @@
+ <test name="http-dashpush" result="OK" date="29/04/2021 23:42:38">
+
+  <stat subtest="dash_push" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="52276" cpu_percent="4%" cpu_elapsed_time="0:03.07" cpu_user_time="0.08" cpu_kernel_time="0.04" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -run-for 3000 -dash-live 1000 -subdur 1000 -profile live ./results/temp/source.mp4 -out http://127.0.0.1:8080/live.mpd:hmode=push -logs=http@debug</command_line>
+  </stat>
+  <stat subtest="http-server" execution_status="OK" return_status="0" mem_total_avg="0" mem_resident_avg="0" mem_resident_max="50336" cpu_percent="1%" cpu_elapsed_time="0:06.13" cpu_user_time="0.06" cpu_kernel_time="0.02" page_faults="0" file_inputs="0" socket_msg_rec="0" socket_msg_sent="0" return_value="0">
+   <command_line>gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -runfor=6000 httpout:port=8080:wdir=./results/temp --reqlog=PUT,DELETE</command_line>
+  </stat>
+ </test>

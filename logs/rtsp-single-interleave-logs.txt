@@ -1,0 +1,47 @@
+*** rtsp-single-interleave logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:45:47 ***
+
+Computing ./results/temp/inspect.txt  (dump-inspect) hash: 
+File hash (SHA-1): 0F9606FD95E7A7A635203AADCCF674CBE0B05132
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i rtsp://127.0.0.1:8888/testsession inspect:deep:allp:dur=1/1:log=./results/temp/inspect.txt  --interleave -stats -graph" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 1024819072
+
+Filter stats - 2 filters
+	Filter rtpin (src=rtsp://127.0.0.1:8888/testsession) : 0 input pids 1 output pids 559 tasks 357434 us process time
+		58 packets sent 14296 bytes sent (162.268 pck/sec 0.31997 mbps)
+		* output PID PID1: 58 packets sent
+	Filter inspect (deep:allp:dur=1/1:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 51 tasks 473 us process time
+		48 packets processed 11718 bytes processed (101480 pck/sec 198.19 mbps)
+		* input PID PID1: 48 frames (58 packets) received
+Session stats - threads 1
+	Thread 1: run_time 1648787 us active_time 358807 us nb_tasks 610
+
+Total: run_time 1648787 us active_time 358807 us nb_tasks 610
+
+Filters connected:
+rtpin (src=rtsp://127.0.0.1:8888/testsession) (ptr=0x564824e58840)
+-(PID PID1) inspect (deep:allp:dur=1/1:log=./results/temp/inspect.txt) (ptr=0x564824e59d90)
+
+
+*** Subtest "server-single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_audio.aac -o rtsp://127.0.0.1:8888/testsession  --tso=10000 -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -902918272
+[RTPOut] AAC stream detected but not information available on average size/tsdelta/duration, assuming const dur 1024 max_tsdelta 1024 average size 500 max size 1000
+
+Filter stats - 3 filters
+	Filter fin (src=./media/auxiliary_files/enst_audio.aac) : 0 input pids 1 output pids 13 tasks 848 us process time
+		5 packets sent 25000 bytes sent (5896.23 pck/sec 235.849 mbps)
+		* output PID enst_audio.aac: 5 packets sent
+	Filter rtspout (dst=rtsp://127.0.0.1:8888/testsession) : 1 input pids 0 output pids 429 tasks 472343 us process time
+		79 packets processed 19359 bytes processed (167.251 pck/sec 0.32788 mbps)
+		* input PID enst_audio.aac: 79 packets received
+	Filter rfadts : 1 input pids 1 output pids 1464293 tasks 104245 us process time
+		5 packets processed 25000 bytes processed (47.9639 pck/sec 1.91856 mbps)
+		79 packets sent 19359 bytes sent (757.83 pck/sec 1.48565 mbps)
+		* input PID enst_audio.aac: 5 packets received
+		* output PID enst_audio.aac: 79 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2717214 us active_time 1111359 us nb_tasks 1464745
+
+Total: run_time 2717214 us active_time 1111359 us nb_tasks 1464745
+

@@ -1,0 +1,38 @@
+*** filelist-enum logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:14 ***
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 flist:srcs=./media/auxiliary_files/\*.jpg:fsort=name inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats -logs=app@debug" ***
+GPAC args: -mem-track -noprog -for-test -old-arch -no-reassign -p=0 flist:srcs=./media/auxiliary_files/\*.jpg:fsort=name inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats -logs=app@debug 
+System info: 7961 MB RAM - 2 cores - main thread ID 2084355968
+
+Filter stats - 4 filters
+	Filter flist (srcs=./media/auxiliary_files/\*.jpg:fsort=name) : 1 input pids 1 output pids 15 tasks 270 us process time
+		2 packets processed 20277 bytes processed (7407.41 pck/sec 600.8 mbps)
+		2 packets sent 20277 bytes sent (7407.41 pck/sec 600.8 mbps)
+		* input PID sky.jpg: 1 packets received
+		* output PID sky.jpg: 2 packets sent
+	Filter inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 4 tasks 169 us process time
+		2 packets processed 20277 bytes processed (11834.3 pck/sec 959.858 mbps)
+		* input PID sky.jpg: 2 packets received
+	Filter fin (src=./media/auxiliary_files/sky.jpg) : 0 input pids 1 output pids 4 tasks 572 us process time
+		2 packets sent 6496 bytes sent (3496.5 pck/sec 90.8531 mbps)
+		* output PID sky.jpg: 2 packets sent
+	Filter rfimg : 1 input pids 1 output pids 6 tasks 94 us process time
+		1 packets processed 6496 bytes processed (10638.3 pck/sec 552.851 mbps)
+		1 packets sent 6496 bytes sent (10638.3 pck/sec 552.851 mbps)
+		* input PID sky.jpg: 1 frames (2 packets) received
+		* output PID sky.jpg: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 2116 us active_time 2104 us nb_tasks 52
+
+Total: run_time 2116 us active_time 2104 us nb_tasks 52
+
+Filters connected:
+fin (src=./media/auxiliary_files/sky.jpg) (ptr=0x55765fc6f530)
+-(PID sky.jpg) rfimg (ptr=0x55765fc75a20)
+--(PID sky.jpg) flist (srcs=./media/auxiliary_files/\*.jpg:fsort=name) (ptr=0x55765fc5a840)
+---(PID sky.jpg) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x55765fc5ae80)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 048E2C0A006FA68CCCE4BC1580CF71FF87DBAF06
+Hash OK for ./results/temp/inspect.txt

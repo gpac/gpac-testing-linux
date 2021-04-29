@@ -1,0 +1,465 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - evg/raster_rgb.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">evg</a> - raster_rgb.c<span style="font-size: 80%;"> (source / <a href="raster_rgb.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">187</td>
+            <td class="headerCovTableEntry">204</td>
+            <td class="headerCovTableEntryHi">91.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2019
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / software 2D rasterizer module
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  *
+<span class="lineNum">      25 </span>            :  *
+<span class="lineNum">      26 </span>            :  */
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &quot;rast_soft.h&quot;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : static s32
+<span class="lineNum">      31 </span>            : mul255(s32 a, s32 b)
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span><span class="lineCov">   58564324 :         return ((a + 1) * b) &gt;&gt; 8;</span>
+<span class="lineNum">      34 </span>            : }
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : /*
+<span class="lineNum">      38 </span>            :                         RGB part
+<a name="39"><span class="lineNum">      39 </span>            : */</a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">    4365632 : void overmask_rgb(u32 src, u8 *dst, u32 alpha, GF_EVGSurface *surf)</span>
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span><span class="lineCov">    4365632 :         s32 srca = (src &gt;&gt; 24) &amp; 0xff;</span>
+<span class="lineNum">      44 </span><span class="lineCov">    4365632 :         s32 srcr = (src &gt;&gt; 16) &amp; 0xff;</span>
+<span class="lineNum">      45 </span><span class="lineCov">    4365632 :         s32 srcg = (src &gt;&gt; 8) &amp; 0xff;</span>
+<span class="lineNum">      46 </span><span class="lineCov">    4365632 :         s32 srcb = (src) &amp; 0xff;</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">    4365632 :         s32 dstr = dst[surf-&gt;idx_r] &amp; 0xFF;</span>
+<span class="lineNum">      49 </span><span class="lineCov">    4365632 :         s32 dstg = dst[surf-&gt;idx_g] &amp; 0xFF;</span>
+<span class="lineNum">      50 </span><span class="lineCov">    4365632 :         s32 dstb = dst[surf-&gt;idx_b] &amp; 0xFF;</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineCov">    4365632 :         srca = mul255(srca, alpha);</span>
+<span class="lineNum">      53 </span><span class="lineCov">    8731264 :         dst[surf-&gt;idx_r] = mul255(srca, srcr - dstr) + dstr;</span>
+<span class="lineNum">      54 </span><span class="lineCov">    8731264 :         dst[surf-&gt;idx_g] = mul255(srca, srcg - dstg) + dstg;</span>
+<span class="lineNum">      55 </span><span class="lineCov">    8731264 :         dst[surf-&gt;idx_b] = mul255(srca, srcb - dstb) + dstb;</span>
+<a name="56"><span class="lineNum">      56 </span><span class="lineCov">    4365632 : }</span></a>
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">    6832928 : static void overmask_rgb_const_run(u32 src, u8 *dst, s32 dst_pitch_x, u32 count, GF_EVGSurface *surf)</span>
+<span class="lineNum">      59 </span>            : {
+<span class="lineNum">      60 </span><span class="lineCov">    6832928 :         s32 srca = (src &gt;&gt; 24) &amp; 0xff;</span>
+<span class="lineNum">      61 </span><span class="lineCov">    6832928 :         s32 srcr = (src &gt;&gt; 16) &amp; 0xff;</span>
+<span class="lineNum">      62 </span><span class="lineCov">    6832928 :         s32 srcg = (src &gt;&gt; 8) &amp; 0xff;</span>
+<span class="lineNum">      63 </span><span class="lineCov">    6832928 :         s32 srcb = (src) &amp; 0xff;</span>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">   25084082 :         while (count) {</span>
+<span class="lineNum">      66 </span><span class="lineCov">   11418226 :                 s32 dstr = dst[surf-&gt;idx_r];</span>
+<span class="lineNum">      67 </span><span class="lineCov">   11418226 :                 s32 dstg = dst[surf-&gt;idx_g];</span>
+<span class="lineNum">      68 </span><span class="lineCov">   11418226 :                 s32 dstb = dst[surf-&gt;idx_b];</span>
+<span class="lineNum">      69 </span><span class="lineCov">   22836452 :                 dst[surf-&gt;idx_r] = (u8) mul255(srca, srcr - dstr) + dstr;</span>
+<span class="lineNum">      70 </span><span class="lineCov">   22836452 :                 dst[surf-&gt;idx_g] = (u8) mul255(srca, srcg - dstg) + dstg;</span>
+<span class="lineNum">      71 </span><span class="lineCov">   22836452 :                 dst[surf-&gt;idx_b] = (u8) mul255(srca, srcb - dstb) + dstb;</span>
+<span class="lineNum">      72 </span><span class="lineCov">   11418226 :                 dst += dst_pitch_x;</span>
+<span class="lineNum">      73 </span><span class="lineCov">   11418226 :                 count--;</span>
+<span class="lineNum">      74 </span>            :         }
+<a name="75"><span class="lineNum">      75 </span><span class="lineCov">    6832928 : }</span></a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">    3117931 : void evg_rgb_fill_single(s32 y, s32 x, u32 col, GF_EVGSurface *surf)</span>
+<span class="lineNum">      78 </span>            : {
+<span class="lineNum">      79 </span><span class="lineCov">    3117931 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y + x * surf-&gt;pitch_x;</span>
+<span class="lineNum">      80 </span><span class="lineCov">    3117931 :         u8 r = GF_COL_R(col);</span>
+<span class="lineNum">      81 </span><span class="lineCov">    3117931 :         u8 g = GF_COL_G(col);</span>
+<span class="lineNum">      82 </span><span class="lineCov">    3117931 :         u8 b = GF_COL_B(col);</span>
+<span class="lineNum">      83 </span><span class="lineCov">    3117931 :         dst[surf-&gt;idx_r] = r;</span>
+<span class="lineNum">      84 </span><span class="lineCov">    3117931 :         dst[surf-&gt;idx_g] = g;</span>
+<span class="lineNum">      85 </span><span class="lineCov">    3117931 :         dst[surf-&gt;idx_b] = b;</span>
+<a name="86"><span class="lineNum">      86 </span><span class="lineCov">    3117931 : }</span></a>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineCov">     294619 : void evg_rgb_fill_single_a(s32 y, s32 x, u8 coverage, u32 col, GF_EVGSurface *surf)</span>
+<span class="lineNum">      89 </span>            : {
+<span class="lineNum">      90 </span><span class="lineCov">     294619 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y + x * surf-&gt;pitch_x;</span>
+<span class="lineNum">      91 </span><span class="lineCov">     294619 :         overmask_rgb(col, dst, coverage, surf);</span>
+<a name="92"><span class="lineNum">      92 </span><span class="lineCov">     294619 : }</span></a>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">    1868607 : void evg_rgb_fill_const(s32 y, s32 count, EVG_Span *spans, GF_EVGSurface *surf)</span>
+<span class="lineNum">      95 </span>            : {
+<span class="lineNum">      96 </span><span class="lineCov">    1868607 :         u32 col = surf-&gt;fill_col;</span>
+<span class="lineNum">      97 </span><span class="lineCov">    1868607 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y;</span>
+<span class="lineNum">      98 </span>            :         s32 i;
+<span class="lineNum">      99 </span>            :         u32 col_no_a, r, g, b;
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">    1868607 :         r = GF_COL_R(col);</span>
+<span class="lineNum">     102 </span><span class="lineCov">    1868607 :         g = GF_COL_G(col);</span>
+<span class="lineNum">     103 </span>            :         b = GF_COL_B(col);
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span><span class="lineCov">    1868607 :         col_no_a = col &amp; 0x00FFFFFF;</span>
+<span class="lineNum">     106 </span><span class="lineCov">    9147955 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     107 </span>            :                 u32 a, fin, len;
+<span class="lineNum">     108 </span>            :                 char *p;
+<span class="lineNum">     109 </span><span class="lineCov">    7279348 :                 len = spans[i].len;</span>
+<span class="lineNum">     110 </span><span class="lineCov">    7279348 :                 p = dst + spans[i].x * surf-&gt;pitch_x;</span>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineCov">    7279348 :                 if (spans[i].coverage != 0xFF) {</span>
+<span class="lineNum">     113 </span><span class="lineCov">   12950562 :                         a = mul255(0xFF, spans[i].coverage);</span>
+<span class="lineNum">     114 </span><span class="lineCov">    6475281 :                         fin = (a&lt;&lt;24) | col_no_a;</span>
+<span class="lineNum">     115 </span><span class="lineCov">    6475281 :                         overmask_rgb_const_run(fin, p, surf-&gt;pitch_x, len, surf);</span>
+<span class="lineNum">     116 </span>            :                 } else {
+<span class="lineNum">     117 </span><span class="lineCov">   24526581 :                         while (len--) {</span>
+<span class="lineNum">     118 </span><span class="lineCov">   23722514 :                                 p[surf-&gt;idx_r] = r;</span>
+<span class="lineNum">     119 </span><span class="lineCov">   23722514 :                                 p[surf-&gt;idx_g] = g;</span>
+<span class="lineNum">     120 </span><span class="lineCov">   23722514 :                                 p[surf-&gt;idx_b] = b;</span>
+<span class="lineNum">     121 </span><span class="lineCov">   23722514 :                                 p += surf-&gt;pitch_x;</span>
+<span class="lineNum">     122 </span>            :                         }
+<span class="lineNum">     123 </span>            :                 }
+<span class="lineNum">     124 </span>            :         }
+<a name="125"><span class="lineNum">     125 </span><span class="lineCov">    1868607 : }</span></a>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">      86579 : void evg_rgb_fill_const_a(s32 y, s32 count, EVG_Span *spans, GF_EVGSurface *surf)</span>
+<span class="lineNum">     128 </span>            : {
+<span class="lineNum">     129 </span><span class="lineCov">      86579 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y;</span>
+<span class="lineNum">     130 </span><span class="lineCov">      86579 :         u32 col = surf-&gt;fill_col;</span>
+<span class="lineNum">     131 </span>            :         u32 a, fin;
+<span class="lineNum">     132 </span>            :         s32 i;
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">      86579 :         a = (col&gt;&gt;24)&amp;0xFF;</span>
+<span class="lineNum">     135 </span><span class="lineCov">      86579 :         if (surf-&gt;get_alpha) {</span>
+<span class="lineNum">     136 </span><span class="lineCov">         16 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     137 </span>            :                         u32 j;
+<span class="lineNum">     138 </span><span class="lineCov">        256 :                         for (j=0; j&lt;spans[i].len; j++) {</span>
+<span class="lineNum">     139 </span><span class="lineCov">        256 :                                 s32 x = spans[i].x + j;</span>
+<span class="lineNum">     140 </span><span class="lineCov">        256 :                                 u8 aa = surf-&gt;get_alpha(surf-&gt;get_alpha_udta, a, x, y);</span>
+<span class="lineNum">     141 </span><span class="lineCov">        512 :                                 fin = mul255(aa, spans[i].coverage);</span>
+<span class="lineNum">     142 </span><span class="lineCov">        256 :                                 fin = (fin&lt;&lt;24) | (col&amp;0x00FFFFFF);</span>
+<span class="lineNum">     143 </span><span class="lineCov">        256 :                                 overmask_rgb_const_run(fin, dst + surf-&gt;pitch_x * x, surf-&gt;pitch_x, 1, surf);</span>
+<span class="lineNum">     144 </span>            :                         }
+<span class="lineNum">     145 </span>            :                 }
+<span class="lineNum">     146 </span>            :         } else {
+<span class="lineNum">     147 </span><span class="lineCov">     357391 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     148 </span><span class="lineCov">     714782 :                         fin = mul255(a, spans[i].coverage);</span>
+<span class="lineNum">     149 </span><span class="lineCov">     357391 :                         fin = (fin&lt;&lt;24) | (col&amp;0x00FFFFFF);</span>
+<span class="lineNum">     150 </span><span class="lineCov">     357391 :                         overmask_rgb_const_run(fin, dst + surf-&gt;pitch_x * spans[i].x, surf-&gt;pitch_x, spans[i].len, surf);</span>
+<span class="lineNum">     151 </span>            :                 }
+<span class="lineNum">     152 </span>            :         }
+<span class="lineNum">     153 </span><span class="lineCov">      86579 : }</span>
+<a name="154"><span class="lineNum">     154 </span>            : </a>
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span><span class="lineCov">     492153 : void evg_rgb_fill_var(s32 y, s32 count, EVG_Span *spans, GF_EVGSurface *surf)</span>
+<span class="lineNum">     157 </span>            : {
+<span class="lineNum">     158 </span><span class="lineCov">     492153 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y;</span>
+<span class="lineNum">     159 </span>            :         s32 i;
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span><span class="lineCov">    2534301 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     162 </span>            :                 u8 spanalpha, col_a;
+<span class="lineNum">     163 </span>            :                 s32 x;
+<span class="lineNum">     164 </span>            :                 u32 len;
+<span class="lineNum">     165 </span>            :                 u32 *col;
+<span class="lineNum">     166 </span><span class="lineCov">    2042148 :                 len = spans[i].len;</span>
+<span class="lineNum">     167 </span><span class="lineCov">    2042148 :                 spanalpha = spans[i].coverage;</span>
+<span class="lineNum">     168 </span><span class="lineCov">    2042148 :                 evg_fill_run(surf-&gt;sten, surf, spans[i].x, y, len);</span>
+<span class="lineNum">     169 </span><span class="lineCov">    2042148 :                 col = surf-&gt;stencil_pix_run;</span>
+<span class="lineNum">     170 </span><span class="lineCov">    2042148 :                 x = surf-&gt;pitch_x * spans[i].x;</span>
+<span class="lineNum">     171 </span><span class="lineCov">   34247269 :                 while (len--) {</span>
+<span class="lineNum">     172 </span><span class="lineCov">   30162973 :                         col_a = GF_COL_A(*col);</span>
+<span class="lineNum">     173 </span><span class="lineCov">   30162973 :                         if (col_a) {</span>
+<span class="lineNum">     174 </span><span class="lineCov">   28150811 :                                 if ((spanalpha!=0xFF) || (col_a != 0xFF)) {</span>
+<span class="lineNum">     175 </span><span class="lineCov">    4071013 :                                         overmask_rgb(*col, dst + x, spanalpha, surf);</span>
+<span class="lineNum">     176 </span>            :                                 } else {
+<span class="lineNum">     177 </span><span class="lineCov">   24079798 :                                         dst[x + surf-&gt;idx_r] = GF_COL_R(*col);</span>
+<span class="lineNum">     178 </span><span class="lineCov">   24079798 :                                         dst[x + surf-&gt;idx_g] = GF_COL_G(*col);</span>
+<span class="lineNum">     179 </span><span class="lineCov">   24079798 :                                         dst[x + surf-&gt;idx_b] = GF_COL_B(*col);</span>
+<span class="lineNum">     180 </span>            :                                 }
+<span class="lineNum">     181 </span>            :                         }
+<span class="lineNum">     182 </span><span class="lineCov">   30162973 :                         col++;</span>
+<span class="lineNum">     183 </span><span class="lineCov">   30162973 :                         x += surf-&gt;pitch_x;</span>
+<span class="lineNum">     184 </span>            :                 }
+<span class="lineNum">     185 </span>            :         }
+<a name="186"><span class="lineNum">     186 </span><span class="lineCov">     492153 : }</span></a>
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineCov">       2744 : GF_Err evg_surface_clear_rgb(GF_EVGSurface *surf, GF_IRect rc, GF_Color col)</span>
+<span class="lineNum">     189 </span>            : {
+<span class="lineNum">     190 </span>            :         u32 x, y, w, h, sx, sy;
+<span class="lineNum">     191 </span>            :         s32 st;
+<span class="lineNum">     192 </span>            :         u8 r, g, b;
+<span class="lineNum">     193 </span>            :         u8 *o_data;
+<span class="lineNum">     194 </span>            :         GF_EVGSurface *_this = (GF_EVGSurface *)surf;
+<span class="lineNum">     195 </span><span class="lineCov">       2744 :         st = _this-&gt;pitch_y;</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineCov">       2744 :         h = rc.height;</span>
+<span class="lineNum">     198 </span><span class="lineCov">       2744 :         w = rc.width;</span>
+<span class="lineNum">     199 </span><span class="lineCov">       2744 :         sx = rc.x;</span>
+<span class="lineNum">     200 </span><span class="lineCov">       2744 :         sy = rc.y;</span>
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineCov">       2744 :         r = GF_COL_R(col);</span>
+<span class="lineNum">     203 </span><span class="lineCov">       2744 :         g = GF_COL_G(col);</span>
+<span class="lineNum">     204 </span><span class="lineCov">       2744 :         b = GF_COL_B(col);</span>
+<span class="lineNum">     205 </span>            :         o_data = NULL;
+<span class="lineNum">     206 </span><span class="lineCov">     346393 :         for (y = 0; y &lt; h; y++) {</span>
+<span class="lineNum">     207 </span><span class="lineCov">     343649 :                 u8 *data = _this -&gt;pixels + (y + sy) * st + _this-&gt;pitch_x*sx;</span>
+<span class="lineNum">     208 </span><span class="lineCov">     343649 :                 if (!y) {</span>
+<span class="lineNum">     209 </span>            :                         o_data = data;
+<span class="lineNum">     210 </span><span class="lineCov">     361595 :                         for (x = 0; x &lt; w; x++) {</span>
+<span class="lineNum">     211 </span><span class="lineCov">     361595 :                                 data[surf-&gt;idx_r] = r;</span>
+<span class="lineNum">     212 </span><span class="lineCov">     361595 :                                 data[surf-&gt;idx_g] = g;</span>
+<span class="lineNum">     213 </span><span class="lineCov">     361595 :                                 data[surf-&gt;idx_b] = b;</span>
+<span class="lineNum">     214 </span><span class="lineCov">     361595 :                                 data += _this-&gt;pitch_x;</span>
+<span class="lineNum">     215 </span>            :                         }
+<span class="lineNum">     216 </span>            :                 } else {
+<span class="lineNum">     217 </span><span class="lineCov">     340905 :                         memcpy(data, o_data, w*3);</span>
+<span class="lineNum">     218 </span>            :                 }
+<span class="lineNum">     219 </span>            :         }
+<span class="lineNum">     220 </span><span class="lineCov">       2744 :         return GF_OK;</span>
+<span class="lineNum">     221 </span>            : }
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            : /*
+<span class="lineNum">     227 </span>            :                         grey part
+<span class="lineNum">     228 </span>            : */
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            : static void overmask_grey(u32 src, char *dst, u32 alpha, u32 grey_type)
+<span class="lineNum">     231 </span>            : {
+<span class="lineNum">     232 </span><span class="lineCov">       5023 :         s32 srca = (src &gt;&gt; 24) &amp; 0xff;</span>
+<span class="lineNum">     233 </span>            :         u32 srcc;
+<span class="lineNum">     234 </span><span class="lineCov">       5023 :         s32 dstc = *dst;</span>
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineCov">       5023 :         if (grey_type==0) srcc = (src &gt;&gt; 16) &amp; 0xff;</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :         else if (grey_type==1) srcc = (src &gt;&gt; 8) &amp; 0xff;</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :         else srcc = (src) &amp; 0xff;</span>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span><span class="lineCov">       5023 :         srca = mul255(srca, alpha);</span>
+<span class="lineNum">     242 </span><span class="lineCov">      10046 :         *dst = mul255(srca, srcc - dstc) + dstc;</span>
+<span class="lineNum">     243 </span>            : }
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            : static void overmask_grey_const_run(u8 srca, u8 srcc, char *dst, s32 dst_pitch_x, u32 count)
+<span class="lineNum">     246 </span>            : {
+<span class="lineNum">     247 </span><span class="lineCov">       4144 :         while (count) {</span>
+<span class="lineNum">     248 </span><span class="lineCov">       2472 :                 u8 dstc = *(dst);</span>
+<span class="lineNum">     249 </span><span class="lineCov">       4944 :                 *dst = (u8) mul255(srca, srcc - dstc) + dstc;</span>
+<span class="lineNum">     250 </span><span class="lineCov">       2472 :                 dst += dst_pitch_x;</span>
+<span class="lineNum">     251 </span><span class="lineCov">       2472 :                 count--;</span>
+<span class="lineNum">     252 </span>            :         }
+<a name="253"><span class="lineNum">     253 </span>            : }</a>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineCov">       8410 : void evg_grey_fill_single(s32 y, s32 x, u32 col, GF_EVGSurface *surf)</span>
+<span class="lineNum">     256 </span>            : {
+<span class="lineNum">     257 </span><span class="lineCov">       8410 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y + x * surf-&gt;pitch_x;</span>
+<span class="lineNum">     258 </span>            :         u8 c;
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineCov">       8410 :         if (surf-&gt;grey_type==0) c = GF_COL_R(col);</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :         else if (surf-&gt;grey_type==1) c = GF_COL_G(col);</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :         else c = GF_COL_B(col);</span>
+<span class="lineNum">     263 </span><span class="lineCov">       8410 :         *dst = c;</span>
+<a name="264"><span class="lineNum">     264 </span><span class="lineCov">       8410 : }</span></a>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">        792 : void evg_grey_fill_single_a(s32 y, s32 x, u8 coverage, u32 col, GF_EVGSurface *surf)</span>
+<span class="lineNum">     267 </span>            : {
+<span class="lineNum">     268 </span><span class="lineCov">        792 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y + x * surf-&gt;pitch_x;</span>
+<span class="lineNum">     269 </span><span class="lineCov">        792 :         overmask_grey(col, dst, coverage, surf-&gt;grey_type);</span>
+<a name="270"><span class="lineNum">     270 </span><span class="lineCov">        792 : }</span></a>
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span><span class="lineCov">        307 : void evg_grey_fill_const(s32 y, s32 count, EVG_Span *spans, GF_EVGSurface *surf)</span>
+<span class="lineNum">     273 </span>            : {
+<span class="lineNum">     274 </span><span class="lineCov">        307 :         u32 col = surf-&gt;fill_col;</span>
+<span class="lineNum">     275 </span>            :         u32 c;
+<span class="lineNum">     276 </span><span class="lineCov">        307 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y;</span>
+<span class="lineNum">     277 </span>            :         s32 i;
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span><span class="lineCov">        307 :         if (surf-&gt;grey_type==0) c = GF_COL_R(col);</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :         else if (surf-&gt;grey_type==1) c = GF_COL_G(col);</span>
+<span class="lineNum">     281 </span>            :         else c = GF_COL_B(col);
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineCov">       2032 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     284 </span>            :                 u32 a, len;
+<span class="lineNum">     285 </span>            :                 char *p;
+<span class="lineNum">     286 </span><span class="lineCov">       1725 :                 len = spans[i].len;</span>
+<span class="lineNum">     287 </span><span class="lineCov">       1725 :                 p = dst + spans[i].x * surf-&gt;pitch_x;</span>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineCov">       1725 :                 if (spans[i].coverage != 0xFF) {</span>
+<span class="lineNum">     290 </span><span class="lineCov">       1428 :                         a = mul255(0xFF, spans[i].coverage);</span>
+<span class="lineNum">     291 </span><span class="lineCov">       1428 :                         overmask_grey_const_run(a, c, p, surf-&gt;pitch_x, len);</span>
+<span class="lineNum">     292 </span>            :                 } else {
+<span class="lineNum">     293 </span><span class="lineCov">       3226 :                         while (len--) {</span>
+<span class="lineNum">     294 </span><span class="lineCov">       2929 :                                 *(p) = c;</span>
+<span class="lineNum">     295 </span><span class="lineCov">       2929 :                                 p += surf-&gt;pitch_x;</span>
+<span class="lineNum">     296 </span>            :                         }
+<span class="lineNum">     297 </span>            :                 }
+<span class="lineNum">     298 </span>            :         }
+<a name="299"><span class="lineNum">     299 </span><span class="lineCov">        307 : }</span></a>
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span><span class="lineCov">         56 : void evg_grey_fill_const_a(s32 y, s32 count, EVG_Span *spans, GF_EVGSurface *surf)</span>
+<span class="lineNum">     302 </span>            : {
+<span class="lineNum">     303 </span><span class="lineCov">         56 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y;</span>
+<span class="lineNum">     304 </span>            :         u32 a, fin;
+<span class="lineNum">     305 </span>            :         s32 i;
+<span class="lineNum">     306 </span>            :         u8 c;
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineCov">         56 :         if (surf-&gt;grey_type==0) c = GF_COL_R(surf-&gt;fill_col);</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :         else if (surf-&gt;grey_type==1) c = GF_COL_G(surf-&gt;fill_col);</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :         else c = GF_COL_B(surf-&gt;fill_col);</span>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span><span class="lineCov">         56 :         a = GF_COL_A(surf-&gt;fill_col);</span>
+<span class="lineNum">     313 </span><span class="lineCov">         56 :         if (surf-&gt;get_alpha) {</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     315 </span>            :                         u32 j;
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :                         for (j=0; j&lt;spans[i].len; j++) {</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :                                 s32 x = spans[i].x + j;</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :                                 u8 aa = surf-&gt;get_alpha(surf-&gt;get_alpha_udta, a, x, y);</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                                 fin = mul255(aa, spans[i].coverage);</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :                                 overmask_grey_const_run(fin, c, dst + surf-&gt;pitch_x * x, surf-&gt;pitch_x, 1);</span>
+<span class="lineNum">     321 </span>            :                         }
+<span class="lineNum">     322 </span>            :                 }
+<span class="lineNum">     323 </span>            :         } else {
+<span class="lineNum">     324 </span><span class="lineCov">        244 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     325 </span><span class="lineCov">        244 :                         fin = mul255(a, spans[i].coverage);</span>
+<span class="lineNum">     326 </span><span class="lineCov">        244 :                         overmask_grey_const_run(fin, c, dst + surf-&gt;pitch_x * spans[i].x, surf-&gt;pitch_x, spans[i].len);</span>
+<span class="lineNum">     327 </span>            :                 }
+<span class="lineNum">     328 </span>            :         }
+<span class="lineNum">     329 </span><span class="lineCov">         56 : }</span>
+<a name="330"><span class="lineNum">     330 </span>            : </a>
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineCov">       1131 : void evg_grey_fill_var(s32 y, s32 count, EVG_Span *spans, GF_EVGSurface *surf)</span>
+<span class="lineNum">     333 </span>            : {
+<span class="lineNum">     334 </span><span class="lineCov">       1131 :         u8 *dst = surf-&gt;pixels + y * surf-&gt;pitch_y;</span>
+<span class="lineNum">     335 </span>            :         s32 i;
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span><span class="lineCov">       2982 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     338 </span>            :                 u8 spanalpha, col_a;
+<span class="lineNum">     339 </span>            :                 s32 x;
+<span class="lineNum">     340 </span>            :                 u32 len;
+<span class="lineNum">     341 </span>            :                 u32 *col;
+<span class="lineNum">     342 </span><span class="lineCov">       1851 :                 len = spans[i].len;</span>
+<span class="lineNum">     343 </span><span class="lineCov">       1851 :                 spanalpha = spans[i].coverage;</span>
+<span class="lineNum">     344 </span><span class="lineCov">       1851 :                 evg_fill_run(surf-&gt;sten, surf, spans[i].x, y, len);</span>
+<span class="lineNum">     345 </span><span class="lineCov">       1851 :                 col = surf-&gt;stencil_pix_run;</span>
+<span class="lineNum">     346 </span><span class="lineCov">       1851 :                 x = surf-&gt;pitch_x * spans[i].x;</span>
+<span class="lineNum">     347 </span><span class="lineCov">     123381 :                 while (len--) {</span>
+<span class="lineNum">     348 </span><span class="lineCov">     119679 :                         col_a = GF_COL_A(*col);</span>
+<span class="lineNum">     349 </span><span class="lineCov">     119679 :                         if (col_a) {</span>
+<span class="lineNum">     350 </span><span class="lineCov">     107979 :                                 if ((spanalpha!=0xFF) || (col_a != 0xFF)) {</span>
+<span class="lineNum">     351 </span><span class="lineCov">       4231 :                                         overmask_grey(*col, dst + x, spanalpha, surf-&gt;grey_type);</span>
+<span class="lineNum">     352 </span>            :                                 } else {
+<span class="lineNum">     353 </span>            :                                         u8 c;
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span><span class="lineCov">     103748 :                                         if (surf-&gt;grey_type==0) c = GF_COL_R(*col);</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                                         else if (surf-&gt;grey_type==1) c = GF_COL_G(*col);</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                                         else c = GF_COL_B(*col);</span>
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineCov">     103748 :                                         *(dst + x) = c;</span>
+<span class="lineNum">     360 </span>            :                                 }
+<span class="lineNum">     361 </span>            :                         }
+<span class="lineNum">     362 </span><span class="lineCov">     119679 :                         col++;</span>
+<span class="lineNum">     363 </span><span class="lineCov">     119679 :                         x += surf-&gt;pitch_x;</span>
+<span class="lineNum">     364 </span>            :                 }
+<span class="lineNum">     365 </span>            :         }
+<a name="366"><span class="lineNum">     366 </span><span class="lineCov">       1131 : }</span></a>
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineCov">          5 : GF_Err evg_surface_clear_grey(GF_EVGSurface *surf, GF_IRect rc, GF_Color col)</span>
+<span class="lineNum">     369 </span>            : {
+<span class="lineNum">     370 </span>            :         u32 y, w, h, sx, sy;
+<span class="lineNum">     371 </span>            :         s32 st;
+<span class="lineNum">     372 </span>            :         u8 r;
+<span class="lineNum">     373 </span><span class="lineCov">          5 :         st = surf-&gt;pitch_y;</span>
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span><span class="lineCov">          5 :         h = rc.height;</span>
+<span class="lineNum">     376 </span><span class="lineCov">          5 :         w = rc.width;</span>
+<span class="lineNum">     377 </span><span class="lineCov">          5 :         sx = rc.x;</span>
+<span class="lineNum">     378 </span><span class="lineCov">          5 :         sy = rc.y;</span>
+<span class="lineNum">     379 </span>            : 
+<span class="lineNum">     380 </span><span class="lineCov">          5 :         if (surf-&gt;grey_type==0) r = GF_COL_R(col);</span>
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :         else if (surf-&gt;grey_type==1) r = GF_COL_G(col);</span>
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :         else r = GF_COL_B(col);</span>
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span><span class="lineCov">        817 :         for (y = 0; y &lt; h; y++) {</span>
+<span class="lineNum">     385 </span><span class="lineCov">        812 :                 char *data = surf -&gt;pixels + (y + sy) * st + surf-&gt;pitch_x*sx;</span>
+<span class="lineNum">     386 </span><span class="lineCov">        812 :                 memset(data, r, w*surf-&gt;pitch_x);</span>
+<span class="lineNum">     387 </span>            :         }
+<span class="lineNum">     388 </span><span class="lineCov">          5 :         return GF_OK;</span>
+<span class="lineNum">     389 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

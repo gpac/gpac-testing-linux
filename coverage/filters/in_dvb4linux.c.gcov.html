@@ -1,0 +1,520 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/in_dvb4linux.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - in_dvb4linux.c<span style="font-size: 80%;"> (source / <a href="in_dvb4linux.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">163</td>
+            <td class="headerCovTableEntryLo">3.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryLo">22.2 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / DVB4Linux input filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #ifndef WIN32
+<span class="lineNum">      32 </span>            : //#define GPAC_HAS_LINUX_DVB
+<span class="lineNum">      33 </span>            : //#define GPAC_SIM_LINUX_DVB
+<span class="lineNum">      34 </span>            : #endif
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #ifdef GPAC_HAS_LINUX_DVB
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      40 </span>            : #include &lt;sys/ioctl.h&gt;
+<span class="lineNum">      41 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      42 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : #ifndef GPAC_SIM_LINUX_DVB
+<span class="lineNum">      45 </span>            : #include &lt;linux/dvb/dmx.h&gt;
+<span class="lineNum">      46 </span>            : #include &lt;linux/dvb/frontend.h&gt;
+<span class="lineNum">      47 </span>            : #endif
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : typedef struct
+<span class="lineNum">      50 </span>            : {
+<span class="lineNum">      51 </span>            :         //options
+<span class="lineNum">      52 </span>            :         const char *src;
+<span class="lineNum">      53 </span>            :         const char *chcfg;
+<span class="lineNum">      54 </span>            :         u32 block_size;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :         //only one output pid declared
+<span class="lineNum">      57 </span>            :         GF_FilterPid *pid;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :         u32 freq;
+<span class="lineNum">      60 </span>            :         u16 vpid;
+<span class="lineNum">      61 </span>            :         u16 apid;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : #ifndef GPAC_SIM_LINUX_DVB
+<span class="lineNum">      64 </span>            :         fe_spectral_inversion_t specInv;
+<span class="lineNum">      65 </span>            :         fe_modulation_t modulation;
+<span class="lineNum">      66 </span>            :         fe_bandwidth_t bandwidth;
+<span class="lineNum">      67 </span>            :         fe_transmit_mode_t TransmissionMode;
+<span class="lineNum">      68 </span>            :         fe_guard_interval_t guardInterval;
+<span class="lineNum">      69 </span>            :         fe_code_rate_t HP_CodeRate;
+<span class="lineNum">      70 </span>            :         fe_code_rate_t LP_CodeRate;
+<span class="lineNum">      71 </span>            :         fe_hierarchy_t hierarchy;
+<span class="lineNum">      72 </span>            : #endif
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :         int demux_fd;
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :         char *block;
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            : } GF_DVBLinuxCtx;
+<a name="79"><span class="lineNum">      79 </span>            : </a>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 : static GF_Err dvblin_tune(GF_DVBLinuxCtx *ctx)</span>
+<span class="lineNum">      82 </span>            : {
+<span class="lineNum">      83 </span>            :         FILE *chanfile;
+<span class="lineNum">      84 </span>            :         char line[255];
+<span class="lineNum">      85 </span>            : #ifndef GPAC_SIM_LINUX_DVB
+<span class="lineNum">      86 </span>            :         int demux1, front1;
+<span class="lineNum">      87 </span>            :         struct dmx_pes_filter_params pesFilterParams;
+<span class="lineNum">      88 </span>            :         struct dvb_frontend_parameters frp;
+<span class="lineNum">      89 </span>            :         char chan_name_t[255];
+<span class="lineNum">      90 </span>            :         char freq_str[255], inv[255], bw[255], lcr[255], hier[255], cr[255],
+<span class="lineNum">      91 </span>            :              mod[255], transm[255], gi[255], apid_str[255], vpid_str[255];
+<span class="lineNum">      92 </span>            :         const char *chan_conf = &quot;:%255[^:]:%255[^:]:%255[^:]:%255[^:]:%255[^:]:%255[^:]:%255[^:]:%255[^:]:%255[^:]:%255[^:]:%255[^:]:&quot;;
+<span class="lineNum">      93 </span>            : #endif
+<span class="lineNum">      94 </span>            :         char *chan_name;
+<span class="lineNum">      95 </span>            :         char *tmp;
+<span class="lineNum">      96 </span>            :         char frontend_name[100], demux_name[100], dvr_name[100];
+<span class="lineNum">      97 </span>            :         u32 adapter_num;
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;src) {</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[DVB4Lin] Missing URL\n&quot;));</span>
+<span class="lineNum">     101 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     102 </span>            :         }
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;chcfg) {</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[DVB4Lin] Missing channels config file\n&quot;));</span>
+<span class="lineNum">     105 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     106 </span>            :         }
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :         chanfile = gf_fopen(ctx-&gt;chcfg, &quot;rb&quot;);</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :         if (!chanfile) return GF_BAD_PARAM;</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :         chan_name = (char *) ctx-&gt;src+6; // 6 = strlen(&quot;dvb://&quot;)</span>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            :         // support for multiple frontends
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :         tmp = strchr(chan_name, '@');</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         if (tmp) {</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :                 adapter_num = atoi(tmp+1);</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :                 tmp[0] = 0;</span>
+<span class="lineNum">     117 </span>            :         } else {
+<span class="lineNum">     118 </span>            :                 adapter_num = 0;
+<span class="lineNum">     119 </span>            :         }
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_CONTAINER, (&quot;Channel name %s\n&quot;, chan_name));</span>
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :         while(!gf_feof(chanfile)) {</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                 if ( gf_fgets(line, 255, chanfile) != NULL) {</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :                         if (line[0]=='#') continue;</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                         if (line[0]=='\r') continue;</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                         if (line[0]=='\n') continue;</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            : #ifndef GPAC_SIM_LINUX_DVB
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :                         strncpy(chan_name_t, line, index(line, ':')-line);</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :                         chan_name_t[254] = 0;</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :                         if (strncmp(chan_name,chan_name_t,strlen(chan_name))==0) {</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :                                 sscanf(strstr(line,&quot;:&quot;), chan_conf, freq_str, inv, bw, lcr, cr, mod, transm, gi, hier, apid_str, vpid_str);</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :                                 ctx-&gt;freq = (uint32_t) atoi(freq_str);</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :                                 ctx-&gt;apid = (uint16_t) atoi(apid_str);</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :                                 ctx-&gt;vpid = (uint16_t) atoi(vpid_str);</span>
+<span class="lineNum">     137 </span>            :                                 //Inversion
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :                                 if(! strcmp(inv, &quot;INVERSION_ON&quot;)) ctx-&gt;specInv = INVERSION_ON;</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(inv, &quot;INVERSION_OFF&quot;)) ctx-&gt;specInv = INVERSION_OFF;</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :                                 else ctx-&gt;specInv = INVERSION_AUTO;</span>
+<span class="lineNum">     141 </span>            :                                 //LP Code Rate
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :                                 if(! strcmp(lcr, &quot;FEC_1_2&quot;)) ctx-&gt;LP_CodeRate =FEC_1_2;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(lcr, &quot;FEC_2_3&quot;)) ctx-&gt;LP_CodeRate =FEC_2_3;</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(lcr, &quot;FEC_3_4&quot;)) ctx-&gt;LP_CodeRate =FEC_3_4;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(lcr, &quot;FEC_4_5&quot;)) ctx-&gt;LP_CodeRate =FEC_4_5;</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(lcr, &quot;FEC_6_7&quot;)) ctx-&gt;LP_CodeRate =FEC_6_7;</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(lcr, &quot;FEC_8_9&quot;)) ctx-&gt;LP_CodeRate =FEC_8_9;</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(lcr, &quot;FEC_5_6&quot;)) ctx-&gt;LP_CodeRate =FEC_5_6;</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(lcr, &quot;FEC_7_8&quot;)) ctx-&gt;LP_CodeRate =FEC_7_8;</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(lcr, &quot;FEC_NONE&quot;)) ctx-&gt;LP_CodeRate =FEC_NONE;</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                                 else ctx-&gt;LP_CodeRate =FEC_AUTO;</span>
+<span class="lineNum">     152 </span>            :                                 //HP Code Rate
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                                 if(! strcmp(cr, &quot;FEC_1_2&quot;)) ctx-&gt;HP_CodeRate =FEC_1_2;</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(cr, &quot;FEC_2_3&quot;)) ctx-&gt;HP_CodeRate =FEC_2_3;</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(cr, &quot;FEC_3_4&quot;)) ctx-&gt;HP_CodeRate =FEC_3_4;</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(cr, &quot;FEC_4_5&quot;)) ctx-&gt;HP_CodeRate =FEC_4_5;</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(cr, &quot;FEC_6_7&quot;)) ctx-&gt;HP_CodeRate =FEC_6_7;</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(cr, &quot;FEC_8_9&quot;)) ctx-&gt;HP_CodeRate =FEC_8_9;</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(cr, &quot;FEC_5_6&quot;)) ctx-&gt;HP_CodeRate =FEC_5_6;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(cr, &quot;FEC_7_8&quot;)) ctx-&gt;HP_CodeRate =FEC_7_8;</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(cr, &quot;FEC_NONE&quot;)) ctx-&gt;HP_CodeRate =FEC_NONE;</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :                                 else ctx-&gt;HP_CodeRate =FEC_AUTO;</span>
+<span class="lineNum">     163 </span>            :                                 //Modulation
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                                 if(! strcmp(mod, &quot;QAM_128&quot;)) ctx-&gt;modulation = QAM_128;</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(mod, &quot;QAM_256&quot;)) ctx-&gt;modulation = QAM_256;</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(mod, &quot;QAM_64&quot;)) ctx-&gt;modulation = QAM_64;</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(mod, &quot;QAM_32&quot;)) ctx-&gt;modulation = QAM_32;</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(mod, &quot;QAM_16&quot;)) ctx-&gt;modulation = QAM_16;</span>
+<span class="lineNum">     169 </span>            :                                 //Bandwidth
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                                 if(! strcmp(bw, &quot;BANDWIDTH_6_MHZ&quot;)) ctx-&gt;bandwidth = BANDWIDTH_6_MHZ;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(bw, &quot;BANDWIDTH_7_MHZ&quot;)) ctx-&gt;bandwidth = BANDWIDTH_7_MHZ;</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(bw, &quot;BANDWIDTH_8_MHZ&quot;)) ctx-&gt;bandwidth = BANDWIDTH_8_MHZ;</span>
+<span class="lineNum">     173 </span>            :                                 //Transmission Mode
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :                                 if(! strcmp(transm, &quot;TRANSMISSION_MODE_2K&quot;)) ctx-&gt;TransmissionMode = TRANSMISSION_MODE_2K;</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(transm, &quot;TRANSMISSION_MODE_8K&quot;)) ctx-&gt;TransmissionMode = TRANSMISSION_MODE_8K;</span>
+<span class="lineNum">     176 </span>            :                                 //Guard Interval
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                                 if(! strcmp(gi, &quot;GUARD_INTERVAL_1_32&quot;)) ctx-&gt;guardInterval = GUARD_INTERVAL_1_32;</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(gi, &quot;GUARD_INTERVAL_1_16&quot;)) ctx-&gt;guardInterval = GUARD_INTERVAL_1_16;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(gi, &quot;GUARD_INTERVAL_1_8&quot;)) ctx-&gt;guardInterval = GUARD_INTERVAL_1_8;</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                                 else ctx-&gt;guardInterval = GUARD_INTERVAL_1_4;</span>
+<span class="lineNum">     181 </span>            :                                 //Hierarchy
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :                                 if(! strcmp(hier, &quot;HIERARCHY_1&quot;)) ctx-&gt;hierarchy = HIERARCHY_1;</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(hier, &quot;HIERARCHY_2&quot;)) ctx-&gt;hierarchy = HIERARCHY_2;</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(hier, &quot;HIERARCHY_4&quot;)) ctx-&gt;hierarchy = HIERARCHY_4;</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :                                 else if(! strcmp(hier, &quot;HIERARCHY_AUTO&quot;)) ctx-&gt;hierarchy = HIERARCHY_AUTO;</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                                 else ctx-&gt;hierarchy = HIERARCHY_NONE;</span>
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            :                                 break;
+<span class="lineNum">     189 </span>            :                         }
+<span class="lineNum">     190 </span>            : #endif
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :                 }
+<span class="lineNum">     193 </span>            :         }
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :         gf_fclose(chanfile);</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :         sprintf(frontend_name, &quot;/dev/dvb/adapter%d/frontend0&quot;, adapter_num);
+<span class="lineNum">     197 </span>            :         sprintf(demux_name, &quot;/dev/dvb/adapter%d/demux0&quot;, adapter_num);
+<span class="lineNum">     198 </span>            :         sprintf(dvr_name, &quot;/dev/dvb/adapter%d/dvr0&quot;, adapter_num);
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            : #ifndef GPAC_SIM_LINUX_DVB
+<span class="lineNum">     201 </span>            :         // Open frontend
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :         if((front1 = open(frontend_name,O_RDWR|O_NONBLOCK)) &lt; 0) {</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;Cannot open frontend %s.\n&quot;, frontend_name));</span>
+<span class="lineNum">     204 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     205 </span>            :         } else {
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_CONTAINER, (&quot;Frontend %s opened.\n&quot;, frontend_name));</span>
+<span class="lineNum">     207 </span>            :         }
+<span class="lineNum">     208 </span>            :         // Open demuxes
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :         if ((demux1=open(demux_name, O_RDWR|O_NONBLOCK)) &lt; 0) {</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;Cannot open demux %s\n&quot;, demux_name));</span>
+<span class="lineNum">     211 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     212 </span>            :         } else {
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;Demux %s opened.\n&quot;, demux_name));</span>
+<span class="lineNum">     214 </span>            :         }
+<span class="lineNum">     215 </span>            :         // Set FrontendParameters - DVB-T
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :         frp.frequency = ctx-&gt;freq;</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :         frp.inversion = ctx-&gt;specInv;</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :         frp.u.ofdm.bandwidth = ctx-&gt;bandwidth;</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :         frp.u.ofdm.code_rate_HP = ctx-&gt;HP_CodeRate;</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :         frp.u.ofdm.code_rate_LP = ctx-&gt;LP_CodeRate;</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :         frp.u.ofdm.constellation = ctx-&gt;modulation;</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :         frp.u.ofdm.transmission_mode = ctx-&gt;TransmissionMode;</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :         frp.u.ofdm.guard_interval = ctx-&gt;guardInterval;</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :         frp.u.ofdm.hierarchy_information = ctx-&gt;hierarchy;</span>
+<span class="lineNum">     225 </span>            :         // Set frontend
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :         if (ioctl(front1, FE_SET_FRONTEND, &amp;frp) &lt; 0) {</span>
+<span class="lineNum">     227 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     228 </span>            :         }
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            :         // Set dumex
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :         pesFilterParams.pid      = 0x2000;                              // Linux-DVB API take PID=2000 for FULL/RAW TS flag</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :         pesFilterParams.input    = DMX_IN_FRONTEND;</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         pesFilterParams.output   = DMX_OUT_TS_TAP;</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :         pesFilterParams.pes_type = DMX_PES_OTHER;</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :         pesFilterParams.flags    = DMX_IMMEDIATE_START;</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :         if (ioctl(demux1, DMX_SET_PES_FILTER, &amp;pesFilterParams) &lt; 0) {</span>
+<span class="lineNum">     237 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     238 </span>            :         }
+<span class="lineNum">     239 </span>            :         /* The following code differs from mplayer and alike because the device is opened in blocking mode */
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :         if ((ctx-&gt;demux_fd = open(dvr_name, O_RDONLY/*|O_NONBLOCK*/)) &lt; 0) {</span>
+<span class="lineNum">     241 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     242 </span>            :         }
+<span class="lineNum">     243 </span>            : #endif
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<a name="246"><span class="lineNum">     246 </span>            : }</a>
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 : static u32 gf_dvblin_get_freq_from_url(GF_DVBLinuxCtx *ctx, const char *url)</span>
+<span class="lineNum">     249 </span>            : {
+<span class="lineNum">     250 </span>            :         FILE *chcfgig_file;
+<span class="lineNum">     251 </span>            :         char line[255], *tmp, *channel_name;
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            :         u32 freq;
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :         /* get rid of trailing @ */
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :         tmp = strchr(url, '@');</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :         if (tmp) tmp[0] = 0;</span>
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :         channel_name = (char *)url+6;</span>
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :         chcfgig_file = gf_fopen(ctx-&gt;chcfg, &quot;rb&quot;);</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :         if (!chcfgig_file) return GF_BAD_PARAM;</span>
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            :         freq = 0;
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :         while(!gf_feof(chcfgig_file)) {</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :                 if ( gf_fgets(line, 255, chcfgig_file) != NULL) {</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :                         if (line[0]=='#') continue;</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                         if (line[0]=='\r') continue;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :                         if (line[0]=='\n') continue;</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :                         tmp = strchr(line, ':');</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :                         tmp[0] = 0;</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :                         if (!strcmp(line, channel_name)) {</span>
+<span class="lineNum">     274 </span>            :                                 char *tmp2;
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :                                 tmp++;</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                                 tmp2 = strchr(tmp, ':');</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :                                 if (tmp2) tmp2[0] = 0;</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                                 freq = (u32)atoi(tmp);</span>
+<span class="lineNum">     279 </span>            :                                 break;
+<span class="lineNum">     280 </span>            :                         }
+<span class="lineNum">     281 </span>            :                 }
+<span class="lineNum">     282 </span>            :         }
+<span class="lineNum">     283 </span>            :         return freq;
+<a name="284"><span class="lineNum">     284 </span>            : }</a>
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 : GF_Err dvblin_setup_demux(GF_DVBLinuxCtx *ctx)</span>
+<span class="lineNum">     287 </span>            : {
+<span class="lineNum">     288 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;chcfg) {</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[DVB4Lin] Missing channels config file\n&quot;));</span>
+<span class="lineNum">     292 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     293 </span>            :         }
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :         if (strnicmp(ctx-&gt;src, &quot;dvb://&quot;, 6)) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :         if ((ctx-&gt;freq != 0) &amp;&amp; (ctx-&gt;freq == gf_dvblin_get_freq_from_url(ctx, ctx-&gt;src)) ) {</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[M2TSDemux] Tuner already tuned to that frequency\n&quot;));</span>
+<span class="lineNum">     298 </span>            :                 return GF_OK;
+<span class="lineNum">     299 </span>            :         }
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :         e = dvblin_tune(ctx);</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :         if (e) {</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CONTAINER, (&quot;[M2TSDemux] Unable to tune to frequency\n&quot;));</span>
+<span class="lineNum">     304 </span>            :                 return GF_SERVICE_ERROR;
+<span class="lineNum">     305 </span>            :         }
+<span class="lineNum">     306 </span>            :         return GF_OK;
+<span class="lineNum">     307 </span>            : }
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            : 
+<a name="310"><span class="lineNum">     310 </span>            : </a>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 : GF_Err dvblin_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     313 </span>            : {
+<span class="lineNum">     314 </span>            :         GF_Err e = GF_OK;
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :         GF_DVBLinuxCtx *ctx = (GF_DVBLinuxCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :         if (!ctx || !ctx-&gt;src) return GF_BAD_PARAM;</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :         e = dvblin_setup_demux(ctx);</span>
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :         if (e) {</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_NETWORK, (&quot;[DVBLinux] Failed to open %s\n&quot;, ctx-&gt;src));</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :                 gf_filter_setup_failure(filter, e);</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :                 return GF_URL_ERROR;</span>
+<span class="lineNum">     324 </span>            :         }
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :         GF_LOG(GF_LOG_INFO, GF_LOG_NETWORK, (&quot;[DVBLinux] opening %s\n&quot;, ctx-&gt;src));</span>
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :         ctx-&gt;block = gf_malloc(ctx-&gt;block_size +1);</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<a name="329"><span class="lineNum">     329 </span>            : }</a>
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 : void dvblin_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     332 </span>            : {
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :         GF_DVBLinuxCtx *ctx = (GF_DVBLinuxCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     334 </span>            : #ifndef GPAC_SIM_LINUX_DVB
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :         if (ctx-&gt;demux_fd) close(ctx-&gt;demux_fd);</span>
+<span class="lineNum">     336 </span>            : #endif
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :         if (ctx-&gt;block) gf_free(ctx-&gt;block);</span>
+<a name="338"><span class="lineNum">     338 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span><span class="lineCov">       2939 : GF_FilterProbeScore dvblin_probe_url(const char *url, const char *mime_type)</span>
+<span class="lineNum">     341 </span>            : {
+<span class="lineNum">     342 </span><span class="lineCov">       2939 :         if (!strnicmp(url, &quot;dvb://&quot;, 6)) return GF_FPROBE_SUPPORTED;</span>
+<span class="lineNum">     343 </span><span class="lineCov">       2939 :         return GF_FPROBE_NOT_SUPPORTED;</span>
+<span class="lineNum">     344 </span>            : }
+<a name="345"><span class="lineNum">     345 </span>            : </a>
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 : static Bool dvblin_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     348 </span>            : {
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :         GF_DVBLinuxCtx *ctx = (GF_DVBLinuxCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :         if (!evt-&gt;base.on_pid) return GF_FALSE;</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :         if (evt-&gt;base.on_pid != ctx-&gt;pid) return GF_FALSE;</span>
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :         switch (evt-&gt;base.type) {</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :         case GF_FEVT_PLAY:</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                 dvblin_setup_demux(ctx);</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                 return GF_TRUE;</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :         case GF_FEVT_STOP:</span>
+<span class="lineNum">     359 </span>            : #ifndef GPAC_SIM_LINUX_DVB
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;demux_fd) close(ctx-&gt;demux_fd);</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                 ctx-&gt;demux_fd = 0;</span>
+<span class="lineNum">     362 </span>            : #endif
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :                 return GF_TRUE;</span>
+<span class="lineNum">     364 </span>            :         default:
+<span class="lineNum">     365 </span>            :                 break;
+<span class="lineNum">     366 </span>            :         }
+<span class="lineNum">     367 </span>            :         return GF_FALSE;
+<a name="368"><span class="lineNum">     368 </span>            : }</a>
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 : static GF_Err dvblin_process(GF_Filter *filter)</span>
+<span class="lineNum">     371 </span>            : {
+<span class="lineNum">     372 </span>            :         GF_FilterPacket *dst_pck;
+<span class="lineNum">     373 </span>            :         u8 *out_data;
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :         GF_DVBLinuxCtx *ctx = (GF_DVBLinuxCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :         if (!ctx-&gt;freq) return GF_EOS;</span>
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span>            : #ifndef GPAC_SIM_LINUX_DVB
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :         u32 nb_read = read(ctx-&gt;demux_fd, ctx-&gt;block, ctx-&gt;block_size);</span>
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :         if (!nb_read) return GF_OK;</span>
+<span class="lineNum">     381 </span>            : #endif
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;pid, nb_read, &amp;out_data);</span>
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :         memcpy(out_data, ctx-&gt;block, nb_read);</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :         gf_filter_pck_set_framing(dst_pck, GF_TRUE, GF_TRUE);</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :         return GF_OK;</span>
+<span class="lineNum">     389 </span>            : }
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            : #else
+<span class="lineNum">     392 </span>            : static GF_Err dvblin_process(GF_Filter *filter)
+<span class="lineNum">     393 </span>            : {
+<span class="lineNum">     394 </span>            :         return GF_EOS;
+<span class="lineNum">     395 </span>            : }
+<span class="lineNum">     396 </span>            : #endif //GPAC_HAS_LINUX_DVB
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            : #ifdef GPAC_HAS_LINUX_DVB
+<span class="lineNum">     400 </span>            : #define OFFS(_n)        #_n, offsetof(GF_DVBLinuxCtx, _n)
+<span class="lineNum">     401 </span>            : #else
+<span class="lineNum">     402 </span>            : #define OFFS(_n)        #_n, -1
+<span class="lineNum">     403 </span>            : #endif
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            : static const GF_FilterArgs DVBLinuxArgs[] =
+<span class="lineNum">     406 </span>            : {
+<span class="lineNum">     407 </span>            :         { OFFS(src), &quot;URL of source content - see filter help&quot;, GF_PROP_NAME, NULL, NULL, 0},
+<span class="lineNum">     408 </span>            :         { OFFS(block_size), &quot;block size used to read file&quot;, GF_PROP_UINT, &quot;65536&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     409 </span>            :         { OFFS(chcfg), &quot;path to channels.conf file&quot;, GF_PROP_NAME, NULL, NULL, 0},
+<span class="lineNum">     410 </span>            :         {0}
+<span class="lineNum">     411 </span>            : };
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            : GF_FilterRegister DVBLinuxRegister = {
+<span class="lineNum">     414 </span>            :         .name = &quot;dvbin&quot;,
+<span class="lineNum">     415 </span>            :         GF_FS_SET_DESCRIPTION(&quot;DVB for Linux&quot;)
+<span class="lineNum">     416 </span>            :         GF_FS_SET_HELP(&quot;Experimental DVB support for linux, requires a channel config file through [-chcfg]()\n&quot;
+<span class="lineNum">     417 </span>            :         &quot;  \n&quot;
+<span class="lineNum">     418 </span>            :         &quot;The URL syntax is `dvb://CHANNAME[@FRONTEND]`, with:\n&quot;
+<span class="lineNum">     419 </span>            :         &quot; - CHANNAME: the channel name as listed in the channel config file\n&quot;
+<span class="lineNum">     420 </span>            :         &quot; - frontend: the index of the DVB adapter to use (optional, default is 0)\n&quot;
+<span class="lineNum">     421 </span>            :         )
+<span class="lineNum">     422 </span>            :         .args = DVBLinuxArgs,
+<span class="lineNum">     423 </span>            : #ifdef GPAC_HAS_LINUX_DVB
+<span class="lineNum">     424 </span>            :         .private_size = sizeof(GF_DVBLinuxCtx),
+<span class="lineNum">     425 </span>            :         .initialize = dvblin_initialize,
+<span class="lineNum">     426 </span>            :         .finalize = dvblin_finalize,
+<span class="lineNum">     427 </span>            :         .process = dvblin_process,
+<span class="lineNum">     428 </span>            :         .process_event = dvblin_process_event,
+<span class="lineNum">     429 </span>            :         .probe_url = dvblin_probe_url
+<span class="lineNum">     430 </span>            : #else
+<span class="lineNum">     431 </span>            :         .process = dvblin_process,
+<span class="lineNum">     432 </span>            : #endif
+<a name="433"><span class="lineNum">     433 </span>            : };</a>
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span><span class="lineCov">       2877 : const GF_FilterRegister *dvblin_register(GF_FilterSession *session)</span>
+<span class="lineNum">     436 </span>            : {
+<span class="lineNum">     437 </span>            : #if !defined(GPAC_HAS_LINUX_DVB) || defined(GPAC_SIM_LINUX_DVB)
+<span class="lineNum">     438 </span>            :         if (!gf_opts_get_bool(&quot;temp&quot;, &quot;gendoc&quot;))
+<span class="lineNum">     439 </span>            :                 return NULL;
+<span class="lineNum">     440 </span>            :         DVBLinuxRegister.version = &quot;! Warning: DVB4Linux NOT AVAILABLE IN THIS BUILD !&quot;;
+<span class="lineNum">     441 </span>            : #endif
+<span class="lineNum">     442 </span><span class="lineCov">       2877 :         return &amp;DVBLinuxRegister;</span>
+<span class="lineNum">     443 </span>            : }
+<span class="lineNum">     444 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

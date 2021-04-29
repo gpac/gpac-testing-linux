@@ -1,0 +1,202 @@
+*** gpac-null-profile logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:21 ***
+
+
+*** Subtest "single": executing "gpac -p=0 -hh mp4mx" ***
+
+[32mmp4mx[0m
+
+Description: ISOBMFF/QT muxer
+
+Muxes file according to ISOBMFF (14496-12 and derived specifications) or QuickTime
+  
+
+[32mTracks and Items[0m
+
+By default all input PIDs with ItemID property set are muxed as items, otherwise they are muxed as tracks.
+To prevent source items to be muxed as items, use [33m[3m-itemid[0m option from ISOBMF demuxer.
+[33mExample:
+-i source.mp4:itemid=false -o file.mp4[0m
+  
+To force non-item streams to be muxed as items, use [3m#ItemID[0m option on that PID:
+[33mExample:
+-i source.jpg:#ItemID=1 -o file.mp4[0m
+  
+
+[32mStorage[0m
+
+The [33m[3mstore[0m option allows controlling if the file is fragmented ot not, and when not fragmented, how interleaving is done. For cases where disk requirements are tight and fragmentation cannot be used, it is recommended to use either [33m[3mflat[0m or [33m[3mfstart[0m modes.
+  
+The [33m[3mvodcache[0m option allows controlling how DASH onDemand segments are generated:
+- If set to [33m[3mon[0m, file data is stored to a temporary file on disk and flushed upon completion, no padding is present.
+- If set to [33m[3minsert[0m, SIDX/SSIX will be injected upon completion of the file by shifting bytes in file. In this case, no padding is required but this might not be compatible with all output sinks and will take longer to write the file.
+- If set to [33m[3mreplace[0m, SIDX/SSIX size will be estimated based on duration and DASH segment length, and padding will be used in the file [3mbefore[0m the final SIDX. If input pids have the properties [33m[3mDSegs[0m set, this will be as the number of segments.
+The [33m[3mon[0m and [33m[3minsert[0m modes will produce exactly the same file, while the mode [33m[3mreplace[0m may inject a [33m[3mfree[0m box before the sidx.
+  
+
+[32mCustom boxes[0m
+
+Custom boxes can be specified as box patches:
+For movie-level patch, the [33m[3mboxpatch[0m option of the filter should be used.
+Per PID box patch can be specified through the PID property [33m[3mboxpatch[0m.
+[33mExample:
+src=source:#boxpatch=myfile.xml dst=mux.mp4[0m
+Per Item box patch can be specified through the PID property [33m[3mboxpatch[0m.
+[33mExample:
+src=source:1ItemID=1:#boxpatch=myfile.xml dst=mux.mp4[0m
+  
+The box patch is applied before writing the initial moov box in fragmented mode, or when writing the complete file otherwise.
+The box patch can either be a filename or the full XML string.
+  
+
+[32mTagging[0m
+
+When tagging is enabled, the filter will watch the property [33m[3mCoverArt[0m and all custom properties on incoming pid.
+The built-in tag names are indicated by [33m[3mMP4Box -h tags[0m.
+Other tag class may be specified using [33m[3mtag_NAME[0m property names, and will be added if [33m[3mtags[0m is set to [33m[3mall[0m using:
+- [33m[3mNAME[0m as a box 4CC if [33m[3mNAME[0m is four characters long
+- [33m[3mNAME[0m as a box 4CC if [33m[3mNAME[0m is 3 characters long, and will be prefixed by 0xA9
+- the CRC32 of the [33m[3mNAME[0m as a box 4CC if [33m[3mNAME[0m is not four characters long
+  
+
+[32mNotes[0m
+
+The filter watches the property [33m[3mFileNumber[0m on incoming packets to create new files or new segments in DASH mode.
+
+
+
+[32mOptions (expert):[0m
+
+[32mm4sys[0m (bool, default: [3mfalse[0m):  force MPEG-4 Systems signaling of tracks
+[32mdref[0m (bool, default: [3mfalse[0m):   only references data from source file - not compatible with all media sources
+[32mctmode[0m (enum, default: [3medit[0m):  set composition offset mode for video tracks
+	* [33medit[0m: uses edit lists to shift first frame to presentation time 0
+	* [33mnoedit[0m: ignore edit lists and does not shift timeline
+	* [33mnegctts[0m: uses ctts v1 with possibly negative offsets and no edit lists
+
+[32midur[0m (frac, default: [3m0[0m):       only import the specified duration. If negative, specify the number of coded frames to import
+[32mpack3gp[0m (uint, default: [3m1[0m):    pack a given number of 3GPP audio frames in one sample
+[32mimporter[0m (bool, default: [3mfalse[0m): compatibility with old importer, displays import progress
+[32mpack_nal[0m (bool, default: [3mfalse[0m): repack NALU size length to minimum possible size for NALU-based video (AVC/HEVC/...)
+[32mxps_inband[0m (enum, default: [3mno[0m): use inband (in sample data) parameter set for NALU-based video (AVC/HEVC/...)
+	* [33mno[0m: paramater sets are not inband, several sample descriptions might be created
+	* [33mall[0m: paramater sets are inband, no parameter sets in sample description
+	* [33mboth[0m: paramater sets are inband, signaled as inband, and also first set is kept in sample description
+	* [33mmix[0m: creates non-standard files using single sample entry with first PSs found, and moves other PS inband
+
+[32mstore[0m (enum, default: [3minter[0m):  file storage mode
+	* [33minter[0m: perform precise interleave of the file using [33m[3mcdur[0m (requires temporary storage of all media)
+	* [33mflat[0m: write samples as they arrive and moov at end (fastest mode)
+	* [33mfstart[0m: write samples as they arrive and moov before mdat
+	* [33mtight[0m:  uses per-sample interleaving of all tracks (requires temporary storage of all media)
+	* [33mfrag[0m: fragments the file using cdur duration
+	* [33msfrag[0m: framents the file using cdur duration but adjusting to start with SAP1/3
+
+[32mcdur[0m (frac, default: [3m-1/1[0m):    chunk duration for flat and interleaving modes or fragment duration for fragmentation modes
+	* [33m0[0m: no specific interleaving but moov first
+	* [33mnegative[0m: defaults to 1.0 unless overridden by storage profile
+[32mmoovts[0m (sint, default: [3m600[0m):   timescale to use for movie. A negative value picks the media timescale of the first track added
+[32mmoof_first[0m (bool, default: [3mtrue[0m): generate fragments starting with moof then mdat
+[32mabs_offset[0m (bool, default: [3mfalse[0m): use absolute file offset in fragments rather than offsets from moof
+[32mfsap[0m (bool, default: [3mtrue[0m):    split truns in video fragments at SAPs to reduce file size
+[32msubs_sidx[0m (sint, default: [3m-1[0m): number of subsegments per sidx. negative value disables sidx, -2 removes sidx if present in source pid
+[32mm4cc[0m (str):                    4 character code of empty box to append at the end of a segment
+[32mchain_sidx[0m (bool, default: [3mfalse[0m): use daisy-chaining of SIDX
+[32mmsn[0m (uint, default: [3m1[0m):        sequence number of first moof to N
+[32mmsninc[0m (uint, default: [3m1[0m):     sequence number increase between moofs
+[32mtfdt[0m (lfrac, default: [3m0[0m):      set TFDT of first traf
+[32mtfdt_traf[0m (bool, default: [3mfalse[0m): set TFDT in each traf
+[32mnofragdef[0m (bool, default: [3mfalse[0m): disable default flags in fragments
+[32mstraf[0m (bool, default: [3mfalse[0m):  use a single traf per moof (smooth streaming and co)
+[32mstrun[0m (bool, default: [3mfalse[0m):  use a single trun per traf (smooth streaming and co)
+[32mpsshs[0m (enum, default: [3mmoov[0m):   set PSSH boxes store mode
+	* [33mmoof[0m: in first moof of each segments
+	* [33mmoov[0m: in movie box
+	* [33mnone[0m: pssh is discarded
+
+[32msgpd_traf[0m (bool, default: [3mfalse[0m): store sample group descriptions in traf (duplicated for each traf). If not used, sample group descriptions are stored in the movie box
+[32mvodcache[0m (enum, default: [3mreplace[0m): enable temp storage for VoD dash modes - see filter help
+	* [33mon[0m: use temp storage of complete file for sidx and ssix injection
+	* [33minsert[0m: insert sidx and ssix by shifting bytes in output file
+	* [33mreplace[0m: precompute pace requirements for sidx and ssix and rewrite file range at end
+
+[32mnoinit[0m (bool, default: [3mfalse[0m): do not produce initial moov, used for DASH bitstream switching mode
+[32mtktpl[0m (enum, default: [3myes[0m):    use track box from input if any as a template to create new track
+	* [33mno[0m: disables template
+	* [33myes[0m: clones the track (except edits and decoder config)
+	* [33mudta[0m: only loads udta
+
+[32mmudta[0m (enum, default: [3myes[0m):    use udta and other moov extension boxes from input if any
+	* [33mno[0m: disables import
+	* [33myes[0m: clones all extension boxes
+	* [33mudta[0m: only loads udta
+
+[32mmvex[0m (bool, default: [3mfalse[0m):   set mvex after tracks
+[32msdtp_traf[0m (enum, default: [3mno[0m): use sdtp in traf rather than using flags in trun sample entries
+	* [33mno[0m: do not use sdtp
+	* [33msdtp[0m: use sdtp box to indicate sample dependencies and do not write info in trun sample flags
+	* [33mboth[0m: use sdtp box to indicate sample dependencies and also write info in trun sample flags
+
+[32mtrackid[0m (uint, default: [3m0[0m):    track ID of created track for single track. Default 0 uses next available trackID
+[32mfragdur[0m (bool, default: [3mfalse[0m): fragment based on fragment duration rather than CTS. Mostly used for MP4Box -frag option
+[32mbtrt[0m (bool, default: [3mtrue[0m):    set btrt box in sample description
+[32mstyp[0m (str):                    set segment styp major brand to the given 4CC[.version]
+[32mmediats[0m (sint, default: [3m0[0m):    set media timescale. A value of 0 means inherit from pid, a value of -1 means derive from samplerate or frame rate
+[32mase[0m (enum, default: [3mv0[0m):       set audio sample entry mode for more than stereo layouts
+	* [33mv0[0m: use v0 signaling but channel count from stream, recommended for backward compatibility
+	* [33mv0s[0m: use v0 signaling and force channel count to 2 (stereo) if more than 2 channels
+	* [33mv1[0m: use v1 signaling, ISOBMFF style (will mux raw PCM as ISOBMFF style)
+	* [33mv1qt[0m: use v1 signaling, QTFF style
+
+[32mssix[0m (bool, default: [3mfalse[0m):   create ssix when sidx is present, level 1 mapping I-frames byte ranges, level 0xFF mapping the rest
+[32mccst[0m (bool, default: [3mfalse[0m):   insert coding constraint box for video tracks
+[32mmaxchunk[0m (uint, default: [3m0[0m):   set max chunk size in bytes for runs (only used in non-fragmented mode). 0 means no constraints
+[32mnoroll[0m (bool, default: [3mfalse[0m): disable roll sample grouping
+[32msaio32[0m (bool, default: [3mfalse[0m): use 32 bit offset for side data location instead of 64 bit offset
+[32mtfdt64[0m (bool, default: [3mfalse[0m): use 64 bit tfdt and sidx even for 32 bits timestamps
+[32mcompress[0m (enum, default: [3mno[0m):  set top-level box compression mode
+	* [33mno[0m: disable box compression
+	* [33mmoov[0m: compress only moov box
+	* [33mmoof[0m: compress only moof boxes
+	* [33msidx[0m: compress moof and sidx boxes
+	* [33mssix[0m: compress moof, sidx and ssix boxes
+	* [33mall[0m: compress moov, moof, sidx and ssix boxes
+
+[32mfcomp[0m (bool, default: [3mfalse[0m):  force using compress box even when compressed size is larger than uncompressed
+[32motyp[0m (bool, default: [3mfalse[0m):   inject original file type when using compressed boxes
+[32mtrun_inter[0m (bool, default: [3mfalse[0m): interleave samples in trun based on the temporal level, the lowest level are stored first - this will create as many trun as required
+[32mtruns_first[0m (bool, default: [3mfalse[0m): store track runs before sample group description and sample encryption information
+[32mblock_size[0m (uint, default: [3m10000[0m): target output block size, 0 for default internal value (10k)
+[32mboxpatch[0m (str):                apply box patch before writing
+[32mdeps[0m (bool, default: [3mtrue[0m):    add samples dependencies information
+[32mmfra[0m (bool, default: [3mfalse[0m):   enable movie fragment random access when fragmenting (ignored when dashing)
+[32mforcesync[0m (bool, default: [3mfalse[0m): force all SAP types to be considered sync samples (might produce non-conformant files)
+[32mrefrag[0m (bool, default: [3mfalse[0m): indicate to use track fragment defaults from initial file if any rather than computing them from PID properties (used when processing standalone segments/fragments)
+[32mitags[0m (enum, default: [3mstrict[0m): tag injection mode
+	* [33mnone[0m: do not inject tags
+	* [33mstrict[0m: only inject recognized itunes tags
+	* [33mall[0m: inject all possible tags
+
+[32mkeep_utc[0m (bool, default: [3mfalse[0m): force all new files and tracks to keep the source UTC creation and modification times
+[32mpps_inband[0m (bool, default: [3mno[0m): when xps_inband is set, inject PPS in each non SAP 1/2/3 sample
+[32mmoovpad[0m (uint, default: [3m0[0m):    insert free box of given size after moov for future in-place editing
+[32mcmaf[0m (enum, default: [3mno[0m):      use cmaf guidelines
+	* [33mno[0m: CMAF not enforced
+	* [33mcmfc[0m: use CMAF [33m[3mcmfc[0m guidelines
+	* [33mcmf2[0m: use CMAF [33m[3mcmf2[0m guidelines
+
+Capabilities Bundle:
+	 Flags: Input Exclude StreamType="File"
+	 Flags: Input Exclude StreamType="SceneDescription"
+	 Flags: Input Exclude StreamType="ObjectDescriptor"
+	 Flags: Input Exclude Unframed="true"
+	 Flags: Input Exclude CodecID="Codec Not Supported"
+	 Flags: Output Extension="mp4|mpg4|m4a|m4i|3gp|3gpp|3g2|3gp2|iso|ismv|m4s|heif|heic|iff|avci|avif|mj2|mov|qt"
+	 Flags: Output MIMEType="application/x-isomedia|application/mp4|video/mp4|audio/mp4|video/3gpp|audio/3gpp|video/3gp2|audio/3gp2|video/iso.segment|audio/iso.segment|image/heif|image/heic|image/avci|video/quicktime"
+Capabilities Bundle:
+	 Flags: Input StreamType="SceneDescription"
+	 Flags: Input StreamType="ObjectDescriptor"
+	 Flags: Input StreamType="Text"
+	 Flags: Input Exclude Unframed="true"
+	 Flags: Input Exclude CodecID="Raw media"
+
+

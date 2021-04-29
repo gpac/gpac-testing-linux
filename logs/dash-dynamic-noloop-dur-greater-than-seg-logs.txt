@@ -1,0 +1,56 @@
+*** dash-dynamic-noloop-dur-greater-than-seg logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:11 ***
+
+
+*** Subtest "dash-gen": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash-live 2000 -subdur 2000 -profile live -mpd-refresh 10 -time-shift -1 -run-for 4000 -no-loop ./results/temp/file.mp4#video:dur=2.4001 ./results/temp/file.mp4#audio:dur=2.4001 -out ./results/temp/file.mpd" ***
+Live DASH-ing - press 'q' to quit, 's' to save context and quit
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[Dasher] MPD Availability start time initialized to 1619739071789 ms
+[MPD] Generating MPD at time 2021-04-29T23:31:11.791Z
+[Dasher] AS-1 Rep 1 segment 1 done 1997 ms before UTC due time
+[Dasher] AS-1 Rep 2 segment 1 done 1993 ms before UTC due time
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.99692 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 2 end 2
+[Dasher] updated period DID1 duration 2000 MPD time 2000
+[MPD] Generating MPD at time 2021-04-29T23:31:11.793Z
+
+Next generation scheduled in 1995 ms (DASH time 2000 ms)Slept for 1994 ms before generation, dash cumulated time 2019
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.4 end 3
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.39166 end 3
+
+Next generation scheduled in 1 ms (DASH time 2000 ms)Slept for 0 ms before generation, dash cumulated time 2022
+[Dasher] updated period DID1 duration 2400 MPD time 2400
+[MPD] Generating MPD at time 2021-04-29T23:31:13.791Z
+[Dasher] End of Period DID1
+[MPD] Generating MPD at time 2021-04-29T23:31:13.794Z
+[Dasher] AS-1 Rep 1 segment 1 done 7 ms after UTC due time
+[Dasher] AS-1 Rep 2 segment 1 done TOO LATE by 11 ms
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.99692 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 2 end 2
+[Dasher] updated period DID2 duration 2000 MPD time 4400
+[MPD] Generating MPD at time 2021-04-29T23:31:13.796Z
+
+Next generation scheduled in 2393 ms (DASH time 4400 ms)Done running, computing static MPD
+[MPD] Generating MPD at time 2021-04-29T23:31:13.796Z
+
+
+Computing ./results/temp/file.mpd  (hash-mpd) hash: 
+File hash (SHA-1): 88D36C5407E5425D5FDABA3DA8935E627DD7B3C8
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/file_dash_track2_p2_1.m4s  (hash-seg1p2-audio) hash: 
+File hash (SHA-1): 8DB22F6B08BA52BF1EEB8C290678110387D8ECC6
+Hash OK for ./results/temp/file_dash_track2_p2_1.m4s
+Computing ./results/temp/file_dash_track1_p2_1.m4s  (hash-seg1p2-video) hash: 
+File hash (SHA-1): 17193D7089F2CCB428544AF8B4C1F8D0313CFE69
+Hash OK for ./results/temp/file_dash_track1_p2_1.m4s
+Computing ./results/temp/file_dash_track2_2.m4s  (hash-seg2p1-audio) hash: 
+File hash (SHA-1): 5CDBEC83627D74BB9AADC7B1A8B0DB85582F059A
+Hash OK for ./results/temp/file_dash_track2_2.m4s
+Computing ./results/temp/file_dash_track1_2.m4s  (hash-seg2p1-video) hash: 
+File hash (SHA-1): E146B15EE0AB8F8E69D25FB21E9AD27C4E8F5E98
+Hash OK for ./results/temp/file_dash_track1_2.m4s
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:dur=2/1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 9190FCF78573331C2A6873C41D596EA9411D45DA
+Hash fail, ref hash ./hash_refs/dash-dynamic-noloop-dur-greater-than-seg-inspect.hash was A0E3567C85B47D6695FEECFB9F0E855324538648

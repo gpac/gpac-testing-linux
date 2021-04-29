@@ -1,0 +1,36 @@
+*** vflip-yuv logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:46:51 ***
+
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/vid.mp4 -o ./results/temp/raw.yuv -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+
+*** Subtest "flipv": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 vflip @ -o ./results/temp/dumpflipv.yuv" ***
+
+Computing ./results/temp/dumpflipv.yuv  (flipv) hash: 
+File hash (SHA-1): F743016B295D2F3953CFE56C1668F5237891DEA8
+Hash OK for ./results/temp/dumpflipv.yuv
+
+*** Subtest "fliph": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 vflip:horiz @ -o ./results/temp/dumpfliph.yuv" ***
+
+Computing ./results/temp/dumpfliph.yuv  (fliph) hash: 
+File hash (SHA-1): F0EDE0F861F155B6DC75D4B4EE6DBF211FF8DABB
+Hash OK for ./results/temp/dumpfliph.yuv
+
+*** Subtest "fliphv": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 vflip:both @ -o ./results/temp/dumpfliphv.yuv" ***
+
+Computing ./results/temp/dumpfliphv.yuv  (fliphv) hash: 
+File hash (SHA-1): 8A88D18D7EF15B4B643220F6D0EC645C6B374D46
+Hash OK for ./results/temp/dumpfliphv.yuv
+
+*** Subtest "flipoff": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 vflip:off @ -o ./results/temp/dumpflipno.yuv -graph" ***
+
+Filters connected:
+fin (src=./results/temp/raw.yuv:size=128x128) (ptr=0x55ad11791ec0)
+-(PID raw.yuv) rfrawvid (ptr=0x55ad11799800)
+--(PID raw.yuv) vflip (off) (ID=_0x55ad11794900_)
+---(PID raw.yuv) writegen (ptr=0x55ad1179ee50)
+----(PID raw.yuv) fout (dst=./results/temp/dumpflipno.yuv) (ptr=0x55ad11795c40)
+
+Computing ./results/temp/dumpflipno.yuv  (flipoff) hash: 
+File hash (SHA-1): 4D76BA4F6D0853BA6F8976DBACB5333741B0A286
+Hash OK for ./results/temp/dumpflipno.yuv

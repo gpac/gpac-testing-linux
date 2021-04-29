@@ -1,0 +1,54 @@
+*** items-pids logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:36:41 ***
+
+
+*** Subtest "create-iff": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add-image ./external_media/counter/counter_1280_720_I_25_tiled_500kb.hevc:dur=10:time=0 -add-image ./external_media/counter/counter_1280_720_I_25_tiled_500kb.hevc:dur=10:time=1 -add-image ./external_media/counter/counter_1280_720_I_25_tiled_500kb.hevc:dur=10:time=2 -add-image ./external_media/counter/counter_1280_720_I_25_tiled_500kb.hevc:dur=10:time=3 -ab heic -new ./results/temp/images.heic" ***
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 750 samples (7505 NALUs) - Slices: 270 I 6480 P 0 B - 751 SEI - 270 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+Adding sample at time 0.000 as item 1
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 750 samples (7505 NALUs) - Slices: 270 I 6480 P 0 B - 751 SEI - 270 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+Adding sample at time 1.000 as item 2
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 750 samples (7505 NALUs) - Slices: 270 I 6480 P 0 B - 751 SEI - 270 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+Adding sample at time 2.000 as item 3
+Track Importing HEVC - Width 1280 Height 720 FPS 25000/1000
+HEVC Import results: 750 samples (7505 NALUs) - Slices: 270 I 6480 P 0 B - 751 SEI - 270 IDR
+HEVC Max NALU size is 9963 - stream could be optimized by setting nal_length=2
+Adding sample at time 3.000 as item 4
+
+Computing ./results/temp/images.heic  (create-iff) hash: 
+File hash (SHA-1): 575C44186089CA90CD624026D717EF6368F536C7
+Hash OK for ./results/temp/images.heic
+
+*** Subtest "single-item": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/images.heic inspect:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (single-item) hash: 
+File hash (SHA-1): 31108DF8514A36CD019A63448BA11DF04CCFFF00
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "single-pid": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/images.heic:itt inspect:allp:log=./results/temp/inspect2.txt" ***
+
+Computing ./results/temp/inspect2.txt  (single-pid) hash: 
+File hash (SHA-1): B3B1FF82F81A57436DA88D2D14B3CBC6F8548621
+Hash OK for ./results/temp/inspect2.txt
+
+*** Subtest "muxitem-multipid": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/images.heic reframer @ -o ./results/temp/items-multi.heic" ***
+
+Computing ./results/temp/items-multi.heic  (muxitem-multipid) hash: 
+File hash (SHA-1): 8289A7C8C52592B0ACD82B204EFE3738FA656666
+Hash OK for ./results/temp/items-multi.heic
+
+*** Subtest "muxitem-singlepid": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/images.heic:itt reframer @ -o ./results/temp/items-single.heic" ***
+
+Computing ./results/temp/items-single.heic  (muxitem-singlepid) hash: 
+File hash (SHA-1): 8289A7C8C52592B0ACD82B204EFE3738FA656666
+Hash fail, ref hash ./hash_refs/items-pids-muxitem-singlepid.hash was 85E7BBDB15C52EF8D56F92CE77CB9F3A08B59BB4
+
+*** Subtest "muxitem-singlepid": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_1280_720_I_25_tiled_500kb.hevc:#ItemID=1 reframer:saps=1 @ -o ./results/temp/items-raw.heic" ***
+
+Computing ./results/temp/items-raw.heic  (muxitem-singlepid) hash: 
+File hash (SHA-1): 85E7BBDB15C52EF8D56F92CE77CB9F3A08B59BB4
+Hash OK for ./results/temp/items-raw.heic

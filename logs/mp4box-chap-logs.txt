@@ -1,0 +1,59 @@
+*** mp4box-chap logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:11 ***
+
+
+*** Subtest "chap-stream": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_video.cmp -add ./media/auxiliary_files/subtitle.srt:chap -new ./results/temp/chap-stream.mp4" ***
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+Track Importing Timed Text - Text track 120 x 96 font Serif (size 18) layer 0
+
+Computing ./results/temp/chap-stream.mp4  (chap-stream) hash: 
+File hash (SHA-1): 057424753234BBAFEC83CE318F999CDCCB9F8DCA
+Hash OK for ./results/temp/chap-stream.mp4
+
+*** Subtest "chap-zoom": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_video.cmp:chapfile=./external_media/chapters/chapters.chap -new ./results/temp/chap-zoom.mp4" ***
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+[Chapter import] Guessed video frame rate 25000/1000
+
+Computing ./results/temp/chap-zoom.mp4  (chap-zoom) hash: 
+File hash (SHA-1): 50D9246C7B132C5D5E850A84377FAAE3DBA1E40E
+Hash OK for ./results/temp/chap-zoom.mp4
+
+*** Subtest "dump-zoom": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dump-chap-zoom ./results/temp/chap-zoom.mp4 -out ./results/temp/chap-zoom.txt" ***
+
+Computing ./results/temp/chap-zoom.txt  (dump-zoom) hash: 
+File hash (SHA-1): 9C1B00425945561EFCBBF1529798D6821BB7F3D3
+Hash OK for ./results/temp/chap-zoom.txt
+
+*** Subtest "dump-ogg": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dump-chap-ogg ./results/temp/chap-zoom.mp4 -out ./results/temp/chap-zoom.txt" ***
+
+Computing ./results/temp/chap-zoom.txt  (dump-ogg) hash: 
+File hash (SHA-1): E7D9926C06B6AE3798514CB633FE666E6AC04546
+Hash OK for ./results/temp/chap-zoom.txt
+
+*** Subtest "dump-ttxt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dump-chap ./results/temp/chap-zoom.mp4 -out ./results/temp/chap-zoom.txt" ***
+
+Computing ./results/temp/chap-zoom.txt  (dump-ttxt) hash: 
+File hash (SHA-1): 93050800B0512B509DC93628AE076FA95E98B40F
+Hash OK for ./results/temp/chap-zoom.txt
+
+*** Subtest "chap-file": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_video.cmp:chapfile=./external_media/chapters/chapters.txt -new ./results/temp/chap-zoom.mp4" ***
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+[Chapter import] Guessed video frame rate 25000/1000
+
+Computing ./results/temp/chap-zoom.mp4  (chap-file) hash: 
+File hash (SHA-1): 5C179638ED6870EC54FD4BFD4AD84311B0D2B709
+Hash OK for ./results/temp/chap-zoom.mp4
+
+*** Subtest "dump-chap": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dump-chap-zoom ./results/temp/chap-zoom.mp4 -out ./results/temp/chap.txt" ***
+
+Computing ./results/temp/chap.txt  (dump-chap) hash: 
+File hash (SHA-1): D575EB7C232E32D85428D397F82EAF3DF1106A1C
+Hash OK for ./results/temp/chap.txt

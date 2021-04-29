@@ -1,0 +1,498 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - compositor/audio_render.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">compositor</a> - audio_render.c<span style="font-size: 80%;"> (source / <a href="audio_render.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">195</td>
+            <td class="headerCovTableEntry">205</td>
+            <td class="headerCovTableEntryHi">95.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / Scene Compositor sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<a name="26"><span class="lineNum">      26 </span>            : #include &lt;gpac/internal/compositor_dev.h&gt;</a>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span><span class="lineCov">         20 : void gf_ar_rcfg_done(GF_Filter *filter, GF_FilterPid *pid, GF_FilterPacket *pck)</span>
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span>            :         u32 size;
+<span class="lineNum">      31 </span><span class="lineCov">         20 :         GF_AudioRenderer *ar = (GF_AudioRenderer *) gf_filter_pck_get_data(pck, &amp;size);</span>
+<span class="lineNum">      32 </span>            :         assert(!size);
+<span class="lineNum">      33 </span>            :         assert(ar-&gt;wait_for_rcfg);
+<span class="lineNum">      34 </span><span class="lineCov">         20 :         ar-&gt;wait_for_rcfg --;</span>
+<span class="lineNum">      35 </span><span class="lineCov">         20 :         if (ar-&gt;wait_for_rcfg) {</span>
+<span class="lineNum">      36 </span><span class="lineCov">          1 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Compositor] Reconfigure negociation %d still pending\n&quot;, ar-&gt;wait_for_rcfg));</span>
+<span class="lineNum">      37 </span>            :         } else {
+<span class="lineNum">      38 </span><span class="lineCov">         19 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Compositor] Reconfigure negociation done\n&quot;));</span>
+<span class="lineNum">      39 </span>            :         }
+<a name="40"><span class="lineNum">      40 </span><span class="lineCov">         20 : }</span></a>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineCov">        623 : static GF_Err gf_ar_setup_output_format(GF_AudioRenderer *ar)</span>
+<span class="lineNum">      43 </span>            : {
+<span class="lineNum">      44 </span>            :         u32 freq, a_fmt, nb_chan;
+<span class="lineNum">      45 </span>            :         u64 ch_cfg;
+<span class="lineNum">      46 </span>            :         u32 bsize;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">        623 :         freq = ar-&gt;compositor-&gt;asr;</span>
+<span class="lineNum">      49 </span><span class="lineCov">        623 :         a_fmt = ar-&gt;compositor-&gt;afmt;</span>
+<span class="lineNum">      50 </span><span class="lineCov">        623 :         nb_chan = ar-&gt;compositor-&gt;ach;</span>
+<span class="lineNum">      51 </span><span class="lineCov">        623 :         ch_cfg = ar-&gt;compositor-&gt;alayout;</span>
+<span class="lineNum">      52 </span><span class="lineCov">        623 :         bsize = ar-&gt;compositor-&gt;asize;</span>
+<span class="lineNum">      53 </span><span class="lineCov">        623 :         if (!bsize) bsize = 1024;</span>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineCov">        623 :         if (!freq || !a_fmt || !nb_chan || !ch_cfg) {</span>
+<span class="lineNum">      56 </span><span class="lineCov">        623 :                 gf_mixer_get_config(ar-&gt;mixer, &amp;freq, &amp;nb_chan, &amp;a_fmt, &amp;ch_cfg);</span>
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :                 /*user disabled multichannel audio*/
+<span class="lineNum">      59 </span><span class="lineCov">        623 :                 if (!ar-&gt;compositor-&gt;amc &amp;&amp; (nb_chan&gt;2) ) nb_chan = 2;</span>
+<span class="lineNum">      60 </span>            :         } else {
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :                 if (!ar-&gt;config_forced) ar-&gt;config_forced++;</span>
+<span class="lineNum">      62 </span>            :         }
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">        623 :         gf_mixer_set_config(ar-&gt;mixer, freq, nb_chan, a_fmt, ch_cfg);</span>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">        623 :         if (ar-&gt;samplerate) {</span>
+<span class="lineNum">      68 </span><span class="lineCov">         20 :                 ar-&gt;time_at_last_config_sr = ar-&gt;current_time_sr * freq / ar-&gt;samplerate;</span>
+<span class="lineNum">      69 </span>            :         }
+<span class="lineNum">      70 </span><span class="lineCov">        623 :         if (!ar-&gt;compositor-&gt;abuf) {</span>
+<span class="lineNum">      71 </span>            : #ifdef GPAC_CONFIG_ANDROID
+<span class="lineNum">      72 </span>            :                 ar-&gt;compositor-&gt;abuf = 200;
+<span class="lineNum">      73 </span>            : #else
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :                 ar-&gt;compositor-&gt;abuf = 100;</span>
+<span class="lineNum">      75 </span>            : #endif
+<span class="lineNum">      76 </span>            :         }
+<span class="lineNum">      77 </span><span class="lineCov">        623 :         ar-&gt;samplerate = freq;</span>
+<span class="lineNum">      78 </span><span class="lineCov">        623 :         ar-&gt;bytes_per_samp = nb_chan * gf_audio_fmt_bit_depth(a_fmt) / 8;</span>
+<span class="lineNum">      79 </span><span class="lineCov">        623 :         ar-&gt;bytes_per_second = freq * ar-&gt;bytes_per_samp;</span>
+<span class="lineNum">      80 </span><span class="lineCov">        623 :         ar-&gt;max_bytes_out = ar-&gt;bytes_per_second * ar-&gt;compositor-&gt;abuf / 1000;</span>
+<span class="lineNum">      81 </span><span class="lineCov">        623 :         while (ar-&gt;max_bytes_out % (2*ar-&gt;bytes_per_samp) ) ar-&gt;max_bytes_out++;</span>
+<span class="lineNum">      82 </span><span class="lineCov">        623 :         ar-&gt;buffer_size = ar-&gt;bytes_per_samp * bsize;</span>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">        623 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Compositor] Reconfigure audio to %d Hz %d channels %s\n&quot;, freq, nb_chan, gf_audio_fmt_name(a_fmt) ));</span>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">        623 :         if (ar-&gt;aout) {</span>
+<span class="lineNum">      87 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_SAMPLE_RATE, &amp;PROP_UINT(freq) );</span>
+<span class="lineNum">      88 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_TIMESCALE, &amp;PROP_UINT(freq) );</span>
+<span class="lineNum">      89 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_NUM_CHANNELS, &amp;PROP_UINT(nb_chan) );</span>
+<span class="lineNum">      90 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_AUDIO_FORMAT, &amp;PROP_UINT(a_fmt) );</span>
+<span class="lineNum">      91 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_CHANNEL_LAYOUT, &amp;PROP_LONGUINT(ch_cfg) );</span>
+<span class="lineNum">      92 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_AUDIO_VOLUME, &amp;PROP_UINT(ar-&gt;volume) );</span>
+<span class="lineNum">      93 </span><span class="lineCov">         20 :                 gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_AUDIO_PAN, &amp;PROP_UINT(ar-&gt;pan) );</span>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">         20 :                 gf_filter_pid_set_max_buffer(ar-&gt;aout, 1000*ar-&gt;compositor-&gt;abuf);</span>
+<span class="lineNum">      96 </span>            :         }
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineCov">        623 :         ar-&gt;time_at_last_config = ar-&gt;current_time;</span>
+<span class="lineNum">      99 </span><span class="lineCov">        623 :         ar-&gt;bytes_requested = 0;</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">        623 :         if (ar-&gt;aout) {</span>
+<span class="lineNum">     102 </span>            :                 GF_FilterPacket *pck;
+<span class="lineNum">     103 </span>            :                 //issue a dummy packet to tag the point at which we reconfigured
+<span class="lineNum">     104 </span><span class="lineCov">         20 :                 pck = gf_filter_pck_new_shared(ar-&gt;aout, (u8 *) ar, 0, gf_ar_rcfg_done);</span>
+<span class="lineNum">     105 </span><span class="lineCov">         20 :                 if (!pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     106 </span><span class="lineCov">         20 :                 ar-&gt;wait_for_rcfg ++;</span>
+<span class="lineNum">     107 </span><span class="lineCov">         20 :                 gf_filter_pck_set_readonly(pck);</span>
+<span class="lineNum">     108 </span><span class="lineCov">         20 :                 gf_filter_pck_send(pck);</span>
+<span class="lineNum">     109 </span>            :         }
+<span class="lineNum">     110 </span>            :         return GF_OK;
+<a name="111"><span class="lineNum">     111 </span>            : }</a>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineCov">        668 : static void gf_ar_pause(GF_AudioRenderer *ar, Bool DoFreeze, Bool for_reconfig, Bool reset_hw_buffer)</span>
+<span class="lineNum">     114 </span>            : {
+<span class="lineNum">     115 </span>            :         GF_FilterEvent evt;
+<span class="lineNum">     116 </span><span class="lineCov">        668 :         gf_mixer_lock(ar-&gt;mixer, GF_TRUE);</span>
+<span class="lineNum">     117 </span><span class="lineCov">        668 :         if (DoFreeze) {</span>
+<span class="lineNum">     118 </span><span class="lineCov">        333 :                 if (!ar-&gt;Frozen) {</span>
+<span class="lineNum">     119 </span><span class="lineCov">        333 :                         ar-&gt;freeze_time = gf_sys_clock_high_res();</span>
+<span class="lineNum">     120 </span><span class="lineCov">        333 :                         if (!for_reconfig &amp;&amp; ar-&gt;aout) {</span>
+<span class="lineNum">     121 </span><span class="lineCov">          5 :                                 GF_FEVT_INIT(evt, GF_FEVT_STOP, ar-&gt;aout);</span>
+<span class="lineNum">     122 </span><span class="lineCov">          5 :                                 gf_filter_pid_send_event(ar-&gt;aout, &amp;evt);</span>
+<span class="lineNum">     123 </span>            :                         }
+<span class="lineNum">     124 </span><span class="lineCov">        333 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_SYNC, (&quot;[Audio] pausing master clock - time &quot;LLD&quot; (sys time &quot;LLD&quot;)\n&quot;, ar-&gt;freeze_time, gf_sys_clock_high_res()));</span>
+<span class="lineNum">     125 </span><span class="lineCov">        333 :                         ar-&gt;Frozen = GF_TRUE;</span>
+<span class="lineNum">     126 </span>            :                 }
+<span class="lineNum">     127 </span>            :         } else {
+<span class="lineNum">     128 </span><span class="lineCov">        335 :                 if (ar-&gt;Frozen) {</span>
+<span class="lineNum">     129 </span><span class="lineCov">        333 :                         if (!for_reconfig &amp;&amp; ar-&gt;aout) {</span>
+<span class="lineNum">     130 </span><span class="lineCov">          5 :                                 GF_FEVT_INIT(evt, GF_FEVT_PLAY, ar-&gt;aout);</span>
+<span class="lineNum">     131 </span><span class="lineCov">          5 :                                 evt.play.hw_buffer_reset = reset_hw_buffer ? 1 : 0;</span>
+<span class="lineNum">     132 </span><span class="lineCov">          5 :                                 gf_filter_pid_send_event(ar-&gt;aout, &amp;evt);</span>
+<span class="lineNum">     133 </span>            :                         }
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">        333 :                         ar-&gt;start_time += gf_sys_clock_high_res() - ar-&gt;freeze_time;</span>
+<span class="lineNum">     136 </span><span class="lineCov">        333 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_SYNC, (&quot;[Audio] resuming master clock - new time &quot;LLD&quot; (sys time &quot;LLD&quot;) \n&quot;, ar-&gt;start_time, gf_sys_clock_high_res()));</span>
+<span class="lineNum">     137 </span><span class="lineCov">        333 :                         ar-&gt;Frozen = GF_FALSE;</span>
+<span class="lineNum">     138 </span>            :                 }
+<span class="lineNum">     139 </span>            :         }
+<span class="lineNum">     140 </span><span class="lineCov">        668 :         gf_mixer_lock(ar-&gt;mixer, GF_FALSE);</span>
+<span class="lineNum">     141 </span><span class="lineCov">        668 : }</span>
+<a name="142"><span class="lineNum">     142 </span>            : </a>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineCov">        605 : GF_AudioRenderer *gf_sc_ar_load(GF_Compositor *compositor, u32 init_flags)</span>
+<span class="lineNum">     145 </span>            : {
+<span class="lineNum">     146 </span>            :         GF_AudioRenderer *ar;
+<span class="lineNum">     147 </span><span class="lineCov">        605 :         ar = (GF_AudioRenderer *) gf_malloc(sizeof(GF_AudioRenderer));</span>
+<span class="lineNum">     148 </span>            :         memset(ar, 0, sizeof(GF_AudioRenderer));
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineCov">        605 :         ar-&gt;compositor = compositor;</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">        605 :         ar-&gt;mixer = gf_mixer_new(ar);</span>
+<span class="lineNum">     153 </span><span class="lineCov">        605 :         ar-&gt;non_rt_output = GF_TRUE;</span>
+<span class="lineNum">     154 </span><span class="lineCov">        605 :         ar-&gt;volume = MIN(100, compositor-&gt;avol);</span>
+<span class="lineNum">     155 </span><span class="lineCov">        605 :         ar-&gt;pan = MIN(100, compositor-&gt;apan);</span>
+<span class="lineNum">     156 </span><span class="lineCov">        605 :         if (! (init_flags &amp; GF_TERM_NO_AUDIO) ) {</span>
+<span class="lineNum">     157 </span><span class="lineCov">        603 :                 gf_ar_setup_output_format(ar);</span>
+<span class="lineNum">     158 </span>            :         }
+<span class="lineNum">     159 </span><span class="lineCov">        605 :         gf_mixer_set_max_speed(ar-&gt;mixer, compositor-&gt;max_aspeed);</span>
+<span class="lineNum">     160 </span><span class="lineCov">        605 :         ar-&gt;current_time = 0;</span>
+<span class="lineNum">     161 </span><span class="lineCov">        605 :         return ar;</span>
+<a name="162"><span class="lineNum">     162 </span>            : }</a>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">        604 : void gf_sc_ar_del(GF_AudioRenderer *ar)</span>
+<span class="lineNum">     165 </span>            : {
+<span class="lineNum">     166 </span><span class="lineCov">        604 :         if (!ar) return;</span>
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span><span class="lineCov">        604 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Compositor] Destroying compositor\n&quot;));</span>
+<span class="lineNum">     169 </span>            :         /*resume if paused (might cause deadlock otherwise)*/
+<span class="lineNum">     170 </span><span class="lineCov">        604 :         if (ar-&gt;Frozen) gf_sc_ar_control(ar, GF_SC_AR_RESUME);</span>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineCov">        604 :         gf_mixer_del(ar-&gt;mixer);</span>
+<span class="lineNum">     173 </span><span class="lineCov">        604 :         gf_free(ar);</span>
+<span class="lineNum">     174 </span><span class="lineCov">        604 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Compositor] Renderer destroyed\n&quot;));</span>
+<span class="lineNum">     175 </span>            : }
+<a name="176"><span class="lineNum">     176 </span>            : </a>
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span><span class="lineCov">       2509 : void gf_sc_ar_reset(GF_AudioRenderer *ar)</span>
+<span class="lineNum">     179 </span>            : {
+<span class="lineNum">     180 </span><span class="lineCov">       2509 :         if (!ar) return;</span>
+<span class="lineNum">     181 </span>            :         
+<span class="lineNum">     182 </span><span class="lineCov">       2509 :         gf_mixer_remove_all(ar-&gt;mixer);</span>
+<span class="lineNum">     183 </span><span class="lineCov">       2509 :         if (ar-&gt;scene_ready) {</span>
+<span class="lineNum">     184 </span><span class="lineCov">        606 :                 ar-&gt;scene_ready = 0;</span>
+<span class="lineNum">     185 </span><span class="lineCov">        606 :                 ar-&gt;current_time = 0;</span>
+<span class="lineNum">     186 </span><span class="lineCov">        606 :                 ar-&gt;current_time_sr = 0;</span>
+<span class="lineNum">     187 </span><span class="lineCov">        606 :                 ar-&gt;bytes_requested = 0;</span>
+<span class="lineNum">     188 </span><span class="lineCov">        606 :                 ar-&gt;nb_audio_objects = 0;</span>
+<span class="lineNum">     189 </span>            :         }
+<a name="190"><span class="lineNum">     190 </span>            : }</a>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span><span class="lineCov">        628 : void gf_sc_ar_control(GF_AudioRenderer *ar, u32 PauseType)</span>
+<span class="lineNum">     193 </span>            : {
+<span class="lineNum">     194 </span><span class="lineCov">        628 :         gf_ar_pause(ar, (PauseType==GF_SC_AR_PAUSE) ? GF_TRUE : GF_FALSE, GF_FALSE, (PauseType==GF_SC_AR_RESET_HW_AND_PLAY) ? GF_TRUE : GF_FALSE);</span>
+<a name="195"><span class="lineNum">     195 </span><span class="lineCov">        628 : }</span></a>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineCov">       1204 : void gf_sc_ar_set_volume(GF_AudioRenderer *ar, u32 Volume)</span>
+<span class="lineNum">     198 </span>            : {
+<span class="lineNum">     199 </span><span class="lineCov">       1204 :         if (Volume&gt;100) Volume=100;</span>
+<span class="lineNum">     200 </span><span class="lineCov">       1204 :         if (ar-&gt;volume==Volume) return;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :         ar-&gt;volume = Volume;</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :         if (ar-&gt;aout) gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_AUDIO_VOLUME, &amp;PROP_UINT(ar-&gt;volume) );</span>
+<a name="203"><span class="lineNum">     203 </span>            : }</a>
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span><span class="lineCov">          2 : void gf_sc_ar_mute(GF_AudioRenderer *ar, Bool mute)</span>
+<span class="lineNum">     206 </span>            : {
+<span class="lineNum">     207 </span><span class="lineCov">          2 :         ar-&gt;mute = mute;</span>
+<span class="lineNum">     208 </span><span class="lineCov">          2 :         if (ar-&gt;aout) gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_AUDIO_VOLUME, &amp;PROP_UINT(mute ? 0 : ar-&gt;volume) );</span>
+<a name="209"><span class="lineNum">     209 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineCov">       1204 : void gf_sc_ar_set_pan(GF_AudioRenderer *ar, u32 Balance)</span>
+<span class="lineNum">     212 </span>            : {
+<span class="lineNum">     213 </span><span class="lineCov">       1204 :         if (Balance&gt;100) Balance = 100;</span>
+<span class="lineNum">     214 </span><span class="lineCov">       1204 :         if (ar-&gt;pan == Balance) return;</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :         ar-&gt;pan = Balance;</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :         if (ar-&gt;aout) gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_AUDIO_PAN, &amp;PROP_UINT(ar-&gt;pan) );</span>
+<span class="lineNum">     217 </span>            : }
+<span class="lineNum">     218 </span>            : 
+<a name="219"><span class="lineNum">     219 </span>            : </a>
+<span class="lineNum">     220 </span>            : void compositor_setup_aout(GF_Compositor *ctx);
+<span class="lineNum">     221 </span><span class="lineCov">         21 : void gf_sc_ar_add_src(GF_AudioRenderer *ar, GF_AudioInterface *source)</span>
+<span class="lineNum">     222 </span>            : {
+<span class="lineNum">     223 </span>            :         Bool recfg;
+<span class="lineNum">     224 </span><span class="lineCov">         21 :         if (!ar) return;</span>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineCov">         21 :         compositor_setup_aout(ar-&gt;compositor);</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :         /*lock mixer*/
+<span class="lineNum">     229 </span><span class="lineCov">         21 :         gf_mixer_lock(ar-&gt;mixer, GF_TRUE);</span>
+<span class="lineNum">     230 </span><span class="lineCov">         21 :         gf_mixer_add_input(ar-&gt;mixer, source);</span>
+<span class="lineNum">     231 </span>            :         /*if changed reconfig*/
+<span class="lineNum">     232 </span><span class="lineCov">         21 :         recfg = gf_mixer_reconfig(ar-&gt;mixer);</span>
+<span class="lineNum">     233 </span><span class="lineCov">         21 :         if (!ar-&gt;need_reconfig) ar-&gt;need_reconfig = recfg;</span>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">         21 :         if (!gf_mixer_empty(ar-&gt;mixer) &amp;&amp; ar-&gt;aout) {</span>
+<span class="lineNum">     236 </span>            :                 GF_FilterEvent evt;
+<span class="lineNum">     237 </span><span class="lineCov">         21 :                 GF_FEVT_INIT(evt, GF_FEVT_PLAY, ar-&gt;aout);</span>
+<span class="lineNum">     238 </span><span class="lineCov">         21 :                 gf_filter_pid_send_event(ar-&gt;aout, &amp;evt);</span>
+<span class="lineNum">     239 </span>            :         }
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :         /*unlock mixer*/
+<span class="lineNum">     242 </span><span class="lineCov">         21 :         gf_mixer_lock(ar-&gt;mixer, GF_FALSE);</span>
+<a name="243"><span class="lineNum">     243 </span>            : }</a>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">         21 : void gf_sc_ar_remove_src(GF_AudioRenderer *ar, GF_AudioInterface *source)</span>
+<span class="lineNum">     246 </span>            : {
+<span class="lineNum">     247 </span><span class="lineCov">         21 :         if (ar) {</span>
+<span class="lineNum">     248 </span><span class="lineCov">         21 :                 gf_mixer_remove_input(ar-&gt;mixer, source);</span>
+<span class="lineNum">     249 </span><span class="lineCov">         21 :                 if (gf_mixer_empty(ar-&gt;mixer) &amp;&amp; ar-&gt;aout) {</span>
+<span class="lineNum">     250 </span>            :                         GF_FilterEvent evt;
+<span class="lineNum">     251 </span><span class="lineCov">         21 :                         GF_FEVT_INIT(evt, GF_FEVT_STOP, ar-&gt;aout);</span>
+<span class="lineNum">     252 </span><span class="lineCov">         21 :                         gf_filter_pid_send_event(ar-&gt;aout, &amp;evt);</span>
+<span class="lineNum">     253 </span>            :                 }
+<span class="lineNum">     254 </span>            :         }
+<span class="lineNum">     255 </span><span class="lineCov">         21 : }</span>
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            : #if 0 //unused
+<span class="lineNum">     259 </span>            : void gf_sc_ar_set_priority(GF_AudioRenderer *ar, u32 priority)
+<span class="lineNum">     260 </span>            : {
+<span class="lineNum">     261 </span>            :         if (ar-&gt;aout)
+<span class="lineNum">     262 </span>            :                 gf_filter_pid_set_property(ar-&gt;aout, GF_PROP_PID_AUDIO_PRIORITY, &amp;PROP_UINT(priority) );
+<span class="lineNum">     263 </span>            : }
+<a name="264"><span class="lineNum">     264 </span>            : #endif</a>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">      22396 : void gf_sc_ar_update_video_clock(GF_AudioRenderer *ar, u32 video_ts)</span>
+<span class="lineNum">     267 </span>            : {
+<span class="lineNum">     268 </span><span class="lineCov">      22396 :         ar-&gt;video_ts = video_ts;</span>
+<a name="269"><span class="lineNum">     269 </span><span class="lineCov">      22396 : }</span></a>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineCov">      34299 : static void gf_ar_pck_done(GF_Filter *filter, GF_FilterPid *pid, GF_FilterPacket *pck)</span>
+<span class="lineNum">     272 </span>            : {
+<span class="lineNum">     273 </span>            :         u32 size;
+<span class="lineNum">     274 </span><span class="lineCov">      34299 :         GF_Compositor *compositor = gf_filter_pid_get_udta(pid);</span>
+<span class="lineNum">     275 </span><span class="lineCov">      34299 :         /*data = */gf_filter_pck_get_data(pck, &amp;size);</span>
+<span class="lineNum">     276 </span><span class="lineCov">      34325 :         if (!size) return;</span>
+<span class="lineNum">     277 </span>            :         
+<span class="lineNum">     278 </span>            :         assert(size &lt;= compositor-&gt;audio_renderer-&gt;nb_bytes_out);
+<span class="lineNum">     279 </span><span class="lineCov">      34273 :         compositor-&gt;audio_renderer-&gt;nb_bytes_out -= size;</span>
+<a name="280"><span class="lineNum">     280 </span>            : }</a>
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span><span class="lineCov">     124704 : void gf_ar_send_packets(GF_AudioRenderer *ar)</span>
+<span class="lineNum">     283 </span>            : {
+<span class="lineNum">     284 </span>            :         u32 written, max_send=100;
+<span class="lineNum">     285 </span><span class="lineCov">     124704 :         u64 now = gf_sys_clock_high_res();</span>
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineCov">     124704 :         if (!ar-&gt;aout) {</span>
+<span class="lineNum">     288 </span><span class="lineCov">     120981 :                 if (ar-&gt;compositor-&gt;player) {</span>
+<span class="lineNum">     289 </span><span class="lineCov">         54 :                         ar-&gt;current_time = (u32) ( (now - ar-&gt;start_time)/1000);</span>
+<span class="lineNum">     290 </span>            :                 }
+<span class="lineNum">     291 </span>            :                 return;
+<span class="lineNum">     292 </span>            :         }
+<span class="lineNum">     293 </span><span class="lineCov">       3723 :         if (!ar-&gt;scene_ready) return;</span>
+<span class="lineNum">     294 </span><span class="lineCov">       3689 :         if (ar-&gt;need_reconfig) return;</span>
+<span class="lineNum">     295 </span><span class="lineCov">       3689 :         if (ar-&gt;Frozen) return;</span>
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :         //reconfiguration is pending, wait for the packet issued at reconfig to be consumed before issuing any new frame
+<span class="lineNum">     298 </span><span class="lineCov">       3689 :         if (ar-&gt;wait_for_rcfg) {</span>
+<span class="lineNum">     299 </span><span class="lineCov">         77 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Compositor] Waiting for audio output reconfiguration\n&quot;));</span>
+<span class="lineNum">     300 </span>            :                 return;
+<span class="lineNum">     301 </span>            :         }
+<span class="lineNum">     302 </span>            :         if (ar-&gt;scene_ready) {
+<span class="lineNum">     303 </span><span class="lineCov">       3612 :                 if (!ar-&gt;start_time) {</span>
+<span class="lineNum">     304 </span><span class="lineCov">          5 :                         ar-&gt;start_time = now;</span>
+<span class="lineNum">     305 </span>            :                 }
+<span class="lineNum">     306 </span><span class="lineCov">       3612 :                 if (!ar-&gt;nb_audio_objects &amp;&amp; !ar-&gt;non_rt_output) {</span>
+<span class="lineNum">     307 </span><span class="lineCov">        587 :                         ar-&gt;current_time = (u32) ( (now - ar-&gt;start_time)/1000);</span>
+<span class="lineNum">     308 </span><span class="lineCov">        587 :                         return;</span>
+<span class="lineNum">     309 </span>            :                 }
+<span class="lineNum">     310 </span>            :         }
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span><span class="lineCov">      34617 :         while (max_send) {</span>
+<span class="lineNum">     313 </span>            :                 u32 delay_ms = 0;
+<span class="lineNum">     314 </span>            :                 u8 *data;
+<span class="lineNum">     315 </span>            :                 u32 dur;
+<span class="lineNum">     316 </span>            :                 GF_FilterPacket *pck;
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span><span class="lineCov">      34302 :                 if (gf_filter_pid_would_block(ar-&gt;aout))</span>
+<span class="lineNum">     319 </span>            :                         break;
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span><span class="lineCov">      34299 :                 pck = gf_filter_pck_new_alloc_destructor(ar-&gt;aout, ar-&gt;buffer_size, &amp;data, gf_ar_pck_done);</span>
+<span class="lineNum">     322 </span><span class="lineCov">      34299 :                 if (!pck) break;</span>
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span><span class="lineCov">      34299 :                 if (ar-&gt;compositor-&gt;async) {</span>
+<span class="lineNum">     325 </span>            :                         GF_Fraction64 ref_ts;
+<span class="lineNum">     326 </span><span class="lineCov">      34299 :                         gf_filter_get_clock_hint(ar-&gt;compositor-&gt;filter, NULL, &amp;ref_ts);</span>
+<span class="lineNum">     327 </span>            :                         //valid clock hint, compute delay between last known playback point and current time
+<span class="lineNum">     328 </span><span class="lineCov">      34299 :                         if (ref_ts.den) {</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :                                 if (ref_ts.den != ar-&gt;samplerate) {</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :                                         delay_ms = (u32) (1000 * ar-&gt;current_time_sr / ar-&gt;samplerate);</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :                                         delay_ms -= (u32) (1000 * ref_ts.num / ref_ts.den);</span>
+<span class="lineNum">     332 </span>            :                                 } else {
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :                                         delay_ms = (u32) (1000 * (ar-&gt;current_time_sr - ref_ts.num) / ar-&gt;samplerate);</span>
+<span class="lineNum">     334 </span>            :                                 }
+<span class="lineNum">     335 </span>            :                         }
+<span class="lineNum">     336 </span>            :                         //unknown clock hint, use number of bytes out as delay
+<span class="lineNum">     337 </span>            :                         else {
+<span class="lineNum">     338 </span><span class="lineCov">      34299 :                                 delay_ms = (1000*ar-&gt;nb_bytes_out) / ar-&gt;bytes_per_second;</span>
+<span class="lineNum">     339 </span>            :                         }
+<span class="lineNum">     340 </span>            :                 }
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineCov">      34299 :                 gf_mixer_lock(ar-&gt;mixer, GF_TRUE);</span>
+<span class="lineNum">     343 </span><span class="lineCov">      34299 :                 written = gf_mixer_get_output(ar-&gt;mixer, data, ar-&gt;buffer_size, delay_ms);</span>
+<span class="lineNum">     344 </span><span class="lineCov">      34299 :                 gf_mixer_lock(ar-&gt;mixer, GF_FALSE);</span>
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span><span class="lineCov">      34299 :                 if (!written) {</span>
+<span class="lineNum">     347 </span><span class="lineCov">      28671 :                         if (!ar-&gt;non_rt_output) written = ar-&gt;buffer_size;</span>
+<span class="lineNum">     348 </span><span class="lineCov">      28671 :                         else if (ar-&gt;scene_ready &amp;&amp; ar-&gt;nb_audio_objects &amp;&amp; !gf_mixer_buffering(ar-&gt;mixer) ) written = ar-&gt;buffer_size;</span>
+<span class="lineNum">     349 </span>            :                         else {
+<span class="lineNum">     350 </span><span class="lineCov">         26 :                                 gf_filter_pck_truncate(pck, 0);</span>
+<span class="lineNum">     351 </span><span class="lineCov">         26 :                                 gf_filter_pck_discard(pck);</span>
+<span class="lineNum">     352 </span><span class="lineCov">         26 :                                 break;</span>
+<span class="lineNum">     353 </span>            :                         }
+<span class="lineNum">     354 </span>            :                 }
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineCov">      34273 :                 if (written&lt;ar-&gt;buffer_size) {</span>
+<span class="lineNum">     357 </span><span class="lineCov">         79 :                         gf_filter_pck_truncate(pck, written);</span>
+<span class="lineNum">     358 </span>            :                 }
+<span class="lineNum">     359 </span><span class="lineCov">      34273 :                 gf_filter_pck_set_sap(pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     360 </span><span class="lineCov">      34273 :                 gf_filter_pck_set_cts(pck, ar-&gt;current_time_sr);</span>
+<span class="lineNum">     361 </span><span class="lineCov">      34273 :                 dur = written / ar-&gt;bytes_per_samp;</span>
+<span class="lineNum">     362 </span><span class="lineCov">      34273 :                 gf_filter_pck_set_duration(pck, dur);</span>
+<span class="lineNum">     363 </span><span class="lineCov">      34273 :                 GF_LOG(GF_LOG_INFO, GF_LOG_AUDIO, (&quot;[Compositor] Send audio frame TS &quot;LLU&quot; nb samples %d - AR clock %u - delay %d ms\n&quot;, ar-&gt;current_time_sr, dur, ar-&gt;current_time, delay_ms));</span>
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">      34273 :                 ar-&gt;nb_bytes_out += written;</span>
+<span class="lineNum">     366 </span><span class="lineCov">      34273 :                 gf_filter_pck_send(pck);</span>
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineCov">      34273 :                 ar-&gt;bytes_requested += written;</span>
+<span class="lineNum">     369 </span><span class="lineCov">      34273 :                 ar-&gt;current_time_sr = ar-&gt;time_at_last_config_sr + (u32) (ar-&gt;bytes_requested / ar-&gt;bytes_per_samp);</span>
+<span class="lineNum">     370 </span><span class="lineCov">      34273 :                 ar-&gt;current_time = ar-&gt;time_at_last_config + (u32) (ar-&gt;bytes_requested * 1000 / ar-&gt;bytes_per_second);</span>
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span><span class="lineCov">      34273 :                 max_send--;</span>
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            :                 //this is a safety for non blocking mode, otherwise the pid_would_block is enough
+<span class="lineNum">     375 </span><span class="lineCov">      34273 :                 if (ar-&gt;nb_bytes_out &gt; ar-&gt;max_bytes_out)</span>
+<span class="lineNum">     376 </span>            :                         break;
+<span class="lineNum">     377 </span>            :         }
+<span class="lineNum">     378 </span>            : }
+<a name="379"><span class="lineNum">     379 </span>            : </a>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span><span class="lineCov">     124704 : void gf_sc_ar_send_or_reconfig(GF_AudioRenderer *ar)</span>
+<span class="lineNum">     382 </span>            : {
+<span class="lineNum">     383 </span>            :         Bool frozen;
+<span class="lineNum">     384 </span><span class="lineCov">     124704 :         if (ar-&gt;need_reconfig) {</span>
+<span class="lineNum">     385 </span><span class="lineCov">         20 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Compositor] Reconfiguring audio mixer\n&quot;));</span>
+<span class="lineNum">     386 </span>            :                 /*lock mixer*/
+<span class="lineNum">     387 </span><span class="lineCov">         20 :                 gf_mixer_lock(ar-&gt;mixer, GF_TRUE);</span>
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span><span class="lineCov">         20 :                 frozen = ar-&gt;Frozen;</span>
+<span class="lineNum">     390 </span><span class="lineCov">         20 :                 if (!frozen )</span>
+<span class="lineNum">     391 </span><span class="lineCov">         20 :                         gf_ar_pause(ar, GF_TRUE, GF_TRUE, GF_FALSE);</span>
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span><span class="lineCov">         20 :                 ar-&gt;need_reconfig = GF_FALSE;</span>
+<span class="lineNum">     394 </span><span class="lineCov">         20 :                 gf_ar_setup_output_format(ar);</span>
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span><span class="lineCov">         20 :                 if (!frozen)</span>
+<span class="lineNum">     397 </span><span class="lineCov">         20 :                         gf_ar_pause(ar, GF_FALSE, GF_TRUE, GF_FALSE);</span>
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :                 /*unlock mixer*/
+<span class="lineNum">     400 </span><span class="lineCov">         20 :                 gf_mixer_lock(ar-&gt;mixer, GF_FALSE);</span>
+<span class="lineNum">     401 </span>            :         }
+<span class="lineNum">     402 </span><span class="lineCov">     124704 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Compositor] sending audio packets\n&quot;));</span>
+<span class="lineNum">     403 </span><span class="lineCov">     124704 :         gf_ar_send_packets(ar);</span>
+<span class="lineNum">     404 </span><span class="lineCov">     124704 : }</span>
+<span class="lineNum">     405 </span>            : 
+<span class="lineNum">     406 </span>            : #if 0 //unused
+<span class="lineNum">     407 </span>            : u32 gf_sc_ar_get_delay(GF_AudioRenderer *ar)
+<span class="lineNum">     408 </span>            : {
+<span class="lineNum">     409 </span>            :         if (!ar-&gt;bytes_per_second) return 0;
+<span class="lineNum">     410 </span>            :         //try to FIXME, this is not as precise as what we have before using ar-&gt;audio_out-&gt;GetAudioDelay(ar-&gt;audio_out)
+<span class="lineNum">     411 </span>            :         // since we don't know how much of the first packet data out there has been consumed
+<span class="lineNum">     412 </span>            :         return 1000 * ar-&gt;nb_bytes_out / ar-&gt;bytes_per_second;
+<span class="lineNum">     413 </span>            : }
+<a name="414"><span class="lineNum">     414 </span>            : #endif</a>
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span><span class="lineCov">       1688 : u32 gf_sc_ar_get_clock(GF_AudioRenderer *ar)</span>
+<span class="lineNum">     417 </span>            : {
+<span class="lineNum">     418 </span><span class="lineCov">       1688 :         return ar-&gt;current_time;</span>
+<span class="lineNum">     419 </span>            : }
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

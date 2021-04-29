@@ -1,0 +1,44 @@
+*** filelist-params logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:14 ***
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i plist-params.m3u:fdur=1/1 inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats -logs=app@debug" ***
+GPAC args: -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i plist-params.m3u:fdur=1/1 inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph -stats -logs=app@debug 
+System info: 7961 MB RAM - 2 cores - main thread ID -1337680000
+
+Filter stats - 5 filters
+	Filter fin (src=plist-params.m3u:fdur=1/1) : 0 input pids 1 output pids 4 tasks 609 us process time
+		1 packets sent 45 bytes sent (1642.04 pck/sec 0.591133 mbps)
+		* output PID plist-params.m3u: 1 packets sent
+	Filter inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) : 1 input pids 0 output pids 27 tasks 1154 us process time
+		25 packets processed 344525 bytes processed (21663.8 pck/sec 2388.39 mbps)
+		* input PID logo.jpg: 25 packets received
+	Filter flist : 2 input pids 1 output pids 129 tasks 283 us process time
+		26 packets processed 344570 bytes processed (91872.8 pck/sec 9740.49 mbps)
+		25 packets sent 344525 bytes sent (88339.2 pck/sec 9739.22 mbps)
+		* input PID plist-params.m3u: 1 packets received
+		* input PID logo.jpg: 25 packets received
+		* output PID logo.jpg: 25 packets sent
+	Filter fin (src=media/auxiliary_files/logo.jpg:allp:deep:interleave=false:log=./results/temp/inspect.txt) : 0 input pids 1 output pids 125 tasks 770 us process time
+		75 packets sent 344525 bytes sent (97402.6 pck/sec 3579.48 mbps)
+		* output PID logo.jpg: 75 packets sent
+	Filter rfimg : 1 input pids 1 output pids 222 tasks 270 us process time
+		25 packets processed 344525 bytes processed (92592.6 pck/sec 10208.1 mbps)
+		25 packets sent 344525 bytes sent (92592.6 pck/sec 10208.1 mbps)
+		* input PID logo.jpg: 25 frames (75 packets) received
+		* output PID logo.jpg: 25 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3252 us active_time 3218 us nb_tasks 583
+
+Total: run_time 3252 us active_time 3218 us nb_tasks 583
+
+Filters connected:
+fin (src=plist-params.m3u:fdur=1/1) (ptr=0x5641151e7840)
+-(PID plist-params.m3u) flist (ptr=0x5641151eed40)
+--(PID logo.jpg) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x5641151ea280)
+fin (src=media/auxiliary_files/logo.jpg:allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x5641151f1660)
+-(PID logo.jpg) rfimg (ptr=0x5641151f7a20)
+--(PID logo.jpg) flist (ptr=0x5641151eed40)
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 8232590455022A46DED2C8D7DDFEF4048436A4A4
+Hash OK for ./results/temp/inspect.txt

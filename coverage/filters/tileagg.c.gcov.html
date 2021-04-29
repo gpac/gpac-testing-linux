@@ -1,0 +1,479 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/tileagg.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - tileagg.c<span style="font-size: 80%;"> (source / <a href="tileagg.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">145</td>
+            <td class="headerCovTableEntry">161</td>
+            <td class="headerCovTableEntryHi">90.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / tile aggregrator filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/avparse.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      30 </span>            : #include &lt;gpac/media_tools.h&gt;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : typedef struct
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            :         //options
+<span class="lineNum">      36 </span>            :         GF_PropUIntList tiledrop;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :         //internal
+<span class="lineNum">      39 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      40 </span>            :         GF_FilterPid *base_ipid;
+<span class="lineNum">      41 </span>            :         u32 nalu_size_length;
+<span class="lineNum">      42 </span>            :         u32 base_id;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :         GF_BitStream *bs_r;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :         u32 flush_packets;
+<span class="lineNum">      47 </span>            :         const GF_PropertyValue *sabt;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :         Bool check_connections;
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : } GF_TileAggCtx;
+<a name="52"><span class="lineNum">      52 </span>            : </a>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineCov">        137 : static GF_Err tileagg_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">      55 </span>            : {
+<span class="lineNum">      56 </span>            :         u32 codec_id=0;
+<span class="lineNum">      57 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">      58 </span>            :         GF_HEVCConfig *hvcc;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineCov">        137 :         GF_TileAggCtx *ctx = (GF_TileAggCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineCov">        137 :         if (is_remove) {</span>
+<span class="lineNum">      63 </span><span class="lineCov">         20 :                 if (ctx-&gt;base_ipid == pid) {</span>
+<span class="lineNum">      64 </span><span class="lineCov">          2 :                         if (ctx-&gt;opid) {</span>
+<span class="lineNum">      65 </span><span class="lineCov">          2 :                                 gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">      66 </span><span class="lineCov">          2 :                                 ctx-&gt;opid = NULL;</span>
+<span class="lineNum">      67 </span>            :                         }
+<span class="lineNum">      68 </span>            :                 }
+<span class="lineNum">      69 </span>            :                 return GF_OK;
+<span class="lineNum">      70 </span>            :         }
+<span class="lineNum">      71 </span><span class="lineCov">        117 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_CODECID);</span>
+<span class="lineNum">      72 </span><span class="lineCov">        117 :         if (!p)</span>
+<span class="lineNum">      73 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">      74 </span><span class="lineCov">        117 :         codec_id = p-&gt;value.uint;</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :         //a single HEVC base is allowed per instance
+<span class="lineNum">      77 </span><span class="lineCov">        117 :         if ((codec_id==GF_CODECID_HEVC) &amp;&amp; ctx-&gt;base_ipid &amp;&amp; (ctx-&gt;base_ipid != pid))</span>
+<span class="lineNum">      78 </span>            :                 return GF_REQUIRES_NEW_INSTANCE;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :         //a tile pid connected before our base, check we have the same base ID, otherwise we need a new instance
+<span class="lineNum">      81 </span><span class="lineCov">        117 :         if ((codec_id==GF_CODECID_HEVC) &amp;&amp; !ctx-&gt;base_ipid &amp;&amp; ctx-&gt;base_id) {</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_ID);</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                 if (!p)</span>
+<span class="lineNum">      84 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;base_id != p-&gt;value.uint)</span>
+<span class="lineNum">      87 </span>            :                         return GF_REQUIRES_NEW_INSTANCE;
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :                 ctx-&gt;base_ipid = pid;</span>
+<span class="lineNum">      90 </span>            :         }
+<span class="lineNum">      91 </span>            :         //tile pid connecting after another tile pid,  we share the same base
+<span class="lineNum">      92 </span><span class="lineCov">        117 :         if ((codec_id==GF_CODECID_HEVC_TILES) &amp;&amp; ctx-&gt;base_id) {</span>
+<span class="lineNum">      93 </span><span class="lineCov">        105 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_DEPENDENCY_ID);</span>
+<span class="lineNum">      94 </span><span class="lineCov">        105 :                 if (!p) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">      95 </span><span class="lineCov">        105 :                 if (ctx-&gt;base_id != p-&gt;value.uint)</span>
+<span class="lineNum">      96 </span>            :                         return GF_REQUIRES_NEW_INSTANCE;
+<span class="lineNum">      97 </span>            :         }
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineCov">        117 :         if (!ctx-&gt;base_ipid &amp;&amp; (codec_id==GF_CODECID_HEVC) ) {</span>
+<span class="lineNum">     101 </span><span class="lineCov">          7 :                 ctx-&gt;base_ipid = pid;</span>
+<span class="lineNum">     102 </span><span class="lineCov">          7 :                 if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">          7 :                         ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     104 </span>            :                 }
+<span class="lineNum">     105 </span>            :         }
+<span class="lineNum">     106 </span><span class="lineCov">        117 :         ctx-&gt;check_connections = GF_TRUE;</span>
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineCov">        117 :         if (ctx-&gt;base_ipid == pid) {</span>
+<span class="lineNum">     109 </span><span class="lineCov">         12 :                 gf_filter_pid_copy_properties(ctx-&gt;opid, ctx-&gt;base_ipid);</span>
+<span class="lineNum">     110 </span><span class="lineCov">         12 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_TILE_BASE, NULL);</span>
+<span class="lineNum">     111 </span><span class="lineCov">         12 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_SRD, NULL);</span>
+<span class="lineNum">     112 </span>            :                 //we keep the SRDREF property to indicate this was a tiled HEVC reassembled
+<span class="lineNum">     113 </span><span class="lineCov">         12 :                 gf_filter_pid_set_property_str(ctx-&gt;opid, &quot;isom:sabt&quot;, NULL);</span>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">         12 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     116 </span>            :                 //not ready yet
+<span class="lineNum">     117 </span><span class="lineCov">         12 :                 if (!p) return GF_OK;</span>
+<span class="lineNum">     118 </span><span class="lineCov">         12 :                 hvcc = gf_odf_hevc_cfg_read(p-&gt;value.data.ptr, p-&gt;value.data.size, GF_FALSE);</span>
+<span class="lineNum">     119 </span><span class="lineCov">         12 :                 ctx-&gt;nalu_size_length = hvcc ? hvcc-&gt;nal_unit_size : 4;</span>
+<span class="lineNum">     120 </span><span class="lineCov">         12 :                 if (hvcc) gf_odf_hevc_cfg_del(hvcc);</span>
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineCov">         12 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_ID);</span>
+<span class="lineNum">     123 </span><span class="lineCov">         12 :                 if (!p)</span>
+<span class="lineNum">     124 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">     125 </span><span class="lineCov">         12 :                 ctx-&gt;base_id = p-&gt;value.uint;</span>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">         12 :                 ctx-&gt;sabt = gf_filter_pid_get_property_str(pid, &quot;isom:sabt&quot;);</span>
+<span class="lineNum">     128 </span>            :         } else {
+<span class="lineNum">     129 </span><span class="lineCov">        105 :                 p = gf_filter_pid_get_property(pid, GF_PROP_PID_DEPENDENCY_ID);</span>
+<span class="lineNum">     130 </span><span class="lineCov">        105 :                 if (!p) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     131 </span><span class="lineCov">        105 :                 if (!ctx-&gt;base_ipid) {</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :                         ctx-&gt;base_id = p-&gt;value.uint;</span>
+<span class="lineNum">     133 </span>            :                 }
+<span class="lineNum">     134 </span>            :                 //we already checked the same base ID is used
+<span class="lineNum">     135 </span>            :         }
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :         return GF_OK;
+<a name="138"><span class="lineNum">     138 </span>            : }</a>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineCov">          8 : static GF_Err tileagg_set_eos(GF_Filter *filter, GF_TileAggCtx *ctx)</span>
+<span class="lineNum">     141 </span>            : {
+<span class="lineNum">     142 </span><span class="lineCov">          8 :         u32 i, count = gf_filter_get_ipid_count(filter);</span>
+<span class="lineNum">     143 </span><span class="lineCov">         77 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     144 </span><span class="lineCov">         77 :                 GF_FilterPid *pid = gf_filter_get_ipid(filter, i);</span>
+<span class="lineNum">     145 </span><span class="lineCov">         77 :                 gf_filter_pid_set_discard(pid, GF_TRUE);</span>
+<span class="lineNum">     146 </span>            :         }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineCov">          8 :         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     149 </span><span class="lineCov">          8 :         return GF_EOS;</span>
+<a name="150"><span class="lineNum">     150 </span>            : }</a>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">      11562 : static GF_Err tileagg_process(GF_Filter *filter)</span>
+<span class="lineNum">     153 </span>            : {
+<span class="lineNum">     154 </span><span class="lineCov">      11562 :         GF_TileAggCtx *ctx = (GF_TileAggCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     155 </span><span class="lineCov">      11562 :         u32 i, j, count = gf_filter_get_ipid_count(filter);</span>
+<span class="lineNum">     156 </span>            :         GF_FilterPacket *dst_pck, *base_pck;
+<span class="lineNum">     157 </span>            :         u64 min_cts = GF_FILTER_NO_TS;
+<span class="lineNum">     158 </span>            :         u32 pck_size, final_size, size = 0;
+<span class="lineNum">     159 </span>            :         u32 pos, nb_ready=0;
+<span class="lineNum">     160 </span>            :         u32 sabt_idx;
+<span class="lineNum">     161 </span>            :         Bool has_sei_suffix = GF_FALSE;
+<span class="lineNum">     162 </span>            :         const char *data;
+<span class="lineNum">     163 </span>            :         u8 *output;
+<span class="lineNum">     164 </span><span class="lineCov">      11562 :         if (!ctx-&gt;base_ipid) return GF_EOS;</span>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineCov">      11562 :         if (ctx-&gt;check_connections) {</span>
+<span class="lineNum">     167 </span><span class="lineCov">         57 :                 if (gf_filter_connections_pending(filter))</span>
+<span class="lineNum">     168 </span>            :                         return GF_OK;
+<span class="lineNum">     169 </span><span class="lineCov">         57 :                 ctx-&gt;check_connections = GF_FALSE;</span>
+<span class="lineNum">     170 </span>            :         }
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineCov">      11562 :         base_pck = gf_filter_pid_get_packet(ctx-&gt;base_ipid);</span>
+<span class="lineNum">     173 </span><span class="lineCov">      11562 :         if (!base_pck) {</span>
+<span class="lineNum">     174 </span><span class="lineCov">        310 :                 ctx-&gt;flush_packets = 0;</span>
+<span class="lineNum">     175 </span><span class="lineCov">        310 :                 if (gf_filter_pid_is_eos(ctx-&gt;base_ipid)) {</span>
+<span class="lineNum">     176 </span><span class="lineCov">          8 :                         return tileagg_set_eos(filter, ctx);</span>
+<span class="lineNum">     177 </span>            :                 }
+<span class="lineNum">     178 </span>            :                 return GF_OK;
+<span class="lineNum">     179 </span>            :         }
+<span class="lineNum">     180 </span><span class="lineCov">      11252 :         min_cts = gf_filter_pck_get_cts(base_pck);</span>
+<span class="lineNum">     181 </span><span class="lineCov">      11252 :         gf_filter_pck_get_data(base_pck, &amp;pck_size);</span>
+<span class="lineNum">     182 </span><span class="lineCov">      11252 :         size = pck_size;</span>
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineCov">      86084 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     185 </span>            :                 GF_FilterPacket *pck;
+<span class="lineNum">     186 </span>            :                 u64 cts;
+<span class="lineNum">     187 </span>            :                 Bool do_drop=GF_FALSE;
+<span class="lineNum">     188 </span><span class="lineCov">      82095 :                 GF_FilterPid *pid = gf_filter_get_ipid(filter, i);</span>
+<span class="lineNum">     189 </span><span class="lineCov">      82095 :                 if (pid==ctx-&gt;base_ipid) continue;</span>
+<span class="lineNum">     190 </span>            :                 while (1) {
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :                         pck = gf_filter_pid_get_packet(pid);</span>
+<span class="lineNum">     192 </span><span class="lineCov">      70843 :                         if (!pck) {</span>
+<span class="lineNum">     193 </span><span class="lineCov">       7263 :                                 if (gf_filter_pid_is_eos(pid)) {</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                                         return tileagg_set_eos(filter, ctx);</span>
+<span class="lineNum">     195 </span>            :                                 }
+<span class="lineNum">     196 </span>            :                                 //if we are flushing a segment, consider the PID discarded if no packet
+<span class="lineNum">     197 </span>            :                                 //otherwise wait for packet
+<span class="lineNum">     198 </span><span class="lineCov">       7263 :                                 if (! ctx-&gt;flush_packets)</span>
+<span class="lineNum">     199 </span>            :                                         return GF_OK;
+<span class="lineNum">     200 </span>            :                                 break;
+<span class="lineNum">     201 </span>            :                         }
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineCov">      63580 :                         cts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     204 </span><span class="lineCov">      63580 :                         if (cts &lt; min_cts) {</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_WARNING, GF_LOG_PARSER, (&quot;[TileAgg] Tiled pid %s with cts &quot;LLU&quot; less than base tile pid cts &quot;LLU&quot; - discarding packet\n&quot;, gf_filter_pid_get_name(pid), cts, min_cts ));</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :                                 gf_filter_pid_drop_packet(pid);</span>
+<span class="lineNum">     207 </span>            :                         } else {
+<span class="lineNum">     208 </span>            :                                 break;
+<span class="lineNum">     209 </span>            :                         }
+<span class="lineNum">     210 </span>            :                 }
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineCov">      63580 :                 if (!pck) continue;</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span><span class="lineCov">      63580 :                 if (cts &gt; min_cts) continue;</span>
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :                 for (j=0; j&lt;ctx-&gt;tiledrop.nb_items; j++) {</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :                         if (ctx-&gt;tiledrop.vals[j] == i)</span>
+<span class="lineNum">     218 </span>            :                                 do_drop=GF_TRUE;
+<span class="lineNum">     219 </span>            :                 }
+<span class="lineNum">     220 </span><span class="lineCov">      63580 :                 if (do_drop) {</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                         gf_filter_pid_drop_packet(pid);</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     223 </span>            :                 }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineCov">      63580 :                 gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     226 </span><span class="lineCov">      63580 :                 size += pck_size;</span>
+<span class="lineNum">     227 </span><span class="lineCov">      63580 :                 nb_ready++;</span>
+<span class="lineNum">     228 </span>            :         }
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineCov">       3989 :         GF_LOG(GF_LOG_DEBUG, GF_LOG_PARSER, (&quot;[TileAgg] reaggregating CTS &quot;LLU&quot; %d ready %d pids (nb flush pck %d)\n&quot;, min_cts, nb_ready+1, count, ctx-&gt;flush_packets));</span>
+<span class="lineNum">     231 </span><span class="lineCov">       3989 :         if (ctx-&gt;flush_packets)</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :                 ctx-&gt;flush_packets--;</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineCov">       3989 :         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, size, &amp;output);</span>
+<span class="lineNum">     235 </span><span class="lineCov">       3989 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     236 </span>            :         
+<span class="lineNum">     237 </span>            :         final_size = size;
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span><span class="lineCov">       3989 :         gf_filter_pck_merge_properties(base_pck, dst_pck);</span>
+<span class="lineNum">     240 </span><span class="lineCov">       3989 :         data = gf_filter_pck_get_data(base_pck, &amp;pck_size);</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            :         //copy all NAL from base except SEI suffixes
+<span class="lineNum">     243 </span><span class="lineCov">       3989 :         gf_bs_reassign_buffer(ctx-&gt;bs_r, data, pck_size);</span>
+<span class="lineNum">     244 </span>            :         pos = 0;
+<span class="lineNum">     245 </span>            :         size = 0;
+<span class="lineNum">     246 </span><span class="lineCov">      11974 :         while (pos&lt;pck_size) {</span>
+<span class="lineNum">     247 </span><span class="lineCov">       3996 :                 u32 nal_size = gf_bs_read_int(ctx-&gt;bs_r, 8*ctx-&gt;nalu_size_length);</span>
+<span class="lineNum">     248 </span>            :                 u8 nal_type;
+<span class="lineNum">     249 </span><span class="lineCov">       3996 :                 gf_bs_read_int(ctx-&gt;bs_r, 1);</span>
+<span class="lineNum">     250 </span><span class="lineCov">       3996 :                 nal_type = gf_bs_read_int(ctx-&gt;bs_r, 6);</span>
+<span class="lineNum">     251 </span><span class="lineCov">       3996 :                 gf_bs_read_int(ctx-&gt;bs_r, 1);</span>
+<span class="lineNum">     252 </span><span class="lineCov">       3996 :                 gf_bs_skip_bytes(ctx-&gt;bs_r, nal_size-1);</span>
+<span class="lineNum">     253 </span><span class="lineCov">       3996 :                 if (nal_type == GF_HEVC_NALU_SEI_SUFFIX) {</span>
+<span class="lineNum">     254 </span>            :                         has_sei_suffix = GF_TRUE;
+<span class="lineNum">     255 </span>            :                 } else {
+<span class="lineNum">     256 </span><span class="lineCov">          7 :                         memcpy(output+size, data+pos, nal_size + ctx-&gt;nalu_size_length);</span>
+<span class="lineNum">     257 </span><span class="lineCov">          7 :                         size += nal_size + ctx-&gt;nalu_size_length;</span>
+<span class="lineNum">     258 </span>            :                 }
+<span class="lineNum">     259 </span><span class="lineCov">       3996 :                 pos += nal_size + ctx-&gt;nalu_size_length;</span>
+<span class="lineNum">     260 </span>            :         }
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            :         sabt_idx = 0;
+<span class="lineNum">     263 </span>            :         while (1) {
+<span class="lineNum">     264 </span>            :                 u32 pid_id = 0;
+<span class="lineNum">     265 </span><span class="lineCov">      37640 :                 if (ctx-&gt;sabt) {</span>
+<span class="lineNum">     266 </span><span class="lineCov">      37640 :                         if (sabt_idx &gt;= ctx-&gt;sabt-&gt;value.uint_list.nb_items)</span>
+<span class="lineNum">     267 </span>            :                                 break;
+<span class="lineNum">     268 </span><span class="lineCov">      33651 :                         pid_id = ctx-&gt;sabt-&gt;value.uint_list.vals[sabt_idx];</span>
+<span class="lineNum">     269 </span><span class="lineCov">      33651 :                         sabt_idx++;</span>
+<span class="lineNum">     270 </span>            :                 }
+<span class="lineNum">     271 </span><span class="lineCov">     195156 :                 for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     272 </span>            :                         u64 cts;
+<span class="lineNum">     273 </span>            :                         GF_FilterPacket *pck;
+<span class="lineNum">     274 </span><span class="lineCov">     195156 :                         GF_FilterPid *pid = gf_filter_get_ipid(filter, i);</span>
+<span class="lineNum">     275 </span><span class="lineCov">     195156 :                         if (pid==ctx-&gt;base_ipid) continue;</span>
+<span class="lineNum">     276 </span><span class="lineCov">     161505 :                         if (pid_id) {</span>
+<span class="lineNum">     277 </span><span class="lineCov">     161505 :                                 const GF_PropertyValue *p = gf_filter_pid_get_property(pid, GF_PROP_PID_ID);</span>
+<span class="lineNum">     278 </span><span class="lineCov">     161505 :                                 if (!p || (p-&gt;value.uint != pid_id))</span>
+<span class="lineNum">     279 </span><span class="lineCov">     127854 :                                         continue;</span>
+<span class="lineNum">     280 </span>            :                         }
+<span class="lineNum">     281 </span><span class="lineCov">      33651 :                         pck = gf_filter_pid_get_packet(pid);</span>
+<span class="lineNum">     282 </span>            :                         //can happen if we drop one tile
+<span class="lineNum">     283 </span><span class="lineCov">      33651 :                         if (!pck) continue;</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">      33651 :                         cts = gf_filter_pck_get_cts(pck);</span>
+<span class="lineNum">     286 </span><span class="lineCov">      33651 :                         if (cts != min_cts) continue;</span>
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span><span class="lineCov">      33651 :                         data = gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     289 </span><span class="lineCov">      33651 :                         memcpy(output+size, data, pck_size);</span>
+<span class="lineNum">     290 </span><span class="lineCov">      33651 :                         size += pck_size;</span>
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineCov">      33651 :                         gf_filter_pid_drop_packet(pid);</span>
+<span class="lineNum">     293 </span><span class="lineCov">      33651 :                         if (pid_id)</span>
+<span class="lineNum">     294 </span>            :                                 break;
+<span class="lineNum">     295 </span>            :                 }
+<span class="lineNum">     296 </span><span class="lineCov">      33651 :                 if (!pid_id)</span>
+<span class="lineNum">     297 </span>            :                         break;
+<span class="lineNum">     298 </span>            :         }
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :         //append all SEI suffixes
+<span class="lineNum">     301 </span><span class="lineCov">       3989 :         if (has_sei_suffix) {</span>
+<span class="lineNum">     302 </span><span class="lineCov">       3989 :                 data = gf_filter_pck_get_data(base_pck, &amp;pck_size);</span>
+<span class="lineNum">     303 </span><span class="lineCov">       3989 :                 gf_bs_reassign_buffer(ctx-&gt;bs_r, data, pck_size);</span>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :                 pos = 0;
+<span class="lineNum">     306 </span><span class="lineCov">      11974 :                 while (pos&lt;pck_size) {</span>
+<span class="lineNum">     307 </span><span class="lineCov">       3996 :                         u32 nal_size = gf_bs_read_int(ctx-&gt;bs_r, 8*ctx-&gt;nalu_size_length);</span>
+<span class="lineNum">     308 </span>            :                         u8 nal_type;
+<span class="lineNum">     309 </span><span class="lineCov">       3996 :                         gf_bs_read_int(ctx-&gt;bs_r, 1);</span>
+<span class="lineNum">     310 </span><span class="lineCov">       3996 :                         nal_type = gf_bs_read_int(ctx-&gt;bs_r, 6);</span>
+<span class="lineNum">     311 </span><span class="lineCov">       3996 :                         gf_bs_read_int(ctx-&gt;bs_r, 1);</span>
+<span class="lineNum">     312 </span><span class="lineCov">       3996 :                         gf_bs_skip_bytes(ctx-&gt;bs_r, nal_size-1);</span>
+<span class="lineNum">     313 </span><span class="lineCov">       3996 :                         if (nal_type == GF_HEVC_NALU_SEI_SUFFIX) {</span>
+<span class="lineNum">     314 </span><span class="lineCov">       3989 :                                 memcpy(output+size, data+pos, nal_size + ctx-&gt;nalu_size_length);</span>
+<span class="lineNum">     315 </span><span class="lineCov">       3989 :                                 size += nal_size + ctx-&gt;nalu_size_length;</span>
+<span class="lineNum">     316 </span>            :                         }
+<span class="lineNum">     317 </span><span class="lineCov">       3996 :                         pos += nal_size + ctx-&gt;nalu_size_length;</span>
+<span class="lineNum">     318 </span>            :                 }
+<span class="lineNum">     319 </span>            :         }
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span><span class="lineCov">       3989 :         gf_filter_pid_drop_packet(ctx-&gt;base_ipid);</span>
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span><span class="lineCov">       3989 :         if (size &lt;   final_size)</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                 gf_filter_pck_truncate(dst_pck, size);</span>
+<span class="lineNum">     325 </span>            :                 
+<span class="lineNum">     326 </span><span class="lineCov">       3989 :         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     327 </span><span class="lineCov">       3989 :         return GF_OK;</span>
+<a name="328"><span class="lineNum">     328 </span>            : }</a>
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineCov">          7 : static GF_Err tileagg_initialize(GF_Filter *filter)</span>
+<span class="lineNum">     331 </span>            : {
+<span class="lineNum">     332 </span><span class="lineCov">          7 :         GF_TileAggCtx *ctx = (GF_TileAggCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     333 </span><span class="lineCov">          7 :         ctx-&gt;bs_r = gf_bs_new((char *)ctx, 1, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span><span class="lineCov">          7 :         return GF_OK;</span>
+<a name="336"><span class="lineNum">     336 </span>            : }</a>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineCov">          7 : static void tileagg_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     339 </span>            : {
+<span class="lineNum">     340 </span><span class="lineCov">          7 :         GF_TileAggCtx *ctx = (GF_TileAggCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     341 </span><span class="lineCov">          7 :         gf_bs_del(ctx-&gt;bs_r);</span>
+<a name="342"><span class="lineNum">     342 </span><span class="lineCov">          7 : }</span></a>
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span><span class="lineCov">      33221 : static Bool tileagg_process_event(GF_Filter *filter, const GF_FilterEvent *evt)</span>
+<span class="lineNum">     345 </span>            : {
+<span class="lineNum">     346 </span><span class="lineCov">      33221 :         GF_TileAggCtx *ctx = (GF_TileAggCtx *) gf_filter_get_udta(filter);</span>
+<span class="lineNum">     347 </span><span class="lineCov">      33221 :         if (evt-&gt;base.type != GF_FEVT_PLAY_HINT) return GF_FALSE;</span>
+<span class="lineNum">     348 </span><span class="lineCov">         99 :         if (evt-&gt;play.forced_dash_segment_switch) {</span>
+<span class="lineNum">     349 </span>            :                 //this assumes the dashin module performs regulation of output in case of losses
+<span class="lineNum">     350 </span>            :                 //otherwise it may dispatch more than one segment in the input buffer
+<span class="lineNum">     351 </span><span class="lineCov">         99 :                 if (!ctx-&gt;flush_packets)</span>
+<span class="lineNum">     352 </span><span class="lineCov">         99 :                         gf_filter_pid_get_buffer_occupancy(ctx-&gt;base_ipid, NULL, &amp;ctx-&gt;flush_packets, NULL, NULL);</span>
+<span class="lineNum">     353 </span>            :                 else {
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_PARSER, (&quot;[TileAgg] Something is wrong in demuxer, received segment flush event but previous segment is not yet flushed !\n&quot; ));</span>
+<span class="lineNum">     355 </span>            :                 }
+<span class="lineNum">     356 </span>            :         }
+<span class="lineNum">     357 </span>            :         return GF_TRUE;
+<span class="lineNum">     358 </span>            : }
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            : static const GF_FilterCapability TileAggCaps[] =
+<span class="lineNum">     361 </span>            : {
+<span class="lineNum">     362 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     363 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     364 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_CODECID, GF_CODECID_HEVC),
+<span class="lineNum">     365 </span>            :         CAP_BOOL(GF_CAPS_INPUT,GF_PROP_PID_TILE_BASE, GF_TRUE),
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            :         CAP_UINT(GF_CAPS_OUTPUT_STATIC, GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     368 </span>            :         CAP_UINT(GF_CAPS_OUTPUT_STATIC, GF_PROP_PID_CODECID, GF_CODECID_HEVC),
+<span class="lineNum">     369 </span>            :         {0},
+<span class="lineNum">     370 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     371 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     372 </span>            :         CAP_UINT(GF_CAPS_INPUT,GF_PROP_PID_CODECID, GF_CODECID_HEVC_TILES),
+<span class="lineNum">     373 </span>            : };
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span>            : #define OFFS(_n)        #_n, offsetof(GF_TileAggCtx, _n)
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            : static const GF_FilterArgs TileAggArgs[] =
+<span class="lineNum">     378 </span>            : {
+<span class="lineNum">     379 </span>            :         { OFFS(tiledrop), &quot;specify indexes of tiles to drop&quot;, GF_PROP_UINT_LIST, &quot;&quot;, NULL, GF_FS_ARG_UPDATE},
+<span class="lineNum">     380 </span>            :         {0}
+<span class="lineNum">     381 </span>            : };
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            : GF_FilterRegister TileAggRegister = {
+<span class="lineNum">     384 </span>            :         .name = &quot;tileagg&quot;,
+<span class="lineNum">     385 </span>            :         GF_FS_SET_DESCRIPTION(&quot;HEVC tile aggregator&quot;)
+<span class="lineNum">     386 </span>            :         GF_FS_SET_HELP(&quot;This filter reaggregates a set of split tiled HEVC streams (`hvt1` or `hvt2` in isobmff) into a single HEVC stream.&quot;)
+<span class="lineNum">     387 </span>            :         .private_size = sizeof(GF_TileAggCtx),
+<span class="lineNum">     388 </span>            :         SETCAPS(TileAggCaps),
+<span class="lineNum">     389 </span>            :         .initialize = tileagg_initialize,
+<span class="lineNum">     390 </span>            :         .finalize = tileagg_finalize,
+<span class="lineNum">     391 </span>            :         .args = TileAggArgs,
+<span class="lineNum">     392 </span>            :         .configure_pid = tileagg_configure_pid,
+<span class="lineNum">     393 </span>            :         .process = tileagg_process,
+<span class="lineNum">     394 </span>            :         .process_event = tileagg_process_event,
+<span class="lineNum">     395 </span>            :         .max_extra_pids = (u32) (-1),
+<a name="396"><span class="lineNum">     396 </span>            : };</a>
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span><span class="lineCov">       2877 : const GF_FilterRegister *tileagg_register(GF_FilterSession *session)</span>
+<span class="lineNum">     399 </span>            : {
+<span class="lineNum">     400 </span><span class="lineCov">       2877 :         return &amp;TileAggRegister;</span>
+<span class="lineNum">     401 </span>            : }
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+*** mp4box-io-counter_english.qcp logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:54 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/counter_english.qcp" ***
+Import probing results for ./external_media/import/counter_english.qcp:
+File has 1 tracks
+- Track 1 type: Audio - Codec QCELP Voice
+	SampleRate 8000 - 1 channels
+
+For more details, use `gpac -i counter_english.qcp inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/counter_english.qcp.mp4  (add) hash: 
+File hash (SHA-1): 881A0106919E168A21D4A36D559BE95E174EA9B9
+Hash OK for ./results/temp/counter_english.qcp.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/counter_english.qcp -new ./results/temp/counter_english.qcp.mp4" ***
+Track Importing QCELP - SampleRate 8000 Num Channels 1
+
+Computing ./results/temp/counter_english.qcp.1.tmp  (diso) hash: 
+File hash (SHA-1): FFD9C21E6A9DC1D5167EE1701A68A8B9C6249981
+Hash OK for ./results/temp/counter_english.qcp.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/counter_english.qcp.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.020
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand 3g2a - version 65536 - compatible brands: isom 3g2a
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 8000
+Media Duration 00:00:10.020 
+Media Info: Language "Undetermined (und)" - Type "soun:sqcp" - 501 samples
+	3GPP QCELP stream - Sample Rate 8000 - 1 channel(s) 16 bps
+	RFC6381 Codec Parameters: sqcp
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 160 / 8000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/counter_english.qcp.mp4 -out ./results/temp/counter_english.qcp.1.tmp" ***
+
+Computing ./results/temp/counter_english.qcp.2.tmp  (dts) hash: 
+File hash (SHA-1): EC40EF58075652FF683AFEBBA42FED7F5FC00FB9
+Hash OK for ./results/temp/counter_english.qcp.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/counter_english.qcp.mp4 -out ./results/temp/counter_english.qcp.2.tmp" ***
+
+Computing ./results/temp/counter_english.qcp.mp4.hint  (hint) hash: 
+File hash (SHA-1): B3CF71D44C1FBEEB3CB93E6EA4431ED8598BED4E
+Hash OK for ./results/temp/counter_english.qcp.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/counter_english.qcp.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 9A8AE689AFBC49A8E9B9223D604BF21617F8E535
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/counter_english.qcp.mp4 -out ./results/temp/counter_english.qcp.mp4.hint" ***
+Hinting track ID 1 - Type "sqcp:sqcp" (QCELP) - BW 7 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/counter_english.qcp.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/counter_english.qcp.mp4.hint  (unhint) hash: 
+File hash (SHA-1): D1A6660456EA21318BE7634EB7466948ACCD9B03
+Hash OK for ./results/temp/counter_english.qcp.mp4.hint

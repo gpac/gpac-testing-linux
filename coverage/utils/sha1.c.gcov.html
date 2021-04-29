@@ -1,0 +1,850 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - utils/sha1.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">utils</a> - sha1.c<span style="font-size: 80%;"> (source / <a href="sha1.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">122</td>
+            <td class="headerCovTableEntry">127</td>
+            <td class="headerCovTableEntryHi">96.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef GPAC_DISABLE_CORE_TOOLS</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : #ifndef _CRT_SECURE_NO_DEPRECATE
+<span class="lineNum">       4 </span>            : #define _CRT_SECURE_NO_DEPRECATE 1
+<span class="lineNum">       5 </span>            : #endif
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #include &lt;gpac/tools.h&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #ifndef PUT_UINT32_BE
+<span class="lineNum">      10 </span>            : #define PUT_UINT32_BE(n,b,i)                            \
+<span class="lineNum">      11 </span>            : {                                                       \
+<span class="lineNum">      12 </span>            :     (b)[(i)    ] = (u8) ( (n) &gt;&gt; 24 );       \
+<span class="lineNum">      13 </span>            :     (b)[(i) + 1] = (u8) ( (n) &gt;&gt; 16 );       \
+<span class="lineNum">      14 </span>            :     (b)[(i) + 2] = (u8) ( (n) &gt;&gt;  8 );       \
+<span class="lineNum">      15 </span>            :     (b)[(i) + 3] = (u8) ( (n)       );       \
+<span class="lineNum">      16 </span>            : }
+<span class="lineNum">      17 </span>            : #endif
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #if 0
+<span class="lineNum">      20 </span>            : /*
+<span class="lineNum">      21 </span>            :  *  FIPS-180-1 compliant SHA-1 implementation
+<span class="lineNum">      22 </span>            :  *
+<span class="lineNum">      23 </span>            :  *  Copyright (C) 2003-2006  Christophe Devine
+<span class="lineNum">      24 </span>            :  *
+<span class="lineNum">      25 </span>            :  *  This library is free software; you can redistribute it and/or
+<span class="lineNum">      26 </span>            :  *  modify it under the terms of the GNU Lesser General Public
+<span class="lineNum">      27 </span>            :  *  License, version 2.1 as published by the Free Software Foundation.
+<span class="lineNum">      28 </span>            :  *
+<span class="lineNum">      29 </span>            :  *  This library is distributed in the hope that it will be useful,
+<span class="lineNum">      30 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      31 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+<span class="lineNum">      32 </span>            :  *  Lesser General Public License for more details.
+<span class="lineNum">      33 </span>            :  *
+<span class="lineNum">      34 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      35 </span>            :  *  License along with this library; if not, write to the Free Software
+<span class="lineNum">      36 </span>            :  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+<span class="lineNum">      37 </span>            :  *  MA  02110-1301  USA
+<span class="lineNum">      38 </span>            :  */
+<span class="lineNum">      39 </span>            : /*
+<span class="lineNum">      40 </span>            :  *  The SHA-1 standard was published by NIST in 1993.
+<span class="lineNum">      41 </span>            :  *
+<span class="lineNum">      42 </span>            :  *  http://www.itl.nist.gov/fipspubs/fip180-1.htm
+<span class="lineNum">      43 </span>            :  */
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : struct __sha1_context
+<span class="lineNum">      47 </span>            : {
+<span class="lineNum">      48 </span>            :         u32 total[2];
+<span class="lineNum">      49 </span>            :         u32 state[5];
+<span class="lineNum">      50 </span>            :         u8 buffer[64];
+<span class="lineNum">      51 </span>            : };
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : /*
+<span class="lineNum">      54 </span>            :  * 32-bit integer manipulation macros (big endian)
+<span class="lineNum">      55 </span>            :  */
+<span class="lineNum">      56 </span>            : #ifndef GET_UINT32_BE
+<span class="lineNum">      57 </span>            : #define GET_UINT32_BE(n,b,i)                            \
+<span class="lineNum">      58 </span>            : {                                                       \
+<span class="lineNum">      59 </span>            :     (n) = ( (u32) (b)[(i)    ] &lt;&lt; 24 )        \
+<span class="lineNum">      60 </span>            :         | ( (u32) (b)[(i) + 1] &lt;&lt; 16 )        \
+<span class="lineNum">      61 </span>            :         | ( (u32) (b)[(i) + 2] &lt;&lt;  8 )        \
+<span class="lineNum">      62 </span>            :         | ( (u32) (b)[(i) + 3]       );       \
+<span class="lineNum">      63 </span>            : }
+<span class="lineNum">      64 </span>            : #endif
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : /*
+<span class="lineNum">      67 </span>            :  * SHA-1 context setup
+<span class="lineNum">      68 </span>            :  */
+<span class="lineNum">      69 </span>            : GF_SHA1Context *gf_sha1_starts()
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :         GF_SHA1Context *ctx;
+<span class="lineNum">      72 </span>            :         GF_SAFEALLOC(ctx, GF_SHA1Context);
+<span class="lineNum">      73 </span>            :         if (!ctx) return NULL;
+<span class="lineNum">      74 </span>            :         ctx-&gt;total[0] = 0;
+<span class="lineNum">      75 </span>            :         ctx-&gt;total[1] = 0;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :         ctx-&gt;state[0] = 0x67452301;
+<span class="lineNum">      78 </span>            :         ctx-&gt;state[1] = 0xEFCDAB89;
+<span class="lineNum">      79 </span>            :         ctx-&gt;state[2] = 0x98BADCFE;
+<span class="lineNum">      80 </span>            :         ctx-&gt;state[3] = 0x10325476;
+<span class="lineNum">      81 </span>            :         ctx-&gt;state[4] = 0xC3D2E1F0;
+<span class="lineNum">      82 </span>            :         return ctx;
+<span class="lineNum">      83 </span>            : }
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            : static void sha1_process(GF_SHA1Context *ctx, u8 data[64] )
+<span class="lineNum">      86 </span>            : {
+<span class="lineNum">      87 </span>            :         u32 temp, W[16], A, B, C, D, E;
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :         GET_UINT32_BE( W[0],  data,  0 );
+<span class="lineNum">      90 </span>            :         GET_UINT32_BE( W[1],  data,  4 );
+<span class="lineNum">      91 </span>            :         GET_UINT32_BE( W[2],  data,  8 );
+<span class="lineNum">      92 </span>            :         GET_UINT32_BE( W[3],  data, 12 );
+<span class="lineNum">      93 </span>            :         GET_UINT32_BE( W[4],  data, 16 );
+<span class="lineNum">      94 </span>            :         GET_UINT32_BE( W[5],  data, 20 );
+<span class="lineNum">      95 </span>            :         GET_UINT32_BE( W[6],  data, 24 );
+<span class="lineNum">      96 </span>            :         GET_UINT32_BE( W[7],  data, 28 );
+<span class="lineNum">      97 </span>            :         GET_UINT32_BE( W[8],  data, 32 );
+<span class="lineNum">      98 </span>            :         GET_UINT32_BE( W[9],  data, 36 );
+<span class="lineNum">      99 </span>            :         GET_UINT32_BE( W[10], data, 40 );
+<span class="lineNum">     100 </span>            :         GET_UINT32_BE( W[11], data, 44 );
+<span class="lineNum">     101 </span>            :         GET_UINT32_BE( W[12], data, 48 );
+<span class="lineNum">     102 </span>            :         GET_UINT32_BE( W[13], data, 52 );
+<span class="lineNum">     103 </span>            :         GET_UINT32_BE( W[14], data, 56 );
+<span class="lineNum">     104 </span>            :         GET_UINT32_BE( W[15], data, 60 );
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : #define S(x,n) ((x &lt;&lt; n) | ((x &amp; 0xFFFFFFFF) &gt;&gt; (32 - n)))
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            : #define R(t)                                            \
+<span class="lineNum">     109 </span>            : (                                                       \
+<span class="lineNum">     110 </span>            :     temp = W[(t -  3) &amp; 0x0F] ^ W[(t - 8) &amp; 0x0F] ^     \
+<span class="lineNum">     111 </span>            :            W[(t - 14) &amp; 0x0F] ^ W[ t      &amp; 0x0F],      \
+<span class="lineNum">     112 </span>            :     ( W[t &amp; 0x0F] = S(temp,1) )                         \
+<span class="lineNum">     113 </span>            : )
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            : #define P(a,b,c,d,e,x)                                  \
+<span class="lineNum">     116 </span>            : {                                                       \
+<span class="lineNum">     117 </span>            :     e += S(a,5) + F(b,c,d) + K + x; b = S(b,30);        \
+<span class="lineNum">     118 </span>            : }
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            :         A = ctx-&gt;state[0];
+<span class="lineNum">     121 </span>            :         B = ctx-&gt;state[1];
+<span class="lineNum">     122 </span>            :         C = ctx-&gt;state[2];
+<span class="lineNum">     123 </span>            :         D = ctx-&gt;state[3];
+<span class="lineNum">     124 </span>            :         E = ctx-&gt;state[4];
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : #define F(x,y,z) (z ^ (x &amp; (y ^ z)))
+<span class="lineNum">     127 </span>            : #define K 0x5A827999
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :         P( A, B, C, D, E, W[0]  );
+<span class="lineNum">     130 </span>            :         P( E, A, B, C, D, W[1]  );
+<span class="lineNum">     131 </span>            :         P( D, E, A, B, C, W[2]  );
+<span class="lineNum">     132 </span>            :         P( C, D, E, A, B, W[3]  );
+<span class="lineNum">     133 </span>            :         P( B, C, D, E, A, W[4]  );
+<span class="lineNum">     134 </span>            :         P( A, B, C, D, E, W[5]  );
+<span class="lineNum">     135 </span>            :         P( E, A, B, C, D, W[6]  );
+<span class="lineNum">     136 </span>            :         P( D, E, A, B, C, W[7]  );
+<span class="lineNum">     137 </span>            :         P( C, D, E, A, B, W[8]  );
+<span class="lineNum">     138 </span>            :         P( B, C, D, E, A, W[9]  );
+<span class="lineNum">     139 </span>            :         P( A, B, C, D, E, W[10] );
+<span class="lineNum">     140 </span>            :         P( E, A, B, C, D, W[11] );
+<span class="lineNum">     141 </span>            :         P( D, E, A, B, C, W[12] );
+<span class="lineNum">     142 </span>            :         P( C, D, E, A, B, W[13] );
+<span class="lineNum">     143 </span>            :         P( B, C, D, E, A, W[14] );
+<span class="lineNum">     144 </span>            :         P( A, B, C, D, E, W[15] );
+<span class="lineNum">     145 </span>            :         P( E, A, B, C, D, R(16) );
+<span class="lineNum">     146 </span>            :         P( D, E, A, B, C, R(17) );
+<span class="lineNum">     147 </span>            :         P( C, D, E, A, B, R(18) );
+<span class="lineNum">     148 </span>            :         P( B, C, D, E, A, R(19) );
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            : #undef K
+<span class="lineNum">     151 </span>            : #undef F
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            : #define F(x,y,z) (x ^ y ^ z)
+<span class="lineNum">     154 </span>            : #define K 0x6ED9EBA1
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :         P( A, B, C, D, E, R(20) );
+<span class="lineNum">     157 </span>            :         P( E, A, B, C, D, R(21) );
+<span class="lineNum">     158 </span>            :         P( D, E, A, B, C, R(22) );
+<span class="lineNum">     159 </span>            :         P( C, D, E, A, B, R(23) );
+<span class="lineNum">     160 </span>            :         P( B, C, D, E, A, R(24) );
+<span class="lineNum">     161 </span>            :         P( A, B, C, D, E, R(25) );
+<span class="lineNum">     162 </span>            :         P( E, A, B, C, D, R(26) );
+<span class="lineNum">     163 </span>            :         P( D, E, A, B, C, R(27) );
+<span class="lineNum">     164 </span>            :         P( C, D, E, A, B, R(28) );
+<span class="lineNum">     165 </span>            :         P( B, C, D, E, A, R(29) );
+<span class="lineNum">     166 </span>            :         P( A, B, C, D, E, R(30) );
+<span class="lineNum">     167 </span>            :         P( E, A, B, C, D, R(31) );
+<span class="lineNum">     168 </span>            :         P( D, E, A, B, C, R(32) );
+<span class="lineNum">     169 </span>            :         P( C, D, E, A, B, R(33) );
+<span class="lineNum">     170 </span>            :         P( B, C, D, E, A, R(34) );
+<span class="lineNum">     171 </span>            :         P( A, B, C, D, E, R(35) );
+<span class="lineNum">     172 </span>            :         P( E, A, B, C, D, R(36) );
+<span class="lineNum">     173 </span>            :         P( D, E, A, B, C, R(37) );
+<span class="lineNum">     174 </span>            :         P( C, D, E, A, B, R(38) );
+<span class="lineNum">     175 </span>            :         P( B, C, D, E, A, R(39) );
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : #undef K
+<span class="lineNum">     178 </span>            : #undef F
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            : #define F(x,y,z) ((x &amp; y) | (z &amp; (x | y)))
+<span class="lineNum">     181 </span>            : #define K 0x8F1BBCDC
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :         P( A, B, C, D, E, R(40) );
+<span class="lineNum">     184 </span>            :         P( E, A, B, C, D, R(41) );
+<span class="lineNum">     185 </span>            :         P( D, E, A, B, C, R(42) );
+<span class="lineNum">     186 </span>            :         P( C, D, E, A, B, R(43) );
+<span class="lineNum">     187 </span>            :         P( B, C, D, E, A, R(44) );
+<span class="lineNum">     188 </span>            :         P( A, B, C, D, E, R(45) );
+<span class="lineNum">     189 </span>            :         P( E, A, B, C, D, R(46) );
+<span class="lineNum">     190 </span>            :         P( D, E, A, B, C, R(47) );
+<span class="lineNum">     191 </span>            :         P( C, D, E, A, B, R(48) );
+<span class="lineNum">     192 </span>            :         P( B, C, D, E, A, R(49) );
+<span class="lineNum">     193 </span>            :         P( A, B, C, D, E, R(50) );
+<span class="lineNum">     194 </span>            :         P( E, A, B, C, D, R(51) );
+<span class="lineNum">     195 </span>            :         P( D, E, A, B, C, R(52) );
+<span class="lineNum">     196 </span>            :         P( C, D, E, A, B, R(53) );
+<span class="lineNum">     197 </span>            :         P( B, C, D, E, A, R(54) );
+<span class="lineNum">     198 </span>            :         P( A, B, C, D, E, R(55) );
+<span class="lineNum">     199 </span>            :         P( E, A, B, C, D, R(56) );
+<span class="lineNum">     200 </span>            :         P( D, E, A, B, C, R(57) );
+<span class="lineNum">     201 </span>            :         P( C, D, E, A, B, R(58) );
+<span class="lineNum">     202 </span>            :         P( B, C, D, E, A, R(59) );
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            : #undef K
+<span class="lineNum">     205 </span>            : #undef F
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            : #define F(x,y,z) (x ^ y ^ z)
+<span class="lineNum">     208 </span>            : #define K 0xCA62C1D6
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :         P( A, B, C, D, E, R(60) );
+<span class="lineNum">     211 </span>            :         P( E, A, B, C, D, R(61) );
+<span class="lineNum">     212 </span>            :         P( D, E, A, B, C, R(62) );
+<span class="lineNum">     213 </span>            :         P( C, D, E, A, B, R(63) );
+<span class="lineNum">     214 </span>            :         P( B, C, D, E, A, R(64) );
+<span class="lineNum">     215 </span>            :         P( A, B, C, D, E, R(65) );
+<span class="lineNum">     216 </span>            :         P( E, A, B, C, D, R(66) );
+<span class="lineNum">     217 </span>            :         P( D, E, A, B, C, R(67) );
+<span class="lineNum">     218 </span>            :         P( C, D, E, A, B, R(68) );
+<span class="lineNum">     219 </span>            :         P( B, C, D, E, A, R(69) );
+<span class="lineNum">     220 </span>            :         P( A, B, C, D, E, R(70) );
+<span class="lineNum">     221 </span>            :         P( E, A, B, C, D, R(71) );
+<span class="lineNum">     222 </span>            :         P( D, E, A, B, C, R(72) );
+<span class="lineNum">     223 </span>            :         P( C, D, E, A, B, R(73) );
+<span class="lineNum">     224 </span>            :         P( B, C, D, E, A, R(74) );
+<span class="lineNum">     225 </span>            :         P( A, B, C, D, E, R(75) );
+<span class="lineNum">     226 </span>            :         P( E, A, B, C, D, R(76) );
+<span class="lineNum">     227 </span>            :         P( D, E, A, B, C, R(77) );
+<span class="lineNum">     228 </span>            :         P( C, D, E, A, B, R(78) );
+<span class="lineNum">     229 </span>            :         P( B, C, D, E, A, R(79) );
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            : #undef K
+<span class="lineNum">     232 </span>            : #undef F
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :         ctx-&gt;state[0] += A;
+<span class="lineNum">     235 </span>            :         ctx-&gt;state[1] += B;
+<span class="lineNum">     236 </span>            :         ctx-&gt;state[2] += C;
+<span class="lineNum">     237 </span>            :         ctx-&gt;state[3] += D;
+<span class="lineNum">     238 </span>            :         ctx-&gt;state[4] += E;
+<span class="lineNum">     239 </span>            : }
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            : /*
+<span class="lineNum">     242 </span>            :  * SHA-1 process buffer
+<span class="lineNum">     243 </span>            :  */
+<span class="lineNum">     244 </span>            : void gf_sha1_update(GF_SHA1Context *ctx, u8 *input, u32 ilen )
+<span class="lineNum">     245 </span>            : {
+<span class="lineNum">     246 </span>            :         s32 fill;
+<span class="lineNum">     247 </span>            :         u32 left;
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :         if( ilen &lt;= 0 )
+<span class="lineNum">     250 </span>            :                 return;
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            :         left = ctx-&gt;total[0] &amp; 0x3F;
+<span class="lineNum">     253 </span>            :         fill = 64 - left;
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :         ctx-&gt;total[0] += ilen;
+<span class="lineNum">     256 </span>            :         ctx-&gt;total[0] &amp;= 0xFFFFFFFF;
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :         if( ctx-&gt;total[0] &lt; (u32) ilen )
+<span class="lineNum">     259 </span>            :                 ctx-&gt;total[1]++;
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            :         if( left &amp;&amp; (s32) ilen &gt;= fill )
+<span class="lineNum">     262 </span>            :         {
+<span class="lineNum">     263 </span>            :                 memcpy( (void *) (ctx-&gt;buffer + left),
+<span class="lineNum">     264 </span>            :                         (void *) input, fill );
+<span class="lineNum">     265 </span>            :                 sha1_process( ctx, ctx-&gt;buffer );
+<span class="lineNum">     266 </span>            :                 input += fill;
+<span class="lineNum">     267 </span>            :                 ilen  -= fill;
+<span class="lineNum">     268 </span>            :                 left = 0;
+<span class="lineNum">     269 </span>            :         }
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :         while( ilen &gt;= 64 )
+<span class="lineNum">     272 </span>            :         {
+<span class="lineNum">     273 </span>            :                 sha1_process( ctx, input );
+<span class="lineNum">     274 </span>            :                 input += 64;
+<span class="lineNum">     275 </span>            :                 ilen  -= 64;
+<span class="lineNum">     276 </span>            :         }
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :         if( ilen &gt; 0 )
+<span class="lineNum">     279 </span>            :         {
+<span class="lineNum">     280 </span>            :                 memcpy( (void *) (ctx-&gt;buffer + left),
+<span class="lineNum">     281 </span>            :                         (void *) input, ilen );
+<span class="lineNum">     282 </span>            :         }
+<span class="lineNum">     283 </span>            : }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : static const u8 sha1_padding[64] =
+<span class="lineNum">     286 </span>            : {
+<span class="lineNum">     287 </span>            :         0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+<span class="lineNum">     288 </span>            :         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+<span class="lineNum">     289 </span>            :         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+<span class="lineNum">     290 </span>            :         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+<span class="lineNum">     291 </span>            : };
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            : /*
+<span class="lineNum">     294 </span>            :  * SHA-1 final digest
+<span class="lineNum">     295 </span>            :  */
+<span class="lineNum">     296 </span>            : void gf_sha1_finish(GF_SHA1Context *ctx, u8 output[GF_SHA1_DIGEST_SIZE] )
+<span class="lineNum">     297 </span>            : {
+<span class="lineNum">     298 </span>            :         u32 last, padn;
+<span class="lineNum">     299 </span>            :         u32 high, low;
+<span class="lineNum">     300 </span>            :         u8 msglen[8];
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            :         high = ( ctx-&gt;total[0] &gt;&gt; 29 )
+<span class="lineNum">     303 </span>            :                | ( ctx-&gt;total[1] &lt;&lt;  3 );
+<span class="lineNum">     304 </span>            :         low  = ( ctx-&gt;total[0] &lt;&lt;  3 );
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :         PUT_UINT32_BE( high, msglen, 0 );
+<span class="lineNum">     307 </span>            :         PUT_UINT32_BE( low,  msglen, 4 );
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :         last = ctx-&gt;total[0] &amp; 0x3F;
+<span class="lineNum">     310 </span>            :         padn = ( last &lt; 56 ) ? ( 56 - last ) : ( 120 - last );
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            :         gf_sha1_update( ctx, (u8 *) sha1_padding, padn );
+<span class="lineNum">     313 </span>            :         gf_sha1_update( ctx, msglen, 8 );
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span>            :         PUT_UINT32_BE( ctx-&gt;state[0], output,  0 );
+<span class="lineNum">     316 </span>            :         PUT_UINT32_BE( ctx-&gt;state[1], output,  4 );
+<span class="lineNum">     317 </span>            :         PUT_UINT32_BE( ctx-&gt;state[2], output,  8 );
+<span class="lineNum">     318 </span>            :         PUT_UINT32_BE( ctx-&gt;state[3], output, 12 );
+<span class="lineNum">     319 </span>            :         PUT_UINT32_BE( ctx-&gt;state[4], output, 16 );
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            :         gf_free(ctx);
+<span class="lineNum">     322 </span>            : }
+<span class="lineNum">     323 </span>            : #else
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            : /*
+<span class="lineNum">     326 </span>            :  *  sha1.c
+<span class="lineNum">     327 </span>            :  *
+<span class="lineNum">     328 </span>            :  *  Copyright (C) 1998, 2009
+<span class="lineNum">     329 </span>            :  *  Paul E. Jones &lt;paulej@packetizer.com&gt;
+<span class="lineNum">     330 </span>            :  *  All Rights Reserved
+<span class="lineNum">     331 </span>            :  *
+<span class="lineNum">     332 </span>            :  *  Freeware Public License (FPL)
+<span class="lineNum">     333 </span>            :  *
+<span class="lineNum">     334 </span>            :  *  This software is licensed as &quot;freeware.&quot;  Permission to distribute
+<span class="lineNum">     335 </span>            :  *  this software in source and binary forms, including incorporation
+<span class="lineNum">     336 </span>            :  *  into other products, is hereby granted without a fee.  THIS SOFTWARE
+<span class="lineNum">     337 </span>            :  *  IS PROVIDED 'AS IS' AND WITHOUT ANY EXPRESSED OR IMPLIED WARRANTIES,
+<span class="lineNum">     338 </span>            :  *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+<span class="lineNum">     339 </span>            :  *  AND FITNESS FOR A PARTICULAR PURPOSE.  THE AUTHOR SHALL NOT BE HELD
+<span class="lineNum">     340 </span>            :  *  LIABLE FOR ANY DAMAGES RESULTING FROM THE USE OF THIS SOFTWARE, EITHER
+<span class="lineNum">     341 </span>            :  *  DIRECTLY OR INDIRECTLY, INCLUDING, BUT NOT LIMITED TO, LOSS OF DATA
+<span class="lineNum">     342 </span>            :  *  OR DATA BEING RENDERED INACCURATE.
+<span class="lineNum">     343 </span>            :  *
+<span class="lineNum">     344 </span>            :  *****************************************************************************
+<span class="lineNum">     345 </span>            :  *  $Id: sha1.c 12 2009-06-22 19:34:25Z paulej $
+<span class="lineNum">     346 </span>            :  *****************************************************************************
+<span class="lineNum">     347 </span>            :  *
+<span class="lineNum">     348 </span>            :  *  Description:
+<span class="lineNum">     349 </span>            :  *      This file implements the Secure Hashing Standard as defined
+<span class="lineNum">     350 </span>            :  *      in FIPS PUB 180-1 published April 17, 1995.
+<span class="lineNum">     351 </span>            :  *
+<span class="lineNum">     352 </span>            :  *      The Secure Hashing Standard, which uses the Secure Hashing
+<span class="lineNum">     353 </span>            :  *      Algorithm (SHA), produces a 160-bit message digest for a
+<span class="lineNum">     354 </span>            :  *      given data stream.  In theory, it is highly improbable that
+<span class="lineNum">     355 </span>            :  *      two messages will produce the same message digest.  Therefore,
+<span class="lineNum">     356 </span>            :  *      this algorithm can serve as a means of providing a &quot;fingerprint&quot;
+<span class="lineNum">     357 </span>            :  *      for a message.
+<span class="lineNum">     358 </span>            :  *
+<span class="lineNum">     359 </span>            :  *  Portability Issues:
+<span class="lineNum">     360 </span>            :  *      SHA-1 is defined in terms of 32-bit &quot;words&quot;.  This code was
+<span class="lineNum">     361 </span>            :  *      written with the expectation that the processor has at least
+<span class="lineNum">     362 </span>            :  *      a 32-bit machine word size.  If the machine word size is larger,
+<span class="lineNum">     363 </span>            :  *      the code should still function properly.  One caveat to that
+<span class="lineNum">     364 </span>            :  *      is that the input functions taking characters and character
+<span class="lineNum">     365 </span>            :  *      arrays assume that only 8 bits of information are stored in each
+<span class="lineNum">     366 </span>            :  *      character.
+<span class="lineNum">     367 </span>            :  *
+<span class="lineNum">     368 </span>            :  *  Caveats:
+<span class="lineNum">     369 </span>            :  *      SHA-1 is designed to work with messages less than 2^64 bits
+<span class="lineNum">     370 </span>            :  *      long. Although SHA-1 allows a message digest to be generated for
+<span class="lineNum">     371 </span>            :  *      messages of any number of bits less than 2^64, this
+<span class="lineNum">     372 </span>            :  *      implementation only works with messages with a length that is a
+<span class="lineNum">     373 </span>            :  *      multiple of the size of an 8-bit character.
+<span class="lineNum">     374 </span>            :  *
+<span class="lineNum">     375 </span>            :  */
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            : /*
+<span class="lineNum">     378 </span>            :  *  This structure will hold context information for the hashing
+<span class="lineNum">     379 </span>            :  *  operation
+<span class="lineNum">     380 </span>            :  */
+<span class="lineNum">     381 </span>            : struct __sha1_context
+<span class="lineNum">     382 </span>            : {
+<span class="lineNum">     383 </span>            :         unsigned Message_Digest[5]; /* Message Digest (output)          */
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            :         unsigned Length_Low;        /* Message length in bits           */
+<span class="lineNum">     386 </span>            :         unsigned Length_High;       /* Message length in bits           */
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span>            :         unsigned char Message_Block[64]; /* 512-bit message blocks      */
+<span class="lineNum">     389 </span>            :         int Message_Block_Index;    /* Index into message block array   */
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            :         int Computed;               /* Is the digest computed?          */
+<span class="lineNum">     392 </span>            :         int Corrupted;              /* Is the message digest corruped?  */
+<span class="lineNum">     393 </span>            : };
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span>            : /*
+<span class="lineNum">     396 </span>            :  *  Define the circular shift macro
+<span class="lineNum">     397 </span>            :  */
+<span class="lineNum">     398 </span>            : #define SHA1CircularShift(bits,word) \
+<span class="lineNum">     399 </span>            :                 ((((word) &lt;&lt; (bits)) &amp; 0xFFFFFFFF) | \
+<span class="lineNum">     400 </span>            :                 ((word) &gt;&gt; (32-(bits))))
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            : /*
+<span class="lineNum">     404 </span>            :  *  SHA1ProcessMessageBlock
+<span class="lineNum">     405 </span>            :  *
+<span class="lineNum">     406 </span>            :  *  Description:
+<span class="lineNum">     407 </span>            :  *      This function will process the next 512 bits of the message
+<span class="lineNum">     408 </span>            :  *      stored in the Message_Block array.
+<span class="lineNum">     409 </span>            :  *
+<span class="lineNum">     410 </span>            :  *  Parameters:
+<span class="lineNum">     411 </span>            :  *      None.
+<span class="lineNum">     412 </span>            :  *
+<span class="lineNum">     413 </span>            :  *  Returns:
+<span class="lineNum">     414 </span>            :  *      Nothing.
+<span class="lineNum">     415 </span>            :  *
+<span class="lineNum">     416 </span>            :  *  Comments:
+<span class="lineNum">     417 </span>            :  *      Many of the variable names in the SHAContext, especially the
+<span class="lineNum">     418 </span>            :  *      single character names, were used because those were the names
+<span class="lineNum">     419 </span>            :  *      used in the publication.
+<span class="lineNum">     420 </span>            :  *
+<a name="421"><span class="lineNum">     421 </span>            :  *</a>
+<span class="lineNum">     422 </span>            :  */
+<span class="lineNum">     423 </span><span class="lineCov">   14860414 : void SHA1ProcessMessageBlock(GF_SHA1Context *context)</span>
+<span class="lineNum">     424 </span>            : {
+<span class="lineNum">     425 </span>            :         const unsigned K[] =            /* Constants defined in SHA-1   */
+<span class="lineNum">     426 </span>            :         {
+<span class="lineNum">     427 </span>            :                 0x5A827999,
+<span class="lineNum">     428 </span>            :                 0x6ED9EBA1,
+<span class="lineNum">     429 </span>            :                 0x8F1BBCDC,
+<span class="lineNum">     430 </span>            :                 0xCA62C1D6
+<span class="lineNum">     431 </span>            :         };
+<span class="lineNum">     432 </span>            :         int         t;                  /* Loop counter                 */
+<span class="lineNum">     433 </span>            :         unsigned    temp;               /* Temporary word value         */
+<span class="lineNum">     434 </span>            :         unsigned    W[80];              /* Word sequence                */
+<span class="lineNum">     435 </span>            :         unsigned    A, B, C, D, E;      /* Word buffers                 */
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :         /*
+<span class="lineNum">     438 </span>            :          *  Initialize the first 16 words in the array W
+<span class="lineNum">     439 </span>            :          */
+<span class="lineNum">     440 </span><span class="lineCov">  252627038 :         for(t = 0; t &lt; 16; t++)</span>
+<span class="lineNum">     441 </span>            :         {
+<span class="lineNum">     442 </span><span class="lineCov">  237766624 :                 W[t] = ((unsigned) context-&gt;Message_Block[t * 4]) &lt;&lt; 24;</span>
+<span class="lineNum">     443 </span><span class="lineCov">  237766624 :                 W[t] |= ((unsigned) context-&gt;Message_Block[t * 4 + 1]) &lt;&lt; 16;</span>
+<span class="lineNum">     444 </span><span class="lineCov">  237766624 :                 W[t] |= ((unsigned) context-&gt;Message_Block[t * 4 + 2]) &lt;&lt; 8;</span>
+<span class="lineNum">     445 </span><span class="lineCov">  237766624 :                 W[t] |= ((unsigned) context-&gt;Message_Block[t * 4 + 3]);</span>
+<span class="lineNum">     446 </span>            :         }
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span><span class="lineCov">  951065920 :         for(t = 16; t &lt; 80; t++)</span>
+<span class="lineNum">     449 </span>            :         {
+<span class="lineNum">     450 </span><span class="lineCov">  951065920 :                 W[t] = SHA1CircularShift(1,W[t-3] ^ W[t-8] ^ W[t-14] ^ W[t-16]);</span>
+<span class="lineNum">     451 </span>            :         }
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span><span class="lineCov">   14860414 :         A = context-&gt;Message_Digest[0];</span>
+<span class="lineNum">     454 </span><span class="lineCov">   14860414 :         B = context-&gt;Message_Digest[1];</span>
+<span class="lineNum">     455 </span><span class="lineCov">   14860414 :         C = context-&gt;Message_Digest[2];</span>
+<span class="lineNum">     456 </span><span class="lineCov">   14860414 :         D = context-&gt;Message_Digest[3];</span>
+<span class="lineNum">     457 </span><span class="lineCov">   14860414 :         E = context-&gt;Message_Digest[4];</span>
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span><span class="lineCov">  312068574 :         for(t = 0; t &lt; 20; t++)</span>
+<span class="lineNum">     460 </span>            :         {
+<span class="lineNum">     461 </span><span class="lineCov">  891624480 :                 temp =  SHA1CircularShift(5,A) +</span>
+<span class="lineNum">     462 </span><span class="lineCov">  594416320 :                         ((B &amp; C) | ((~B) &amp; D)) + E + W[t] + K[0];</span>
+<span class="lineNum">     463 </span>            :                 temp &amp;= 0xFFFFFFFF;
+<span class="lineNum">     464 </span>            :                 E = D;
+<span class="lineNum">     465 </span>            :                 D = C;
+<span class="lineNum">     466 </span><span class="lineCov">  297208160 :                 C = SHA1CircularShift(30,B);</span>
+<span class="lineNum">     467 </span>            :                 B = A;
+<span class="lineNum">     468 </span>            :                 A = temp;
+<span class="lineNum">     469 </span>            :         }
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span><span class="lineCov">  297208180 :         for(t = 20; t &lt; 40; t++)</span>
+<span class="lineNum">     472 </span>            :         {
+<span class="lineNum">     473 </span><span class="lineCov">  297208180 :                 temp = SHA1CircularShift(5,A) + (B ^ C ^ D) + E + W[t] + K[1];</span>
+<span class="lineNum">     474 </span>            :                 temp &amp;= 0xFFFFFFFF;
+<span class="lineNum">     475 </span>            :                 E = D;
+<span class="lineNum">     476 </span>            :                 D = C;
+<span class="lineNum">     477 </span><span class="lineCov">  297208180 :                 C = SHA1CircularShift(30,B);</span>
+<span class="lineNum">     478 </span>            :                 B = A;
+<span class="lineNum">     479 </span>            :                 A = temp;
+<span class="lineNum">     480 </span>            :         }
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span><span class="lineCov">  297208060 :         for(t = 40; t &lt; 60; t++)</span>
+<span class="lineNum">     483 </span>            :         {
+<span class="lineNum">     484 </span><span class="lineCov">  891624180 :                 temp = SHA1CircularShift(5,A) +</span>
+<span class="lineNum">     485 </span><span class="lineCov">  594416120 :                        ((B &amp; C) | (B &amp; D) | (C &amp; D)) + E + W[t] + K[2];</span>
+<span class="lineNum">     486 </span>            :                 temp &amp;= 0xFFFFFFFF;
+<span class="lineNum">     487 </span>            :                 E = D;
+<span class="lineNum">     488 </span>            :                 D = C;
+<span class="lineNum">     489 </span><span class="lineCov">  297208060 :                 C = SHA1CircularShift(30,B);</span>
+<span class="lineNum">     490 </span>            :                 B = A;
+<span class="lineNum">     491 </span>            :                 A = temp;
+<span class="lineNum">     492 </span>            :         }
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span><span class="lineCov">  297208160 :         for(t = 60; t &lt; 80; t++)</span>
+<span class="lineNum">     495 </span>            :         {
+<span class="lineNum">     496 </span><span class="lineCov">  297208160 :                 temp = SHA1CircularShift(5,A) + (B ^ C ^ D) + E + W[t] + K[3];</span>
+<span class="lineNum">     497 </span>            :                 temp &amp;= 0xFFFFFFFF;
+<span class="lineNum">     498 </span>            :                 E = D;
+<span class="lineNum">     499 </span>            :                 D = C;
+<span class="lineNum">     500 </span><span class="lineCov">  297208160 :                 C = SHA1CircularShift(30,B);</span>
+<span class="lineNum">     501 </span>            :                 B = A;
+<span class="lineNum">     502 </span>            :                 A = temp;
+<span class="lineNum">     503 </span>            :         }
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span><span class="lineCov">   14860414 :         context-&gt;Message_Digest[0] =</span>
+<span class="lineNum">     506 </span><span class="lineCov">   14860414 :             (context-&gt;Message_Digest[0] + A) &amp; 0xFFFFFFFF;</span>
+<span class="lineNum">     507 </span><span class="lineCov">   14860414 :         context-&gt;Message_Digest[1] =</span>
+<span class="lineNum">     508 </span><span class="lineCov">   14860414 :             (context-&gt;Message_Digest[1] + B) &amp; 0xFFFFFFFF;</span>
+<span class="lineNum">     509 </span><span class="lineCov">   14860414 :         context-&gt;Message_Digest[2] =</span>
+<span class="lineNum">     510 </span><span class="lineCov">   14860414 :             (context-&gt;Message_Digest[2] + C) &amp; 0xFFFFFFFF;</span>
+<span class="lineNum">     511 </span><span class="lineCov">   14860414 :         context-&gt;Message_Digest[3] =</span>
+<span class="lineNum">     512 </span><span class="lineCov">   14860414 :             (context-&gt;Message_Digest[3] + D) &amp; 0xFFFFFFFF;</span>
+<span class="lineNum">     513 </span><span class="lineCov">   14860414 :         context-&gt;Message_Digest[4] =</span>
+<span class="lineNum">     514 </span><span class="lineCov">   14860414 :             (context-&gt;Message_Digest[4] + E) &amp; 0xFFFFFFFF;</span>
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span><span class="lineCov">   14860414 :         context-&gt;Message_Block_Index = 0;</span>
+<span class="lineNum">     517 </span><span class="lineCov">   14860414 : }</span>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span>            : /*
+<span class="lineNum">     520 </span>            :  *  SHA1PadMessage
+<span class="lineNum">     521 </span>            :  *
+<span class="lineNum">     522 </span>            :  *  Description:
+<span class="lineNum">     523 </span>            :  *      According to the standard, the message must be padded to an even
+<span class="lineNum">     524 </span>            :  *      512 bits.  The first padding bit must be a '1'.  The last 64
+<span class="lineNum">     525 </span>            :  *      bits represent the length of the original message.  All bits in
+<span class="lineNum">     526 </span>            :  *      between should be 0.  This function will pad the message
+<span class="lineNum">     527 </span>            :  *      according to those rules by filling the Message_Block array
+<span class="lineNum">     528 </span>            :  *      accordingly.  It will also call SHA1ProcessMessageBlock()
+<span class="lineNum">     529 </span>            :  *      appropriately.  When it returns, it can be assumed that the
+<span class="lineNum">     530 </span>            :  *      message digest has been computed.
+<span class="lineNum">     531 </span>            :  *
+<span class="lineNum">     532 </span>            :  *  Parameters:
+<span class="lineNum">     533 </span>            :  *      context: [in/out]
+<span class="lineNum">     534 </span>            :  *          The context to pad
+<span class="lineNum">     535 </span>            :  *
+<span class="lineNum">     536 </span>            :  *  Returns:
+<span class="lineNum">     537 </span>            :  *      Nothing.
+<span class="lineNum">     538 </span>            :  *
+<span class="lineNum">     539 </span>            :  *  Comments:
+<a name="540"><span class="lineNum">     540 </span>            :  *</a>
+<span class="lineNum">     541 </span>            :  */
+<span class="lineNum">     542 </span><span class="lineCov">       4893 : static void SHA1PadMessage(GF_SHA1Context *context)</span>
+<span class="lineNum">     543 </span>            : {
+<span class="lineNum">     544 </span>            :         /*
+<span class="lineNum">     545 </span>            :          *  Check to see if the current message block is too small to hold
+<span class="lineNum">     546 </span>            :          *  the initial padding bits and length.  If so, we will pad the
+<span class="lineNum">     547 </span>            :          *  block, process it, and then continue padding into a second
+<span class="lineNum">     548 </span>            :          *  block.
+<span class="lineNum">     549 </span>            :          */
+<span class="lineNum">     550 </span><span class="lineCov">       4893 :         if (context-&gt;Message_Block_Index &gt; 55)</span>
+<span class="lineNum">     551 </span>            :         {
+<span class="lineNum">     552 </span><span class="lineCov">        717 :                 context-&gt;Message_Block[context-&gt;Message_Block_Index++] = 0x80;</span>
+<span class="lineNum">     553 </span><span class="lineCov">       4632 :                 while(context-&gt;Message_Block_Index &lt; 64)</span>
+<span class="lineNum">     554 </span>            :                 {
+<span class="lineNum">     555 </span><span class="lineCov">       3198 :                         context-&gt;Message_Block[context-&gt;Message_Block_Index++] = 0;</span>
+<span class="lineNum">     556 </span>            :                 }
+<span class="lineNum">     557 </span>            : 
+<span class="lineNum">     558 </span><span class="lineCov">        717 :                 SHA1ProcessMessageBlock(context);</span>
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span><span class="lineCov">      41586 :                 while(context-&gt;Message_Block_Index &lt; 56)</span>
+<span class="lineNum">     561 </span>            :                 {
+<span class="lineNum">     562 </span><span class="lineCov">      40152 :                         context-&gt;Message_Block[context-&gt;Message_Block_Index++] = 0;</span>
+<span class="lineNum">     563 </span>            :                 }
+<span class="lineNum">     564 </span>            :         }
+<span class="lineNum">     565 </span>            :         else
+<span class="lineNum">     566 </span>            :         {
+<span class="lineNum">     567 </span><span class="lineCov">       4176 :                 context-&gt;Message_Block[context-&gt;Message_Block_Index++] = 0x80;</span>
+<span class="lineNum">     568 </span><span class="lineCov">     132746 :                 while(context-&gt;Message_Block_Index &lt; 56)</span>
+<span class="lineNum">     569 </span>            :                 {
+<span class="lineNum">     570 </span><span class="lineCov">     124394 :                         context-&gt;Message_Block[context-&gt;Message_Block_Index++] = 0;</span>
+<span class="lineNum">     571 </span>            :                 }
+<span class="lineNum">     572 </span>            :         }
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span>            :         /*
+<span class="lineNum">     575 </span>            :          *  Store the message length as the last 8 octets
+<span class="lineNum">     576 </span>            :          */
+<span class="lineNum">     577 </span><span class="lineCov">       4893 :         context-&gt;Message_Block[56] = (context-&gt;Length_High &gt;&gt; 24) &amp; 0xFF;</span>
+<span class="lineNum">     578 </span><span class="lineCov">       4893 :         context-&gt;Message_Block[57] = (context-&gt;Length_High &gt;&gt; 16) &amp; 0xFF;</span>
+<span class="lineNum">     579 </span><span class="lineCov">       4893 :         context-&gt;Message_Block[58] = (context-&gt;Length_High &gt;&gt; 8) &amp; 0xFF;</span>
+<span class="lineNum">     580 </span><span class="lineCov">       4893 :         context-&gt;Message_Block[59] = (context-&gt;Length_High) &amp; 0xFF;</span>
+<span class="lineNum">     581 </span><span class="lineCov">       4893 :         context-&gt;Message_Block[60] = (context-&gt;Length_Low &gt;&gt; 24) &amp; 0xFF;</span>
+<span class="lineNum">     582 </span><span class="lineCov">       4893 :         context-&gt;Message_Block[61] = (context-&gt;Length_Low &gt;&gt; 16) &amp; 0xFF;</span>
+<span class="lineNum">     583 </span><span class="lineCov">       4893 :         context-&gt;Message_Block[62] = (context-&gt;Length_Low &gt;&gt; 8) &amp; 0xFF;</span>
+<span class="lineNum">     584 </span><span class="lineCov">       4893 :         context-&gt;Message_Block[63] = (context-&gt;Length_Low) &amp; 0xFF;</span>
+<span class="lineNum">     585 </span>            : 
+<span class="lineNum">     586 </span><span class="lineCov">       4893 :         SHA1ProcessMessageBlock(context);</span>
+<span class="lineNum">     587 </span><span class="lineCov">       4893 : }</span>
+<span class="lineNum">     588 </span>            : /*
+<span class="lineNum">     589 </span>            :  *  SHA1Reset
+<span class="lineNum">     590 </span>            :  *
+<span class="lineNum">     591 </span>            :  *  Description:
+<span class="lineNum">     592 </span>            :  *      This function will initialize the SHA1Context in preparation
+<span class="lineNum">     593 </span>            :  *      for computing a new message digest.
+<span class="lineNum">     594 </span>            :  *
+<span class="lineNum">     595 </span>            :  *  Parameters:
+<span class="lineNum">     596 </span>            :  *      context: [in/out]
+<span class="lineNum">     597 </span>            :  *          The context to reset.
+<span class="lineNum">     598 </span>            :  *
+<span class="lineNum">     599 </span>            :  *  Returns:
+<span class="lineNum">     600 </span>            :  *      Nothing.
+<span class="lineNum">     601 </span>            :  *
+<span class="lineNum">     602 </span>            :  *  Comments:
+<a name="603"><span class="lineNum">     603 </span>            :  *</a>
+<span class="lineNum">     604 </span>            :  */
+<span class="lineNum">     605 </span><span class="lineCov">       4891 : GF_SHA1Context *gf_sha1_starts()</span>
+<span class="lineNum">     606 </span>            : {
+<span class="lineNum">     607 </span>            :         GF_SHA1Context *context;
+<span class="lineNum">     608 </span><span class="lineCov">       4891 :         GF_SAFEALLOC(context, GF_SHA1Context);</span>
+<span class="lineNum">     609 </span><span class="lineCov">       4893 :         if (!context) return NULL;</span>
+<span class="lineNum">     610 </span><span class="lineCov">       4893 :         context-&gt;Length_Low             = 0;</span>
+<span class="lineNum">     611 </span><span class="lineCov">       4893 :         context-&gt;Length_High            = 0;</span>
+<span class="lineNum">     612 </span><span class="lineCov">       4893 :         context-&gt;Message_Block_Index    = 0;</span>
+<span class="lineNum">     613 </span>            : 
+<span class="lineNum">     614 </span><span class="lineCov">       4893 :         context-&gt;Message_Digest[0]      = 0x67452301;</span>
+<span class="lineNum">     615 </span><span class="lineCov">       4893 :         context-&gt;Message_Digest[1]      = 0xEFCDAB89;</span>
+<span class="lineNum">     616 </span><span class="lineCov">       4893 :         context-&gt;Message_Digest[2]      = 0x98BADCFE;</span>
+<span class="lineNum">     617 </span><span class="lineCov">       4893 :         context-&gt;Message_Digest[3]      = 0x10325476;</span>
+<span class="lineNum">     618 </span><span class="lineCov">       4893 :         context-&gt;Message_Digest[4]      = 0xC3D2E1F0;</span>
+<span class="lineNum">     619 </span>            : 
+<span class="lineNum">     620 </span><span class="lineCov">       4893 :         context-&gt;Computed   = 0;</span>
+<span class="lineNum">     621 </span><span class="lineCov">       4893 :         context-&gt;Corrupted  = 0;</span>
+<span class="lineNum">     622 </span><span class="lineCov">       4893 :         return context;</span>
+<a name="623"><span class="lineNum">     623 </span>            : }</a>
+<span class="lineNum">     624 </span>            : 
+<span class="lineNum">     625 </span><span class="lineCov">     294201 : void gf_sha1_update(GF_SHA1Context *context, u8 *message_array, u32 length )</span>
+<span class="lineNum">     626 </span>            : {
+<span class="lineNum">     627 </span><span class="lineCov">     294201 :         if (!length)</span>
+<span class="lineNum">     628 </span>            :         {
+<span class="lineNum">     629 </span>            :                 return;
+<span class="lineNum">     630 </span>            :         }
+<span class="lineNum">     631 </span>            : 
+<span class="lineNum">     632 </span><span class="lineCov">     294206 :         if (context-&gt;Computed || context-&gt;Corrupted)</span>
+<span class="lineNum">     633 </span>            :         {
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :                 context-&gt;Corrupted = 1;</span>
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :                 return;</span>
+<span class="lineNum">     636 </span>            :         }
+<span class="lineNum">     637 </span>            : 
+<span class="lineNum">     638 </span><span class="lineCov">  951148795 :         while(length-- &amp;&amp; !context-&gt;Corrupted)</span>
+<span class="lineNum">     639 </span>            :         {
+<span class="lineNum">     640 </span><span class="lineCov"> 1901709230 :                 context-&gt;Message_Block[context-&gt;Message_Block_Index++] =</span>
+<span class="lineNum">     641 </span><span class="lineCov">  950854615 :                     (*message_array &amp; 0xFF);</span>
+<span class="lineNum">     642 </span>            : 
+<span class="lineNum">     643 </span><span class="lineCov">  950854615 :                 context-&gt;Length_Low += 8;</span>
+<span class="lineNum">     644 </span>            :                 /* Force it to 32 bits */
+<span class="lineNum">     645 </span>            :                 context-&gt;Length_Low &amp;= 0xFFFFFFFF;
+<span class="lineNum">     646 </span><span class="lineCov">  950854615 :                 if (context-&gt;Length_Low == 0)</span>
+<span class="lineNum">     647 </span>            :                 {
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :                         context-&gt;Length_High++;</span>
+<span class="lineNum">     649 </span>            :                         /* Force it to 32 bits */
+<span class="lineNum">     650 </span>            :                         context-&gt;Length_High &amp;= 0xFFFFFFFF;
+<span class="lineNum">     651 </span><span class="lineNoCov">          0 :                         if (context-&gt;Length_High == 0)</span>
+<span class="lineNum">     652 </span>            :                         {
+<span class="lineNum">     653 </span>            :                                 /* Message is too long */
+<span class="lineNum">     654 </span><span class="lineNoCov">          0 :                                 context-&gt;Corrupted = 1;</span>
+<span class="lineNum">     655 </span>            :                         }
+<span class="lineNum">     656 </span>            :                 }
+<span class="lineNum">     657 </span>            : 
+<span class="lineNum">     658 </span><span class="lineCov">  950854615 :                 if (context-&gt;Message_Block_Index == 64)</span>
+<span class="lineNum">     659 </span>            :                 {
+<span class="lineNum">     660 </span><span class="lineCov">   14854804 :                         SHA1ProcessMessageBlock(context);</span>
+<span class="lineNum">     661 </span>            :                 }
+<span class="lineNum">     662 </span>            : 
+<span class="lineNum">     663 </span><span class="lineCov">  950854589 :                 message_array++;</span>
+<a name="664"><span class="lineNum">     664 </span>            :         }</a>
+<span class="lineNum">     665 </span>            : }
+<span class="lineNum">     666 </span><span class="lineCov">       4893 : void gf_sha1_finish(GF_SHA1Context *context, u8 output[GF_SHA1_DIGEST_SIZE] )</span>
+<span class="lineNum">     667 </span>            : {
+<span class="lineNum">     668 </span><span class="lineCov">       4893 :         if (context-&gt;Corrupted)</span>
+<span class="lineNum">     669 </span>            :         {
+<span class="lineNum">     670 </span>            :                 return;
+<span class="lineNum">     671 </span>            :         }
+<span class="lineNum">     672 </span>            : 
+<span class="lineNum">     673 </span><span class="lineCov">       4893 :         if (!context-&gt;Computed)</span>
+<span class="lineNum">     674 </span>            :         {
+<span class="lineNum">     675 </span><span class="lineCov">       4893 :                 SHA1PadMessage(context);</span>
+<span class="lineNum">     676 </span><span class="lineCov">       4893 :                 context-&gt;Computed = 1;</span>
+<span class="lineNum">     677 </span>            :         }
+<span class="lineNum">     678 </span><span class="lineCov">       4893 :         PUT_UINT32_BE( context-&gt;Message_Digest[0], output,  0 );</span>
+<span class="lineNum">     679 </span><span class="lineCov">       4893 :         PUT_UINT32_BE( context-&gt;Message_Digest[1], output,  4 );</span>
+<span class="lineNum">     680 </span><span class="lineCov">       4893 :         PUT_UINT32_BE( context-&gt;Message_Digest[2], output,  8 );</span>
+<span class="lineNum">     681 </span><span class="lineCov">       4893 :         PUT_UINT32_BE( context-&gt;Message_Digest[3], output, 12 );</span>
+<span class="lineNum">     682 </span><span class="lineCov">       4893 :         PUT_UINT32_BE( context-&gt;Message_Digest[4], output, 16 );</span>
+<span class="lineNum">     683 </span>            : 
+<span class="lineNum">     684 </span><span class="lineCov">       4893 :         gf_free(context);</span>
+<span class="lineNum">     685 </span>            : }
+<span class="lineNum">     686 </span>            : 
+<span class="lineNum">     687 </span>            : #endif
+<span class="lineNum">     688 </span>            : 
+<span class="lineNum">     689 </span>            : /*
+<span class="lineNum">     690 </span>            :  * Output = SHA-1( file contents )
+<a name="691"><span class="lineNum">     691 </span>            :  */</a>
+<span class="lineNum">     692 </span>            : GF_EXPORT
+<span class="lineNum">     693 </span><span class="lineCov">        702 : GF_Err gf_sha1_file_ptr(FILE *f, u8 output[GF_SHA1_DIGEST_SIZE] )</span>
+<span class="lineNum">     694 </span>            : {
+<span class="lineNum">     695 </span><span class="lineCov">        702 :         u64 pos = gf_ftell(f);</span>
+<span class="lineNum">     696 </span>            :         size_t n;
+<span class="lineNum">     697 </span>            :         GF_SHA1Context *ctx;
+<span class="lineNum">     698 </span>            :         u8 buf[1024];
+<span class="lineNum">     699 </span>            : 
+<span class="lineNum">     700 </span><span class="lineCov">        702 :         ctx  = gf_sha1_starts();</span>
+<span class="lineNum">     701 </span><span class="lineCov">        702 :         gf_fseek(f, 0, SEEK_SET);</span>
+<span class="lineNum">     702 </span>            : 
+<span class="lineNum">     703 </span><span class="lineCov">       2360 :         while( ( n = gf_fread( buf, sizeof( buf ), f ) ) &gt; 0 )</span>
+<span class="lineNum">     704 </span><span class="lineCov">        956 :                 gf_sha1_update(ctx, buf, (s32) n );</span>
+<span class="lineNum">     705 </span>            : 
+<span class="lineNum">     706 </span><span class="lineCov">        702 :         gf_sha1_finish(ctx, output );</span>
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span><span class="lineCov">        702 :         gf_fseek(f, pos, SEEK_SET);</span>
+<span class="lineNum">     709 </span><span class="lineCov">        702 :         return GF_OK;</span>
+<span class="lineNum">     710 </span>            : }
+<a name="711"><span class="lineNum">     711 </span>            : </a>
+<span class="lineNum">     712 </span>            : GF_EXPORT
+<span class="lineNum">     713 </span><span class="lineCov">        147 : GF_Err gf_sha1_file( const char *path, u8 output[GF_SHA1_DIGEST_SIZE] )</span>
+<span class="lineNum">     714 </span>            : {
+<span class="lineNum">     715 </span>            :         FILE *f;
+<span class="lineNum">     716 </span>            :         GF_Err e;
+<span class="lineNum">     717 </span>            : 
+<span class="lineNum">     718 </span><span class="lineCov">        147 :         if (!strncmp(path, &quot;gmem://&quot;, 7)) {</span>
+<span class="lineNum">     719 </span>            :                 u32 size;
+<span class="lineNum">     720 </span>            :                 u8 *mem_address;
+<span class="lineNum">     721 </span><span class="lineCov">        103 :                 e = gf_blob_get(path, &amp;mem_address, &amp;size, NULL);</span>
+<span class="lineNum">     722 </span><span class="lineCov">        103 :                 if (e) return e;</span>
+<span class="lineNum">     723 </span>            : 
+<span class="lineNum">     724 </span><span class="lineCov">        103 :                 gf_sha1_csum(mem_address, size, output);</span>
+<span class="lineNum">     725 </span><span class="lineCov">        103 :         gf_blob_release(path);</span>
+<span class="lineNum">     726 </span><span class="lineCov">        103 :                 return GF_OK;</span>
+<span class="lineNum">     727 </span>            :         }
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span><span class="lineCov">         44 :         if( ( f = gf_fopen( path, &quot;rb&quot; ) ) == NULL )</span>
+<span class="lineNum">     730 </span>            :                 return GF_URL_ERROR;
+<span class="lineNum">     731 </span>            : 
+<span class="lineNum">     732 </span><span class="lineCov">         44 :         e = gf_sha1_file_ptr(f, output);</span>
+<span class="lineNum">     733 </span><span class="lineCov">         44 :         gf_fclose( f );</span>
+<span class="lineNum">     734 </span><span class="lineCov">         44 :         return e;</span>
+<span class="lineNum">     735 </span>            : }
+<span class="lineNum">     736 </span>            : 
+<span class="lineNum">     737 </span>            : /*
+<span class="lineNum">     738 </span>            :  * Output = SHA-1( input buffer )
+<a name="739"><span class="lineNum">     739 </span>            :  */</a>
+<span class="lineNum">     740 </span>            : GF_EXPORT
+<span class="lineNum">     741 </span><span class="lineCov">       1074 : void gf_sha1_csum( u8 *input, u32 ilen, u8 output[GF_SHA1_DIGEST_SIZE] )</span>
+<span class="lineNum">     742 </span>            : {
+<span class="lineNum">     743 </span>            :         GF_SHA1Context *ctx;
+<span class="lineNum">     744 </span>            : 
+<span class="lineNum">     745 </span>            :         memset(output, 0, sizeof(u8)*GF_SHA1_DIGEST_SIZE);
+<span class="lineNum">     746 </span><span class="lineCov">       1074 :         ctx = gf_sha1_starts();</span>
+<span class="lineNum">     747 </span><span class="lineCov">       1074 :         if (ctx) {</span>
+<span class="lineNum">     748 </span><span class="lineCov">       1074 :                 gf_sha1_update(ctx, input, ilen );</span>
+<span class="lineNum">     749 </span><span class="lineCov">       1074 :                 gf_sha1_finish(ctx, output );</span>
+<span class="lineNum">     750 </span>            :         }
+<span class="lineNum">     751 </span><span class="lineCov">       1074 : }</span>
+<span class="lineNum">     752 </span>            : 
+<span class="lineNum">     753 </span>            : #if 0 //unused
+<span class="lineNum">     754 </span>            : #define GF_SHA1_DIGEST_SIZE_HEXA                41
+<span class="lineNum">     755 </span>            : void gf_sha1_csum_hexa(u8 *buf, u32 buflen, u8 digest[GF_SHA1_DIGEST_SIZE_HEXA]) {
+<span class="lineNum">     756 </span>            :         u8 tmp[GF_SHA1_DIGEST_SIZE];
+<span class="lineNum">     757 </span>            :         gf_sha1_csum (buf, buflen, tmp );
+<span class="lineNum">     758 </span>            :         digest[0] = 0;
+<span class="lineNum">     759 </span>            :         {
+<span class="lineNum">     760 </span>            :                 int i;
+<span class="lineNum">     761 </span>            :                 for ( i=0; i&lt;GF_SHA1_DIGEST_SIZE; i++ )
+<span class="lineNum">     762 </span>            :                 {
+<span class="lineNum">     763 </span>            :                         char t[3];
+<span class="lineNum">     764 </span>            :                         t[2] = 0;
+<span class="lineNum">     765 </span>            :                         sprintf ( t, &quot;%02X&quot;, tmp[i] );
+<span class="lineNum">     766 </span>            :                         strcat ( (char*)digest, t );
+<span class="lineNum">     767 </span>            :                 }
+<span class="lineNum">     768 </span>            :         }
+<span class="lineNum">     769 </span>            : }
+<span class="lineNum">     770 </span>            : #endif
+<span class="lineNum">     771 </span>            : 
+<span class="lineNum">     772 </span>            : 
+<span class="lineNum">     773 </span>            : #endif
+<span class="lineNum">     774 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

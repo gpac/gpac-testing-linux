@@ -1,0 +1,141 @@
+*** gpac-mp4mx-ha logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:20 ***
+
+
+*** Subtest "single": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -ha mp4mx" ***
+
+mp4mx
+
+Description: ISOBMFF/QT muxer
+
+Muxes file according to ISOBMFF (14496-12 and derived specifications) or QuickTime
+  
+
+Tracks and Items
+
+By default all input PIDs with ItemID property set are muxed as items, otherwise they are muxed as tracks.
+To prevent source items to be muxed as items, use -itemid option from ISOBMF demuxer.
+Example:
+-i source.mp4:itemid=false -o file.mp4
+  
+To force non-item streams to be muxed as items, use #ItemID option on that PID:
+Example:
+-i source.jpg:#ItemID=1 -o file.mp4
+  
+
+Storage
+
+The store option allows controlling if the file is fragmented ot not, and when not fragmented, how interleaving is done. For cases where disk requirements are tight and fragmentation cannot be used, it is recommended to use either flat or fstart modes.
+  
+The vodcache option allows controlling how DASH onDemand segments are generated:
+- If set to on, file data is stored to a temporary file on disk and flushed upon completion, no padding is present.
+- If set to insert, SIDX/SSIX will be injected upon completion of the file by shifting bytes in file. In this case, no padding is required but this might not be compatible with all output sinks and will take longer to write the file.
+- If set to replace, SIDX/SSIX size will be estimated based on duration and DASH segment length, and padding will be used in the file before the final SIDX. If input pids have the properties DSegs set, this will be as the number of segments.
+The on and insert modes will produce exactly the same file, while the mode replace may inject a free box before the sidx.
+  
+
+Custom boxes
+
+Custom boxes can be specified as box patches:
+For movie-level patch, the boxpatch option of the filter should be used.
+Per PID box patch can be specified through the PID property boxpatch.
+Example:
+src=source:#boxpatch=myfile.xml dst=mux.mp4
+Per Item box patch can be specified through the PID property boxpatch.
+Example:
+src=source:1ItemID=1:#boxpatch=myfile.xml dst=mux.mp4
+  
+The box patch is applied before writing the initial moov box in fragmented mode, or when writing the complete file otherwise.
+The box patch can either be a filename or the full XML string.
+  
+
+Tagging
+
+When tagging is enabled, the filter will watch the property CoverArt and all custom properties on incoming pid.
+The built-in tag names are indicated by MP4Box -h tags.
+Other tag class may be specified using tag_NAME property names, and will be added if tags is set to all using:
+- NAME as a box 4CC if NAME is four characters long
+- NAME as a box 4CC if NAME is 3 characters long, and will be prefixed by 0xA9
+- the CRC32 of the NAME as a box 4CC if NAME is not four characters long
+  
+
+Notes
+
+The filter watches the property FileNumber on incoming packets to create new files or new segments in DASH mode.
+
+
+
+Options (advanced):
+
+m4sys (bool, default: false):  force MPEG-4 Systems signaling of tracks
+dref (bool, default: false):   only references data from source file - not compatible with all media sources
+ctmode (enum, default: edit):  set composition offset mode for video tracks
+	* edit: uses edit lists to shift first frame to presentation time 0
+	* noedit: ignore edit lists and does not shift timeline
+	* negctts: uses ctts v1 with possibly negative offsets and no edit lists
+
+idur (frac, default: 0):       only import the specified duration. If negative, specify the number of coded frames to import
+pack3gp (uint, default: 1):    pack a given number of 3GPP audio frames in one sample
+importer (bool, default: false): compatibility with old importer, displays import progress
+xps_inband (enum, default: no): use inband (in sample data) parameter set for NALU-based video (AVC/HEVC/...)
+	* no: paramater sets are not inband, several sample descriptions might be created
+	* all: paramater sets are inband, no parameter sets in sample description
+	* both: paramater sets are inband, signaled as inband, and also first set is kept in sample description
+	* mix: creates non-standard files using single sample entry with first PSs found, and moves other PS inband
+
+store (enum, default: inter):  file storage mode
+	* inter: perform precise interleave of the file using cdur (requires temporary storage of all media)
+	* flat: write samples as they arrive and moov at end (fastest mode)
+	* fstart: write samples as they arrive and moov before mdat
+	* tight:  uses per-sample interleaving of all tracks (requires temporary storage of all media)
+	* frag: fragments the file using cdur duration
+	* sfrag: framents the file using cdur duration but adjusting to start with SAP1/3
+
+cdur (frac, default: -1/1):    chunk duration for flat and interleaving modes or fragment duration for fragmentation modes
+	* 0: no specific interleaving but moov first
+	* negative: defaults to 1.0 unless overridden by storage profile
+moovts (sint, default: 600):   timescale to use for movie. A negative value picks the media timescale of the first track added
+moof_first (bool, default: true): generate fragments starting with moof then mdat
+abs_offset (bool, default: false): use absolute file offset in fragments rather than offsets from moof
+fsap (bool, default: true):    split truns in video fragments at SAPs to reduce file size
+subs_sidx (sint, default: -1): number of subsegments per sidx. negative value disables sidx, -2 removes sidx if present in source pid
+m4cc (str):                    4 character code of empty box to append at the end of a segment
+msn (uint, default: 1):        sequence number of first moof to N
+msninc (uint, default: 1):     sequence number increase between moofs
+tfdt (lfrac, default: 0):      set TFDT of first traf
+tfdt_traf (bool, default: false): set TFDT in each traf
+nofragdef (bool, default: false): disable default flags in fragments
+straf (bool, default: false):  use a single traf per moof (smooth streaming and co)
+strun (bool, default: false):  use a single trun per traf (smooth streaming and co)
+psshs (enum, default: moov):   set PSSH boxes store mode
+	* moof: in first moof of each segments
+	* moov: in movie box
+	* none: pssh is discarded
+
+sgpd_traf (bool, default: false): store sample group descriptions in traf (duplicated for each traf). If not used, sample group descriptions are stored in the movie box
+vodcache (enum, default: replace): enable temp storage for VoD dash modes - see filter help
+	* on: use temp storage of complete file for sidx and ssix injection
+	* insert: insert sidx and ssix by shifting bytes in output file
+	* replace: precompute pace requirements for sidx and ssix and rewrite file range at end
+
+noinit (bool, default: false): do not produce initial moov, used for DASH bitstream switching mode
+mvex (bool, default: false):   set mvex after tracks
+trackid (uint, default: 0):    track ID of created track for single track. Default 0 uses next available trackID
+fragdur (bool, default: false): fragment based on fragment duration rather than CTS. Mostly used for MP4Box -frag option
+btrt (bool, default: true):    set btrt box in sample description
+styp (str):                    set segment styp major brand to the given 4CC[.version]
+mediats (sint, default: 0):    set media timescale. A value of 0 means inherit from pid, a value of -1 means derive from samplerate or frame rate
+ase (enum, default: v0):       set audio sample entry mode for more than stereo layouts
+	* v0: use v0 signaling but channel count from stream, recommended for backward compatibility
+	* v0s: use v0 signaling and force channel count to 2 (stereo) if more than 2 channels
+	* v1: use v1 signaling, ISOBMFF style (will mux raw PCM as ISOBMFF style)
+	* v1qt: use v1 signaling, QTFF style
+
+ssix (bool, default: false):   create ssix when sidx is present, level 1 mapping I-frames byte ranges, level 0xFF mapping the rest
+ccst (bool, default: false):   insert coding constraint box for video tracks
+maxchunk (uint, default: 0):   set max chunk size in bytes for runs (only used in non-fragmented mode). 0 means no constraints
+block_size (uint, default: 10000): target output block size, 0 for default internal value (10k)
+refrag (bool, default: false): indicate to use track fragment defaults from initial file if any rather than computing them from PID properties (used when processing standalone segments/fragments)
+keep_utc (bool, default: false): force all new files and tracks to keep the source UTC creation and modification times
+pps_inband (bool, default: no): when xps_inband is set, inject PPS in each non SAP 1/2/3 sample
+
+

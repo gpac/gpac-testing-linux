@@ -1,0 +1,949 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - utils/os_thread.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">utils</a> - os_thread.c<span style="font-size: 80%;"> (source / <a href="os_thread.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">159</td>
+            <td class="headerCovTableEntry">202</td>
+            <td class="headerCovTableEntryMed">78.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntryHi">95.7 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2012
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / common tools sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #ifndef GPAC_DISABLE_CORE_TOOLS
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #ifdef GPAC_CONFIG_ANDROID
+<span class="lineNum">      29 </span>            : #include &lt;jni.h&gt;
+<span class="lineNum">      30 </span>            : #endif
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : #include &lt;gpac/thread.h&gt;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : #if defined(WIN32) || defined(_WIN32_WCE)
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : /*win32 threads*/
+<span class="lineNum">      37 </span>            : #include &lt;windows.h&gt;
+<span class="lineNum">      38 </span>            : typedef HANDLE TH_HANDLE;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : #else
+<span class="lineNum">      41 </span>            : /*pthreads*/
+<span class="lineNum">      42 </span>            : #include &lt;sched.h&gt;
+<span class="lineNum">      43 </span>            : #include &lt;pthread.h&gt;
+<span class="lineNum">      44 </span>            : #include &lt;semaphore.h&gt;
+<span class="lineNum">      45 </span>            : #include &lt;errno.h&gt;
+<span class="lineNum">      46 </span>            : typedef pthread_t TH_HANDLE ;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : #endif
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : /*********************************************************************
+<span class="lineNum">      53 </span>            :                                                 OS-Specific Thread Object
+<span class="lineNum">      54 </span>            : **********************************************************************/
+<span class="lineNum">      55 </span>            : struct __tag_thread
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :         u32 status;
+<span class="lineNum">      59 </span>            :         TH_HANDLE threadH;
+<span class="lineNum">      60 </span>            :         u32 stackSize;
+<span class="lineNum">      61 </span>            :         /* the thread procedure */
+<span class="lineNum">      62 </span>            :         u32 (*Run)(void *param);
+<span class="lineNum">      63 </span>            :         void *args;
+<span class="lineNum">      64 </span>            :         /* lock for signal */
+<span class="lineNum">      65 </span>            :         GF_Semaphore *_signal;
+<span class="lineNum">      66 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">      67 </span>            :         u32 id;
+<span class="lineNum">      68 </span>            :         char *log_name;
+<span class="lineNum">      69 </span>            : #endif
+<span class="lineNum">      70 </span>            : #ifdef GPAC_CONFIG_ANDROID
+<span class="lineNum">      71 </span>            :         u32 (*RunBeforeExit)(void *param);
+<span class="lineNum">      72 </span>            : #endif
+<span class="lineNum">      73 </span>            : };
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">      77 </span>            : #include &lt;gpac/list.h&gt;
+<a name="78"><span class="lineNum">      78 </span>            : static GF_List *thread_bank = NULL;</a>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineCov">        225 : static void log_add_thread(GF_Thread *t)</span>
+<span class="lineNum">      81 </span>            : {
+<span class="lineNum">      82 </span><span class="lineCov">        225 :         if (!thread_bank) thread_bank = gf_list_new();</span>
+<a name="83"><span class="lineNum">      83 </span><span class="lineCov">        225 :         gf_list_add(thread_bank, t);</span></a>
+<span class="lineNum">      84 </span><span class="lineCov">        225 : }</span>
+<span class="lineNum">      85 </span><span class="lineCov">        223 : static void log_del_thread(GF_Thread *t)</span>
+<span class="lineNum">      86 </span>            : {
+<span class="lineNum">      87 </span><span class="lineCov">        223 :         gf_list_del_item(thread_bank, t);</span>
+<span class="lineNum">      88 </span><span class="lineCov">        223 :         if (!gf_list_count(thread_bank)) {</span>
+<span class="lineNum">      89 </span><span class="lineCov">         97 :                 gf_list_del(thread_bank);</span>
+<span class="lineNum">      90 </span><span class="lineCov">         97 :                 thread_bank = NULL;</span>
+<a name="91"><span class="lineNum">      91 </span>            :         }</a>
+<span class="lineNum">      92 </span><span class="lineCov">        223 : }</span>
+<span class="lineNum">      93 </span><span class="lineCov">      48121 : static const char *log_th_name(u32 id)</span>
+<span class="lineNum">      94 </span>            : {
+<span class="lineNum">      95 </span>            :         u32 i, count;
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">      48121 :         if (!id) id = gf_th_id();</span>
+<span class="lineNum">      98 </span><span class="lineCov">      48121 :         count = gf_list_count(thread_bank);</span>
+<span class="lineNum">      99 </span><span class="lineCov">     126780 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">     100 </span><span class="lineCov">      97471 :                 GF_Thread *t = (GF_Thread*)gf_list_get(thread_bank, i);</span>
+<span class="lineNum">     101 </span><span class="lineCov">      97471 :                 if (t-&gt;id == id) return t-&gt;log_name;</span>
+<span class="lineNum">     102 </span>            :         }
+<span class="lineNum">     103 </span>            :         return &quot;Main Process&quot;;
+<span class="lineNum">     104 </span>            : }
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : #endif
+<span class="lineNum">     107 </span>            : 
+<a name="108"><span class="lineNum">     108 </span>            : </a>
+<span class="lineNum">     109 </span>            : GF_EXPORT
+<span class="lineNum">     110 </span><span class="lineCov">        225 : GF_Thread *gf_th_new(const char *name)</span>
+<span class="lineNum">     111 </span>            : {
+<span class="lineNum">     112 </span><span class="lineCov">        225 :         GF_Thread *tmp = (GF_Thread*)gf_malloc(sizeof(GF_Thread));</span>
+<span class="lineNum">     113 </span>            :         memset(tmp, 0, sizeof(GF_Thread));
+<span class="lineNum">     114 </span><span class="lineCov">        225 :         tmp-&gt;status = GF_THREAD_STATUS_STOP;</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     117 </span><span class="lineCov">        225 :         if (name) {</span>
+<span class="lineNum">     118 </span><span class="lineCov">        225 :                 tmp-&gt;log_name = gf_strdup(name);</span>
+<span class="lineNum">     119 </span>            :         } else {
+<span class="lineNum">     120 </span>            :                 char szN[20];
+<span class="lineNum">     121 </span>            :                 sprintf(szN, &quot;%p&quot;, (void*)tmp);
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :                 tmp-&gt;log_name = gf_strdup(szN);</span>
+<span class="lineNum">     123 </span>            :         }
+<span class="lineNum">     124 </span><span class="lineCov">        225 :         log_add_thread(tmp);</span>
+<span class="lineNum">     125 </span>            : #endif
+<span class="lineNum">     126 </span><span class="lineCov">        225 :         return tmp;</span>
+<span class="lineNum">     127 </span>            : }
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            : #ifdef GPAC_CONFIG_ANDROID
+<span class="lineNum">     131 </span>            : #include &lt;pthread.h&gt;
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            : static pthread_key_t currentThreadInfoKey = 0;
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : /* Unique allocation of key */
+<span class="lineNum">     136 </span>            : static pthread_once_t currentThreadInfoKey_once = PTHREAD_ONCE_INIT;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : GF_Err gf_register_before_exit_function(GF_Thread *t, u32 (*toRunBeforePthreadExit)(void *param) )
+<span class="lineNum">     139 </span>            : {
+<span class="lineNum">     140 </span>            :         if (!t)
+<span class="lineNum">     141 </span>            :                 return GF_BAD_PARAM;
+<span class="lineNum">     142 </span>            :         t-&gt;RunBeforeExit = toRunBeforePthreadExit;
+<span class="lineNum">     143 </span>            :         return GF_OK;
+<span class="lineNum">     144 </span>            : }
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : /* Unique key allocation */
+<span class="lineNum">     147 </span>            : static void currentThreadInfoKey_alloc()
+<span class="lineNum">     148 </span>            : {
+<span class="lineNum">     149 </span>            :         int err;
+<span class="lineNum">     150 </span>            :         /* We do not use any destructor */
+<span class="lineNum">     151 </span>            :         err = pthread_key_create(&amp;currentThreadInfoKey, NULL);
+<span class="lineNum">     152 </span>            :         if (err) {
+<span class="lineNum">     153 </span>            :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex] pthread_key_create() failed with error %d\n&quot;, err));
+<span class="lineNum">     154 </span>            :         }
+<span class="lineNum">     155 </span>            : }
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            : GF_Thread * gf_th_current() {
+<span class="lineNum">     158 </span>            :         return pthread_getspecific(currentThreadInfoKey);
+<span class="lineNum">     159 </span>            : }
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            : #endif /* GPAC_CONFIG_ANDROID */
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            : #ifdef WIN32
+<span class="lineNum">     165 </span>            : DWORD WINAPI RunThread(void *ptr)
+<span class="lineNum">     166 </span>            : {
+<a name="167"><span class="lineNum">     167 </span>            :         DWORD ret = 0;</a>
+<span class="lineNum">     168 </span>            : #else
+<span class="lineNum">     169 </span><span class="lineCov">        225 : void * RunThread(void *ptr)</span>
+<span class="lineNum">     170 </span>            : {
+<span class="lineNum">     171 </span>            :         long int ret = 0;
+<span class="lineNum">     172 </span>            : #endif
+<span class="lineNum">     173 </span>            :         GF_Thread *t = (GF_Thread *)ptr;
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :         /* Signal the caller */
+<span class="lineNum">     176 </span><span class="lineCov">        225 :         if (! t-&gt;_signal) goto exit;</span>
+<span class="lineNum">     177 </span>            : #ifdef GPAC_CONFIG_ANDROID
+<span class="lineNum">     178 </span>            :         if (pthread_once(&amp;currentThreadInfoKey_once, &amp;currentThreadInfoKey_alloc) || pthread_setspecific(currentThreadInfoKey, t))
+<span class="lineNum">     179 </span>            :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex] Couldn't run thread %s, ID 0x%08x\n&quot;, t-&gt;log_name, t-&gt;id));
+<span class="lineNum">     180 </span>            : #endif /* GPAC_CONFIG_ANDROID */
+<span class="lineNum">     181 </span><span class="lineCov">        225 :         t-&gt;status = GF_THREAD_STATUS_RUN;</span>
+<span class="lineNum">     182 </span><span class="lineCov">        225 :         gf_sema_notify(t-&gt;_signal, 1);</span>
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     185 </span><span class="lineCov">        225 :         t-&gt;id = gf_th_id();</span>
+<span class="lineNum">     186 </span><span class="lineCov">        225 :         GF_LOG(GF_LOG_INFO, GF_LOG_MUTEX, (&quot;[Thread %s] At %d Entering thread proc - thread ID 0x%08x\n&quot;, t-&gt;log_name, gf_sys_clock(), t-&gt;id));</span>
+<span class="lineNum">     187 </span>            : #endif
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :         /* Each thread has its own seed */
+<span class="lineNum">     190 </span><span class="lineCov">        225 :         gf_rand_init(GF_FALSE);</span>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :         /* Run our thread */
+<span class="lineNum">     193 </span><span class="lineCov">        225 :         ret = t-&gt;Run(t-&gt;args);</span>
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineCov">        222 : exit:</span>
+<span class="lineNum">     196 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     197 </span><span class="lineCov">        222 :         GF_LOG(GF_LOG_INFO, GF_LOG_MUTEX, (&quot;[Thread %s] At %d Exiting thread proc, return code %d\n&quot;, t-&gt;log_name, gf_sys_clock(), ret));</span>
+<span class="lineNum">     198 </span>            : #endif
+<span class="lineNum">     199 </span><span class="lineCov">        223 :         t-&gt;status = GF_THREAD_STATUS_DEAD;</span>
+<span class="lineNum">     200 </span><span class="lineCov">        223 :         t-&gt;Run = NULL;</span>
+<span class="lineNum">     201 </span>            : #ifdef WIN32
+<span class="lineNum">     202 </span>            :         if (!CloseHandle(t-&gt;threadH)) {
+<span class="lineNum">     203 </span>            :                 DWORD err = GetLastError();
+<span class="lineNum">     204 </span>            :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Thread %s] Couldn't close handle when exiting thread proc, error code: %d\n&quot;, t-&gt;log_name, err));
+<span class="lineNum">     205 </span>            :         }
+<span class="lineNum">     206 </span>            :         t-&gt;threadH = NULL;
+<span class="lineNum">     207 </span>            :         return ret;
+<span class="lineNum">     208 </span>            : #else
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            : #ifdef GPAC_CONFIG_ANDROID
+<span class="lineNum">     211 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     212 </span>            :         GF_LOG(GF_LOG_INFO, GF_LOG_MUTEX, (&quot;[Thread %s] RunBeforeExit=%p\n&quot;, t-&gt;log_name, t-&gt;RunBeforeExit));
+<span class="lineNum">     213 </span>            : #endif
+<span class="lineNum">     214 </span>            :         if (t-&gt;RunBeforeExit)
+<span class="lineNum">     215 </span>            :                 t-&gt;RunBeforeExit(t-&gt;args);
+<span class="lineNum">     216 </span>            : #endif /* GPAC_CONFIG_ANDROID */
+<span class="lineNum">     217 </span><span class="lineCov">        223 :         pthread_exit((void *)0);</span>
+<span class="lineNum">     218 </span>            :         return (void *)ret;
+<span class="lineNum">     219 </span>            : #endif
+<span class="lineNum">     220 </span>            : }
+<a name="221"><span class="lineNum">     221 </span>            : </a>
+<span class="lineNum">     222 </span>            : GF_EXPORT
+<span class="lineNum">     223 </span><span class="lineCov">        225 : GF_Err gf_th_run(GF_Thread *t, u32 (*Run)(void *param), void *param)</span>
+<span class="lineNum">     224 </span>            : {
+<span class="lineNum">     225 </span>            : #ifdef WIN32
+<span class="lineNum">     226 </span>            :         DWORD id;
+<span class="lineNum">     227 </span>            : #else
+<span class="lineNum">     228 </span>            :         pthread_attr_t att;
+<span class="lineNum">     229 </span>            : #endif
+<span class="lineNum">     230 </span><span class="lineCov">        225 :         if (!t || t-&gt;Run || t-&gt;_signal) return GF_BAD_PARAM;</span>
+<span class="lineNum">     231 </span><span class="lineCov">        225 :         t-&gt;Run = Run;</span>
+<span class="lineNum">     232 </span><span class="lineCov">        225 :         t-&gt;args = param;</span>
+<span class="lineNum">     233 </span><span class="lineCov">        225 :         t-&gt;_signal = gf_sema_new(1, 0);</span>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">        225 :         if (!t-&gt;_signal)</span>
+<span class="lineNum">     236 </span>            :                 return GF_IO_ERR;
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineCov">        225 :         GF_LOG(GF_LOG_INFO, GF_LOG_MUTEX, (&quot;[Thread %s] Starting\n&quot;, t-&gt;log_name));</span>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : #ifdef WIN32
+<span class="lineNum">     241 </span>            :         t-&gt;threadH = CreateThread(NULL, t-&gt;stackSize, &amp;(RunThread), (void *)t, 0, &amp;id);
+<span class="lineNum">     242 </span>            :         if (t-&gt;threadH != NULL) {
+<span class="lineNum">     243 </span>            : #ifdef _MSC_VER
+<span class="lineNum">     244 </span>            :                 /*add thread name for the msvc debugger*/
+<span class="lineNum">     245 </span>            : #pragma pack(push,8)
+<span class="lineNum">     246 </span>            :                 typedef struct {
+<span class="lineNum">     247 </span>            :                         DWORD dwType;
+<span class="lineNum">     248 </span>            :                         LPCSTR szName;
+<span class="lineNum">     249 </span>            :                         DWORD dwThreadID;
+<span class="lineNum">     250 </span>            :                         DWORD dwFlags;
+<span class="lineNum">     251 </span>            :                 } THREADNAME_INFO;
+<span class="lineNum">     252 </span>            : #pragma pack(pop)
+<span class="lineNum">     253 </span>            :                 THREADNAME_INFO info;
+<span class="lineNum">     254 </span>            :                 info.dwType = 0x1000;
+<span class="lineNum">     255 </span>            :                 info.szName = t-&gt;log_name;
+<span class="lineNum">     256 </span>            :                 info.dwThreadID = id;
+<span class="lineNum">     257 </span>            :                 info.dwFlags = 0;
+<span class="lineNum">     258 </span>            :                 __try {
+<span class="lineNum">     259 </span>            :                         RaiseException(0x406D1388, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&amp;info);
+<span class="lineNum">     260 </span>            :                 } __except (EXCEPTION_CONTINUE_EXECUTION) {
+<span class="lineNum">     261 </span>            :                 }
+<span class="lineNum">     262 </span>            : #endif
+<span class="lineNum">     263 </span>            :         } else {
+<span class="lineNum">     264 </span>            : #else
+<span class="lineNum">     265 </span><span class="lineCov">        225 :         if ( pthread_attr_init(&amp;att) != 0 ) return GF_IO_ERR;</span>
+<span class="lineNum">     266 </span><span class="lineCov">        225 :         pthread_attr_setdetachstate(&amp;att, PTHREAD_CREATE_JOINABLE);</span>
+<span class="lineNum">     267 </span><span class="lineCov">        225 :         if ( pthread_create(&amp;t-&gt;threadH, &amp;att, RunThread, t) != 0 ) {</span>
+<span class="lineNum">     268 </span>            : #endif
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :                 t-&gt;status = GF_THREAD_STATUS_DEAD;</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :                 return GF_IO_ERR;</span>
+<span class="lineNum">     271 </span>            :         }
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            :         /*wait for the child function to call us - do NOT return before, otherwise the thread status would
+<span class="lineNum">     274 </span>            :         be unknown*/
+<span class="lineNum">     275 </span><span class="lineCov">        225 :         gf_sema_wait(t-&gt;_signal);</span>
+<span class="lineNum">     276 </span><span class="lineCov">        225 :         gf_sema_del(t-&gt;_signal);</span>
+<span class="lineNum">     277 </span><span class="lineCov">        225 :         t-&gt;_signal = NULL;</span>
+<span class="lineNum">     278 </span><span class="lineCov">        225 :         GF_LOG(GF_LOG_INFO, GF_LOG_MUTEX, (&quot;[Thread %s] Started\n&quot;, t-&gt;log_name));</span>
+<span class="lineNum">     279 </span>            :         return GF_OK;
+<span class="lineNum">     280 </span>            : }
+<span class="lineNum">     281 </span>            : 
+<a name="282"><span class="lineNum">     282 </span>            : </a>
+<span class="lineNum">     283 </span>            : /* Stops a thread. If Destroy is not 0, thread is destroyed DANGEROUS as no cleanup */
+<span class="lineNum">     284 </span><span class="lineCov">        223 : void Thread_Stop(GF_Thread *t, Bool Destroy)</span>
+<span class="lineNum">     285 </span>            : {
+<span class="lineNum">     286 </span><span class="lineCov">        223 :         if (gf_th_status(t) == GF_THREAD_STATUS_RUN) {</span>
+<span class="lineNum">     287 </span>            : #ifdef WIN32
+<span class="lineNum">     288 </span>            :                 if (Destroy) {
+<span class="lineNum">     289 </span>            :                         DWORD dw = 1;
+<span class="lineNum">     290 </span>            :                         BOOL ret = TerminateThread(t-&gt;threadH, dw);
+<span class="lineNum">     291 </span>            :                         if (!ret) {
+<span class="lineNum">     292 </span>            :                                 DWORD err = GetLastError();
+<span class="lineNum">     293 </span>            :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Thread %s] Couldn't stop thread ID 0x%08x, error code %d\n&quot;, t-&gt;log_name, t-&gt;id, err));
+<span class="lineNum">     294 </span>            :                         }
+<span class="lineNum">     295 </span>            :                         t-&gt;threadH = NULL;
+<span class="lineNum">     296 </span>            :                 } else {
+<span class="lineNum">     297 </span>            :                         WaitForSingleObject(t-&gt;threadH, INFINITE);
+<span class="lineNum">     298 </span>            :                 }
+<span class="lineNum">     299 </span>            : #else
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :                 if (Destroy) {</span>
+<span class="lineNum">     301 </span>            : #if defined(GPAC_CONFIG_ANDROID) || defined(PTHREAD_HAS_NO_CANCEL)
+<span class="lineNum">     302 </span>            :                         if (pthread_kill(t-&gt;threadH, SIGQUIT))
+<span class="lineNum">     303 </span>            : #else
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :                         if (pthread_cancel(t-&gt;threadH))</span>
+<span class="lineNum">     305 </span>            : #endif
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Thread %s] Couldn't kill thread ID 0x%08x\n&quot;, t-&gt;log_name, t-&gt;id));</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                         t-&gt;threadH = 0;</span>
+<span class="lineNum">     308 </span>            :                 } else {
+<span class="lineNum">     309 </span>            :                         /*gracefully wait for Run to finish*/
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :                         if (pthread_join(t-&gt;threadH, NULL))</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Thread %s] pthread_join() returned an error with thread ID 0x%08x\n&quot;, t-&gt;log_name, t-&gt;id));</span>
+<span class="lineNum">     312 </span>            :                 }
+<span class="lineNum">     313 </span>            : #endif
+<span class="lineNum">     314 </span>            :         }
+<span class="lineNum">     315 </span><span class="lineCov">        223 :         t-&gt;status = GF_THREAD_STATUS_DEAD;</span>
+<span class="lineNum">     316 </span><span class="lineCov">        223 : }</span>
+<a name="317"><span class="lineNum">     317 </span>            : </a>
+<span class="lineNum">     318 </span>            : GF_EXPORT
+<span class="lineNum">     319 </span><span class="lineCov">          1 : void gf_th_stop(GF_Thread *t)</span>
+<span class="lineNum">     320 </span>            : {
+<span class="lineNum">     321 </span><span class="lineCov">          1 :         if (t) Thread_Stop(t, GF_FALSE);</span>
+<span class="lineNum">     322 </span><span class="lineCov">          1 : }</span>
+<a name="323"><span class="lineNum">     323 </span>            : </a>
+<span class="lineNum">     324 </span>            : GF_EXPORT
+<span class="lineNum">     325 </span><span class="lineCov">        223 : void gf_th_del(GF_Thread *t)</span>
+<span class="lineNum">     326 </span>            : {
+<span class="lineNum">     327 </span><span class="lineCov">        223 :         Thread_Stop(t, GF_FALSE);</span>
+<span class="lineNum">     328 </span>            : #ifdef WIN32
+<span class="lineNum">     329 </span>            : //      if (t-&gt;threadH) CloseHandle(t-&gt;threadH);
+<span class="lineNum">     330 </span>            : #else
+<span class="lineNum">     331 </span>            :         /* It is necessary to free pthread handle */
+<span class="lineNum">     332 </span><span class="lineCov">        223 :         if (t-&gt;threadH)</span>
+<span class="lineNum">     333 </span><span class="lineCov">        223 :                 pthread_detach(t-&gt;threadH);</span>
+<span class="lineNum">     334 </span><span class="lineCov">        223 :         t-&gt;threadH = 0;</span>
+<span class="lineNum">     335 </span>            : #endif
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     338 </span><span class="lineCov">        223 :         gf_free(t-&gt;log_name);</span>
+<span class="lineNum">     339 </span><span class="lineCov">        223 :         log_del_thread(t);</span>
+<span class="lineNum">     340 </span>            : #endif
+<span class="lineNum">     341 </span><span class="lineCov">        223 :         gf_free(t);</span>
+<span class="lineNum">     342 </span><span class="lineCov">        223 : }</span>
+<a name="343"><span class="lineNum">     343 </span>            : </a>
+<span class="lineNum">     344 </span>            : GF_EXPORT
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 : void gf_th_set_priority(GF_Thread *t, s32 priority)</span>
+<span class="lineNum">     346 </span>            : {
+<span class="lineNum">     347 </span>            : #ifdef WIN32
+<span class="lineNum">     348 </span>            :         /*!! in WinCE, changin thread priority is extremely dangerous, it may freeze threads randomly !!*/
+<span class="lineNum">     349 </span>            : #ifndef _WIN32_WCE
+<span class="lineNum">     350 </span>            :         int _prio;
+<span class="lineNum">     351 </span>            :         BOOL ret;
+<span class="lineNum">     352 </span>            :         switch (priority) {
+<span class="lineNum">     353 </span>            :         case GF_THREAD_PRIORITY_IDLE:
+<span class="lineNum">     354 </span>            :                 _prio = THREAD_PRIORITY_IDLE;
+<span class="lineNum">     355 </span>            :                 break;
+<span class="lineNum">     356 </span>            :         case GF_THREAD_PRIORITY_LESS_IDLE:
+<span class="lineNum">     357 </span>            :                 _prio = THREAD_PRIORITY_IDLE;
+<span class="lineNum">     358 </span>            :                 break;
+<span class="lineNum">     359 </span>            :         case GF_THREAD_PRIORITY_LOWEST:
+<span class="lineNum">     360 </span>            :                 _prio = THREAD_PRIORITY_LOWEST;
+<span class="lineNum">     361 </span>            :                 break;
+<span class="lineNum">     362 </span>            :         case GF_THREAD_PRIORITY_LOW:
+<span class="lineNum">     363 </span>            :                 _prio = THREAD_PRIORITY_BELOW_NORMAL;
+<span class="lineNum">     364 </span>            :                 break;
+<span class="lineNum">     365 </span>            :         case GF_THREAD_PRIORITY_NORMAL:
+<span class="lineNum">     366 </span>            :                 _prio = THREAD_PRIORITY_NORMAL;
+<span class="lineNum">     367 </span>            :                 break;
+<span class="lineNum">     368 </span>            :         case GF_THREAD_PRIORITY_HIGH:
+<span class="lineNum">     369 </span>            :                 _prio = THREAD_PRIORITY_ABOVE_NORMAL;
+<span class="lineNum">     370 </span>            :                 break;
+<span class="lineNum">     371 </span>            :         case GF_THREAD_PRIORITY_HIGHEST:
+<span class="lineNum">     372 </span>            :                 _prio = THREAD_PRIORITY_HIGHEST;
+<span class="lineNum">     373 </span>            :                 break;
+<span class="lineNum">     374 </span>            :         default: /*GF_THREAD_PRIORITY_REALTIME -&gt; GF_THREAD_PRIORITY_REALTIME_END*/
+<span class="lineNum">     375 </span>            :                 _prio = THREAD_PRIORITY_TIME_CRITICAL;
+<span class="lineNum">     376 </span>            :                 break;
+<span class="lineNum">     377 </span>            :         }
+<span class="lineNum">     378 </span>            :         ret = SetThreadPriority(t ? t-&gt;threadH : GetCurrentThread(), _prio);
+<span class="lineNum">     379 </span>            :         if (!ret) {
+<span class="lineNum">     380 </span>            :                 DWORD err = GetLastError();
+<span class="lineNum">     381 </span>            :                 GF_LOG(GF_LOG_WARNING, GF_LOG_MUTEX, (&quot;[Thread %s] Couldn't set priority for thread ID 0x%08x, error %d\n&quot;, t-&gt;log_name, t-&gt;id, err));
+<span class="lineNum">     382 </span>            :         }
+<span class="lineNum">     383 </span>            : #endif
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            : #else
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span>            :         struct sched_param s_par;
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :         if (!t) return;</span>
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :         /* consider this as real-time priority */
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :         if (priority &gt; 200) {</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :                 s_par.sched_priority = priority - 200;</span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :                 if (pthread_setschedparam(t-&gt;threadH, SCHED_RR, &amp;s_par))</span>
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_MUTEX, (&quot;[Thread %s] Couldn't set priority(1) for thread ID 0x%08x\n&quot;, t-&gt;log_name, t-&gt;id));</span>
+<span class="lineNum">     395 </span>            :         } else {
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :                 s_par.sched_priority = priority;</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :                 if (pthread_setschedparam(t-&gt;threadH, SCHED_OTHER, &amp;s_par))</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_WARNING, GF_LOG_MUTEX, (&quot;[Thread %s] Couldn't set priority(2) for thread ID 0x%08x\n&quot;, t-&gt;log_name, t-&gt;id));</span>
+<span class="lineNum">     399 </span>            :         }
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            : #endif
+<span class="lineNum">     402 </span>            : }
+<a name="403"><span class="lineNum">     403 </span>            : </a>
+<span class="lineNum">     404 </span>            : GF_EXPORT
+<span class="lineNum">     405 </span><span class="lineCov">        223 : u32 gf_th_status(GF_Thread *t)</span>
+<span class="lineNum">     406 </span>            : {
+<span class="lineNum">     407 </span><span class="lineCov">        223 :         if (!t) return 0;</span>
+<span class="lineNum">     408 </span><span class="lineCov">        223 :         return t-&gt;status;</span>
+<span class="lineNum">     409 </span>            : }
+<span class="lineNum">     410 </span>            : 
+<a name="411"><span class="lineNum">     411 </span>            : </a>
+<span class="lineNum">     412 </span>            : GF_EXPORT
+<span class="lineNum">     413 </span><span class="lineCov">  748736017 : u32 gf_th_id()</span>
+<span class="lineNum">     414 </span>            : {
+<span class="lineNum">     415 </span>            : #ifdef WIN32
+<span class="lineNum">     416 </span>            :         return ((u32) GetCurrentThreadId());
+<span class="lineNum">     417 </span>            : #else
+<span class="lineNum">     418 </span><span class="lineCov">  748736017 :         return ((u32) (PTR_TO_U_CAST(pthread_self())));</span>
+<span class="lineNum">     419 </span>            : #endif
+<span class="lineNum">     420 </span>            : }
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            : /*********************************************************************
+<span class="lineNum">     424 </span>            :                                                 OS-Specific Mutex Object
+<span class="lineNum">     425 </span>            : **********************************************************************/
+<span class="lineNum">     426 </span>            : struct __tag_mutex
+<span class="lineNum">     427 </span>            : {
+<span class="lineNum">     428 </span>            : #ifdef WIN32
+<span class="lineNum">     429 </span>            :         HANDLE hMutex;
+<span class="lineNum">     430 </span>            : #else
+<span class="lineNum">     431 </span>            :         pthread_mutex_t hMutex;
+<span class="lineNum">     432 </span>            : #endif
+<span class="lineNum">     433 </span>            :         /* We filter recursive calls (1 thread calling Lock several times in a row only locks
+<span class="lineNum">     434 </span>            :         ONCE the mutex. Holder is the current ThreadID of the mutex holder*/
+<span class="lineNum">     435 </span>            :         u32 Holder, HolderCount;
+<span class="lineNum">     436 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     437 </span>            :         char *log_name;
+<span class="lineNum">     438 </span>            : #endif
+<span class="lineNum">     439 </span>            : };
+<span class="lineNum">     440 </span>            : 
+<a name="441"><span class="lineNum">     441 </span>            : </a>
+<span class="lineNum">     442 </span>            : GF_EXPORT
+<span class="lineNum">     443 </span><span class="lineCov">      42100 : GF_Mutex *gf_mx_new(const char *name)</span>
+<span class="lineNum">     444 </span>            : {
+<span class="lineNum">     445 </span>            : #ifndef WIN32
+<span class="lineNum">     446 </span>            :         pthread_mutexattr_t attr;
+<span class="lineNum">     447 </span>            : #endif
+<span class="lineNum">     448 </span><span class="lineCov">      42100 :         GF_Mutex *tmp = (GF_Mutex*)gf_malloc(sizeof(GF_Mutex));</span>
+<span class="lineNum">     449 </span><span class="lineCov">      42100 :         if (!tmp) return NULL;</span>
+<span class="lineNum">     450 </span>            :         memset(tmp, 0, sizeof(GF_Mutex));
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span>            : #ifdef WIN32
+<span class="lineNum">     453 </span>            :         tmp-&gt;hMutex = CreateMutex(NULL, FALSE, NULL);
+<span class="lineNum">     454 </span>            :         if (!tmp-&gt;hMutex) {
+<span class="lineNum">     455 </span>            : #else
+<span class="lineNum">     456 </span><span class="lineCov">      42100 :         pthread_mutexattr_init(&amp;attr);</span>
+<span class="lineNum">     457 </span><span class="lineCov">      42100 :         if ( pthread_mutex_init(&amp;tmp-&gt;hMutex, &amp;attr) != 0 ) {</span>
+<span class="lineNum">     458 </span>            : #endif
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex] Couldn't create mutex %s\n&quot;, strlen(name) ? name : &quot;&quot;));</span>
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :                 gf_free(tmp);</span>
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     462 </span>            :         }
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     465 </span><span class="lineCov">      42100 :         if (name) {</span>
+<span class="lineNum">     466 </span><span class="lineCov">      42100 :                 if (stricmp(name, &quot;Logs&quot;)) {</span>
+<span class="lineNum">     467 </span><span class="lineCov">      35859 :                         tmp-&gt;log_name = gf_strdup(name);</span>
+<span class="lineNum">     468 </span>            :                 }
+<span class="lineNum">     469 </span>            :         } else {
+<span class="lineNum">     470 </span>            :                 char szN[20];
+<span class="lineNum">     471 </span>            :                 sprintf(szN, &quot;%p&quot;, (void*)tmp);
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :                 tmp-&gt;log_name = gf_strdup(szN);</span>
+<span class="lineNum">     473 </span>            :         }
+<span class="lineNum">     474 </span>            : #endif
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span>            :         return tmp;
+<span class="lineNum">     477 </span>            : }
+<a name="478"><span class="lineNum">     478 </span>            : </a>
+<span class="lineNum">     479 </span>            : GF_EXPORT
+<span class="lineNum">     480 </span><span class="lineCov">      60711 : void gf_mx_del(GF_Mutex *mx)</span>
+<span class="lineNum">     481 </span>            : {
+<span class="lineNum">     482 </span>            : #ifndef WIN32
+<span class="lineNum">     483 </span>            :         int err;
+<span class="lineNum">     484 </span>            : #endif
+<span class="lineNum">     485 </span><span class="lineCov">      60711 :         if (!mx) return;</span>
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     488 </span><span class="lineCov">      35867 :         if (mx-&gt;Holder &amp;&amp; (gf_th_id() != mx-&gt;Holder) &amp;&amp; mx-&gt;log_name) {</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_WARNING, GF_LOG_MUTEX, (&quot;[Mutex %s] Destroying mutex from thread %s but hold by thread %s\n&quot;, mx-&gt;log_name, log_th_name(gf_th_id() ), log_th_name(mx-&gt;Holder) ));</span>
+<span class="lineNum">     490 </span>            :         }
+<span class="lineNum">     491 </span>            : #endif
+<span class="lineNum">     492 </span>            : 
+<span class="lineNum">     493 </span>            : #ifdef WIN32
+<span class="lineNum">     494 </span>            :         if (!CloseHandle(mx-&gt;hMutex)) {
+<span class="lineNum">     495 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     496 </span>            :                 if (mx-&gt;log_name) {
+<span class="lineNum">     497 </span>            :                         DWORD err = GetLastError();
+<span class="lineNum">     498 </span>            :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex %s] CloseHandle when deleting mutex failed with error code %d\n&quot;, mx-&gt;log_name, err));
+<span class="lineNum">     499 </span>            :                 }
+<span class="lineNum">     500 </span>            : #endif
+<span class="lineNum">     501 </span>            :         }
+<span class="lineNum">     502 </span>            : #else
+<span class="lineNum">     503 </span><span class="lineCov">      35867 :         err = pthread_mutex_destroy(&amp;mx-&gt;hMutex);</span>
+<span class="lineNum">     504 </span><span class="lineCov">      35866 :         if (err) {</span>
+<span class="lineNum">     505 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :                 if (mx-&gt;log_name) {</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex %s] pthread_mutex_destroy failed with error code %d\n&quot;, mx-&gt;log_name, err));</span>
+<span class="lineNum">     508 </span>            :                 }
+<span class="lineNum">     509 </span>            : #endif
+<span class="lineNum">     510 </span>            :         }
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span>            : #endif
+<span class="lineNum">     513 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     514 </span><span class="lineCov">      35866 :         if (mx-&gt;log_name) {</span>
+<span class="lineNum">     515 </span><span class="lineCov">      29626 :                 gf_free(mx-&gt;log_name);</span>
+<span class="lineNum">     516 </span><span class="lineCov">      29627 :                 mx-&gt;log_name = NULL;</span>
+<span class="lineNum">     517 </span>            :         }
+<span class="lineNum">     518 </span>            : #endif
+<span class="lineNum">     519 </span><span class="lineCov">      35867 :         gf_free(mx);</span>
+<span class="lineNum">     520 </span>            : }
+<a name="521"><span class="lineNum">     521 </span>            : </a>
+<span class="lineNum">     522 </span>            : GF_EXPORT
+<span class="lineNum">     523 </span><span class="lineCov">  357333075 : void gf_mx_v(GF_Mutex *mx)</span>
+<span class="lineNum">     524 </span>            : {
+<span class="lineNum">     525 </span>            :         u32 caller;
+<span class="lineNum">     526 </span><span class="lineCov">  357333075 :         if (!mx) return;</span>
+<span class="lineNum">     527 </span><span class="lineCov">  355985364 :         caller = gf_th_id();</span>
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            :         /*only if we own*/
+<span class="lineNum">     530 </span>            :         assert(caller == mx-&gt;Holder);
+<span class="lineNum">     531 </span><span class="lineCov">  355993869 :         if (caller != mx-&gt;Holder) return;</span>
+<span class="lineNum">     532 </span>            :         assert(mx-&gt;HolderCount &gt; 0);
+<span class="lineNum">     533 </span><span class="lineCov">  355995076 :         mx-&gt;HolderCount -= 1;</span>
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span><span class="lineCov">  355995076 :         if (mx-&gt;HolderCount == 0) {</span>
+<span class="lineNum">     536 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     537 </span><span class="lineCov">  261353859 :                 if (mx-&gt;log_name) {</span>
+<span class="lineNum">     538 </span><span class="lineCov">  261081100 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_MUTEX, (&quot;[Mutex %s] At %d Released by thread %s\n&quot;, mx-&gt;log_name, gf_sys_clock(), log_th_name(mx-&gt;Holder) ));</span>
+<span class="lineNum">     539 </span>            :                 }
+<span class="lineNum">     540 </span>            : #endif
+<span class="lineNum">     541 </span><span class="lineCov">  261341478 :                 mx-&gt;Holder = 0;</span>
+<span class="lineNum">     542 </span>            : #ifdef WIN32
+<span class="lineNum">     543 </span>            :                 {
+<span class="lineNum">     544 </span>            :                         BOOL ret = ReleaseMutex(mx-&gt;hMutex);
+<span class="lineNum">     545 </span>            :                         if (!ret) {
+<span class="lineNum">     546 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     547 </span>            :                                 if (mx-&gt;log_name) {
+<span class="lineNum">     548 </span>            :                                         DWORD err = GetLastError();
+<span class="lineNum">     549 </span>            :                                         GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex] Couldn't release mutex (thread %s, error %d)\n&quot;, log_th_name(mx-&gt;Holder), err));
+<span class="lineNum">     550 </span>            :                                 }
+<span class="lineNum">     551 </span>            : #endif
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span>            :                         }
+<span class="lineNum">     554 </span>            :                 }
+<span class="lineNum">     555 </span>            : #else
+<span class="lineNum">     556 </span><span class="lineCov">  261341478 :                 if (pthread_mutex_unlock(&amp;mx-&gt;hMutex)) {</span>
+<span class="lineNum">     557 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :                         if (mx-&gt;log_name) {</span>
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex] Couldn't release mutex (thread %s)\n&quot;, log_th_name(mx-&gt;Holder)));</span>
+<span class="lineNum">     560 </span>            :                         }
+<span class="lineNum">     561 </span>            : #endif
+<span class="lineNum">     562 </span>            :                 }
+<span class="lineNum">     563 </span>            : #endif
+<span class="lineNum">     564 </span>            :         }
+<span class="lineNum">     565 </span>            : }
+<a name="566"><span class="lineNum">     566 </span>            : </a>
+<span class="lineNum">     567 </span>            : GF_EXPORT
+<span class="lineNum">     568 </span><span class="lineCov">  357320483 : u32 gf_mx_p(GF_Mutex *mx)</span>
+<span class="lineNum">     569 </span>            : {
+<span class="lineNum">     570 </span>            : #ifndef WIN32
+<span class="lineNum">     571 </span>            :         int retCode;
+<span class="lineNum">     572 </span>            : #endif
+<span class="lineNum">     573 </span>            :         u32 caller;
+<span class="lineNum">     574 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     575 </span>            :         const char *mx_holder_name;
+<span class="lineNum">     576 </span>            : #endif
+<span class="lineNum">     577 </span>            : 
+<span class="lineNum">     578 </span><span class="lineCov">  357320483 :         if (!mx) return 1;</span>
+<span class="lineNum">     579 </span><span class="lineCov">  355974589 :         caller = gf_th_id();</span>
+<span class="lineNum">     580 </span><span class="lineCov">  355993128 :         if (caller == mx-&gt;Holder) {</span>
+<span class="lineNum">     581 </span><span class="lineCov">   94643722 :                 mx-&gt;HolderCount += 1;</span>
+<span class="lineNum">     582 </span><span class="lineCov">   94643722 :                 return 1;</span>
+<span class="lineNum">     583 </span>            :         }
+<span class="lineNum">     584 </span>            : 
+<span class="lineNum">     585 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     586 </span><span class="lineCov">  261349406 :         mx_holder_name = mx-&gt;Holder ? log_th_name(mx-&gt;Holder) : &quot;none&quot;;</span>
+<span class="lineNum">     587 </span><span class="lineCov">  261349066 :         if (mx-&gt;Holder &amp;&amp; mx-&gt;log_name)</span>
+<span class="lineNum">     588 </span><span class="lineCov">      10252 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MUTEX, (&quot;[Mutex %s] At %d Thread %s waiting a release from thread %s\n&quot;, mx-&gt;log_name, gf_sys_clock(), log_th_name(caller), mx_holder_name ));</span>
+<span class="lineNum">     589 </span>            : #endif
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span>            : #ifdef WIN32
+<span class="lineNum">     592 </span>            :         switch (WaitForSingleObject(mx-&gt;hMutex, INFINITE)) {
+<span class="lineNum">     593 </span>            :         case WAIT_ABANDONED:
+<span class="lineNum">     594 </span>            :         case WAIT_TIMEOUT:
+<span class="lineNum">     595 </span>            :                 return 0;
+<span class="lineNum">     596 </span>            :         default:
+<span class="lineNum">     597 </span>            :                 break;
+<span class="lineNum">     598 </span>            :         }
+<span class="lineNum">     599 </span>            : #else
+<span class="lineNum">     600 </span><span class="lineCov">  261349066 :         retCode = pthread_mutex_lock(&amp;mx-&gt;hMutex);</span>
+<span class="lineNum">     601 </span><span class="lineCov">  261355656 :         if (retCode != 0 ) {</span>
+<span class="lineNum">     602 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :                 if (mx-&gt;log_name) {</span>
+<span class="lineNum">     604 </span><span class="lineNoCov">          0 :                         if (retCode == EINVAL)</span>
+<span class="lineNum">     605 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex %p=%s] Not properly initialized.\n&quot;, mx, mx-&gt;log_name));</span>
+<span class="lineNum">     606 </span><span class="lineNoCov">          0 :                         if (retCode == EDEADLK)</span>
+<span class="lineNum">     607 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex %p=%s] Deadlock detected.\n&quot;, mx, mx-&gt;log_name));</span>
+<span class="lineNum">     608 </span>            :                 }
+<span class="lineNum">     609 </span>            : #endif /* GPAC_DISABLE_LOG */
+<span class="lineNum">     610 </span>            :                 assert(0);
+<span class="lineNum">     611 </span>            :                 return 0;
+<span class="lineNum">     612 </span>            :         }
+<span class="lineNum">     613 </span>            : #endif /* NOT WIN32 */
+<span class="lineNum">     614 </span><span class="lineCov">  261355656 :         mx-&gt;HolderCount = 1;</span>
+<span class="lineNum">     615 </span><span class="lineCov">  261355656 :         mx-&gt;Holder = caller;</span>
+<span class="lineNum">     616 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     617 </span><span class="lineCov">  261355656 :         if (mx-&gt;log_name) {</span>
+<span class="lineNum">     618 </span><span class="lineCov">  261082706 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MUTEX, (&quot;[Mutex %s] At %d Grabbed by thread %s\n&quot;, mx-&gt;log_name, gf_sys_clock(), log_th_name(mx-&gt;Holder) ));</span>
+<span class="lineNum">     619 </span>            :         }
+<span class="lineNum">     620 </span>            : #endif
+<span class="lineNum">     621 </span>            :         return 1;
+<span class="lineNum">     622 </span>            : }
+<span class="lineNum">     623 </span>            : 
+<a name="624"><span class="lineNum">     624 </span>            : </a>
+<span class="lineNum">     625 </span>            : GF_EXPORT
+<span class="lineNum">     626 </span><span class="lineCov">          1 : s32 gf_mx_get_num_locks(GF_Mutex *mx)</span>
+<span class="lineNum">     627 </span>            : {
+<span class="lineNum">     628 </span>            :         u32 caller;
+<span class="lineNum">     629 </span><span class="lineCov">          1 :         if (!mx) return 0;</span>
+<span class="lineNum">     630 </span><span class="lineNoCov">          0 :         caller = gf_th_id();</span>
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :         if (caller == mx-&gt;Holder) {</span>
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :                 return mx-&gt;HolderCount;</span>
+<span class="lineNum">     633 </span>            :         }
+<span class="lineNum">     634 </span>            :         return -1;
+<span class="lineNum">     635 </span>            : }
+<a name="636"><span class="lineNum">     636 </span>            : </a>
+<span class="lineNum">     637 </span>            : GF_EXPORT
+<span class="lineNum">     638 </span><span class="lineCov">       5270 : Bool gf_mx_try_lock(GF_Mutex *mx)</span>
+<span class="lineNum">     639 </span>            : {
+<span class="lineNum">     640 </span>            :         u32 caller;
+<span class="lineNum">     641 </span><span class="lineCov">       5270 :         if (!mx) return GF_FALSE;</span>
+<span class="lineNum">     642 </span><span class="lineCov">       5270 :         caller = gf_th_id();</span>
+<span class="lineNum">     643 </span><span class="lineCov">       5270 :         if (caller == mx-&gt;Holder) {</span>
+<span class="lineNum">     644 </span><span class="lineCov">       1659 :                 mx-&gt;HolderCount += 1;</span>
+<span class="lineNum">     645 </span><span class="lineCov">       1659 :                 return GF_TRUE;</span>
+<span class="lineNum">     646 </span>            :         }
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            : #ifdef WIN32
+<span class="lineNum">     649 </span>            :         /*is the object signaled?*/
+<span class="lineNum">     650 </span>            :         switch (WaitForSingleObject(mx-&gt;hMutex, 0)) {
+<span class="lineNum">     651 </span>            :         case WAIT_OBJECT_0:
+<span class="lineNum">     652 </span>            :                 break;
+<span class="lineNum">     653 </span>            :         case WAIT_ABANDONED:
+<span class="lineNum">     654 </span>            :         case WAIT_TIMEOUT:
+<span class="lineNum">     655 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     656 </span>            :                 if (mx-&gt;log_name) {
+<span class="lineNum">     657 </span>            :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_MUTEX, (&quot;[Mutex %s] At %d Couldn't be locked by thread %s (grabbed by thread %s)\n&quot;, mx-&gt;log_name, gf_sys_clock(), log_th_name(caller), log_th_name(mx-&gt;Holder) ));
+<span class="lineNum">     658 </span>            :                 }
+<span class="lineNum">     659 </span>            : #endif
+<span class="lineNum">     660 </span>            :                 return GF_FALSE;
+<span class="lineNum">     661 </span>            :         case WAIT_FAILED:
+<span class="lineNum">     662 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     663 </span>            :                 if (mx-&gt;log_name) {
+<span class="lineNum">     664 </span>            :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex %s] At %d WaitForSingleObject failed\n&quot;, mx-&gt;log_name, gf_sys_clock()));
+<span class="lineNum">     665 </span>            :                         return GF_FALSE;
+<span class="lineNum">     666 </span>            :                 }
+<span class="lineNum">     667 </span>            : #endif
+<span class="lineNum">     668 </span>            :         default:
+<span class="lineNum">     669 </span>            :                 assert(0);
+<span class="lineNum">     670 </span>            :                 return GF_FALSE;
+<span class="lineNum">     671 </span>            :         }
+<span class="lineNum">     672 </span>            : #else
+<span class="lineNum">     673 </span><span class="lineCov">       3611 :         if (pthread_mutex_trylock(&amp;mx-&gt;hMutex) != 0 ) {</span>
+<span class="lineNum">     674 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     675 </span><span class="lineCov">          2 :                 if (mx-&gt;log_name) {</span>
+<span class="lineNum">     676 </span><span class="lineCov">          2 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_MUTEX, (&quot;[Mutex %s] At %d Couldn't release it for thread %s (grabbed by thread %s)\n&quot;, mx-&gt;log_name, gf_sys_clock(), log_th_name(caller), log_th_name(mx-&gt;Holder) ));</span>
+<span class="lineNum">     677 </span>            :                 }
+<span class="lineNum">     678 </span>            : #endif
+<span class="lineNum">     679 </span>            :                 return GF_FALSE;
+<span class="lineNum">     680 </span>            :         }
+<span class="lineNum">     681 </span>            : #endif
+<span class="lineNum">     682 </span><span class="lineCov">       3609 :         mx-&gt;Holder = caller;</span>
+<span class="lineNum">     683 </span><span class="lineCov">       3609 :         mx-&gt;HolderCount = 1;</span>
+<span class="lineNum">     684 </span>            : #ifndef GPAC_DISABLE_LOG
+<span class="lineNum">     685 </span><span class="lineCov">       3609 :         if (mx-&gt;log_name) {</span>
+<span class="lineNum">     686 </span><span class="lineCov">       3609 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_MUTEX, (&quot;[Mutex %s] At %d Grabbed by thread %s\n&quot;, mx-&gt;log_name, gf_sys_clock(), log_th_name(mx-&gt;Holder) ));</span>
+<span class="lineNum">     687 </span>            :         }
+<span class="lineNum">     688 </span>            : #endif
+<span class="lineNum">     689 </span>            :         return GF_TRUE;
+<span class="lineNum">     690 </span>            : }
+<span class="lineNum">     691 </span>            : 
+<span class="lineNum">     692 </span>            : 
+<span class="lineNum">     693 </span>            : /*********************************************************************
+<span class="lineNum">     694 </span>            :                                                 OS-Specific Semaphore Object
+<span class="lineNum">     695 </span>            : **********************************************************************/
+<span class="lineNum">     696 </span>            : struct __tag_semaphore
+<span class="lineNum">     697 </span>            : {
+<span class="lineNum">     698 </span>            : #ifdef WIN32
+<span class="lineNum">     699 </span>            :         HANDLE hSemaphore;
+<span class="lineNum">     700 </span>            : #else
+<span class="lineNum">     701 </span>            :         sem_t *hSemaphore;
+<span class="lineNum">     702 </span>            :         sem_t SemaData;
+<span class="lineNum">     703 </span>            : #if defined(__DARWIN__) || defined(__APPLE__)
+<span class="lineNum">     704 </span>            :         char *SemName;
+<span class="lineNum">     705 </span>            : #endif
+<span class="lineNum">     706 </span>            : #endif
+<span class="lineNum">     707 </span>            : };
+<a name="708"><span class="lineNum">     708 </span>            : </a>
+<span class="lineNum">     709 </span>            : GF_EXPORT
+<span class="lineNum">     710 </span><span class="lineCov">        436 : GF_Semaphore *gf_sema_new(u32 MaxCount, u32 InitCount)</span>
+<span class="lineNum">     711 </span>            : {
+<span class="lineNum">     712 </span><span class="lineCov">        436 :         GF_Semaphore *tmp = (GF_Semaphore*)gf_malloc(sizeof(GF_Semaphore));</span>
+<span class="lineNum">     713 </span><span class="lineCov">        436 :         if (!tmp) {</span>
+<span class="lineNum">     714 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;Couldn't allocate semaphore\n&quot;));</span>
+<span class="lineNum">     715 </span>            :                 return NULL;
+<span class="lineNum">     716 </span>            :         }
+<span class="lineNum">     717 </span>            : 
+<span class="lineNum">     718 </span>            : #if defined(WIN32)
+<span class="lineNum">     719 </span>            :         MaxCount = MIN(MaxCount, GF_INT_MAX);
+<span class="lineNum">     720 </span>            :         tmp-&gt;hSemaphore = CreateSemaphore(NULL, InitCount, MIN(MaxCount, GF_INT_MAX), NULL);
+<span class="lineNum">     721 </span>            :         if (!tmp-&gt;hSemaphore) {
+<span class="lineNum">     722 </span>            :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;Couldn't create semaphore\n&quot;));
+<span class="lineNum">     723 </span>            :                 gf_free(tmp);
+<span class="lineNum">     724 </span>            :                 return NULL;
+<span class="lineNum">     725 </span>            :         }
+<span class="lineNum">     726 </span>            : 
+<span class="lineNum">     727 </span>            : #elif defined(__DARWIN__) || defined(__APPLE__)
+<span class="lineNum">     728 </span>            :         /* sem_init isn't supported on Mac OS X 10.3 &amp; 10.4; it returns ENOSYS
+<span class="lineNum">     729 </span>            :         To get around this, a NAMED semaphore needs to be used
+<span class="lineNum">     730 </span>            :         sem_t *sem_open(const char *name, int oflag, ...);
+<span class="lineNum">     731 </span>            :         http://users.evitech.fi/~hannuvl/ke04/reaaliaika_ohj/memmap_named_semaphores.c
+<span class="lineNum">     732 </span>            :         */
+<span class="lineNum">     733 </span>            :         {
+<span class="lineNum">     734 </span>            :                 char semaName[40];
+<span class="lineNum">     735 </span>            :                 u64 add = (u64) tmp ^ gf_net_get_utc() ^ gf_rand();
+<span class="lineNum">     736 </span>            :                 sprintf(semaName,&quot;GPAC_SEM&quot;LLU, add);
+<span class="lineNum">     737 </span>            :                 tmp-&gt;SemName = gf_strdup(semaName);
+<span class="lineNum">     738 </span>            :         }
+<span class="lineNum">     739 </span>            :         sem_unlink(tmp-&gt;SemName);
+<span class="lineNum">     740 </span>            :         tmp-&gt;hSemaphore = sem_open(tmp-&gt;SemName, O_CREAT, S_IRUSR|S_IWUSR, InitCount);
+<span class="lineNum">     741 </span>            :         if (tmp-&gt;hSemaphore==SEM_FAILED) {
+<span class="lineNum">     742 </span>            :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;Couldn't init semaphore: error %d\n&quot;, errno));
+<span class="lineNum">     743 </span>            :                 gf_free(tmp);
+<span class="lineNum">     744 </span>            :                 return NULL;
+<span class="lineNum">     745 </span>            :         }
+<span class="lineNum">     746 </span>            : #else
+<span class="lineNum">     747 </span><span class="lineCov">        436 :         if (sem_init(&amp;tmp-&gt;SemaData, 0, InitCount) &lt; 0 ) {</span>
+<span class="lineNum">     748 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;Couldn't init semaphore: error %d\n&quot;, errno));</span>
+<span class="lineNum">     749 </span><span class="lineNoCov">          0 :                 gf_free(tmp);</span>
+<span class="lineNum">     750 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     751 </span>            :         }
+<span class="lineNum">     752 </span><span class="lineCov">        436 :         tmp-&gt;hSemaphore = &amp;tmp-&gt;SemaData;</span>
+<span class="lineNum">     753 </span>            : #endif
+<span class="lineNum">     754 </span><span class="lineCov">        436 :         return tmp;</span>
+<span class="lineNum">     755 </span>            : }
+<a name="756"><span class="lineNum">     756 </span>            : </a>
+<span class="lineNum">     757 </span>            : GF_EXPORT
+<span class="lineNum">     758 </span><span class="lineCov">        434 : void gf_sema_del(GF_Semaphore *sm)</span>
+<span class="lineNum">     759 </span>            : {
+<span class="lineNum">     760 </span><span class="lineCov">        434 :         if (!sm) return;</span>
+<span class="lineNum">     761 </span>            : #if defined(WIN32)
+<span class="lineNum">     762 </span>            :         if (!CloseHandle(sm-&gt;hSemaphore)) {
+<span class="lineNum">     763 </span>            :                 DWORD err = GetLastError();
+<span class="lineNum">     764 </span>            :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Mutex] CloseHandle when deleting semaphore failed with error code %d\n&quot;, err));
+<span class="lineNum">     765 </span>            :         }
+<span class="lineNum">     766 </span>            : #elif defined(__DARWIN__) || defined(__APPLE__)
+<span class="lineNum">     767 </span>            :         sem_close(sm-&gt;hSemaphore);
+<span class="lineNum">     768 </span>            :         sem_unlink(sm-&gt;SemName);
+<span class="lineNum">     769 </span>            :         gf_free(sm-&gt;SemName);
+<span class="lineNum">     770 </span>            : #else
+<span class="lineNum">     771 </span><span class="lineCov">        434 :         sem_destroy(sm-&gt;hSemaphore);</span>
+<span class="lineNum">     772 </span>            : #endif
+<span class="lineNum">     773 </span><span class="lineCov">        434 :         gf_free(sm);</span>
+<span class="lineNum">     774 </span>            : }
+<a name="775"><span class="lineNum">     775 </span>            : </a>
+<span class="lineNum">     776 </span>            : GF_EXPORT
+<span class="lineNum">     777 </span><span class="lineCov">    1978559 : Bool gf_sema_notify(GF_Semaphore *sm, u32 NbRelease)</span>
+<span class="lineNum">     778 </span>            : {
+<span class="lineNum">     779 </span>            : #ifndef WIN32
+<span class="lineNum">     780 </span>            :         sem_t *hSem;
+<span class="lineNum">     781 </span>            : #else
+<span class="lineNum">     782 </span>            :         u32 prevCount=0;
+<span class="lineNum">     783 </span>            : #endif
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span><span class="lineCov">    1978559 :         if (!sm) return GF_FALSE;</span>
+<span class="lineNum">     786 </span>            : 
+<span class="lineNum">     787 </span>            : #if defined(WIN32)
+<span class="lineNum">     788 </span>            :         ReleaseSemaphore(sm-&gt;hSemaphore, NbRelease, (LPLONG) &amp;prevCount);
+<span class="lineNum">     789 </span>            : #else
+<span class="lineNum">     790 </span>            : 
+<span class="lineNum">     791 </span><span class="lineCov">    1973187 :         hSem = sm-&gt;hSemaphore;</span>
+<span class="lineNum">     792 </span>            : 
+<span class="lineNum">     793 </span><span class="lineCov">    7180992 :         while (NbRelease) {</span>
+<span class="lineNum">     794 </span><span class="lineCov">    3237065 :                 if (sem_post(hSem) &lt; 0) return GF_FALSE;</span>
+<span class="lineNum">     795 </span><span class="lineCov">    3234618 :                 NbRelease -= 1;</span>
+<span class="lineNum">     796 </span>            :         }
+<span class="lineNum">     797 </span>            : #endif
+<span class="lineNum">     798 </span>            :         return GF_TRUE;
+<span class="lineNum">     799 </span>            : }
+<a name="800"><span class="lineNum">     800 </span>            : </a>
+<span class="lineNum">     801 </span>            : GF_EXPORT
+<span class="lineNum">     802 </span><span class="lineCov">    1397333 : Bool gf_sema_wait(GF_Semaphore *sm)</span>
+<span class="lineNum">     803 </span>            : {
+<span class="lineNum">     804 </span><span class="lineCov">    1397333 :         if (!sm) return GF_FALSE;</span>
+<span class="lineNum">     805 </span>            : #ifdef WIN32
+<span class="lineNum">     806 </span>            :         switch (WaitForSingleObject(sm-&gt;hSemaphore, INFINITE) ) {
+<span class="lineNum">     807 </span>            :         case WAIT_FAILED:
+<span class="lineNum">     808 </span>            :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Semaphore] failed to wait: %d\n&quot;, GetLastError() ));
+<span class="lineNum">     809 </span>            :                 return GF_FALSE;
+<span class="lineNum">     810 </span>            :         case WAIT_ABANDONED:
+<span class="lineNum">     811 </span>            :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Semaphore] failed to wait: owner thread exit\n&quot;));
+<span class="lineNum">     812 </span>            :                 return GF_FALSE;
+<span class="lineNum">     813 </span>            :         default:
+<span class="lineNum">     814 </span>            :                 break;
+<span class="lineNum">     815 </span>            :         }
+<span class="lineNum">     816 </span>            : 
+<span class="lineNum">     817 </span>            : #else
+<span class="lineNum">     818 </span><span class="lineCov">    1397362 :         if (sem_wait(sm-&gt;hSemaphore) &lt; 0) {</span>
+<span class="lineNum">     819 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MUTEX, (&quot;[Semaphore] failed to wait for semaphore: %d\n&quot;, errno));</span>
+<span class="lineNum">     820 </span>            :                 return GF_FALSE;
+<span class="lineNum">     821 </span>            :         }
+<span class="lineNum">     822 </span>            : #endif
+<span class="lineNum">     823 </span>            :         return GF_TRUE;
+<span class="lineNum">     824 </span>            : }
+<a name="825"><span class="lineNum">     825 </span>            : </a>
+<span class="lineNum">     826 </span>            : GF_EXPORT
+<span class="lineNum">     827 </span><span class="lineCov">       4306 : Bool gf_sema_wait_for(GF_Semaphore *sm, u32 TimeOut)</span>
+<span class="lineNum">     828 </span>            : {
+<span class="lineNum">     829 </span>            : #ifdef WIN32
+<span class="lineNum">     830 </span>            :         if (!sm) return GF_FALSE;
+<span class="lineNum">     831 </span>            :         if (WaitForSingleObject(sm-&gt;hSemaphore, TimeOut) == WAIT_TIMEOUT) return GF_FALSE;
+<span class="lineNum">     832 </span>            :         return GF_TRUE;
+<span class="lineNum">     833 </span>            : #else
+<span class="lineNum">     834 </span>            :         sem_t *hSem;
+<span class="lineNum">     835 </span><span class="lineCov">       4306 :         if (!sm) return GF_FALSE;</span>
+<span class="lineNum">     836 </span><span class="lineCov">       4344 :         hSem = sm-&gt;hSemaphore;</span>
+<span class="lineNum">     837 </span>            : 
+<span class="lineNum">     838 </span><span class="lineCov">       4344 :         if (!TimeOut) {</span>
+<span class="lineNum">     839 </span><span class="lineNoCov">          0 :                 if (!sem_trywait(hSem)) return GF_TRUE;</span>
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :                 return GF_FALSE;</span>
+<span class="lineNum">     841 </span>            :         }
+<span class="lineNum">     842 </span>            : 
+<span class="lineNum">     843 </span>            : #if defined(__DARWIN__) || defined(__APPLE__) || defined(GPAC_CONFIG_IOS)
+<span class="lineNum">     844 </span>            : 
+<span class="lineNum">     845 </span>            :         TimeOut += gf_sys_clock();
+<span class="lineNum">     846 </span>            :         do {
+<span class="lineNum">     847 </span>            :                 if (!sem_trywait(hSem)) return GF_TRUE;
+<span class="lineNum">     848 </span>            :                 //OSX/ios don't support sem_timedwait, so we sleep until the sem is notified or the timeout is done
+<span class="lineNum">     849 </span>            :                 //don't be too greedy, use 5ms sleep
+<span class="lineNum">     850 </span>            :                 //another approach would be to spawn a thread, use sem_wait and send an interrupt on the sema after the timeout ...
+<span class="lineNum">     851 </span>            :                 gf_sleep(1);
+<span class="lineNum">     852 </span>            :         } while (gf_sys_clock() &lt; TimeOut);
+<span class="lineNum">     853 </span>            :         return GF_FALSE;
+<span class="lineNum">     854 </span>            : #else
+<span class="lineNum">     855 </span>            :         struct timespec tv;
+<span class="lineNum">     856 </span>            :         u32 secs;
+<span class="lineNum">     857 </span><span class="lineCov">       4344 :         if (clock_gettime(CLOCK_REALTIME, &amp;tv) == -1) return GF_FALSE;</span>
+<span class="lineNum">     858 </span><span class="lineCov">       4315 :         secs = TimeOut/1000;</span>
+<span class="lineNum">     859 </span><span class="lineCov">       4315 :         tv.tv_sec += secs;</span>
+<span class="lineNum">     860 </span><span class="lineCov">       4315 :         tv.tv_nsec += (u64) ((TimeOut-secs*1000)) * 1000000;</span>
+<span class="lineNum">     861 </span><span class="lineCov">       4315 :         if (tv.tv_nsec&gt;1000000000) {</span>
+<span class="lineNum">     862 </span><span class="lineCov">        190 :                 tv.tv_nsec -= 1000000000;</span>
+<span class="lineNum">     863 </span><span class="lineCov">        190 :                 tv.tv_sec += 1;</span>
+<span class="lineNum">     864 </span>            :         }
+<span class="lineNum">     865 </span><span class="lineCov">       4315 :         if (!sem_timedwait(hSem, &amp;tv)) return GF_TRUE;</span>
+<span class="lineNum">     866 </span>            : 
+<span class="lineNum">     867 </span><span class="lineNoCov">          0 :         return GF_FALSE;</span>
+<span class="lineNum">     868 </span>            : #endif
+<span class="lineNum">     869 </span>            : 
+<span class="lineNum">     870 </span>            : #endif
+<span class="lineNum">     871 </span>            : }
+<span class="lineNum">     872 </span>            : 
+<span class="lineNum">     873 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,690 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/rewrite_nalu.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - rewrite_nalu.c<span style="font-size: 80%;"> (source / <a href="rewrite_nalu.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">211</td>
+            <td class="headerCovTableEntry">295</td>
+            <td class="headerCovTableEntryLo">71.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">88.9 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2017-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / NALU video AnnexB write filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/internal/media_dev.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : enum
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :         UFNAL_AVC,
+<span class="lineNum">      34 </span>            :         UFNAL_HEVC,
+<span class="lineNum">      35 </span>            :         UFNAL_VVC,
+<span class="lineNum">      36 </span>            : };
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : typedef struct
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span>            :         //opts
+<span class="lineNum">      41 </span>            :         Bool rcfg, delim, pps_inband;
+<span class="lineNum">      42 </span>            :         u32 extract;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :         //only one input pid declared
+<span class="lineNum">      45 </span>            :         GF_FilterPid *ipid;
+<span class="lineNum">      46 </span>            :         //only one output pid declared
+<span class="lineNum">      47 </span>            :         GF_FilterPid *opid;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :         u32 vtype;
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :         u32 nal_hdr_size, crc, crc_enh;
+<span class="lineNum">      52 </span>            :         u8 *dsi, *dsi_non_rap;
+<span class="lineNum">      53 </span>            :         u32 dsi_size, dsi_non_rap_size;
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :         GF_BitStream *bs_w, *bs_r;
+<span class="lineNum">      56 </span>            :         u32 nb_nalu, nb_nalu_in_hdr, nb_nalu_in_hdr_non_rap;
+<span class="lineNum">      57 </span>            :         u32 width, height;
+<span class="lineNum">      58 </span>            : } GF_NALUMxCtx;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            : 
+<a name="61"><span class="lineNum">      61 </span>            : </a>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">        181 : static void nalumx_write_ps_list(GF_NALUMxCtx *ctx, GF_BitStream *bs, GF_List *list, Bool for_non_rap)</span>
+<span class="lineNum">      64 </span>            : {
+<span class="lineNum">      65 </span><span class="lineCov">        181 :         u32 i, count = list ? gf_list_count(list) : 0;</span>
+<span class="lineNum">      66 </span><span class="lineCov">        180 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">      67 </span><span class="lineCov">        180 :                 GF_NALUFFParam *sl = gf_list_get(list, i);</span>
+<span class="lineNum">      68 </span><span class="lineCov">        180 :                 gf_bs_write_u32(bs, 1);</span>
+<span class="lineNum">      69 </span><span class="lineCov">        180 :                 gf_bs_write_data(bs, sl-&gt;data, sl-&gt;size);</span>
+<span class="lineNum">      70 </span><span class="lineCov">        180 :                 if (for_non_rap)</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :                         ctx-&gt;nb_nalu_in_hdr_non_rap++;</span>
+<span class="lineNum">      72 </span>            :                 else
+<span class="lineNum">      73 </span><span class="lineCov">        180 :                         ctx-&gt;nb_nalu_in_hdr++;</span>
+<span class="lineNum">      74 </span>            :         }
+<a name="75"><span class="lineNum">      75 </span><span class="lineCov">        181 : }</span></a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">        135 : static GF_List *nalumx_get_hevc_ps(GF_HEVCConfig *cfg, u8 type)</span>
+<span class="lineNum">      78 </span>            : {
+<span class="lineNum">      79 </span><span class="lineCov">        135 :         u32 i, count = gf_list_count(cfg-&gt;param_array);</span>
+<span class="lineNum">      80 </span><span class="lineCov">        270 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">      81 </span><span class="lineCov">        269 :                 GF_NALUFFParamArray *pa = gf_list_get(cfg-&gt;param_array, i);</span>
+<span class="lineNum">      82 </span><span class="lineCov">        269 :                 if (pa-&gt;type == type) return pa-&gt;nalus;</span>
+<span class="lineNum">      83 </span>            :         }
+<a name="84"><span class="lineNum">      84 </span>            :         return NULL;</a>
+<span class="lineNum">      85 </span>            : }
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 : static GF_List *nalumx_get_vvc_ps(GF_VVCConfig *cfg, u8 type)</span>
+<span class="lineNum">      87 </span>            : {
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         u32 i, count = gf_list_count(cfg-&gt;param_array);</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :         for (i=0; i&lt;count; i++) {</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :                 GF_NALUFFParamArray *pa = gf_list_get(cfg-&gt;param_array, i);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :                 if (pa-&gt;type == type) return pa-&gt;nalus;</span>
+<span class="lineNum">      92 </span>            :         }
+<span class="lineNum">      93 </span>            :         return NULL;
+<a name="94"><span class="lineNum">      94 </span>            : }</a>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">         67 : static GF_Err nalumx_make_inband_header(GF_NALUMxCtx *ctx, char *dsi, u32 dsi_len, char *dsi_enh, u32 dsi_enh_len, Bool for_non_rap)</span>
+<span class="lineNum">      97 </span>            : {
+<span class="lineNum">      98 </span>            :         GF_BitStream *bs;
+<span class="lineNum">      99 </span>            :         GF_AVCConfig *avcc = NULL;
+<span class="lineNum">     100 </span>            :         GF_AVCConfig *svcc = NULL;
+<span class="lineNum">     101 </span>            :         GF_HEVCConfig *hvcc = NULL;
+<span class="lineNum">     102 </span>            :         GF_HEVCConfig *lvcc = NULL;
+<span class="lineNum">     103 </span>            :         GF_VVCConfig *vvcc = NULL;
+<span class="lineNum">     104 </span>            :         GF_VVCConfig *s_vvcc = NULL;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">         67 :         if (ctx-&gt;vtype==UFNAL_HEVC) {</span>
+<span class="lineNum">     107 </span><span class="lineCov">         44 :                 if (dsi) hvcc = gf_odf_hevc_cfg_read(dsi, dsi_len, GF_FALSE);</span>
+<span class="lineNum">     108 </span><span class="lineCov">         44 :                 if (dsi_enh) lvcc = gf_odf_hevc_cfg_read(dsi_enh, dsi_enh_len, GF_TRUE);</span>
+<span class="lineNum">     109 </span><span class="lineCov">         44 :                 if (!hvcc &amp;&amp; !lvcc) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     110 </span><span class="lineCov">         44 :                 ctx-&gt;nal_hdr_size = hvcc ? hvcc-&gt;nal_unit_size : lvcc-&gt;nal_unit_size;</span>
+<span class="lineNum">     111 </span><span class="lineCov">         23 :         } else if (ctx-&gt;vtype==UFNAL_VVC) {</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                 if (dsi) vvcc = gf_odf_vvc_cfg_read(dsi, dsi_len);</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                 if (dsi_enh) s_vvcc = gf_odf_vvc_cfg_read(dsi_enh, dsi_enh_len);</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :                 if (!vvcc &amp;&amp; !s_vvcc) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :                 ctx-&gt;nal_hdr_size = vvcc ? vvcc-&gt;nal_unit_size : s_vvcc-&gt;nal_unit_size;</span>
+<span class="lineNum">     116 </span>            :         } else {
+<span class="lineNum">     117 </span><span class="lineCov">         23 :                 if (dsi) avcc = gf_odf_avc_cfg_read(dsi, dsi_len);</span>
+<span class="lineNum">     118 </span><span class="lineCov">         23 :                 if (dsi_enh) svcc = gf_odf_avc_cfg_read(dsi_enh, dsi_enh_len);</span>
+<span class="lineNum">     119 </span><span class="lineCov">         23 :                 if (!avcc &amp;&amp; !svcc) return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     120 </span><span class="lineCov">         23 :                 ctx-&gt;nal_hdr_size = avcc ? avcc-&gt;nal_unit_size : svcc-&gt;nal_unit_size;</span>
+<span class="lineNum">     121 </span>            :         }
+<span class="lineNum">     122 </span><span class="lineCov">         67 :         bs = gf_bs_new(NULL, 0, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     123 </span><span class="lineCov">         67 :         if (avcc || svcc) {</span>
+<span class="lineNum">     124 </span><span class="lineCov">         23 :                 if (avcc &amp;&amp; !for_non_rap) {</span>
+<span class="lineNum">     125 </span><span class="lineCov">         23 :                         nalumx_write_ps_list(ctx, bs, avcc-&gt;sequenceParameterSets, for_non_rap);</span>
+<span class="lineNum">     126 </span>            :                 }
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">         23 :                 if (svcc &amp;&amp; !for_non_rap)</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :                         nalumx_write_ps_list(ctx, bs, svcc-&gt;sequenceParameterSets, for_non_rap);</span>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineCov">         23 :                 if (avcc &amp;&amp; avcc-&gt;sequenceParameterSetExtensions &amp;&amp; !for_non_rap)</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :                         nalumx_write_ps_list(ctx, bs, avcc-&gt;sequenceParameterSetExtensions, for_non_rap);</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">         23 :                 if (svcc &amp;&amp; svcc-&gt;sequenceParameterSetExtensions &amp;&amp; !for_non_rap)</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :                         nalumx_write_ps_list(ctx, bs, svcc-&gt;sequenceParameterSetExtensions, for_non_rap);</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">         23 :                 if (avcc)</span>
+<span class="lineNum">     138 </span><span class="lineCov">         23 :                         nalumx_write_ps_list(ctx, bs, avcc-&gt;pictureParameterSets, for_non_rap);</span>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineCov">         23 :                 if (svcc)</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :                         nalumx_write_ps_list(ctx, bs, svcc-&gt;pictureParameterSets, for_non_rap);</span>
+<span class="lineNum">     142 </span>            :         }
+<span class="lineNum">     143 </span><span class="lineCov">         67 :         if (hvcc || lvcc) {</span>
+<span class="lineNum">     144 </span><span class="lineCov">         44 :                 if (hvcc &amp;&amp; !for_non_rap)</span>
+<span class="lineNum">     145 </span><span class="lineCov">         44 :                         nalumx_write_ps_list(ctx, bs, nalumx_get_hevc_ps(hvcc, GF_HEVC_NALU_VID_PARAM), for_non_rap);</span>
+<span class="lineNum">     146 </span><span class="lineCov">         44 :                 if (lvcc &amp;&amp; !for_non_rap)</span>
+<span class="lineNum">     147 </span><span class="lineCov">          1 :                         nalumx_write_ps_list(ctx, bs, nalumx_get_hevc_ps(lvcc, GF_HEVC_NALU_VID_PARAM), for_non_rap);</span>
+<span class="lineNum">     148 </span><span class="lineCov">         44 :                 if (hvcc &amp;&amp; !for_non_rap)</span>
+<span class="lineNum">     149 </span><span class="lineCov">         44 :                         nalumx_write_ps_list(ctx, bs, nalumx_get_hevc_ps(hvcc, GF_HEVC_NALU_SEQ_PARAM), for_non_rap);</span>
+<span class="lineNum">     150 </span><span class="lineCov">         44 :                 if (lvcc &amp;&amp; !for_non_rap)</span>
+<span class="lineNum">     151 </span><span class="lineCov">          1 :                         nalumx_write_ps_list(ctx, bs, nalumx_get_hevc_ps(lvcc, GF_HEVC_NALU_SEQ_PARAM), for_non_rap);</span>
+<span class="lineNum">     152 </span><span class="lineCov">         44 :                 if (hvcc)</span>
+<span class="lineNum">     153 </span><span class="lineCov">         44 :                         nalumx_write_ps_list(ctx, bs, nalumx_get_hevc_ps(hvcc, GF_HEVC_NALU_PIC_PARAM), for_non_rap);</span>
+<span class="lineNum">     154 </span><span class="lineCov">         44 :                 if (lvcc)</span>
+<span class="lineNum">     155 </span><span class="lineCov">          1 :                         nalumx_write_ps_list(ctx, bs, nalumx_get_hevc_ps(lvcc, GF_HEVC_NALU_PIC_PARAM), for_non_rap);</span>
+<span class="lineNum">     156 </span>            :         }
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span><span class="lineCov">         67 :         if (vvcc || s_vvcc) {</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :                 u32 dump_types[] = {GF_VVC_NALU_VID_PARAM, GF_VVC_NALU_DEC_PARAM, GF_VVC_NALU_SEQ_PARAM, GF_VVC_NALU_PIC_PARAM, GF_VVC_NALU_APS_PREFIX, GF_VVC_NALU_SEI_PREFIX};</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :                 u32 i = for_non_rap ? 3 : 0;</span>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :                 for (; i&lt; GF_ARRAY_LENGTH(dump_types); i++) {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :                         if (vvcc)</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                                 nalumx_write_ps_list(ctx, bs, nalumx_get_vvc_ps(vvcc, dump_types[i]), for_non_rap);</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :                         if (s_vvcc)</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :                                 nalumx_write_ps_list(ctx, bs, nalumx_get_vvc_ps(s_vvcc, dump_types[i]), for_non_rap);</span>
+<span class="lineNum">     167 </span>            :                 }
+<span class="lineNum">     168 </span>            :         }
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">         67 :         if (for_non_rap) {</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;dsi_non_rap) gf_free(ctx-&gt;dsi_non_rap);</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :                 gf_bs_get_content(bs, &amp;ctx-&gt;dsi_non_rap, &amp;ctx-&gt;dsi_non_rap_size);</span>
+<span class="lineNum">     173 </span>            :         } else {
+<span class="lineNum">     174 </span><span class="lineCov">         67 :                 if (ctx-&gt;dsi) gf_free(ctx-&gt;dsi);</span>
+<span class="lineNum">     175 </span><span class="lineCov">         67 :                 gf_bs_get_content(bs, &amp;ctx-&gt;dsi, &amp;ctx-&gt;dsi_size);</span>
+<span class="lineNum">     176 </span>            :         }
+<span class="lineNum">     177 </span><span class="lineCov">         67 :         gf_bs_del(bs);</span>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineCov">         67 :         if (avcc) gf_odf_avc_cfg_del(avcc);</span>
+<span class="lineNum">     180 </span><span class="lineCov">         67 :         if (svcc) gf_odf_avc_cfg_del(svcc);</span>
+<span class="lineNum">     181 </span><span class="lineCov">         67 :         if (hvcc) gf_odf_hevc_cfg_del(hvcc);</span>
+<span class="lineNum">     182 </span><span class="lineCov">         67 :         if (lvcc) gf_odf_hevc_cfg_del(lvcc);</span>
+<span class="lineNum">     183 </span><span class="lineCov">         67 :         if (vvcc) gf_odf_vvc_cfg_del(vvcc);</span>
+<span class="lineNum">     184 </span><span class="lineCov">         67 :         if (s_vvcc) gf_odf_vvc_cfg_del(s_vvcc);</span>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">         67 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG, NULL);</span>
+<span class="lineNum">     187 </span><span class="lineCov">         67 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG_ENHANCEMENT, NULL);</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">         67 :         return GF_OK;</span>
+<a name="190"><span class="lineNum">     190 </span>            : }</a>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span><span class="lineCov">         87 : GF_Err nalumx_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     193 </span>            : {
+<span class="lineNum">     194 </span>            :         GF_Err e;
+<span class="lineNum">     195 </span>            :         u32 crc, crc_enh, codecid;
+<span class="lineNum">     196 </span>            :         const GF_PropertyValue *p, *dcd, *dcd_enh;
+<span class="lineNum">     197 </span><span class="lineCov">         87 :         GF_NALUMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span><span class="lineCov">         87 :         if (is_remove) {</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                 ctx-&gt;ipid = NULL;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">     204 </span>            :                 }
+<span class="lineNum">     205 </span>            :                 return GF_OK;
+<span class="lineNum">     206 </span>            :         }
+<span class="lineNum">     207 </span><span class="lineCov">         87 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">     208 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineCov">         87 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_CODECID);</span>
+<span class="lineNum">     211 </span><span class="lineCov">         87 :         if (!p) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     212 </span><span class="lineCov">         87 :         codecid = p-&gt;value.uint;</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :         //it may happen we don't have anything yet ...
+<span class="lineNum">     215 </span><span class="lineCov">         87 :         dcd = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG);</span>
+<span class="lineNum">     216 </span><span class="lineCov">         87 :         if (!dcd) {</span>
+<span class="lineNum">     217 </span>            :                 crc = -1;
+<span class="lineNum">     218 </span>            :         } else {
+<span class="lineNum">     219 </span><span class="lineCov">         87 :                 crc = gf_crc_32(dcd-&gt;value.data.ptr, dcd-&gt;value.data.size);</span>
+<span class="lineNum">     220 </span>            :         }
+<span class="lineNum">     221 </span><span class="lineCov">         87 :         dcd_enh = gf_filter_pid_get_property(pid, GF_PROP_PID_DECODER_CONFIG_ENHANCEMENT);</span>
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineCov">         87 :         crc_enh = dcd_enh ? gf_crc_32(dcd_enh-&gt;value.data.ptr, dcd_enh-&gt;value.data.size) : 0;</span>
+<span class="lineNum">     224 </span><span class="lineCov">         87 :         if ((ctx-&gt;crc == crc) &amp;&amp; (ctx-&gt;crc_enh == crc_enh)) return GF_OK;</span>
+<span class="lineNum">     225 </span><span class="lineCov">         67 :         ctx-&gt;crc = crc;</span>
+<span class="lineNum">     226 </span><span class="lineCov">         67 :         ctx-&gt;crc_enh = crc_enh;</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">         67 :         if ((codecid==GF_CODECID_HEVC) || (codecid==GF_CODECID_LHVC)) {</span>
+<span class="lineNum">     229 </span><span class="lineCov">         44 :                 ctx-&gt;vtype = UFNAL_HEVC;</span>
+<span class="lineNum">     230 </span><span class="lineCov">         23 :         } else if (codecid==GF_CODECID_VVC) {</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :                 ctx-&gt;vtype = UFNAL_VVC;</span>
+<span class="lineNum">     232 </span>            :         } else {
+<span class="lineNum">     233 </span><span class="lineCov">         23 :                 ctx-&gt;vtype = UFNAL_AVC;</span>
+<span class="lineNum">     234 </span>            :         }
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineCov">         67 :         ctx-&gt;width = ctx-&gt;height = 0;</span>
+<span class="lineNum">     237 </span><span class="lineCov">         67 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_WIDTH);</span>
+<span class="lineNum">     238 </span><span class="lineCov">         67 :         if (p) ctx-&gt;width = p-&gt;value.uint;</span>
+<span class="lineNum">     239 </span><span class="lineCov">         67 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_HEIGHT);</span>
+<span class="lineNum">     240 </span><span class="lineCov">         67 :         if (p) ctx-&gt;height = p-&gt;value.uint;</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">         67 :         if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     243 </span><span class="lineCov">         67 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     244 </span>            :         }
+<span class="lineNum">     245 </span>            :         //copy properties at init or reconfig
+<span class="lineNum">     246 </span><span class="lineCov">         67 :         gf_filter_pid_copy_properties(ctx-&gt;opid, pid);</span>
+<span class="lineNum">     247 </span><span class="lineCov">         67 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_UNFRAMED, &amp;PROP_BOOL(GF_TRUE) );</span>
+<span class="lineNum">     248 </span><span class="lineCov">         67 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG, NULL );</span>
+<span class="lineNum">     249 </span><span class="lineCov">         67 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_DECODER_CONFIG_ENHANCEMENT, NULL );</span>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">         67 :         ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     252 </span><span class="lineCov">         67 :         gf_filter_pid_set_framing_mode(ctx-&gt;ipid, GF_TRUE);</span>
+<span class="lineNum">     253 </span><span class="lineCov">         67 :         if (!dcd &amp;&amp; !dcd_enh)</span>
+<span class="lineNum">     254 </span>            :                 return GF_OK;
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">         67 :         e = nalumx_make_inband_header(ctx, dcd ? dcd-&gt;value.data.ptr : NULL, dcd ? dcd-&gt;value.data.size : 0, dcd_enh ? dcd_enh-&gt;value.data.ptr : NULL, dcd_enh ? dcd_enh-&gt;value.data.size : 0, GF_FALSE);</span>
+<span class="lineNum">     257 </span><span class="lineCov">         67 :         if (e) return e;</span>
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span><span class="lineCov">         67 :         if (!ctx-&gt;pps_inband || !ctx-&gt;rcfg) return GF_OK;</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :         return nalumx_make_inband_header(ctx, dcd ? dcd-&gt;value.data.ptr : NULL, dcd ? dcd-&gt;value.data.size : 0, dcd_enh ? dcd_enh-&gt;value.data.ptr : NULL, dcd_enh ? dcd_enh-&gt;value.data.size : 0, GF_TRUE);</span>
+<span class="lineNum">     261 </span>            : }
+<a name="262"><span class="lineNum">     262 </span>            : </a>
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">     136330 : static Bool nalumx_is_nal_skip(GF_NALUMxCtx *ctx, u8 *data, u32 pos, Bool *has_nal_delim, u32 *out_temporal_id, u32 *out_layer_id, u8 *avc_hdr)</span>
+<span class="lineNum">     265 </span>            : {
+<span class="lineNum">     266 </span>            :         Bool is_layer = GF_FALSE;
+<span class="lineNum">     267 </span><span class="lineCov">     136330 :         if (ctx-&gt;vtype==UFNAL_HEVC) {</span>
+<span class="lineNum">     268 </span><span class="lineCov">     122488 :                 u8 nal_type = (data[pos] &amp; 0x7E) &gt;&gt; 1;</span>
+<span class="lineNum">     269 </span><span class="lineCov">     122488 :                 u8 temporal_id = data[pos+1] &amp; 0x7;</span>
+<span class="lineNum">     270 </span>            :                 u8 layer_id = data[pos] &amp; 1;
+<span class="lineNum">     271 </span><span class="lineCov">     122488 :                 layer_id &lt;&lt;= 5;</span>
+<span class="lineNum">     272 </span><span class="lineCov">     122488 :                 layer_id |= (data[pos+1]&gt;&gt;3) &amp; 0x1F;</span>
+<span class="lineNum">     273 </span><span class="lineCov">     122488 :                 if (temporal_id &gt; *out_temporal_id) *out_temporal_id = temporal_id;</span>
+<span class="lineNum">     274 </span><span class="lineCov">     122488 :                 if (! (*out_layer_id) ) *out_layer_id = 1+layer_id;</span>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span><span class="lineCov">     122488 :                 switch (nal_type) {</span>
+<span class="lineNum">     277 </span>            :                 case GF_HEVC_NALU_VID_PARAM:
+<span class="lineNum">     278 </span>            :                         break;
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                 case GF_HEVC_NALU_ACCESS_UNIT:</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                         *has_nal_delim = GF_TRUE;</span>
+<span class="lineNum">     281 </span>            :                         break;
+<span class="lineNum">     282 </span><span class="lineCov">     122488 :                 default:</span>
+<span class="lineNum">     283 </span><span class="lineCov">     122488 :                         if (layer_id) is_layer = GF_TRUE;</span>
+<span class="lineNum">     284 </span>            :                         break;
+<span class="lineNum">     285 </span>            :                 }
+<span class="lineNum">     286 </span><span class="lineCov">      13842 :         } else if (ctx-&gt;vtype==UFNAL_VVC) {</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :                 u8 nal_type = data[pos+1] &gt;&gt; 3;</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :                 u8 temporal_id = data[pos+1] &amp; 0x7;</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :                 u8 layer_id = data[pos] &amp; 0x3f;</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :                 if (temporal_id &gt; *out_temporal_id) *out_temporal_id = temporal_id;</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                 if (! (*out_layer_id) ) *out_layer_id = 1+layer_id;</span>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                 switch (nal_type) {</span>
+<span class="lineNum">     294 </span>            :                 case GF_VVC_NALU_VID_PARAM:
+<span class="lineNum">     295 </span>            :                         break;
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :                 case GF_VVC_NALU_ACCESS_UNIT:</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                         *has_nal_delim = GF_TRUE;</span>
+<span class="lineNum">     298 </span>            :                         break;
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :                 default:</span>
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :                         if (layer_id) is_layer = GF_TRUE;</span>
+<span class="lineNum">     301 </span>            :                         break;
+<span class="lineNum">     302 </span>            :                 }
+<span class="lineNum">     303 </span>            :         } else {
+<span class="lineNum">     304 </span><span class="lineCov">      13842 :                 u32 nal_type = data[pos] &amp; 0x1F;</span>
+<span class="lineNum">     305 </span>            :                 switch (nal_type) {
+<span class="lineNum">     306 </span>            :                 case GF_AVC_NALU_SVC_PREFIX_NALU:
+<span class="lineNum">     307 </span>            :                 case GF_AVC_NALU_SVC_SLICE:
+<span class="lineNum">     308 </span>            :                 case GF_AVC_NALU_VDRD:
+<span class="lineNum">     309 </span>            :                 case GF_AVC_NALU_SVC_SUBSEQ_PARAM:
+<span class="lineNum">     310 </span>            :                 case GF_AVC_NALU_SEQ_PARAM:
+<span class="lineNum">     311 </span>            :                 case GF_AVC_NALU_SEQ_PARAM_EXT:
+<span class="lineNum">     312 </span>            :                 case GF_AVC_NALU_PIC_PARAM:
+<span class="lineNum">     313 </span>            :                         is_layer = GF_TRUE;
+<span class="lineNum">     314 </span>            :                         break;
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                 case GF_AVC_NALU_ACCESS_UNIT:</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :                         *has_nal_delim = GF_TRUE;</span>
+<span class="lineNum">     317 </span>            :                         break;
+<span class="lineNum">     318 </span><span class="lineCov">      13842 :                 default:</span>
+<span class="lineNum">     319 </span><span class="lineCov">      13842 :                         if (! (*avc_hdr))</span>
+<span class="lineNum">     320 </span><span class="lineCov">       6899 :                                 (*avc_hdr) = data[pos];</span>
+<span class="lineNum">     321 </span>            :                         break;
+<span class="lineNum">     322 </span>            :                 }
+<span class="lineNum">     323 </span>            :         }
+<span class="lineNum">     324 </span><span class="lineCov">     136330 :         if (ctx-&gt;extract==1) return is_layer ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">     325 </span><span class="lineCov">     136330 :         else if (ctx-&gt;extract==2) return is_layer ? GF_FALSE : GF_TRUE;</span>
+<span class="lineNum">     326 </span>            :         return GF_FALSE;
+<a name="327"><span class="lineNum">     327 </span>            : }</a>
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span><span class="lineCov">      40061 : GF_Err nalumx_process(GF_Filter *filter)</span>
+<span class="lineNum">     330 </span>            : {
+<span class="lineNum">     331 </span><span class="lineCov">      40061 :         GF_NALUMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     332 </span>            :         GF_FilterPacket *pck, *dst_pck;
+<span class="lineNum">     333 </span>            :         u8 *data, *output;
+<span class="lineNum">     334 </span>            :         u32 pck_size, size, sap=0, temporal_id, layer_id;
+<span class="lineNum">     335 </span>            :         u8 avc_hdr;
+<span class="lineNum">     336 </span>            :         u8 *dsi_buf = NULL;
+<span class="lineNum">     337 </span>            :         u32 dsi_buf_size = 0, dsi_nb_nal = 0;
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :         Bool has_nalu_delim = GF_FALSE;
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span><span class="lineCov">      40061 :         pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     342 </span><span class="lineCov">      40061 :         if (!pck) {</span>
+<span class="lineNum">     343 </span><span class="lineCov">      14574 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     344 </span><span class="lineCov">         67 :                         if (!ctx-&gt;nb_nalu &amp;&amp; ctx-&gt;dsi) {</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :                                 dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, ctx-&gt;dsi_size, &amp;output);</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                                 if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                                 memcpy(output, ctx-&gt;dsi, ctx-&gt;dsi_size);</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_set_sap(dst_pck, GF_FILTER_SAP_1);</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                                 gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                                 ctx-&gt;nb_nalu += ctx-&gt;nb_nalu_in_hdr;</span>
+<span class="lineNum">     352 </span>            :                         }
+<span class="lineNum">     353 </span><span class="lineCov">         67 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     354 </span><span class="lineCov">         67 :                         return GF_EOS;</span>
+<span class="lineNum">     355 </span>            :                 }
+<span class="lineNum">     356 </span>            :                 return GF_OK;
+<span class="lineNum">     357 </span>            :         }
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineCov">      25487 :         if (!ctx-&gt;nal_hdr_size) {</span>
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_AUTHOR, (&quot;[NALWrite] no NAL size length field set, assuming 4\n&quot;));</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                 ctx-&gt;nal_hdr_size = 4;</span>
+<span class="lineNum">     362 </span>            :         }
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineCov">      25487 :         data = (char *) gf_filter_pck_get_data(pck, &amp;pck_size);</span>
+<span class="lineNum">     365 </span><span class="lineCov">      25487 :         if (!pck_size || !data) {</span>
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     368 </span>            :         }
+<span class="lineNum">     369 </span><span class="lineCov">      25487 :         if (!ctx-&gt;bs_r) ctx-&gt;bs_r = gf_bs_new(data, pck_size, GF_BITSTREAM_READ);</span>
+<span class="lineNum">     370 </span><span class="lineCov">      25420 :         else gf_bs_reassign_buffer(ctx-&gt;bs_r, data, pck_size);</span>
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            :         size = 0;
+<span class="lineNum">     373 </span><span class="lineCov">      25487 :         temporal_id = layer_id = 0;</span>
+<span class="lineNum">     374 </span><span class="lineCov">      25487 :         avc_hdr = 0;</span>
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span><span class="lineCov">     119139 :         while (gf_bs_available((ctx-&gt;bs_r))) {</span>
+<span class="lineNum">     377 </span>            :                 Bool skip_nal = GF_FALSE;
+<span class="lineNum">     378 </span><span class="lineCov">      68165 :                 Bool is_nalu_delim = GF_FALSE;</span>
+<span class="lineNum">     379 </span>            :                 u32 pos;
+<span class="lineNum">     380 </span><span class="lineCov">      68165 :                 u32 nal_size = gf_bs_read_int(ctx-&gt;bs_r, 8*ctx-&gt;nal_hdr_size);</span>
+<span class="lineNum">     381 </span><span class="lineCov">      68165 :                 if (nal_size &gt; gf_bs_available(ctx-&gt;bs_r) ) {</span>
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :                         return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     384 </span>            :                 }
+<span class="lineNum">     385 </span><span class="lineCov">      68165 :                 pos = (u32) gf_bs_get_position(ctx-&gt;bs_r);</span>
+<span class="lineNum">     386 </span>            :                 //even if not filtering, parse to check for AU delim
+<span class="lineNum">     387 </span><span class="lineCov">      68165 :                 skip_nal = nalumx_is_nal_skip(ctx, data, pos, &amp;is_nalu_delim, &amp;layer_id, &amp;temporal_id, &amp;avc_hdr);</span>
+<span class="lineNum">     388 </span><span class="lineCov">      68165 :                 if (!ctx-&gt;extract) {</span>
+<span class="lineNum">     389 </span>            :                         skip_nal = GF_FALSE;
+<span class="lineNum">     390 </span>            :                 }
+<span class="lineNum">     391 </span><span class="lineCov">      68165 :                 if (is_nalu_delim) {</span>
+<span class="lineNum">     392 </span>            :                         has_nalu_delim = GF_TRUE;
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :                         if (!ctx-&gt;delim)</span>
+<span class="lineNum">     394 </span>            :                                 skip_nal = GF_TRUE;
+<span class="lineNum">     395 </span>            :                 }
+<span class="lineNum">     396 </span><span class="lineCov">      68165 :                 if (!skip_nal) {</span>
+<span class="lineNum">     397 </span><span class="lineCov">      68165 :                         size += nal_size + 4;</span>
+<span class="lineNum">     398 </span>            :                 }
+<span class="lineNum">     399 </span><span class="lineCov">      68165 :                 gf_bs_skip_bytes(ctx-&gt;bs_r, nal_size);</span>
+<span class="lineNum">     400 </span>            :         }
+<span class="lineNum">     401 </span><span class="lineCov">      25487 :         gf_bs_seek(ctx-&gt;bs_r, 0);</span>
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span><span class="lineCov">      25487 :         if (!ctx-&gt;delim)</span>
+<span class="lineNum">     404 </span>            :                 has_nalu_delim = GF_TRUE;
+<span class="lineNum">     405 </span>            : 
+<span class="lineNum">     406 </span>            :         //we need to insert NALU delim (2 bytes for avc, 3 for hevc or vvc)
+<span class="lineNum">     407 </span><span class="lineCov">      25487 :         if (!has_nalu_delim) {</span>
+<span class="lineNum">     408 </span><span class="lineCov">      25487 :                 size += (ctx-&gt;vtype != UFNAL_AVC) ? 3 : 2;</span>
+<span class="lineNum">     409 </span><span class="lineCov">      25487 :                 size += 4;</span>
+<span class="lineNum">     410 </span>            :         }
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span><span class="lineCov">      25487 :         if (ctx-&gt;dsi) {</span>
+<span class="lineNum">     413 </span>            :                 Bool insert_dsi = GF_FALSE;
+<span class="lineNum">     414 </span><span class="lineCov">      25487 :                 sap = gf_filter_pck_get_sap(pck);</span>
+<span class="lineNum">     415 </span><span class="lineCov">      25487 :                 if (sap &amp;&amp; (sap &lt;= GF_FILTER_SAP_3) ) {</span>
+<span class="lineNum">     416 </span>            :                         insert_dsi = GF_TRUE;
+<span class="lineNum">     417 </span>            :                 }
+<span class="lineNum">     418 </span>            :                 if (!insert_dsi) {
+<span class="lineNum">     419 </span><span class="lineCov">      24499 :                         u8 flags = gf_filter_pck_get_dependency_flags(pck);</span>
+<span class="lineNum">     420 </span>            :                         //get dependsOn
+<span class="lineNum">     421 </span><span class="lineCov">      24499 :                         if (flags) {</span>
+<span class="lineNum">     422 </span><span class="lineCov">         94 :                                 flags&gt;&gt;=4;</span>
+<span class="lineNum">     423 </span><span class="lineCov">         94 :                                 flags &amp;= 0x3;</span>
+<span class="lineNum">     424 </span><span class="lineCov">         94 :                                 if (flags==2) insert_dsi = GF_TRUE; //could be SAP 1, 2 or 3</span>
+<span class="lineNum">     425 </span>            :                         }
+<span class="lineNum">     426 </span>            :                 }
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span><span class="lineCov">      25487 :                 if (insert_dsi) {</span>
+<span class="lineNum">     429 </span><span class="lineCov">        988 :                         dsi_buf = ctx-&gt;dsi;</span>
+<span class="lineNum">     430 </span><span class="lineCov">        988 :                         dsi_buf_size = ctx-&gt;dsi_size;</span>
+<span class="lineNum">     431 </span><span class="lineCov">        988 :                         dsi_nb_nal = ctx-&gt;nb_nalu_in_hdr;</span>
+<span class="lineNum">     432 </span><span class="lineCov">      24499 :                 } else if (ctx-&gt;dsi_non_rap) {</span>
+<span class="lineNum">     433 </span>            :                         dsi_buf = ctx-&gt;dsi_non_rap;
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :                         dsi_buf_size = ctx-&gt;dsi_non_rap_size;</span>
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :                         dsi_nb_nal = ctx-&gt;nb_nalu_in_hdr_non_rap;</span>
+<span class="lineNum">     436 </span>            :                 }
+<span class="lineNum">     437 </span><span class="lineCov">      25487 :                 size += dsi_buf_size;</span>
+<span class="lineNum">     438 </span>            :         }
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span><span class="lineCov">      25487 :         dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, size, &amp;output);</span>
+<span class="lineNum">     441 </span><span class="lineCov">      25487 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span><span class="lineCov">      25487 :         if (!ctx-&gt;bs_w) ctx-&gt;bs_w = gf_bs_new(output, size, GF_BITSTREAM_WRITE);</span>
+<span class="lineNum">     444 </span><span class="lineCov">      25420 :         else gf_bs_reassign_buffer(ctx-&gt;bs_w, output, size);</span>
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            :         // nalu delimiter is not present, write it first
+<span class="lineNum">     447 </span><span class="lineCov">      25487 :         if (!has_nalu_delim) {</span>
+<span class="lineNum">     448 </span><span class="lineCov">      25487 :                 gf_bs_write_u32(ctx-&gt;bs_w, 1);</span>
+<span class="lineNum">     449 </span><span class="lineCov">      25487 :                 if (ctx-&gt;vtype==UFNAL_HEVC) {</span>
+<span class="lineNum">     450 </span><span class="lineCov">      18588 :                         if (!layer_id)</span>
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :                                 layer_id=1;</span>
+<span class="lineNum">     452 </span><span class="lineCov">      18588 :                         if (!temporal_id)</span>
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :                                 temporal_id=1;</span>
+<span class="lineNum">     454 </span>            : #ifndef GPAC_DISABLE_HEVC
+<span class="lineNum">     455 </span><span class="lineCov">      18588 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 1);</span>
+<span class="lineNum">     456 </span><span class="lineCov">      18588 :                         gf_bs_write_int(ctx-&gt;bs_w, GF_HEVC_NALU_ACCESS_UNIT, 6);</span>
+<span class="lineNum">     457 </span><span class="lineCov">      18588 :                         gf_bs_write_int(ctx-&gt;bs_w, layer_id-1, 6); //we should pick the layerID of the following nalus ...</span>
+<span class="lineNum">     458 </span><span class="lineCov">      18588 :                         gf_bs_write_int(ctx-&gt;bs_w, temporal_id, 3);</span>
+<span class="lineNum">     459 </span>            :                         /*pic-type - by default we signal all slice types possible*/
+<span class="lineNum">     460 </span><span class="lineCov">      18588 :                         gf_bs_write_int(ctx-&gt;bs_w, 2, 3);</span>
+<span class="lineNum">     461 </span><span class="lineCov">      18588 :                         gf_bs_write_int(ctx-&gt;bs_w, 1, 1); //stop bit</span>
+<span class="lineNum">     462 </span><span class="lineCov">      18588 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 4); //4 bits to 0</span>
+<span class="lineNum">     463 </span>            : #endif
+<span class="lineNum">     464 </span><span class="lineCov">       6899 :                 } else if (ctx-&gt;vtype==UFNAL_VVC) {</span>
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :                         if (!layer_id)</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :                                 layer_id=1;</span>
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :                         if (!temporal_id)</span>
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :                                 temporal_id=1;</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 1);</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 1);</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, layer_id-1, 6); //we should pick the layerID of the following nalus ...</span>
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, GF_VVC_NALU_ACCESS_UNIT, 5);</span>
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, temporal_id, 3);</span>
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, sap ? 1 : 0, 1);</span>
+<span class="lineNum">     475 </span>            :                         /*pic-type - by default we signal all slice types possible*/
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, 2, 3);</span>
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, 1, 1); //stop bit</span>
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :                         gf_bs_write_int(ctx-&gt;bs_w, 0, 3); //3 bits to 0</span>
+<span class="lineNum">     480 </span>            :                 } else {
+<span class="lineNum">     481 </span><span class="lineCov">       6899 :                         gf_bs_write_int(ctx-&gt;bs_w, (avc_hdr &amp; 0x60) | GF_AVC_NALU_ACCESS_UNIT, 8);</span>
+<span class="lineNum">     482 </span><span class="lineCov">       6899 :                         gf_bs_write_int(ctx-&gt;bs_w, 0xF0 , 8); /*7 &quot;all supported NALUs&quot; (=111) + rbsp trailing (10000)*/;</span>
+<span class="lineNum">     483 </span>            :                 }
+<span class="lineNum">     484 </span><span class="lineCov">      25487 :                 ctx-&gt;nb_nalu++;</span>
+<span class="lineNum">     485 </span>            :         }
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span><span class="lineCov">      93652 :         while (gf_bs_available((ctx-&gt;bs_r))) {</span>
+<span class="lineNum">     488 </span>            :                 u32 pos;
+<span class="lineNum">     489 </span>            :                 Bool skip_nal = GF_FALSE;
+<span class="lineNum">     490 </span><span class="lineCov">      68165 :                 Bool is_nalu_delim = GF_FALSE;</span>
+<span class="lineNum">     491 </span><span class="lineCov">      68165 :                 u32 nal_size = gf_bs_read_int(ctx-&gt;bs_r, 8*ctx-&gt;nal_hdr_size);</span>
+<span class="lineNum">     492 </span><span class="lineCov">      68165 :                 if (nal_size &gt; gf_bs_available(ctx-&gt;bs_r) ) {</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :                         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :                         return GF_NON_COMPLIANT_BITSTREAM;</span>
+<span class="lineNum">     495 </span>            :                 }
+<span class="lineNum">     496 </span><span class="lineCov">      68165 :                 pos = (u32) gf_bs_get_position(ctx-&gt;bs_r);</span>
+<span class="lineNum">     497 </span>            : 
+<span class="lineNum">     498 </span><span class="lineCov">      68165 :                 skip_nal = nalumx_is_nal_skip(ctx, data, pos, &amp;is_nalu_delim, &amp;layer_id, &amp;temporal_id, &amp;avc_hdr);</span>
+<span class="lineNum">     499 </span><span class="lineCov">      68165 :                 if (!ctx-&gt;extract) {</span>
+<span class="lineNum">     500 </span>            :                         skip_nal = GF_FALSE;
+<span class="lineNum">     501 </span>            :                 }
+<span class="lineNum">     502 </span>            :                 //we don't serialize nalu delimiter, skip nal
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :                 else if (!ctx-&gt;delim &amp;&amp; is_nalu_delim) {</span>
+<span class="lineNum">     504 </span>            :                         skip_nal = GF_TRUE;
+<span class="lineNum">     505 </span>            :                 }
+<span class="lineNum">     506 </span>            : 
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :                 if (skip_nal) {</span>
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :                         gf_bs_skip_bytes(ctx-&gt;bs_r, nal_size);</span>
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     511 </span>            :                 }
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            :                 //insert dsi only after NALUD if any
+<span class="lineNum">     514 </span><span class="lineCov">      68165 :                 if (dsi_buf &amp;&amp; !is_nalu_delim) {</span>
+<span class="lineNum">     515 </span><span class="lineCov">        988 :                         gf_bs_write_data(ctx-&gt;bs_w, dsi_buf, dsi_buf_size);</span>
+<span class="lineNum">     516 </span><span class="lineCov">        988 :                         ctx-&gt;nb_nalu += dsi_nb_nal;</span>
+<span class="lineNum">     517 </span>            :                         dsi_buf = NULL;
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span><span class="lineCov">        988 :                         if (!ctx-&gt;rcfg) {</span>
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :                                 gf_free(ctx-&gt;dsi);</span>
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :                                 ctx-&gt;dsi = NULL;</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :                                 ctx-&gt;dsi_size = 0;</span>
+<span class="lineNum">     523 </span>            :                         }
+<span class="lineNum">     524 </span>            :                 }
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span><span class="lineCov">      68165 :                 gf_bs_write_u32(ctx-&gt;bs_w, 1);</span>
+<span class="lineNum">     527 </span><span class="lineCov">      68165 :                 gf_bs_write_data(ctx-&gt;bs_w, data+pos, nal_size);</span>
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span><span class="lineCov">      68165 :                 gf_bs_skip_bytes(ctx-&gt;bs_r, nal_size);</span>
+<span class="lineNum">     530 </span><span class="lineCov">      68165 :                 ctx-&gt;nb_nalu++;</span>
+<span class="lineNum">     531 </span>            :         }
+<span class="lineNum">     532 </span><span class="lineCov">      25487 :         gf_filter_pck_merge_properties(pck, dst_pck);</span>
+<span class="lineNum">     533 </span><span class="lineCov">      25487 :         gf_filter_pck_set_byte_offset(dst_pck, GF_FILTER_NO_BO);</span>
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span><span class="lineCov">      25487 :         gf_filter_pck_set_framing(dst_pck, GF_TRUE, GF_TRUE);</span>
+<span class="lineNum">     536 </span><span class="lineCov">      25487 :         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span><span class="lineCov">      25487 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span><span class="lineCov">      25487 :         if (gf_filter_reporting_enabled(filter)) {</span>
+<span class="lineNum">     541 </span>            :                 char szStatus[1024];
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :                 sprintf(szStatus, &quot;%s Annex-B %dx%d % 10d NALU&quot;, (ctx-&gt;vtype==UFNAL_HEVC) ? &quot;HEVC&quot; : ((ctx-&gt;vtype==UFNAL_VVC) ? &quot;VVC&quot; : &quot;AVC|H264&quot;), ctx-&gt;width, ctx-&gt;height, ctx-&gt;nb_nalu);</span>
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :                 gf_filter_update_status(filter, -1, szStatus);</span>
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span>            :         }
+<span class="lineNum">     547 </span>            :         return GF_OK;
+<a name="548"><span class="lineNum">     548 </span>            : }</a>
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span><span class="lineCov">         67 : static void nalumx_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     551 </span>            : {
+<span class="lineNum">     552 </span><span class="lineCov">         67 :         GF_NALUMxCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     553 </span><span class="lineCov">         67 :         if (ctx-&gt;bs_r) gf_bs_del(ctx-&gt;bs_r);</span>
+<span class="lineNum">     554 </span><span class="lineCov">         67 :         if (ctx-&gt;bs_w) gf_bs_del(ctx-&gt;bs_w);</span>
+<span class="lineNum">     555 </span><span class="lineCov">         67 :         if (ctx-&gt;dsi) gf_free(ctx-&gt;dsi);</span>
+<span class="lineNum">     556 </span><span class="lineCov">         67 :         if (ctx-&gt;dsi_non_rap) gf_free(ctx-&gt;dsi_non_rap);</span>
+<span class="lineNum">     557 </span><span class="lineCov">         67 : }</span>
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span>            : static const GF_FilterCapability NALUMxCaps[] =
+<span class="lineNum">     560 </span>            : {
+<span class="lineNum">     561 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     562 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_AVC),
+<span class="lineNum">     563 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT_OPT,GF_PROP_PID_CODECID, GF_CODECID_AVC_PS),
+<span class="lineNum">     564 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT_OPT,GF_PROP_PID_CODECID, GF_CODECID_SVC),
+<span class="lineNum">     565 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT_OPT,GF_PROP_PID_CODECID, GF_CODECID_MVC),
+<span class="lineNum">     566 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     567 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     568 </span>            :         {0},
+<span class="lineNum">     569 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     570 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_HEVC),
+<span class="lineNum">     571 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT_OPT,GF_PROP_PID_CODECID, GF_CODECID_LHVC),
+<span class="lineNum">     572 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     573 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_TILE_BASE, GF_TRUE),
+<span class="lineNum">     574 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     575 </span>            :         {0},
+<span class="lineNum">     576 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     577 </span>            :         CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_VVC),
+<span class="lineNum">     578 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     579 </span>            :         CAP_BOOL(GF_CAPS_INPUT_EXCLUDED, GF_PROP_PID_TILE_BASE, GF_TRUE),
+<span class="lineNum">     580 </span>            :         CAP_BOOL(GF_CAPS_OUTPUT, GF_PROP_PID_UNFRAMED, GF_TRUE),
+<span class="lineNum">     581 </span>            : };
+<span class="lineNum">     582 </span>            : 
+<span class="lineNum">     583 </span>            : 
+<span class="lineNum">     584 </span>            : #define OFFS(_n)        #_n, offsetof(GF_NALUMxCtx, _n)
+<span class="lineNum">     585 </span>            : static const GF_FilterArgs NALUMxArgs[] =
+<span class="lineNum">     586 </span>            : {
+<span class="lineNum">     587 </span>            :         { OFFS(rcfg), &quot;force repeating decoder config at each I-frame&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, 0},
+<span class="lineNum">     588 </span>            :         { OFFS(extract), &quot;layer extraction mode\n&quot;
+<span class="lineNum">     589 </span>            :         &quot;- all: extracts all layers\n&quot;
+<span class="lineNum">     590 </span>            :         &quot;- base: extract base layer only\n&quot;
+<span class="lineNum">     591 </span>            :         &quot;- layer: extract non-base layer(s) only&quot;, GF_PROP_UINT, &quot;all&quot;, &quot;all|base|layer&quot;, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     592 </span>            :         { OFFS(delim), &quot;insert AU Delimiter NAL&quot;, GF_PROP_BOOL, &quot;true&quot;, NULL, GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     593 </span>            :         { OFFS(pps_inband), &quot;inject PPS at each non SAP frame, ignored if rcfg is not set&quot;, GF_PROP_BOOL, &quot;false&quot;, NULL, 0},
+<span class="lineNum">     594 </span>            :         {0}
+<span class="lineNum">     595 </span>            : };
+<span class="lineNum">     596 </span>            : 
+<span class="lineNum">     597 </span>            : 
+<span class="lineNum">     598 </span>            : GF_FilterRegister NALUMxRegister = {
+<span class="lineNum">     599 </span>            :         .name = &quot;ufnalu&quot;,
+<span class="lineNum">     600 </span>            :         GF_FS_SET_DESCRIPTION(&quot;AVC/HEVC to AnnexB writer&quot;)
+<span class="lineNum">     601 </span>            :         GF_FS_SET_HELP(&quot;This filter converts AVC|H264 and HEVC streams into AnnexB format, with inband parameter sets and start codes.&quot;)
+<span class="lineNum">     602 </span>            :         .private_size = sizeof(GF_NALUMxCtx),
+<span class="lineNum">     603 </span>            :         .args = NALUMxArgs,
+<span class="lineNum">     604 </span>            :         .finalize = nalumx_finalize,
+<span class="lineNum">     605 </span>            :         SETCAPS(NALUMxCaps),
+<span class="lineNum">     606 </span>            :         .configure_pid = nalumx_configure_pid,
+<span class="lineNum">     607 </span>            :         .process = nalumx_process
+<span class="lineNum">     608 </span>            : };
+<a name="609"><span class="lineNum">     609 </span>            : </a>
+<span class="lineNum">     610 </span>            : 
+<span class="lineNum">     611 </span><span class="lineCov">       2877 : const GF_FilterRegister *nalumx_register(GF_FilterSession *session)</span>
+<span class="lineNum">     612 </span>            : {
+<span class="lineNum">     613 </span><span class="lineCov">       2877 :         return &amp;NALUMxRegister;</span>
+<span class="lineNum">     614 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

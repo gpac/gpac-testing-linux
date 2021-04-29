@@ -1,0 +1,36 @@
+*** raw-vid-yuv logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:37 ***
+
+
+*** Subtest "dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/vid.mp4 -o ./results/temp/raw.yuv -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+Computing ./results/temp/raw.yuv  (dump) hash: 
+File hash (SHA-1): 4D76BA4F6D0853BA6F8976DBACB5333741B0A286
+Hash OK for ./results/temp/raw.yuv
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 inspect:fmt=@pn@-@cts@-@bo@@lf@:log=./results/temp/dump.txt" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 8AFE9BB661746749F5247F774C63C26B7538195B
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "inspect_reverse": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 inspect:fmt=@pn@-@cts@-@bo@@lf@:speed=-1:log=./results/temp/dumpns.txt" ***
+
+Computing ./results/temp/dumpns.txt  (inspect_reverse) hash: 
+File hash (SHA-1): D964A07F15376BB0AB61213A5E156542393B54D2
+Hash OK for ./results/temp/dumpns.txt
+
+*** Subtest "gpu_dump": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 vout:dumpframes=20:out=./results/temp/gpudump.rgb" ***
+Type 'h' in window for command list
+
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 vcrop:wnd=32x10x64x64 @ -o ./results/temp/dumpcrop.yuv" ***
+
+Computing ./results/temp/dumpcrop.yuv  (crop) hash: 
+File hash (SHA-1): 1C8EECF8075A436B8D1C301BADEBB1A8AE00B453
+Hash OK for ./results/temp/dumpcrop.yuv
+
+*** Subtest "crop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.yuv:size=128x128 vcrop:copy:wnd=32x10x64x64 @ -o ./results/temp/dumpcropcp.yuv" ***
+
+Computing ./results/temp/dumpcropcp.yuv  (crop) hash: 
+File hash (SHA-1): 1C8EECF8075A436B8D1C301BADEBB1A8AE00B453
+Hash OK for ./results/temp/dumpcropcp.yuv

@@ -1,0 +1,46 @@
+*** avc-au-delim logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:28:51 ***
+
+
+*** Subtest "create-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264 -new ./results/temp/test.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test.mp4  (create-mp4) hash: 
+File hash (SHA-1): 12A035C2E9B0EB18E845EDD1CBFEE3D94D76EE13
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "dump-mp4": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -raw 1 ./results/temp/test.mp4 -out ./results/temp/test.avc" ***
+Exporting MPEG-4 AVC|H264 Video - Size 128x128
+
+
+*** Subtest "audelim": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/test.avc:au_delim -new ./results/temp/test-aud.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (352 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test-aud.mp4  (audelim) hash: 
+File hash (SHA-1): 625AB8BD9D37977B0889AC5DFBA983DACCAA66C6
+Hash OK for ./results/temp/test-aud.mp4
+
+*** Subtest "xpsinband": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/test.avc:xps_inband -new ./results/temp/test-xpsib.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (352 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test-xpsib.mp4  (xpsinband) hash: 
+File hash (SHA-1): B473EBA67D3F5072808E487DD1BA6E393C8A6C91
+Hash OK for ./results/temp/test-xpsib.mp4
+
+*** Subtest "xpsinband_audelim": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./results/temp/test.avc:xps_inband:au_delim -new ./results/temp/test-xpsib-aud.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (352 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test-xpsib-aud.mp4  (xpsinband_audelim) hash: 
+File hash (SHA-1): A77D7CCCEE0B414C53C14F61992064522B1D910C
+Hash OK for ./results/temp/test-xpsib-aud.mp4

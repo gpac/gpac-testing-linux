@@ -1,0 +1,415 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - compositor/audio_input.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">compositor</a> - audio_input.c<span style="font-size: 80%;"> (source / <a href="audio_input.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">116</td>
+            <td class="headerCovTableEntry">157</td>
+            <td class="headerCovTableEntryLo">73.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2018
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / Scene Compositor sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/internal/compositor_dev.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #define ENABLE_EARLY_FRAME_DETECTION
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : /*diff time in ms to consider an audio frame too late and drop it - we should try to dynamically figure this out
+<span class="lineNum">      31 </span>            : since the drift may be high on TS for example, where PTS-PCR&gt;500ms is quite common*/
+<span class="lineNum">      32 </span>            : #define MAX_RESYNC_TIME         1000
+<span class="lineNum">      33 </span>            : //if drift between audio object time and clock varies more is than this value (in ms) between two drift computation, clock is adjusted. We don't adjust for lower values otherwise we would
+<span class="lineNum">      34 </span>            : //introduce oscillations in the clock and non-smooth playback
+<span class="lineNum">      35 </span>            : #define MIN_DRIFT_ADJUST        75
+<a name="36"><span class="lineNum">      36 </span>            : </a>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineCov">      39475 : static u8 *gf_audio_input_fetch_frame(void *callback, u32 *size, u32 *planar_size, u32 audio_delay_ms)</span>
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span>            :         char *frame;
+<span class="lineNum">      41 </span>            :         u32 obj_time, ts;
+<span class="lineNum">      42 </span>            :         s32 drift;
+<span class="lineNum">      43 </span>            :         Fixed speed;
+<span class="lineNum">      44 </span>            :         Bool done;
+<span class="lineNum">      45 </span>            :         GF_AudioInput *ai = (GF_AudioInput *) callback;
+<span class="lineNum">      46 </span>            :         /*even if the stream is signaled as finished we must check it, because it may have been restarted by a mediaControl*/
+<span class="lineNum">      47 </span><span class="lineCov">      39475 :         if (!ai-&gt;stream) return NULL;</span>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">      39475 :         done = ai-&gt;stream_finished;</span>
+<span class="lineNum">      50 </span><span class="lineCov">      39475 :         ai-&gt;input_ifce.is_buffering = GF_FALSE;</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineCov">      39475 :         frame = gf_mo_fetch_data(ai-&gt;stream, ai-&gt;compositor-&gt;audio_renderer-&gt;non_rt_output ? GF_MO_FETCH_PAUSED : GF_MO_FETCH, 0, &amp;ai-&gt;stream_finished, &amp;ts, size, NULL, NULL, NULL, planar_size);</span>
+<span class="lineNum">      53 </span>            :         /*invalidate scene on end of stream to refresh audio graph*/
+<span class="lineNum">      54 </span><span class="lineCov">      39475 :         if (done != ai-&gt;stream_finished) {</span>
+<span class="lineNum">      55 </span><span class="lineCov">          8 :                 gf_sc_invalidate(ai-&gt;compositor, NULL);</span>
+<span class="lineNum">      56 </span>            :         }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :         /*no more data or not enough data, reset syncro drift*/
+<span class="lineNum">      59 </span><span class="lineCov">      39475 :         if (!frame) {</span>
+<span class="lineNum">      60 </span><span class="lineCov">      28027 :                 if (!ai-&gt;stream_finished &amp;&amp; gf_mo_is_started(ai-&gt;stream) &amp;&amp; (ai-&gt;stream-&gt;odm-&gt;ck-&gt;speed == FIX_ONE)) {</span>
+<span class="lineNum">      61 </span><span class="lineCov">      17826 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Audio Input] No data in audio object\n&quot;));</span>
+<span class="lineNum">      62 </span>            :                 }
+<span class="lineNum">      63 </span><span class="lineCov">      28027 :                 gf_mo_adjust_clock(ai-&gt;stream, 0);</span>
+<span class="lineNum">      64 </span><span class="lineCov">      28027 :                 ai-&gt;input_ifce.is_buffering = gf_mo_is_buffering(ai-&gt;stream);</span>
+<span class="lineNum">      65 </span><span class="lineCov">      28027 :                 *size = 0;</span>
+<span class="lineNum">      66 </span><span class="lineCov">      28027 :                 return NULL;</span>
+<span class="lineNum">      67 </span>            :         }
+<span class="lineNum">      68 </span><span class="lineCov">      11448 :         ai-&gt;need_release = GF_TRUE;</span>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :         //step mode, return the frame without sync check
+<span class="lineNum">      71 </span><span class="lineCov">      11448 :         if (ai-&gt;compositor-&gt;audio_renderer-&gt;non_rt_output) {</span>
+<span class="lineNum">      72 </span><span class="lineCov">      11448 :                 GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Audio Input] audio frame CTS %u %d bytes fetched\n&quot;, ts, *size));</span>
+<span class="lineNum">      73 </span>            :                 return frame;
+<span class="lineNum">      74 </span>            :         }
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :         speed = gf_mo_get_current_speed(ai-&gt;stream);</span>
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :         gf_mo_get_object_time(ai-&gt;stream, &amp;obj_time);</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :         obj_time += audio_delay_ms;</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :         if (ai-&gt;compositor-&gt;bench_mode) {</span>
+<span class="lineNum">      81 </span>            :                 drift = 0;
+<span class="lineNum">      82 </span>            :         } else {
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                 drift = (s32)obj_time;</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :                 drift -= (s32)ts;</span>
+<span class="lineNum">      85 </span>            :         }
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :         if (ai-&gt;stream-&gt;odm-&gt;prev_clock_at_discontinuity_plus_one) {</span>
+<span class="lineNum">      87 </span>            :                 s32 drift_old = drift;
+<span class="lineNum">      88 </span>            :                 s32 diff;
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :                 drift_old -= (s32) ai-&gt;stream-&gt;odm-&gt;ck-&gt;init_timestamp;</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :                 drift_old += (s32) ai-&gt;stream-&gt;odm-&gt;prev_clock_at_discontinuity_plus_one - 1;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :                 diff = ABS(drift_old);</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :                 diff -= ABS(drift);</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :                 if (diff &lt; 0) {</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_SYNC, (&quot;[Audio Input] in clock discontinuity: drift old clock %d new clock %d - disabling clock adjustment\n&quot;, drift_old, drift));</span>
+<span class="lineNum">      95 </span>            :                         drift = 0;
+<span class="lineNum">      96 </span>            :                         audio_delay_ms = 0;
+<span class="lineNum">      97 </span>            :                 } else {
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_SYNC, (&quot;[Audio Input] end of clock discontinuity: drift old clock %d new clock %d\n&quot;, drift_old, drift));</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :                         ai-&gt;stream-&gt;odm-&gt;prev_clock_at_discontinuity_plus_one = 0;</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :                         if (drift&lt;0) {</span>
+<span class="lineNum">     101 </span>            :                                 drift = 0;
+<span class="lineNum">     102 </span>            :                         }
+<span class="lineNum">     103 </span>            :                 }
+<span class="lineNum">     104 </span>            :         }
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : #ifdef ENABLE_EARLY_FRAME_DETECTION
+<span class="lineNum">     107 </span>            :         /*too early (silence insertions), skip*/
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :         if (drift &lt; 0) {</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_INFO, GF_LOG_AUDIO, (&quot;[Audio Input] audio too early of %d (CTS %u at OTB %u with audio delay %d ms)\n&quot;, drift + audio_delay_ms, ts, obj_time, audio_delay_ms));</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :                 ai-&gt;need_release = GF_FALSE;</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                 gf_mo_release_data(ai-&gt;stream, 0, -1);</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                 *size = 0;</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     114 </span>            :         }
+<span class="lineNum">     115 </span>            : #endif
+<span class="lineNum">     116 </span>            :         /*adjust drift*/
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :         if (audio_delay_ms) {</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :                 s32 resync_delay = speed &gt; 0 ? FIX2INT(speed * MAX_RESYNC_TIME) : FIX2INT(-speed * MAX_RESYNC_TIME);</span>
+<span class="lineNum">     119 </span>            :                 /*CU is way too late, discard and fetch a new one - this usually happen when media speed is more than 1*/
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :                 if (drift&gt;resync_delay) {</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_INFO, GF_LOG_AUDIO, (&quot;[Audio Input] Audio data too late obj time %d - CTS %d - drift %d ms - resync forced\n&quot;, obj_time - audio_delay_ms, ts, drift));</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :                         gf_mo_release_data(ai-&gt;stream, *size, 2);</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                         ai-&gt;need_release = GF_FALSE;</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :                         return gf_audio_input_fetch_frame(callback, size, planar_size, audio_delay_ms);</span>
+<span class="lineNum">     125 </span>            :                 }
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                 if (ai-&gt;stream-&gt;odm &amp;&amp; ai-&gt;stream-&gt;odm-&gt;ck)</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :                         resync_delay = ai-&gt;stream-&gt;odm-&gt;ck-&gt;audio_delay - drift;</span>
+<span class="lineNum">     128 </span>            :                 else
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :                         resync_delay = -drift;</span>
+<span class="lineNum">     130 </span>            :                         
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :                 if (resync_delay &lt; 0) resync_delay = -resync_delay;</span>
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :                 if (resync_delay &gt; MIN_DRIFT_ADJUST) {</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_DEBUG, GF_LOG_AUDIO, (&quot;[Audio Input] Audio clock: delay %d - obj time %d - audio delay %d - CTS %d - adjust drift %d\n&quot;, audio_delay_ms, obj_time, audio_delay_ms, ts, drift));</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :                         gf_mo_adjust_clock(ai-&gt;stream, drift);</span>
+<span class="lineNum">     136 </span>            :                 }
+<span class="lineNum">     137 </span>            :         }
+<span class="lineNum">     138 </span>            :         return frame;
+<a name="139"><span class="lineNum">     139 </span>            : }</a>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineCov">      11448 : static void gf_audio_input_release_frame(void *callback, u32 nb_bytes)</span>
+<span class="lineNum">     142 </span>            : {
+<span class="lineNum">     143 </span>            :         GF_AudioInput *ai = (GF_AudioInput *) callback;
+<span class="lineNum">     144 </span><span class="lineCov">      11448 :         if (!ai-&gt;stream) return;</span>
+<span class="lineNum">     145 </span><span class="lineCov">      11448 :         gf_mo_release_data(ai-&gt;stream, nb_bytes, 1);</span>
+<span class="lineNum">     146 </span><span class="lineCov">      11448 :         ai-&gt;need_release = GF_FALSE;</span>
+<a name="147"><span class="lineNum">     147 </span>            : }</a>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineCov">      36543 : static Fixed gf_audio_input_get_speed(void *callback)</span>
+<span class="lineNum">     150 </span>            : {
+<span class="lineNum">     151 </span>            :         GF_AudioInput *ai = (GF_AudioInput *) callback;
+<span class="lineNum">     152 </span><span class="lineCov">      36543 :         return gf_mo_get_current_speed(ai-&gt;stream);</span>
+<a name="153"><span class="lineNum">     153 </span>            : }</a>
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span><span class="lineCov">      34018 : static Bool gf_audio_input_get_volume(void *callback, Fixed *vol)</span>
+<span class="lineNum">     156 </span>            : {
+<span class="lineNum">     157 </span>            :         GF_AudioInput *ai = (GF_AudioInput *) callback;
+<span class="lineNum">     158 </span><span class="lineCov">      34018 :         if (ai-&gt;snd &amp;&amp; ai-&gt;snd-&gt;GetChannelVolume) {</span>
+<span class="lineNum">     159 </span><span class="lineCov">      33869 :                 return ai-&gt;snd-&gt;GetChannelVolume(ai-&gt;snd-&gt;owner, vol);</span>
+<span class="lineNum">     160 </span>            :         } else {
+<span class="lineNum">     161 </span>            :                 u32 i;
+<span class="lineNum">     162 </span><span class="lineCov">       3576 :                 for (i=0; i&lt;GF_AUDIO_MIXER_MAX_CHANNELS; i++)</span>
+<span class="lineNum">     163 </span><span class="lineCov">       3576 :                         vol[i] = ai-&gt;intensity;</span>
+<span class="lineNum">     164 </span>            :                         
+<span class="lineNum">     165 </span><span class="lineCov">        149 :                 return (ai-&gt;intensity==FIX_ONE) ? GF_FALSE : GF_TRUE;</span>
+<span class="lineNum">     166 </span>            :         }
+<a name="167"><span class="lineNum">     167 </span>            : }</a>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineCov">     102433 : static Bool gf_audio_input_is_muted(void *callback)</span>
+<span class="lineNum">     170 </span>            : {
+<span class="lineNum">     171 </span>            :         GF_AudioInput *ai = (GF_AudioInput *) callback;
+<span class="lineNum">     172 </span><span class="lineCov">     102433 :         if (!ai-&gt;stream) return GF_TRUE;</span>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span><span class="lineCov">     102433 :         if (ai-&gt;stream-&gt;odm-&gt;nb_buffering)</span>
+<span class="lineNum">     175 </span><span class="lineCov">      13619 :                 gf_odm_check_buffering(ai-&gt;stream-&gt;odm, NULL);</span>
+<span class="lineNum">     176 </span><span class="lineCov">     102433 :         if (ai-&gt;is_muted)</span>
+<span class="lineNum">     177 </span>            :                 return GF_TRUE;
+<span class="lineNum">     178 </span><span class="lineCov">     102433 :         return gf_mo_is_muted(ai-&gt;stream);</span>
+<a name="179"><span class="lineNum">     179 </span>            : }</a>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">      68576 : static Bool gf_audio_input_get_config(GF_AudioInterface *aifc, Bool for_recf)</span>
+<span class="lineNum">     182 </span>            : {
+<span class="lineNum">     183 </span><span class="lineCov">      68576 :         GF_AudioInput *ai = (GF_AudioInput *) aifc-&gt;callback;</span>
+<span class="lineNum">     184 </span><span class="lineCov">      68576 :         if (!ai-&gt;stream) return GF_FALSE;</span>
+<span class="lineNum">     185 </span>            :         /*watchout for object reuse*/
+<span class="lineNum">     186 </span><span class="lineCov">      68507 :         if (aifc-&gt;samplerate &amp;&amp;  !ai-&gt;stream-&gt;config_changed) return GF_TRUE;</span>
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineCov">         77 :         gf_mo_get_audio_info(ai-&gt;stream, &amp;aifc-&gt;samplerate, &amp;aifc-&gt;afmt , &amp;aifc-&gt;chan, &amp;aifc-&gt;ch_layout, &amp;aifc-&gt;forced_layout);</span>
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineCov">         77 :         if (!for_recf)</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :                 return aifc-&gt;samplerate ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineCov">         77 :         if (aifc-&gt;samplerate &amp;&amp; aifc-&gt;chan &amp;&amp; aifc-&gt;afmt &amp;&amp; ((aifc-&gt;chan&lt;=2) || aifc-&gt;ch_layout))  {</span>
+<span class="lineNum">     194 </span><span class="lineCov">         21 :                 ai-&gt;stream-&gt;config_changed = GF_FALSE;</span>
+<span class="lineNum">     195 </span><span class="lineCov">         21 :                 return GF_TRUE;</span>
+<span class="lineNum">     196 </span>            :         }
+<span class="lineNum">     197 </span>            :         //still not ready !
+<span class="lineNum">     198 </span><span class="lineCov">         56 :         ai-&gt;stream-&gt;config_changed=GF_TRUE;</span>
+<span class="lineNum">     199 </span><span class="lineCov">         56 :         return GF_FALSE;</span>
+<span class="lineNum">     200 </span>            : }
+<a name="201"><span class="lineNum">     201 </span>            : </a>
+<span class="lineNum">     202 </span>            : GF_EXPORT
+<span class="lineNum">     203 </span><span class="lineCov">        236 : void gf_sc_audio_setup(GF_AudioInput *ai, GF_Compositor *compositor, GF_Node *node)</span>
+<span class="lineNum">     204 </span>            : {
+<span class="lineNum">     205 </span>            :         memset(ai, 0, sizeof(GF_AudioInput));
+<span class="lineNum">     206 </span><span class="lineCov">        236 :         ai-&gt;owner = node;</span>
+<span class="lineNum">     207 </span><span class="lineCov">        236 :         ai-&gt;compositor = compositor;</span>
+<span class="lineNum">     208 </span><span class="lineCov">        236 :         ai-&gt;stream = NULL;</span>
+<span class="lineNum">     209 </span>            :         /*setup io interface*/
+<span class="lineNum">     210 </span><span class="lineCov">        236 :         ai-&gt;input_ifce.FetchFrame = gf_audio_input_fetch_frame;</span>
+<span class="lineNum">     211 </span><span class="lineCov">        236 :         ai-&gt;input_ifce.ReleaseFrame = gf_audio_input_release_frame;</span>
+<span class="lineNum">     212 </span><span class="lineCov">        236 :         ai-&gt;input_ifce.GetConfig = gf_audio_input_get_config;</span>
+<span class="lineNum">     213 </span><span class="lineCov">        236 :         ai-&gt;input_ifce.GetChannelVolume = gf_audio_input_get_volume;</span>
+<span class="lineNum">     214 </span><span class="lineCov">        236 :         ai-&gt;input_ifce.GetSpeed = gf_audio_input_get_speed;</span>
+<span class="lineNum">     215 </span><span class="lineCov">        236 :         ai-&gt;input_ifce.IsMuted = gf_audio_input_is_muted;</span>
+<span class="lineNum">     216 </span><span class="lineCov">        236 :         ai-&gt;input_ifce.callback = ai;</span>
+<span class="lineNum">     217 </span><span class="lineCov">        236 :         ai-&gt;intensity = FIX_ONE;</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">        236 :         ai-&gt;speed = FIX_ONE;</span>
+<span class="lineNum">     220 </span>            : 
+<a name="221"><span class="lineNum">     221 </span><span class="lineCov">        236 : }</span></a>
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineCov">        236 : void gf_sc_audio_predestroy(GF_AudioInput *ai)</span>
+<span class="lineNum">     224 </span>            : {
+<span class="lineNum">     225 </span><span class="lineCov">        236 :         gf_sc_audio_stop(ai);</span>
+<span class="lineNum">     226 </span><span class="lineCov">        236 :         gf_sc_audio_unregister(ai);</span>
+<span class="lineNum">     227 </span><span class="lineCov">        236 : }</span>
+<a name="228"><span class="lineNum">     228 </span>            : </a>
+<span class="lineNum">     229 </span>            : GF_EXPORT
+<span class="lineNum">     230 </span><span class="lineCov">        566 : GF_Err gf_sc_audio_open(GF_AudioInput *ai, MFURL *url, Double clipBegin, Double clipEnd, Bool lock_timeline)</span>
+<span class="lineNum">     231 </span>            : {
+<span class="lineNum">     232 </span><span class="lineCov">        566 :         if (ai-&gt;is_open) return GF_BAD_PARAM;</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :         /*get media object*/
+<span class="lineNum">     235 </span><span class="lineCov">        566 :         ai-&gt;stream = gf_mo_register(ai-&gt;owner, url, lock_timeline, GF_FALSE);</span>
+<span class="lineNum">     236 </span>            :         /*bad URL*/
+<span class="lineNum">     237 </span><span class="lineCov">        566 :         if (!ai-&gt;stream) return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :         /*request play*/
+<span class="lineNum">     240 </span><span class="lineCov">         22 :         gf_mo_play(ai-&gt;stream, clipBegin, clipEnd, GF_FALSE);</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">         22 :         ai-&gt;stream_finished = GF_FALSE;</span>
+<span class="lineNum">     243 </span><span class="lineCov">         22 :         ai-&gt;is_open = 1;</span>
+<span class="lineNum">     244 </span>            :         //force reload of audio props
+<span class="lineNum">     245 </span><span class="lineCov">         22 :         ai-&gt;stream-&gt;config_changed = GF_TRUE;</span>
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineCov">         22 :         return GF_OK;</span>
+<span class="lineNum">     248 </span>            : }
+<a name="249"><span class="lineNum">     249 </span>            : </a>
+<span class="lineNum">     250 </span>            : GF_EXPORT
+<span class="lineNum">     251 </span><span class="lineCov">        240 : void gf_sc_audio_stop(GF_AudioInput *ai)</span>
+<span class="lineNum">     252 </span>            : {
+<span class="lineNum">     253 </span><span class="lineCov">        240 :         if (!ai-&gt;is_open) return;</span>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :         /*we must make sure audio mixer is not using the stream otherwise we may leave it dirty (with unrelease frame)*/
+<span class="lineNum">     256 </span><span class="lineCov">         22 :         gf_mixer_lock(ai-&gt;compositor-&gt;audio_renderer-&gt;mixer, GF_TRUE);</span>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :         assert(!ai-&gt;need_release);
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineCov">         22 :         gf_mo_stop(&amp;ai-&gt;stream);</span>
+<span class="lineNum">     261 </span><span class="lineCov">         22 :         ai-&gt;is_open = 0;</span>
+<span class="lineNum">     262 </span><span class="lineCov">         22 :         gf_mo_unregister(ai-&gt;owner, ai-&gt;stream);</span>
+<span class="lineNum">     263 </span><span class="lineCov">         22 :         ai-&gt;stream = NULL;</span>
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineCov">         22 :         gf_mixer_lock(ai-&gt;compositor-&gt;audio_renderer-&gt;mixer, GF_FALSE);</span>
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            : }
+<a name="268"><span class="lineNum">     268 </span>            : </a>
+<span class="lineNum">     269 </span>            : GF_EXPORT
+<span class="lineNum">     270 </span><span class="lineCov">          6 : void gf_sc_audio_restart(GF_AudioInput *ai)</span>
+<span class="lineNum">     271 </span>            : {
+<span class="lineNum">     272 </span><span class="lineCov">          6 :         if (!ai-&gt;is_open) return;</span>
+<span class="lineNum">     273 </span><span class="lineCov">          6 :         if (ai-&gt;need_release) gf_mo_release_data(ai-&gt;stream, 0xFFFFFFFF, 2);</span>
+<span class="lineNum">     274 </span><span class="lineCov">          6 :         ai-&gt;need_release = GF_FALSE;</span>
+<span class="lineNum">     275 </span><span class="lineCov">          6 :         ai-&gt;stream_finished = GF_FALSE;</span>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span><span class="lineCov">          6 :         gf_mo_restart(ai-&gt;stream);</span>
+<span class="lineNum">     278 </span>            : }
+<a name="279"><span class="lineNum">     279 </span>            : </a>
+<span class="lineNum">     280 </span>            : GF_EXPORT
+<span class="lineNum">     281 </span><span class="lineCov">          9 : Bool gf_sc_audio_check_url(GF_AudioInput *ai, MFURL *url)</span>
+<span class="lineNum">     282 </span>            : {
+<span class="lineNum">     283 </span><span class="lineCov">          9 :         if (!ai-&gt;stream) return url-&gt;count;</span>
+<span class="lineNum">     284 </span><span class="lineCov">          6 :         return gf_mo_url_changed(ai-&gt;stream, url);</span>
+<span class="lineNum">     285 </span>            : }
+<a name="286"><span class="lineNum">     286 </span>            : </a>
+<span class="lineNum">     287 </span>            : GF_EXPORT
+<span class="lineNum">     288 </span><span class="lineCov">       1710 : void gf_sc_audio_register(GF_AudioInput *ai, GF_TraverseState *tr_state)</span>
+<span class="lineNum">     289 </span>            : {
+<span class="lineNum">     290 </span>            :         GF_AudioInterface *aifce;
+<span class="lineNum">     291 </span>            :         /*check interface is valid*/
+<span class="lineNum">     292 </span><span class="lineCov">       1710 :         if (!ai-&gt;input_ifce.FetchFrame</span>
+<span class="lineNum">     293 </span><span class="lineCov">       1710 :                 || !ai-&gt;input_ifce.GetChannelVolume</span>
+<span class="lineNum">     294 </span><span class="lineCov">       1710 :                 || !ai-&gt;input_ifce.GetConfig</span>
+<span class="lineNum">     295 </span><span class="lineCov">       1710 :                 || !ai-&gt;input_ifce.GetSpeed</span>
+<span class="lineNum">     296 </span><span class="lineCov">       1710 :                 || !ai-&gt;input_ifce.IsMuted</span>
+<span class="lineNum">     297 </span><span class="lineCov">       1710 :                 || !ai-&gt;input_ifce.ReleaseFrame</span>
+<span class="lineNum">     298 </span>            :            ) return;
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">       1710 :         aifce = &amp;ai-&gt;input_ifce;</span>
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span><span class="lineCov">       1710 :         if (tr_state-&gt;audio_parent) {</span>
+<span class="lineNum">     303 </span>            :                 /*this assume only one parent may use an audio node*/
+<span class="lineNum">     304 </span><span class="lineCov">         16 :                 if (ai-&gt;register_with_parent) return;</span>
+<span class="lineNum">     305 </span><span class="lineCov">          1 :                 if (ai-&gt;register_with_renderer) {</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :                         gf_sc_ar_remove_src(ai-&gt;compositor-&gt;audio_renderer, aifce);</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                         ai-&gt;register_with_renderer = GF_FALSE;</span>
+<span class="lineNum">     308 </span>            :                 }
+<span class="lineNum">     309 </span><span class="lineCov">          1 :                 tr_state-&gt;audio_parent-&gt;add_source(tr_state-&gt;audio_parent, ai);</span>
+<span class="lineNum">     310 </span><span class="lineCov">          1 :                 ai-&gt;register_with_parent = GF_TRUE;</span>
+<span class="lineNum">     311 </span><span class="lineCov">          1 :                 ai-&gt;snd = tr_state-&gt;sound_holder;</span>
+<span class="lineNum">     312 </span><span class="lineCov">       1694 :         } else if (!ai-&gt;register_with_renderer) {</span>
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span><span class="lineCov">         21 :                 if (ai-&gt;register_with_parent) {</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                         ai-&gt;register_with_parent = GF_FALSE;</span>
+<span class="lineNum">     316 </span>            :                         /*if used in a parent audio group, do a complete traverse to rebuild the group*/
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :                         gf_sc_invalidate(ai-&gt;compositor, NULL);</span>
+<span class="lineNum">     318 </span>            :                 }
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span><span class="lineCov">         21 :                 gf_sc_ar_add_src(ai-&gt;compositor-&gt;audio_renderer, aifce);</span>
+<span class="lineNum">     321 </span><span class="lineCov">         21 :                 ai-&gt;register_with_renderer = GF_TRUE;</span>
+<span class="lineNum">     322 </span><span class="lineCov">         21 :                 ai-&gt;snd = tr_state-&gt;sound_holder;</span>
+<span class="lineNum">     323 </span>            :         }
+<span class="lineNum">     324 </span>            : }
+<a name="325"><span class="lineNum">     325 </span>            : </a>
+<span class="lineNum">     326 </span>            : GF_EXPORT
+<span class="lineNum">     327 </span><span class="lineCov">        243 : void gf_sc_audio_unregister(GF_AudioInput *ai)</span>
+<span class="lineNum">     328 </span>            : {
+<span class="lineNum">     329 </span><span class="lineCov">        243 :         GF_AudioInterface *aifce = &amp;ai-&gt;input_ifce;</span>
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span><span class="lineCov">        243 :         if (ai-&gt;register_with_renderer) {</span>
+<span class="lineNum">     332 </span><span class="lineCov">         21 :                 ai-&gt;register_with_renderer = GF_FALSE;</span>
+<span class="lineNum">     333 </span><span class="lineCov">         21 :                 gf_sc_ar_remove_src(ai-&gt;compositor-&gt;audio_renderer, aifce);</span>
+<span class="lineNum">     334 </span>            :         } else {
+<span class="lineNum">     335 </span>            :                 /*if used in a parent audio group, do a complete traverse to rebuild the group*/
+<span class="lineNum">     336 </span><span class="lineCov">        222 :                 gf_sc_invalidate(ai-&gt;compositor, NULL);</span>
+<span class="lineNum">     337 </span>            :         }
+<span class="lineNum">     338 </span><span class="lineCov">        243 : }</span>
+<span class="lineNum">     339 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

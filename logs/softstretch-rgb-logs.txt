@@ -1,0 +1,20 @@
+*** softstretch-rgb logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:46:24 ***
+
+
+*** Subtest "dump-rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.jpg compositor:opfmt=rgb @ -o ./results/temp/raw.rgb -blacklist=vtbdec,nvdec,ohevcdec" ***
+
+Computing ./results/temp/raw.rgb  (dump-rgb) hash: 
+File hash (SHA-1): A7B23597430E39491D755894BC0128ECF8A8506D
+Hash OK for ./results/temp/raw.rgb
+
+*** Subtest "blit-alpha-rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/logo.png compositor:opfmt=rgb @ -o ./results/temp/dump_alpha.rgb" ***
+
+Computing ./results/temp/dump_alpha.rgb  (dump-alpha-rgb) hash: 
+File hash (SHA-1): F4B3FF81EF9806715752ECB722F8FBCB8CF3B587
+Hash OK for ./results/temp/dump_alpha.rgb
+Computing ./results/temp/dump.rgb  (blit-rgb-to-rgb) hash: 
+File hash (SHA-1): A7B23597430E39491D755894BC0128ECF8A8506D
+Hash OK for ./results/temp/dump.rgb
+
+*** Subtest "blit-rgb": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.rgb:size=128x128 compositor:opfmt=rgb @ -o ./results/temp/dump.rgb" ***
+

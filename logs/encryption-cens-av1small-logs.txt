@@ -1,0 +1,61 @@
+*** encryption-cens-av1small logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:34:43 ***
+
+Computing ./results/temp/cens-av1small-crypted.mp4  (crypt) hash: 
+File hash (SHA-1): 0F50811714ECD7B7D76E49D68ED80A1F8DADAF9B
+Hash OK for ./results/temp/cens-av1small-crypted.mp4
+
+*** Subtest "Encrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/cens.xml -out ./results/temp/cens-av1small-crypted.mp4 ./results/temp/source_media.mp4" ***
+
+Computing ./results/temp/cens-av1small-decrypted.mp4  (decrypt) hash: 
+File hash (SHA-1): 30DD40BA139C50BFC68888D5C779498892CA1563
+Hash OK for ./results/temp/cens-av1small-decrypted.mp4
+
+*** Subtest "Decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/cens.xml -out ./results/temp/cens-av1small-decrypted.mp4 ./results/temp/cens-av1small-crypted.mp4" ***
+
+Same Hash for ./results/temp/source_media.mp4 and ./results/temp/cens-av1small-decrypted.mp4
+
+*** Subtest "INFO": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/cens-av1small-crypted.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:00.160
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand iso4 - version 1 - compatible brands: iso4 av01
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 25000
+Media Duration 00:00:00.160 
+Media Info: Language "Undetermined (und)" - Type "vide:encv" - 4 samples
+Visual Sample Entry Info: width=128 height=128 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=128
+	AOM AV1 stream - Resolution 128 x 128
+	version=1, profile=0, level_idx0=0, tier=0
+	high_bitdepth=0, twelve_bit=0, monochrome=0
+	chroma: subsampling_x=1, subsampling_y=1, sample_position=0
+	OBU#1 seq_header hash: 8DC0607E0C6FE939DFF7C9940CF1F6C832786A00
+
+	Protected by CENC scheme cens version 0x00010000 - Pattern 1:10
+		KID 279926496A7F5D25DA69F2B3B2799A7F - IV size 39 
+
+	RFC6381 Codec Parameters: av01.0.00M.08.0.110
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 4 samples
+	Max sample duration: 1000 / 25000
+
+
+Computing ./results/temp/cens-av1small-crypted_dashinit.mp4  (crypt-dash-init) hash: 
+File hash (SHA-1): 3583D060BC8F56FAC4F2C025473E29E7CBFF13C5
+Hash OK for ./results/temp/cens-av1small-crypted_dashinit.mp4
+Computing ./results/temp/cens-av1small-crypted_dash1.m4s  (crypt-dash-seg) hash: 
+File hash (SHA-1): 233625678C3ECADE36EA9900A638D6102CD7CA36
+Hash OK for ./results/temp/cens-av1small-crypted_dash1.m4s
+
+*** Subtest "DASH": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/cens-av1small-crypted.mp4" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[MPD] Generating MPD at time 2021-04-29T23:34:43.793Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 0.16 end 2
+
+

@@ -1,0 +1,38 @@
+*** add-subsamples-HEVC logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:28:20 ***
+
+
+*** Subtest "add-subsamples-HEVC": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/3D-HEVC/stream_bbb.bit:fmt=HEVC:subsamples -new ./results/temp/test.mp4" ***
+Track Importing HEVC - Width 1920 Height 1080 FPS 25000/1000
+HEVC Import results: 762 samples (1529 NALUs) - Slices: 25 I 0 P 737 B - 0 SEI - 49 IDR
+HEVC L-HEVC Import results: Slices: 0 I 24 P 737 B
+HEVC Stream uses forward prediction - stream CTS offset: 7 frames
+
+Computing ./results/temp/test.mp4  (import) hash: 
+File hash (SHA-1): CAB3D1C794939FB73C625F9BD44733CA49CA411B
+Hash fail, ref hash ./hash_refs/add-subsamples-HEVC-import.hash was 6003DD37C51F9D4C8185295F3BB3B5B900714A30
+
+*** Subtest "dash-subsamples": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 2000 ./results/temp/test.mp4 -profile onDemand -out  ./results/temp/test.mpd" ***
+[Dasher] No template assigned, using $File$$FS$_dash
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 2.68 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 5.24 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 6.52 end 4
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 9.08 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 10.36 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 12.92 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 14.2 end 8
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 16.76 end 9
+[MP4Mux] Done writing segment 9 - estimated next fragment times start 19.32 end 10
+[MP4Mux] Done writing segment 10 - estimated next fragment times start 20.6 end 11
+[MP4Mux] Done writing segment 11 - estimated next fragment times start 23.16 end 12
+[MP4Mux] Done writing segment 12 - estimated next fragment times start 24.44 end 13
+[MP4Mux] Done writing segment 13 - estimated next fragment times start 27 end 14
+[MP4Mux] Done writing segment 14 - estimated next fragment times start 28.28 end 15
+[MP4Mux] Done writing segment 15 - estimated next fragment times start 30.6 end 16
+[MPD] Generating MPD at time 2021-04-29T23:28:21.149Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+
+
+Computing ./results/temp/test_dashinit.mp4  (dash-subsamples) hash: 
+File hash (SHA-1): 4F6CD6FB4C8CC7E668F5C96281F4E70528106945
+Hash fail, ref hash ./hash_refs/add-subsamples-HEVC-dash-subsamples.hash was 5DBF50A5548E097C691BD180F48151D1113B9588

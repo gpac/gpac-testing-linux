@@ -1,0 +1,66 @@
+*** mp4box-io-counter_1280_720_I_25_500k.ivf logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:52 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/counter_1280_720_I_25_500k.ivf" ***
+Import probing results for ./external_media/import/counter_1280_720_I_25_500k.ivf:
+File has 1 tracks
+- Track 1 type: Video - Codec VP9 Video
+	Size 1280x720 @ 25 FPS
+
+For more details, use `gpac -i counter_1280_720_I_25_500k.ivf inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/counter_1280_720_I_25_500k.ivf.mp4  (add) hash: 
+File hash (SHA-1): D84B337C8B452E4AD42B3982DAABC5E5DE9B7F13
+Hash OK for ./results/temp/counter_1280_720_I_25_500k.ivf.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/counter_1280_720_I_25_500k.ivf -new ./results/temp/counter_1280_720_I_25_500k.ivf.mp4" ***
+Track Importing VP9 Video - Width 1280 Height 720 FPS 25/1
+
+
+*** Subtest "NALDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 1 ./results/temp/counter_1280_720_I_25_500k.ivf.mp4 -out ./results/temp/nal.xml" ***
+Error: Track #1 is not NALU or OBU based!
+
+Computing ./results/temp/nal.xml  (NALDump) hash: 
+File hash (SHA-1): 476328AF3DBD45D1FE739588960372BC66D75B87
+Hash OK for ./results/temp/nal.xml
+Computing ./results/temp/counter_1280_720_I_25_500k.ivf.1.tmp  (diso) hash: 
+File hash (SHA-1): F7A98FA6572961E93A78E6B1F3E1B97A236B50F0
+Hash OK for ./results/temp/counter_1280_720_I_25_500k.ivf.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/counter_1280_720_I_25_500k.ivf.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.080
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 25
+Media Duration 00:00:10.080 
+Media Info: Language "Undetermined (und)" - Type "vide:vp09" - 252 samples
+Visual Sample Entry Info: width=1280 height=720 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=1280 height=720
+Unknown track type
+	RFC6381 Codec Parameters: vp09.00.00.08.00.255.255.255.00
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 25 samples
+	Max sample duration: 1 / 25
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/counter_1280_720_I_25_500k.ivf.mp4 -out ./results/temp/counter_1280_720_I_25_500k.ivf.1.tmp" ***
+
+Computing ./results/temp/counter_1280_720_I_25_500k.ivf.2.tmp  (dts) hash: 
+File hash (SHA-1): 0885C484DC25020DD6DE04763D14D0664F9AB839
+Hash OK for ./results/temp/counter_1280_720_I_25_500k.ivf.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/counter_1280_720_I_25_500k.ivf.mp4 -out ./results/temp/counter_1280_720_I_25_500k.ivf.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/counter_1280_720_I_25_500k.ivf.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): CF517CA1CC4695335A03E4B1BF014C2F565BDD0D
+Hash OK for ./results/temp/inspect.txt

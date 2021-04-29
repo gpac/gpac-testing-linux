@@ -1,0 +1,31 @@
+*** http-mp4-seek logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:36:01 ***
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 3697A906EDCAFCABC4A545B1005734BCF7031C3C
+Hash fail, ref hash ./hash_refs/http-mp4-seek-inspect.hash was FA3696ED7C8919E32403D3FAD48987D2FFEF27F8
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i http://download.tsi.telecom-paristech.fr/gpac/gpac_test_suite/mp4/counter_video_360.mp4 inspect:allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt:dur=2.0:start=10 -graph -stats" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 10727296
+
+Filter stats - 3 filters
+	Filter httpin (src=http://download.tsi.telecom-paristech.fr/gpac/gpac_test_suite/mp4/counter_video_360.mp4) : 0 input pids 1 output pids 1196 tasks 1000269 us process time
+		14 packets sent 420525 bytes sent (13.9962 pck/sec 3.3633 mbps)
+		* output PID counter_video_360.mp4: 14 packets sent
+	Filter inspect (allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt:dur=2.0:start=10) : 1 input pids 0 output pids 52 tasks 845 us process time
+		49 packets processed 43386 bytes processed (57988.2 pck/sec 410.755 mbps)
+		* input PID counter_video_360.mp4: 49 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 69 tasks 2242 us process time
+		14 packets processed 420525 bytes processed (6244.42 pck/sec 1500.54 mbps)
+		49 packets sent 43386 bytes sent (21855.5 pck/sec 154.812 mbps)
+		* input PID counter_video_360.mp4: 14 packets received
+		* output PID counter_video_360.mp4: 49 packets sent
+Session stats - threads 1
+	Thread 1: run_time 1577100 us active_time 1004934 us nb_tasks 1319
+
+Total: run_time 1577100 us active_time 1004934 us nb_tasks 1319
+
+Filters connected:
+httpin (src=http://download.tsi.telecom-paristech.fr/gpac/gpac_test_suite/mp4/counter_video_360.mp4) (ptr=0x55cd7dbc2840)
+-(PID counter_video_360.mp4) mp4dmx (ptr=0x55cd7dbe7ec0)
+--(PID counter_video_360.mp4) inspect (allp:deep:test=network:interleave=false:log=./results/temp/inspect.txt:dur=2.0:start=10) (ptr=0x55cd7dbdcf80)
+

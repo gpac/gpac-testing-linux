@@ -1,0 +1,47 @@
+*** encryption-segment logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:48 ***
+
+
+*** Subtest "crypt-init": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/ctr.xml ./results/temp/source_dashinit.mp4 -out ./results/temp/dst_dashinit.mp4" ***
+
+Computing ./results/temp/dst_dashinit.mp4  (crypt-init) hash: 
+File hash (SHA-1): 074BB506291D49F34FE407EB8858795B8842C35D
+Hash OK for ./results/temp/dst_dashinit.mp4
+
+*** Subtest "crypt-seg1": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/ctr.xml -init-seg ./results/temp/source_dashinit.mp4 ./results/temp/source_dash1.m4s -out ./results/temp/dst_dash1.m4s" ***
+[MP4Mux] Done writing segment -1 - estimated next fragment times start 5 end 6
+
+Computing ./results/temp/dst_dash1.m4s  (crypt-seg1) hash: 
+File hash (SHA-1): C43D0EC925F49504BA321D8D198DE32B6BC26113
+Hash OK for ./results/temp/dst_dash1.m4s
+
+*** Subtest "crypt-seg2": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/ctr.xml -init-seg ./results/temp/source_dashinit.mp4 ./results/temp/source_dash2.m4s -out ./results/temp/dst_dash2.m4s" ***
+[MP4Mux] Done writing segment -1 - estimated next fragment times start 10 end 11
+
+Computing ./results/temp/dst_dash2.m4s  (crypt-seg2) hash: 
+File hash (SHA-1): 3F01656314F6227F2040FBA151E0BB5AE68C6023
+Hash OK for ./results/temp/dst_dash2.m4s
+
+*** Subtest "diso-seg2": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso -init-seg ./results/temp/source_dashinit.mp4 ./results/temp/source_dash2.m4s" ***
+
+Computing ./results/temp/source_dash2_info.xml  (diso-seg2) hash: 
+File hash (SHA-1): 38EF49DE5C4705C043037E8C6E61A554B9F170CD
+Hash OK for ./results/temp/source_dash2_info.xml
+
+*** Subtest "diso-crypt-seg2": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso -init-seg ./results/temp/dst_dashinit.mp4 ./results/temp/dst_dash2.m4s" ***
+
+Computing ./results/temp/dst_dash2_info.xml  (diso-crypt-seg2) hash: 
+File hash (SHA-1): 57E25D3885588672923C43015C14C5E59C545B5B
+Hash OK for ./results/temp/dst_dash2_info.xml
+
+*** Subtest "decrypt-init": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/ctr.xml ./results/temp/dst_dashinit.mp4 -out ./results/temp/decrypt_dashinit.mp4" ***
+
+Computing ./results/temp/decrypt_dashinit.mp4  (decrypt-init) hash: 
+File hash (SHA-1): 958445B03D984638D9FDB14750D09DF7810D5B48
+Hash OK for ./results/temp/decrypt_dashinit.mp4
+
+*** Subtest "decrypt-seg1": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/ctr.xml -init-seg ./results/temp/dst_dashinit.mp4 ./results/temp/dst_dash1.m4s -out ./results/temp/decrypt_dash1.m4s" ***
+[MP4Mux] Done writing segment -1 - estimated next fragment times start 5 end 6
+
+Computing ./results/temp/decrypt_dash1.m4s  (decrypt-seg1) hash: 
+File hash (SHA-1): C56F61203C1129D40CB0A4F6EBF6065EC1330CA4
+Hash OK for ./results/temp/decrypt_dash1.m4s

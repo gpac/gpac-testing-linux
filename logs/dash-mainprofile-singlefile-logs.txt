@@ -1,0 +1,27 @@
+*** dash-mainprofile-singlefile logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:45 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264  -new ./results/temp/file.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+AVC|H264 Import results: 750 samples (840 NALUs) - Slices: 30 I 720 P 0 B - 1 SEI - 30 IDR
+AVC|H264 Max NALU size is 32815 - stream could be optimized by setting nal_length=2
+
+
+*** Subtest "dash-mainprofile-singlefile-1": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 ./results/temp/file.mp4#video -single-file -profile main -subdur 1000 -dash-ctx ./results/temp/dash_ctx -segment-name test-$Number$ -out ./results/temp/file.mpd" ***
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1 end 2
+[MPD] Generating MPD at time 2021-04-29T23:31:45.620Z
+
+
+Computing ./results/temp/file.mpd  (mpd) hash: 
+File hash (SHA-1): 3553CE2CD9A69046A0DB50B9ADFA22EB33F6CB4A
+Hash OK for ./results/temp/file.mpd
+Computing ./results/temp/test-init.mp4  (seg) hash: 
+File hash (SHA-1): 767FC1E14D2A2D4AC5D7C39C3722CF7890744387
+Hash OK for ./results/temp/test-init.mp4
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 01ED6A63B557D09550446920863F19963269CD60
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:dur=2/1:log=./results/temp/inspect.txt" ***
+

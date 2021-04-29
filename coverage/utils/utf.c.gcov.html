@@ -1,0 +1,829 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - utils/utf.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">utils</a> - utf.c<span style="font-size: 80%;"> (source / <a href="utf.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">134</td>
+            <td class="headerCovTableEntry">193</td>
+            <td class="headerCovTableEntryLo">69.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2007-2012
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / common tools sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #ifndef GPAC_DISABLE_CORE_TOOLS
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &lt;gpac/utf.h&gt;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #if 1
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : /*
+<span class="lineNum">      35 </span>            :  * Copyright 2001-2004 Unicode, Inc.
+<span class="lineNum">      36 </span>            :  *
+<span class="lineNum">      37 </span>            :  * Disclaimer
+<span class="lineNum">      38 </span>            :  *
+<span class="lineNum">      39 </span>            :  * This source code is provided as is by Unicode, Inc. No claims are
+<span class="lineNum">      40 </span>            :  * made as to fitness for any particular purpose. No warranties of any
+<span class="lineNum">      41 </span>            :  * kind are expressed or implied. The recipient agrees to determine
+<span class="lineNum">      42 </span>            :  * applicability of information provided. If this file has been
+<span class="lineNum">      43 </span>            :  * purchased on magnetic or optical media from Unicode, Inc., the
+<span class="lineNum">      44 </span>            :  * sole remedy for any claim will be exchange of defective media
+<span class="lineNum">      45 </span>            :  * within 90 days of receipt.
+<span class="lineNum">      46 </span>            :  *
+<span class="lineNum">      47 </span>            :  * Limitations on Rights to Redistribute This Code
+<span class="lineNum">      48 </span>            :  *
+<span class="lineNum">      49 </span>            :  * Unicode, Inc. hereby grants the right to freely use the information
+<span class="lineNum">      50 </span>            :  * supplied in this file in the creation of products supporting the
+<span class="lineNum">      51 </span>            :  * Unicode Standard, and to make copies of this file in any form
+<span class="lineNum">      52 </span>            :  * for internal or external distribution as long as this notice
+<span class="lineNum">      53 </span>            :  * remains attached.
+<span class="lineNum">      54 </span>            :  */
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : /* ---------------------------------------------------------------------
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :     Conversions between UTF32, UTF-16, and UTF-8. Source code file.
+<span class="lineNum">      59 </span>            :     Author: Mark E. Davis, 1994.
+<span class="lineNum">      60 </span>            :     Rev History: Rick McGowan, fixes &amp; updates May 2001.
+<span class="lineNum">      61 </span>            :     Sept 2001: fixed const &amp; error conditions per
+<span class="lineNum">      62 </span>            :         mods suggested by S. Parent &amp; A. Lillich.
+<span class="lineNum">      63 </span>            :     June 2002: Tim Dodd added detection and handling of incomplete
+<span class="lineNum">      64 </span>            :         source sequences, enhanced error detection, added casts
+<span class="lineNum">      65 </span>            :         to eliminate compiler warnings.
+<span class="lineNum">      66 </span>            :     July 2003: slight mods to back out aggressive FFFE detection.
+<span class="lineNum">      67 </span>            :     Jan 2004: updated switches in from-UTF8 conversions.
+<span class="lineNum">      68 </span>            :     Oct 2004: updated to use UNI_MAX_LEGAL_UTF32 in UTF-32 conversions.
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :     See the header file &quot;ConvertUTF.h&quot; for complete documentation.
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            : ------------------------------------------------------------------------ */
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : typedef u32 UTF32;      /* at least 32 bits */
+<span class="lineNum">      75 </span>            : typedef u16 UTF16;      /* at least 16 bits */
+<span class="lineNum">      76 </span>            : typedef u8 UTF8;        /* typically 8 bits */
+<span class="lineNum">      77 </span>            : typedef u8 Boolean; /* 0 or 1 */
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : /* Some fundamental constants */
+<span class="lineNum">      80 </span>            : #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
+<span class="lineNum">      81 </span>            : #define UNI_MAX_BMP (UTF32)0x0000FFFF
+<span class="lineNum">      82 </span>            : #define UNI_MAX_UTF16 (UTF32)0x0010FFFF
+<span class="lineNum">      83 </span>            : #define UNI_MAX_UTF32 (UTF32)0x7FFFFFFF
+<span class="lineNum">      84 </span>            : #define UNI_MAX_LEGAL_UTF32 (UTF32)0x0010FFFF
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : typedef enum {
+<span class="lineNum">      87 </span>            :         conversionOK,           /* conversion successful */
+<span class="lineNum">      88 </span>            :         sourceExhausted,        /* partial character in source, but hit end */
+<span class="lineNum">      89 </span>            :         targetExhausted,        /* insuff. room in target for conversion */
+<span class="lineNum">      90 </span>            :         sourceIllegal           /* source sequence is illegal/malformed */
+<span class="lineNum">      91 </span>            : } ConversionResult;
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            : typedef enum {
+<span class="lineNum">      94 </span>            :         strictConversion = 0,
+<span class="lineNum">      95 </span>            :         lenientConversion
+<span class="lineNum">      96 </span>            : } ConversionFlags;
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            : static const int halfShift  = 10; /* used for shifting by 10 bits */
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            : static const UTF32 halfBase = 0x0010000UL;
+<span class="lineNum">     101 </span>            : static const UTF32 halfMask = 0x3FFUL;
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : #define UNI_SUR_HIGH_START  (UTF32)0xD800
+<span class="lineNum">     104 </span>            : #define UNI_SUR_HIGH_END    (UTF32)0xDBFF
+<span class="lineNum">     105 </span>            : #define UNI_SUR_LOW_START   (UTF32)0xDC00
+<span class="lineNum">     106 </span>            : #define UNI_SUR_LOW_END     (UTF32)0xDFFF
+<span class="lineNum">     107 </span>            : #define false      0
+<span class="lineNum">     108 </span>            : #define true        1
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : /*
+<span class="lineNum">     111 </span>            :  * Index into the table below with the first byte of a UTF-8 sequence to
+<span class="lineNum">     112 </span>            :  * get the number of trailing bytes that are supposed to follow it.
+<span class="lineNum">     113 </span>            :  * Note that *legal* UTF-8 values can't have 4 or 5-bytes. The table is
+<span class="lineNum">     114 </span>            :  * left as-is for anyone who may want to do such conversion, which was
+<span class="lineNum">     115 </span>            :  * allowed in earlier algorithms.
+<span class="lineNum">     116 </span>            :  */
+<span class="lineNum">     117 </span>            : static const char trailingBytesForUTF8[256] = {
+<span class="lineNum">     118 </span>            :         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+<span class="lineNum">     119 </span>            :         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+<span class="lineNum">     120 </span>            :         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+<span class="lineNum">     121 </span>            :         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+<span class="lineNum">     122 </span>            :         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+<span class="lineNum">     123 </span>            :         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+<span class="lineNum">     124 </span>            :         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+<span class="lineNum">     125 </span>            :         2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, 3,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5
+<span class="lineNum">     126 </span>            : };
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            : /*
+<span class="lineNum">     129 </span>            :  * Magic values subtracted from a buffer value during UTF8 conversion.
+<span class="lineNum">     130 </span>            :  * This table contains as many values as there might be trailing bytes
+<span class="lineNum">     131 </span>            :  * in a UTF-8 sequence.
+<span class="lineNum">     132 </span>            :  */
+<span class="lineNum">     133 </span>            : static const UTF32 offsetsFromUTF8[6] = { 0x00000000UL, 0x00003080UL, 0x000E2080UL,
+<span class="lineNum">     134 </span>            :                                           0x03C82080UL, 0xFA082080UL, 0x82082080UL
+<span class="lineNum">     135 </span>            :                                         };
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            : /*
+<span class="lineNum">     138 </span>            :  * Once the bits are split out into bytes of UTF-8, this is a mask OR-ed
+<span class="lineNum">     139 </span>            :  * into the first byte, depending on how many bytes follow.  There are
+<span class="lineNum">     140 </span>            :  * as many entries in this table as there are UTF-8 sequence types.
+<span class="lineNum">     141 </span>            :  * (I.e., one byte sequence, two byte... etc.). Remember that sequencs
+<span class="lineNum">     142 </span>            :  * for *legal* UTF-8 will be 4 or fewer bytes total.
+<span class="lineNum">     143 </span>            :  */
+<span class="lineNum">     144 </span>            : static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : /* --------------------------------------------------------------------- */
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            : /* The interface converts a whole buffer to avoid function-call overhead.
+<span class="lineNum">     149 </span>            :  * Constants have been gathered. Loops &amp; conditionals have been removed as
+<span class="lineNum">     150 </span>            :  * much as possible for efficiency, in favor of drop-through switches.
+<span class="lineNum">     151 </span>            :  * (See &quot;Note A&quot; at the bottom of the file for equivalent code.)
+<span class="lineNum">     152 </span>            :  * If your compiler supports it, the &quot;isLegalUTF8&quot; call can be turned
+<span class="lineNum">     153 </span>            :  * into an inline function.
+<span class="lineNum">     154 </span>            :  */
+<span class="lineNum">     155 </span>            : 
+<a name="156"><span class="lineNum">     156 </span>            : /* --------------------------------------------------------------------- */</a>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span><span class="lineCov">       8528 : ConversionResult ConvertUTF16toUTF8 (</span>
+<span class="lineNum">     159 </span>            :     const UTF16** sourceStart, const UTF16* sourceEnd,
+<span class="lineNum">     160 </span>            :     UTF8** targetStart, UTF8* targetEnd, ConversionFlags flags) {
+<span class="lineNum">     161 </span>            :         ConversionResult result = conversionOK;
+<span class="lineNum">     162 </span><span class="lineCov">       8528 :         const UTF16* source = *sourceStart;</span>
+<span class="lineNum">     163 </span><span class="lineCov">       8528 :         UTF8* target = *targetStart;</span>
+<span class="lineNum">     164 </span><span class="lineCov">     189525 :         while (source &lt; sourceEnd) {</span>
+<span class="lineNum">     165 </span>            :                 UTF32 ch;
+<span class="lineNum">     166 </span>            :                 unsigned short bytesToWrite = 0;
+<span class="lineNum">     167 </span>            :                 const UTF32 byteMask = 0xBF;
+<span class="lineNum">     168 </span>            :                 const UTF32 byteMark = 0x80;
+<span class="lineNum">     169 </span>            :                 const UTF16* oldSource = source; /* In case we have to back up because of target overflow. */
+<span class="lineNum">     170 </span><span class="lineCov">     172469 :                 ch = *source++;</span>
+<span class="lineNum">     171 </span>            :                 /* If we have a surrogate pair, convert to UTF32 first. */
+<span class="lineNum">     172 </span><span class="lineCov">     172469 :                 if (ch &gt;= UNI_SUR_HIGH_START &amp;&amp; ch &lt;= UNI_SUR_HIGH_END) {</span>
+<span class="lineNum">     173 </span>            :                         /* If the 16 bits following the high surrogate are in the source buffer... */
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :                         if (source &lt; sourceEnd) {</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :                                 UTF32 ch2 = *source;</span>
+<span class="lineNum">     176 </span>            :                                 /* If it's a low surrogate, convert to UTF32. */
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                                 if (ch2 &gt;= UNI_SUR_LOW_START &amp;&amp; ch2 &lt;= UNI_SUR_LOW_END) {</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :                                         ch = ((ch - UNI_SUR_HIGH_START) &lt;&lt; halfShift)</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :                                              + (ch2 - UNI_SUR_LOW_START) + halfBase;</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                                         ++source;</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :                                 } else if (flags == strictConversion) { /* it's an unpaired high surrogate */</span>
+<span class="lineNum">     182 </span>            :                                         --source; /* return to the illegal value itself */
+<span class="lineNum">     183 </span>            :                                         result = sourceIllegal;
+<span class="lineNum">     184 </span>            :                                         break;
+<span class="lineNum">     185 </span>            :                                 }
+<span class="lineNum">     186 </span>            :                         } else { /* We don't have the 16 bits following the high surrogate. */
+<span class="lineNum">     187 </span>            :                                 --source; /* return to the high surrogate */
+<span class="lineNum">     188 </span>            :                                 result = sourceExhausted;
+<span class="lineNum">     189 </span>            :                                 break;
+<span class="lineNum">     190 </span>            :                         }
+<span class="lineNum">     191 </span><span class="lineCov">     172469 :                 } else if (flags == strictConversion) {</span>
+<span class="lineNum">     192 </span>            :                         /* UTF-16 surrogate values are illegal in UTF-32 */
+<span class="lineNum">     193 </span><span class="lineCov">     172469 :                         if (ch &gt;= UNI_SUR_LOW_START &amp;&amp; ch &lt;= UNI_SUR_LOW_END) {</span>
+<span class="lineNum">     194 </span>            :                                 --source; /* return to the illegal value itself */
+<span class="lineNum">     195 </span>            :                                 result = sourceIllegal;
+<span class="lineNum">     196 </span>            :                                 break;
+<span class="lineNum">     197 </span>            :                         }
+<span class="lineNum">     198 </span>            :                 }
+<span class="lineNum">     199 </span>            :                 /* Figure out how many bytes the result will require */
+<span class="lineNum">     200 </span><span class="lineCov">     172469 :                 if (ch &lt; (UTF32)0x80) {</span>
+<span class="lineNum">     201 </span>            :                         bytesToWrite = 1;
+<span class="lineNum">     202 </span><span class="lineCov">       2481 :                 } else if (ch &lt; (UTF32)0x800) {</span>
+<span class="lineNum">     203 </span>            :                         bytesToWrite = 2;
+<span class="lineNum">     204 </span><span class="lineCov">        292 :                 } else if (ch &lt; (UTF32)0x10000) {</span>
+<span class="lineNum">     205 </span>            :                         bytesToWrite = 3;
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :                 } else if (ch &lt; (UTF32)0x110000) {</span>
+<span class="lineNum">     207 </span>            :                         bytesToWrite = 4;
+<span class="lineNum">     208 </span>            :                 } else {
+<span class="lineNum">     209 </span>            :                         bytesToWrite = 3;
+<span class="lineNum">     210 </span>            :                         ch = UNI_REPLACEMENT_CHAR;
+<span class="lineNum">     211 </span>            :                 }
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span><span class="lineCov">     172469 :                 target += bytesToWrite;</span>
+<span class="lineNum">     214 </span><span class="lineCov">     172469 :                 if (target &gt; targetEnd) {</span>
+<span class="lineNum">     215 </span>            :                         source = oldSource; /* Back up source pointer! */
+<span class="lineNum">     216 </span>            :                         target -= bytesToWrite;
+<span class="lineNum">     217 </span>            :                         result = targetExhausted;
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     219 </span>            :                 }
+<span class="lineNum">     220 </span><span class="lineCov">     172469 :                 switch (bytesToWrite) { /* note: everything falls through. */</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                 case 4:</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :                         *--target = (UTF8)((ch | byteMark) &amp; byteMask);</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :                         ch &gt;&gt;= 6;</span>
+<span class="lineNum">     224 </span><span class="lineCov">        292 :                 case 3:</span>
+<span class="lineNum">     225 </span><span class="lineCov">        292 :                         *--target = (UTF8)((ch | byteMark) &amp; byteMask);</span>
+<span class="lineNum">     226 </span><span class="lineCov">        292 :                         ch &gt;&gt;= 6;</span>
+<span class="lineNum">     227 </span><span class="lineCov">       2481 :                 case 2:</span>
+<span class="lineNum">     228 </span><span class="lineCov">       2481 :                         *--target = (UTF8)((ch | byteMark) &amp; byteMask);</span>
+<span class="lineNum">     229 </span><span class="lineCov">       2481 :                         ch &gt;&gt;= 6;</span>
+<span class="lineNum">     230 </span><span class="lineCov">     172469 :                 case 1:</span>
+<span class="lineNum">     231 </span><span class="lineCov">     172469 :                         *--target =  (UTF8)(ch | firstByteMark[bytesToWrite]);</span>
+<span class="lineNum">     232 </span>            :                 }
+<span class="lineNum">     233 </span><span class="lineCov">     172469 :                 target += bytesToWrite;</span>
+<span class="lineNum">     234 </span>            :         }
+<span class="lineNum">     235 </span><span class="lineCov">       8528 :         *sourceStart = source;</span>
+<span class="lineNum">     236 </span><span class="lineCov">       8528 :         *targetStart = target;</span>
+<span class="lineNum">     237 </span><span class="lineCov">       8528 :         return result;</span>
+<span class="lineNum">     238 </span>            : }
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : /*
+<span class="lineNum">     241 </span>            :  * Utility routine to tell whether a sequence of bytes is legal UTF-8.
+<span class="lineNum">     242 </span>            :  * This must be called with the length pre-determined by the first byte.
+<span class="lineNum">     243 </span>            :  * If not calling this from ConvertUTF8to*, then the length can be set by:
+<span class="lineNum">     244 </span>            :  *  length = trailingBytesForUTF8[*source]+1;
+<span class="lineNum">     245 </span>            :  * and the sequence is illegal right away if there aren't that many bytes
+<span class="lineNum">     246 </span>            :  * available.
+<span class="lineNum">     247 </span>            :  * If presented with a length &gt; 4, this returns false.  The Unicode
+<span class="lineNum">     248 </span>            :  * definition of UTF-8 goes up to 4-byte sequences.
+<a name="249"><span class="lineNum">     249 </span>            :  */</a>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">    2768666 : Boolean isLegalUTF8(const UTF8 *source, int length) {</span>
+<span class="lineNum">     252 </span>            :         UTF8 a;
+<span class="lineNum">     253 </span><span class="lineCov">    2768666 :         const UTF8 *srcptr = source+length;</span>
+<span class="lineNum">     254 </span><span class="lineCov">    2768666 :         switch (length) {</span>
+<span class="lineNum">     255 </span>            :         default:
+<span class="lineNum">     256 </span>            :                 return false;
+<span class="lineNum">     257 </span>            :         /* Everything else falls through when &quot;true&quot;... */
+<span class="lineNum">     258 </span><span class="lineCov">         58 :         case 4:</span>
+<span class="lineNum">     259 </span><span class="lineCov">         58 :                 if ((a = (*--srcptr)) &lt; 0x80 || a &gt; 0xBF) return false;</span>
+<span class="lineNum">     260 </span>            :         case 3:
+<span class="lineNum">     261 </span><span class="lineCov">        155 :                 if ((a = (*--srcptr)) &lt; 0x80 || a &gt; 0xBF) return false;</span>
+<span class="lineNum">     262 </span>            :         case 2:
+<span class="lineNum">     263 </span><span class="lineCov">       1993 :                 if ((a = (*--srcptr)) &gt; 0xBF) return false;</span>
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineCov">       1992 :                 switch (*source) {</span>
+<span class="lineNum">     266 </span>            :                 /* no fall-through in this inner switch */
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :                 case 0xE0:</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                         if (a &lt; 0xA0) return false;</span>
+<span class="lineNum">     269 </span>            :                         break;
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :                 case 0xED:</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :                         if (a &gt; 0x9F) return false;</span>
+<span class="lineNum">     272 </span>            :                         break;
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :                 case 0xF0:</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :                         if (a &lt; 0x90) return false;</span>
+<span class="lineNum">     275 </span>            :                         break;
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                 case 0xF4:</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :                         if (a &gt; 0x8F) return false;</span>
+<span class="lineNum">     278 </span>            :                         break;
+<span class="lineNum">     279 </span><span class="lineCov">       1992 :                 default:</span>
+<span class="lineNum">     280 </span><span class="lineCov">       1992 :                         if (a &lt; 0x80) return false;</span>
+<span class="lineNum">     281 </span>            :                 }
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            :         case 1:
+<span class="lineNum">     284 </span><span class="lineCov">    2767348 :                 if (*source &gt;= 0x80 &amp;&amp; *source &lt; 0xC2) return false;</span>
+<span class="lineNum">     285 </span>            :         }
+<span class="lineNum">     286 </span><span class="lineCov">    2766513 :         if (*source &gt; 0xF4) return false;</span>
+<span class="lineNum">     287 </span><span class="lineCov">    2766513 :         return true;</span>
+<span class="lineNum">     288 </span>            : }
+<span class="lineNum">     289 </span>            : 
+<a name="290"><span class="lineNum">     290 </span>            : /* --------------------------------------------------------------------- */</a>
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineCov">       7422 : ConversionResult ConvertUTF8toUTF16 (</span>
+<span class="lineNum">     293 </span>            :     const UTF8** sourceStart, const UTF8* sourceEnd,
+<span class="lineNum">     294 </span>            :     UTF16** targetStart, UTF16* targetEnd, ConversionFlags flags) {
+<span class="lineNum">     295 </span>            :         ConversionResult result = conversionOK;
+<span class="lineNum">     296 </span><span class="lineCov">       7422 :         const UTF8* source = *sourceStart;</span>
+<span class="lineNum">     297 </span><span class="lineCov">       7422 :         UTF16* target = *targetStart;</span>
+<span class="lineNum">     298 </span><span class="lineCov">     410033 :         while (source &lt; sourceEnd) {</span>
+<span class="lineNum">     299 </span>            :                 UTF32 ch = 0;
+<span class="lineNum">     300 </span><span class="lineCov">     395190 :                 unsigned short extraBytesToRead = trailingBytesForUTF8[*source];</span>
+<span class="lineNum">     301 </span><span class="lineCov">     395190 :                 if (source + extraBytesToRead &gt;= sourceEnd) {</span>
+<span class="lineNum">     302 </span>            :                         result = sourceExhausted;
+<span class="lineNum">     303 </span>            :                         break;
+<span class="lineNum">     304 </span>            :                 }
+<span class="lineNum">     305 </span>            :                 /* Do this check whether lenient or strict */
+<span class="lineNum">     306 </span><span class="lineCov">     395189 :                 if (! isLegalUTF8(source, extraBytesToRead+1)) {</span>
+<span class="lineNum">     307 </span>            :                         result = sourceIllegal;
+<span class="lineNum">     308 </span>            :                         break;
+<span class="lineNum">     309 </span>            :                 }
+<span class="lineNum">     310 </span>            :                 /*
+<span class="lineNum">     311 </span>            :                  * The cases all fall through. See &quot;Note A&quot; below.
+<span class="lineNum">     312 </span>            :                  */
+<span class="lineNum">     313 </span><span class="lineCov">     395189 :                 switch (extraBytesToRead) {</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :                 case 5:</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                         ch += *source++;</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :                         ch &lt;&lt;= 6; /* remember, illegal UTF-8 */</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :                 case 4:</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :                         ch += *source++;</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                         ch &lt;&lt;= 6; /* remember, illegal UTF-8 */</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :                 case 3:</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :                         ch += *source++;</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :                         ch &lt;&lt;= 6;</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :                 case 2:</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                         ch += *source++;</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :                         ch &lt;&lt;= 6;</span>
+<span class="lineNum">     326 </span><span class="lineCov">       1691 :                 case 1:</span>
+<span class="lineNum">     327 </span><span class="lineCov">       1691 :                         ch += *source++;</span>
+<span class="lineNum">     328 </span><span class="lineCov">       1691 :                         ch &lt;&lt;= 6;</span>
+<span class="lineNum">     329 </span><span class="lineCov">     395189 :                 case 0:</span>
+<span class="lineNum">     330 </span><span class="lineCov">     395189 :                         ch += *source++;</span>
+<span class="lineNum">     331 </span>            :                 }
+<span class="lineNum">     332 </span><span class="lineCov">     395189 :                 ch -= offsetsFromUTF8[extraBytesToRead];</span>
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span><span class="lineCov">     395189 :                 if (target &gt;= targetEnd) {</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :                         source -= (extraBytesToRead+1); /* Back up source pointer! */</span>
+<span class="lineNum">     336 </span>            :                         result = targetExhausted;
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     338 </span>            :                 }
+<span class="lineNum">     339 </span><span class="lineCov">     395189 :                 if (ch &lt;= UNI_MAX_BMP) { /* Target is a character &lt;= 0xFFFF */</span>
+<span class="lineNum">     340 </span>            :                         /* UTF-16 surrogate values are illegal in UTF-32 */
+<span class="lineNum">     341 </span><span class="lineCov">     395189 :                         if (ch &gt;= UNI_SUR_HIGH_START &amp;&amp; ch &lt;= UNI_SUR_LOW_END) {</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :                                 if (flags == strictConversion) {</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                                         source -= (extraBytesToRead+1); /* return to the illegal value itself */</span>
+<span class="lineNum">     344 </span>            :                                         result = sourceIllegal;
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :                                         break;</span>
+<span class="lineNum">     346 </span>            :                                 } else {
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :                                         *target++ = UNI_REPLACEMENT_CHAR;</span>
+<span class="lineNum">     348 </span>            :                                 }
+<span class="lineNum">     349 </span>            :                         } else {
+<span class="lineNum">     350 </span><span class="lineCov">     395189 :                                 *target++ = (UTF16)ch; /* normal case */</span>
+<span class="lineNum">     351 </span>            :                         }
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :                 } else if (ch &gt; UNI_MAX_UTF16) {</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                         if (flags == strictConversion) {</span>
+<span class="lineNum">     354 </span>            :                                 result = sourceIllegal;
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :                                 source -= (extraBytesToRead+1); /* return to the start */</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                                 break; /* Bail out; shouldn't continue */</span>
+<span class="lineNum">     357 </span>            :                         } else {
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :                                 *target++ = UNI_REPLACEMENT_CHAR;</span>
+<span class="lineNum">     359 </span>            :                         }
+<span class="lineNum">     360 </span>            :                 } else {
+<span class="lineNum">     361 </span>            :                         /* target is a character in range 0xFFFF - 0x10FFFF. */
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :                         if (target + 1 &gt;= targetEnd) {</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :                                 source -= (extraBytesToRead+1); /* Back up source pointer! */</span>
+<span class="lineNum">     364 </span>            :                                 result = targetExhausted;
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     366 </span>            :                         }
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                         ch -= halfBase;</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :                         *target++ = (UTF16)((ch &gt;&gt; halfShift) + UNI_SUR_HIGH_START);</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                         *target++ = (UTF16)((ch &amp; halfMask) + UNI_SUR_LOW_START);</span>
+<span class="lineNum">     370 </span>            :                 }
+<span class="lineNum">     371 </span>            :         }
+<span class="lineNum">     372 </span><span class="lineCov">       7422 :         *sourceStart = source;</span>
+<span class="lineNum">     373 </span><span class="lineCov">       7422 :         *targetStart = target;</span>
+<span class="lineNum">     374 </span><span class="lineCov">       7422 :         return result;</span>
+<span class="lineNum">     375 </span>            : }
+<span class="lineNum">     376 </span>            : 
+<a name="377"><span class="lineNum">     377 </span>            : </a>
+<span class="lineNum">     378 </span>            : GF_EXPORT
+<span class="lineNum">     379 </span><span class="lineCov">       3080 : Bool gf_utf8_is_legal(const u8 *data, u32 length)</span>
+<span class="lineNum">     380 </span>            : {
+<span class="lineNum">     381 </span>            :         //we simply run ConvertUTF8toUTF16 without target
+<span class="lineNum">     382 </span>            :         const UTF8** sourceStart = (const UTF8**) &amp;data;
+<span class="lineNum">     383 </span><span class="lineCov">       3080 :         const UTF8* sourceEnd = (const UTF8*) ( data + length );</span>
+<span class="lineNum">     384 </span>            :         ConversionResult result = conversionOK;
+<span class="lineNum">     385 </span>            :         const UTF8* source = *sourceStart;
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span><span class="lineCov">    2377484 :         while (source &lt; sourceEnd) {</span>
+<span class="lineNum">     388 </span>            :                 UTF32 ch = 0;
+<span class="lineNum">     389 </span><span class="lineCov">    2373477 :                 unsigned short extraBytesToRead = trailingBytesForUTF8[*source];</span>
+<span class="lineNum">     390 </span><span class="lineCov">    2373477 :                 if (source + extraBytesToRead &gt;= sourceEnd) {</span>
+<span class="lineNum">     391 </span>            :                         result = sourceExhausted;
+<span class="lineNum">     392 </span>            :                         break;
+<span class="lineNum">     393 </span>            :                 }
+<span class="lineNum">     394 </span>            :                 /* Do this check whether lenient or strict */
+<span class="lineNum">     395 </span><span class="lineCov">    2373477 :                 if (! isLegalUTF8(source, extraBytesToRead+1)) {</span>
+<span class="lineNum">     396 </span>            :                         result = sourceIllegal;
+<span class="lineNum">     397 </span>            :                         break;
+<span class="lineNum">     398 </span>            :                 }
+<span class="lineNum">     399 </span>            :                 /*
+<span class="lineNum">     400 </span>            :                  * The cases all fall through. See &quot;Note A&quot; below.
+<span class="lineNum">     401 </span>            :                  */
+<span class="lineNum">     402 </span><span class="lineCov">    2371324 :                 switch (extraBytesToRead) {</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :                 case 5:</span>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :                         ch += *source++;</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :                         ch &lt;&lt;= 6; /* remember, illegal UTF-8 */</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :                 case 4:</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :                         ch += *source++;</span>
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :                         ch &lt;&lt;= 6; /* remember, illegal UTF-8 */</span>
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :                 case 3:</span>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :                         ch += *source++;</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :                         ch &lt;&lt;= 6;</span>
+<span class="lineNum">     412 </span><span class="lineCov">         27 :                 case 2:</span>
+<span class="lineNum">     413 </span><span class="lineCov">         27 :                         ch += *source++;</span>
+<span class="lineNum">     414 </span><span class="lineCov">         27 :                         ch &lt;&lt;= 6;</span>
+<span class="lineNum">     415 </span><span class="lineCov">         58 :                 case 1:</span>
+<span class="lineNum">     416 </span><span class="lineCov">         58 :                         ch += *source++;</span>
+<span class="lineNum">     417 </span><span class="lineCov">         58 :                         ch &lt;&lt;= 6;</span>
+<span class="lineNum">     418 </span><span class="lineCov">    2371324 :                 case 0:</span>
+<span class="lineNum">     419 </span><span class="lineCov">    2371324 :                         ch += *source++;</span>
+<span class="lineNum">     420 </span>            :                 }
+<span class="lineNum">     421 </span><span class="lineCov">    2371324 :                 ch -= offsetsFromUTF8[extraBytesToRead];</span>
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span><span class="lineCov">    2371324 :                 if (ch &lt;= UNI_MAX_BMP) { /* Target is a character &lt;= 0xFFFF */</span>
+<span class="lineNum">     424 </span>            :                         /* UTF-16 surrogate values are illegal in UTF-32 */
+<span class="lineNum">     425 </span><span class="lineCov">    2371324 :                         if (ch &gt;= UNI_SUR_HIGH_START &amp;&amp; ch &lt;= UNI_SUR_LOW_END) {</span>
+<span class="lineNum">     426 </span>            :                                 result = sourceIllegal;
+<span class="lineNum">     427 </span>            :                                 break;
+<span class="lineNum">     428 </span>            :                         }
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :                 } else if (ch &gt; UNI_MAX_UTF16) {</span>
+<span class="lineNum">     430 </span>            :                         result = sourceIllegal;
+<span class="lineNum">     431 </span>            :                         break; /* Bail out; shouldn't continue */
+<span class="lineNum">     432 </span>            :                 }
+<span class="lineNum">     433 </span>            :         }
+<span class="lineNum">     434 </span><span class="lineCov">       3080 :         return (result==conversionOK) ? GF_TRUE : GF_FALSE;</span>
+<span class="lineNum">     435 </span>            : }
+<a name="436"><span class="lineNum">     436 </span>            : </a>
+<span class="lineNum">     437 </span>            : GF_EXPORT
+<span class="lineNum">     438 </span><span class="lineCov">      15966 : size_t gf_utf8_wcslen (const unsigned short *s)</span>
+<span class="lineNum">     439 </span>            : {
+<span class="lineNum">     440 </span>            :         const unsigned short* ptr;
+<span class="lineNum">     441 </span><span class="lineCov">      15966 :         for (ptr = s; *ptr != (unsigned short)'\0'; ptr++) {</span>
+<span class="lineNum">     442 </span>            :         }
+<span class="lineNum">     443 </span><span class="lineCov">      15966 :         return ptr - s;</span>
+<span class="lineNum">     444 </span>            : }
+<a name="445"><span class="lineNum">     445 </span>            : </a>
+<span class="lineNum">     446 </span>            : GF_EXPORT
+<span class="lineNum">     447 </span><span class="lineCov">       8528 : size_t gf_utf8_wcstombs(char* dest, size_t len, const unsigned short** srcp)</span>
+<span class="lineNum">     448 </span>            : {
+<span class="lineNum">     449 </span><span class="lineCov">       8528 :         if (!srcp || !*srcp)</span>
+<span class="lineNum">     450 </span>            :                 return 0;
+<span class="lineNum">     451 </span>            :         else {
+<span class="lineNum">     452 </span>            :                 const UTF16** sourceStart = srcp;
+<span class="lineNum">     453 </span><span class="lineCov">       8528 :                 const UTF16* sourceEnd = *srcp + gf_utf8_wcslen(*srcp);</span>
+<span class="lineNum">     454 </span><span class="lineCov">       8528 :                 UTF8* targetStart = (UTF8*) dest;</span>
+<span class="lineNum">     455 </span><span class="lineCov">       8528 :                 UTF8* targetEnd = (UTF8*) dest + len;</span>
+<span class="lineNum">     456 </span>            :                 ConversionFlags flags = strictConversion;
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span><span class="lineCov">       8528 :                 ConversionResult res = ConvertUTF16toUTF8(sourceStart, sourceEnd, &amp;targetStart, targetEnd, flags);</span>
+<span class="lineNum">     459 </span><span class="lineCov">       8528 :                 if (res != conversionOK) return (size_t)-1;</span>
+<span class="lineNum">     460 </span><span class="lineCov">       8528 :                 *targetStart = 0;</span>
+<span class="lineNum">     461 </span><span class="lineCov">       8528 :                 *srcp=NULL;</span>
+<span class="lineNum">     462 </span><span class="lineCov">       8528 :                 return strlen(dest);</span>
+<span class="lineNum">     463 </span>            :         }
+<span class="lineNum">     464 </span>            : }
+<a name="465"><span class="lineNum">     465 </span>            : </a>
+<span class="lineNum">     466 </span>            : GF_EXPORT
+<span class="lineNum">     467 </span><span class="lineCov">       7422 : size_t gf_utf8_mbstowcs(unsigned short* dest, size_t len, const char** srcp)</span>
+<span class="lineNum">     468 </span>            : {
+<span class="lineNum">     469 </span><span class="lineCov">       7422 :         if (!srcp || !*srcp)</span>
+<span class="lineNum">     470 </span>            :                 return 0;
+<span class="lineNum">     471 </span>            :         else {
+<span class="lineNum">     472 </span>            :                 const UTF8** sourceStart = (const UTF8**) srcp;
+<span class="lineNum">     473 </span><span class="lineCov">       7422 :                 const UTF8* sourceEnd = (const UTF8*) ( *srcp + strlen( *srcp) );</span>
+<span class="lineNum">     474 </span><span class="lineCov">       7422 :                 UTF16* targetStart = (UTF16* ) dest;</span>
+<span class="lineNum">     475 </span><span class="lineCov">       7422 :                 UTF16* targetEnd = (UTF16* ) (dest + len);</span>
+<span class="lineNum">     476 </span>            :                 ConversionFlags flags = strictConversion;
+<span class="lineNum">     477 </span><span class="lineCov">       7422 :                 ConversionResult res = ConvertUTF8toUTF16(sourceStart, sourceEnd, &amp;targetStart, targetEnd, flags);</span>
+<span class="lineNum">     478 </span><span class="lineCov">       7422 :                 if (res != conversionOK) return (size_t)-1;</span>
+<span class="lineNum">     479 </span><span class="lineCov">       7421 :                 *targetStart = 0;</span>
+<span class="lineNum">     480 </span><span class="lineCov">       7421 :                 *srcp=NULL;</span>
+<span class="lineNum">     481 </span><span class="lineCov">       7421 :                 return gf_utf8_wcslen(dest);</span>
+<span class="lineNum">     482 </span>            :         }
+<span class="lineNum">     483 </span>            : }
+<span class="lineNum">     484 </span>            : 
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            : #else
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span>            : GF_EXPORT
+<span class="lineNum">     489 </span>            : size_t gf_utf8_wcslen (const unsigned short *s)
+<span class="lineNum">     490 </span>            : {
+<span class="lineNum">     491 </span>            :         const unsigned short* ptr;
+<span class="lineNum">     492 </span>            :         for (ptr = s; *ptr != (unsigned short)'\0'; ptr++) {
+<span class="lineNum">     493 </span>            :         }
+<span class="lineNum">     494 </span>            :         return ptr - s;
+<span class="lineNum">     495 </span>            : }
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span>            : GF_EXPORT
+<span class="lineNum">     498 </span>            : size_t gf_utf8_wcstombs(char* dest, size_t len, const unsigned short** srcp)
+<span class="lineNum">     499 </span>            : {
+<span class="lineNum">     500 </span>            :         /*
+<span class="lineNum">     501 </span>            :         * Original code from the GNU UTF-8 Library
+<span class="lineNum">     502 </span>            :         */
+<span class="lineNum">     503 </span>            :         size_t count;
+<span class="lineNum">     504 </span>            :         const unsigned short * src = *srcp;
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            :         if (dest != NULL) {
+<span class="lineNum">     507 </span>            :                 char* destptr = dest;
+<span class="lineNum">     508 </span>            :                 for (;; src++) {
+<span class="lineNum">     509 </span>            :                         unsigned char c;
+<span class="lineNum">     510 </span>            :                         unsigned short wc = *src;
+<span class="lineNum">     511 </span>            :                         if (wc &lt; 0x80) {
+<span class="lineNum">     512 </span>            :                                 if (wc == (wchar_t)'\0') {
+<span class="lineNum">     513 </span>            :                                         if (len == 0) {
+<span class="lineNum">     514 </span>            :                                                 *srcp = src;
+<span class="lineNum">     515 </span>            :                                                 break;
+<span class="lineNum">     516 </span>            :                                         }
+<span class="lineNum">     517 </span>            :                                         *destptr = '\0';
+<span class="lineNum">     518 </span>            :                                         *srcp = NULL;
+<span class="lineNum">     519 </span>            :                                         break;
+<span class="lineNum">     520 </span>            :                                 }
+<span class="lineNum">     521 </span>            :                                 count = 0;
+<span class="lineNum">     522 </span>            :                                 c = (unsigned char) wc;
+<span class="lineNum">     523 </span>            :                         } else if (wc &lt; 0x800) {
+<span class="lineNum">     524 </span>            :                                 count = 1;
+<span class="lineNum">     525 </span>            :                                 c = (unsigned char) ((wc &gt;&gt; 6) | 0xC0);
+<span class="lineNum">     526 </span>            :                         } else {
+<span class="lineNum">     527 </span>            :                                 count = 2;
+<span class="lineNum">     528 </span>            :                                 c = (unsigned char) ((wc &gt;&gt; 12) | 0xE0);
+<span class="lineNum">     529 </span>            :                         }
+<span class="lineNum">     530 </span>            :                         if (len &lt;= count) {
+<span class="lineNum">     531 </span>            :                                 *srcp = src;
+<span class="lineNum">     532 </span>            :                                 break;
+<span class="lineNum">     533 </span>            :                         }
+<span class="lineNum">     534 </span>            :                         len -= count+1;
+<span class="lineNum">     535 </span>            :                         *destptr++ = c;
+<span class="lineNum">     536 </span>            :                         if (count &gt; 0)
+<span class="lineNum">     537 </span>            :                                 do {
+<span class="lineNum">     538 </span>            :                                         *destptr++ = (unsigned char)(((wc &gt;&gt; (6 * --count)) &amp; 0x3F) | 0x80);
+<span class="lineNum">     539 </span>            :                                 } while (count &gt; 0);
+<span class="lineNum">     540 </span>            :                 }
+<span class="lineNum">     541 </span>            :                 return destptr - dest;
+<span class="lineNum">     542 </span>            :         } else {
+<span class="lineNum">     543 </span>            :                 /* Ignore dest and len. */
+<span class="lineNum">     544 </span>            :                 size_t totalcount = 0;
+<span class="lineNum">     545 </span>            :                 for (;; src++) {
+<span class="lineNum">     546 </span>            :                         unsigned short wc = *src;
+<span class="lineNum">     547 </span>            :                         size_t count;
+<span class="lineNum">     548 </span>            :                         if (wc &lt; 0x80) {
+<span class="lineNum">     549 </span>            :                                 if (wc == (wchar_t)'\0') {
+<span class="lineNum">     550 </span>            :                                         *srcp = NULL;
+<span class="lineNum">     551 </span>            :                                         break;
+<span class="lineNum">     552 </span>            :                                 }
+<span class="lineNum">     553 </span>            :                                 count = 1;
+<span class="lineNum">     554 </span>            :                         } else if (wc &lt; 0x800) {
+<span class="lineNum">     555 </span>            :                                 count = 2;
+<span class="lineNum">     556 </span>            :                         } else {
+<span class="lineNum">     557 </span>            :                                 count = 3;
+<span class="lineNum">     558 </span>            :                         }
+<span class="lineNum">     559 </span>            :                         totalcount += count;
+<span class="lineNum">     560 </span>            :                 }
+<span class="lineNum">     561 </span>            :                 return totalcount;
+<span class="lineNum">     562 </span>            :         }
+<span class="lineNum">     563 </span>            : }
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span>            : typedef struct
+<span class="lineNum">     567 </span>            : {
+<span class="lineNum">     568 </span>            :         u32 count : 16;   /* number of bytes remaining to be processed */
+<span class="lineNum">     569 </span>            :         u32 value : 16;   /* if count &gt; 0: partial wide character */
+<span class="lineNum">     570 </span>            :         /*
+<span class="lineNum">     571 </span>            :            If WCHAR_T_BITS == 16, need 2 bits for count,
+<span class="lineNum">     572 </span>            :            12 bits for value (10 for mbstowcs direction, 12 for wcstombs direction).
+<span class="lineNum">     573 </span>            :         */
+<span class="lineNum">     574 </span>            : } gf_utf8_mbstate_t;
+<span class="lineNum">     575 </span>            : 
+<span class="lineNum">     576 </span>            : static gf_utf8_mbstate_t internal;
+<span class="lineNum">     577 </span>            : 
+<span class="lineNum">     578 </span>            : GF_EXPORT
+<span class="lineNum">     579 </span>            : size_t gf_utf8_mbstowcs(unsigned short* dest, size_t len, const char** srcp)
+<span class="lineNum">     580 </span>            : {
+<span class="lineNum">     581 </span>            :         gf_utf8_mbstate_t* ps = &amp;internal;
+<span class="lineNum">     582 </span>            :         const char *src = *srcp;
+<span class="lineNum">     583 </span>            : 
+<span class="lineNum">     584 </span>            :         unsigned short* destptr = dest;
+<span class="lineNum">     585 </span>            :         for (; len &gt; 0; destptr++, len--) {
+<span class="lineNum">     586 </span>            :                 const char* backup_src = src;
+<span class="lineNum">     587 </span>            :                 unsigned char c;
+<span class="lineNum">     588 </span>            :                 unsigned short wc;
+<span class="lineNum">     589 </span>            :                 size_t count;
+<span class="lineNum">     590 </span>            :                 if (ps-&gt;count == 0) {
+<span class="lineNum">     591 </span>            :                         c = (unsigned char) *src;
+<span class="lineNum">     592 </span>            :                         if (c &lt; 0x80) {
+<span class="lineNum">     593 </span>            :                                 *destptr = (wchar_t) c;
+<span class="lineNum">     594 </span>            :                                 if (c == 0) {
+<span class="lineNum">     595 </span>            :                                         src = NULL;
+<span class="lineNum">     596 </span>            :                                         break;
+<span class="lineNum">     597 </span>            :                                 }
+<span class="lineNum">     598 </span>            :                                 src++;
+<span class="lineNum">     599 </span>            :                                 continue;
+<span class="lineNum">     600 </span>            :                         } else if (c &lt; 0xC0) {
+<span class="lineNum">     601 </span>            :                                 /* Spurious 10XXXXXX byte is invalid. */
+<span class="lineNum">     602 </span>            :                                 goto bad_input;
+<span class="lineNum">     603 </span>            :                         }
+<span class="lineNum">     604 </span>            :                         if (c &lt; 0xE0) {
+<span class="lineNum">     605 </span>            :                                 wc = (wchar_t)(c &amp; 0x1F) &lt;&lt; 6;
+<span class="lineNum">     606 </span>            :                                 count = 1;
+<span class="lineNum">     607 </span>            :                                 if (c &lt; 0xC2) goto bad_input;
+<span class="lineNum">     608 </span>            :                         } else if (c &lt; 0xF0) {
+<span class="lineNum">     609 </span>            :                                 wc = (wchar_t)(c &amp; 0x0F) &lt;&lt; 12;
+<span class="lineNum">     610 </span>            :                                 count = 2;
+<span class="lineNum">     611 </span>            :                         }
+<span class="lineNum">     612 </span>            :                         else goto bad_input;
+<span class="lineNum">     613 </span>            :                         src++;
+<span class="lineNum">     614 </span>            :                 } else {
+<span class="lineNum">     615 </span>            :                         wc = ps-&gt;value &lt;&lt; 6;
+<span class="lineNum">     616 </span>            :                         count = ps-&gt;count;
+<span class="lineNum">     617 </span>            :                 }
+<span class="lineNum">     618 </span>            :                 for (;;) {
+<span class="lineNum">     619 </span>            :                         c = (unsigned char) *src++ ^ 0x80;
+<span class="lineNum">     620 </span>            :                         if (!(c &lt; 0x40)) goto bad_input_backup;
+<span class="lineNum">     621 </span>            :                         wc |= (unsigned short) c &lt;&lt; (6 * --count);
+<span class="lineNum">     622 </span>            :                         if (count == 0)
+<span class="lineNum">     623 </span>            :                                 break;
+<span class="lineNum">     624 </span>            :                         /* The following test is only necessary once for every character,
+<span class="lineNum">     625 </span>            :                         but it would be too complicated to perform it once only, on
+<span class="lineNum">     626 </span>            :                         the first pass through this loop. */
+<span class="lineNum">     627 </span>            :                         if ((unsigned short) wc &lt; ((unsigned short) 1 &lt;&lt; (5 * count + 6)))
+<span class="lineNum">     628 </span>            :                                 goto bad_input_backup;
+<span class="lineNum">     629 </span>            :                 }
+<span class="lineNum">     630 </span>            :                 *destptr = wc;
+<span class="lineNum">     631 </span>            :                 ps-&gt;count = 0;
+<span class="lineNum">     632 </span>            :                 continue;
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            : bad_input_backup:
+<span class="lineNum">     635 </span>            :                 src = backup_src;
+<span class="lineNum">     636 </span>            :                 goto bad_input;
+<span class="lineNum">     637 </span>            :         }
+<span class="lineNum">     638 </span>            :         *srcp = src;
+<span class="lineNum">     639 </span>            :         return destptr-dest;
+<span class="lineNum">     640 </span>            : 
+<span class="lineNum">     641 </span>            : bad_input:
+<span class="lineNum">     642 </span>            :         *srcp = src;
+<span class="lineNum">     643 </span>            :         return (size_t)(-1);
+<span class="lineNum">     644 </span>            : }
+<span class="lineNum">     645 </span>            : 
+<span class="lineNum">     646 </span>            : 
+<span class="lineNum">     647 </span>            : #endif
+<span class="lineNum">     648 </span>            : 
+<a name="649"><span class="lineNum">     649 </span>            : </a>
+<span class="lineNum">     650 </span>            : GF_EXPORT
+<span class="lineNum">     651 </span><span class="lineCov">       6139 : char *gf_utf_get_utf8_string_from_bom(u8 *data, u32 size, char **out_ptr)</span>
+<span class="lineNum">     652 </span>            : {
+<span class="lineNum">     653 </span>            :         u32 unicode_type = 0;
+<span class="lineNum">     654 </span><span class="lineCov">       6139 :         *out_ptr = NULL;</span>
+<span class="lineNum">     655 </span>            : 
+<span class="lineNum">     656 </span><span class="lineCov">       6139 :         if (size&gt;=5) {</span>
+<span class="lineNum">     657 </span>            :                 /*0: no unicode, 1: UTF-16BE, 2: UTF-16LE*/
+<span class="lineNum">     658 </span><span class="lineCov">       6139 :                 if ((data[0]==0xFF) &amp;&amp; (data[1]==0xFE)) {</span>
+<span class="lineNum">     659 </span><span class="lineCov">          6 :                         if (!data[2] &amp;&amp; !data[3]) {</span>
+<span class="lineNum">     660 </span>            :                                 return NULL;
+<span class="lineNum">     661 </span>            :                         } else {
+<span class="lineNum">     662 </span>            :                                 unicode_type = 2;
+<span class="lineNum">     663 </span>            :                         }
+<span class="lineNum">     664 </span><span class="lineCov">       6133 :                 } else if ((data[0]==0xFE) &amp;&amp; (data[1]==0xFF)) {</span>
+<span class="lineNum">     665 </span><span class="lineCov">         10 :                         if (!data[2] &amp;&amp; !data[3]) {</span>
+<span class="lineNum">     666 </span>            :                                 return NULL;
+<span class="lineNum">     667 </span>            :                         } else {
+<span class="lineNum">     668 </span>            :                                 unicode_type = 1;
+<span class="lineNum">     669 </span>            :                         }
+<span class="lineNum">     670 </span><span class="lineCov">       6123 :                 } else if ((data[0]==0xEF) &amp;&amp; (data[1]==0xBB) &amp;&amp; (data[2]==0xBF)) {</span>
+<span class="lineNum">     671 </span><span class="lineCov">         40 :                         return data+4;</span>
+<span class="lineNum">     672 </span>            :                 }
+<span class="lineNum">     673 </span>            :         }
+<span class="lineNum">     674 </span>            : 
+<span class="lineNum">     675 </span>            :         if (!unicode_type) return data;
+<span class="lineNum">     676 </span>            : 
+<span class="lineNum">     677 </span><span class="lineCov">         16 :         if (size%2) size--;</span>
+<span class="lineNum">     678 </span><span class="lineCov">         16 :         u16 *str_wc = gf_malloc(size+2);</span>
+<span class="lineNum">     679 </span>            :         u16 *srcwc;
+<span class="lineNum">     680 </span><span class="lineCov">         16 :         char *dst = gf_malloc(size+2);</span>
+<span class="lineNum">     681 </span><span class="lineCov">         16 :         *out_ptr = dst;</span>
+<span class="lineNum">     682 </span>            :         u32 i;
+<span class="lineNum">     683 </span><span class="lineCov">      30752 :         for (i=0; i&lt;size; i+=2) {</span>
+<span class="lineNum">     684 </span>            :                 u16 wchar=0;
+<span class="lineNum">     685 </span><span class="lineCov">      30736 :                 u8 c1 = data[i];</span>
+<span class="lineNum">     686 </span><span class="lineCov">      30736 :                 u8 c2 = data[i+1];</span>
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span>            :                 /*Little-endian order*/
+<span class="lineNum">     689 </span><span class="lineCov">      30736 :                 if (unicode_type==2) {</span>
+<span class="lineNum">     690 </span><span class="lineCov">       5736 :                         if (c2) {</span>
+<span class="lineNum">     691 </span><span class="lineCov">        218 :                                 wchar = c2;</span>
+<span class="lineNum">     692 </span><span class="lineCov">        218 :                                 wchar &lt;&lt;=8;</span>
+<span class="lineNum">     693 </span><span class="lineCov">        218 :                                 wchar |= c1;</span>
+<span class="lineNum">     694 </span>            :                         }
+<span class="lineNum">     695 </span><span class="lineCov">       5518 :                         else wchar = c1;</span>
+<span class="lineNum">     696 </span>            :                 } else {
+<span class="lineNum">     697 </span><span class="lineCov">      25000 :                         wchar = c1;</span>
+<span class="lineNum">     698 </span><span class="lineCov">      25000 :                         if (c2) {</span>
+<span class="lineNum">     699 </span><span class="lineCov">      16410 :                                 wchar &lt;&lt;= 8;</span>
+<span class="lineNum">     700 </span><span class="lineCov">      16410 :                                 wchar |= c2;</span>
+<span class="lineNum">     701 </span>            :                         }
+<span class="lineNum">     702 </span>            :                 }
+<span class="lineNum">     703 </span><span class="lineCov">      30736 :                 str_wc[i/2] = wchar;</span>
+<span class="lineNum">     704 </span>            :         }
+<span class="lineNum">     705 </span><span class="lineCov">         16 :         str_wc[i/2] = 0;</span>
+<span class="lineNum">     706 </span><span class="lineCov">         16 :         srcwc = str_wc;</span>
+<span class="lineNum">     707 </span><span class="lineCov">         16 :         gf_utf8_wcstombs(dst, size, (const unsigned short **) &amp;srcwc);</span>
+<span class="lineNum">     708 </span><span class="lineCov">         16 :         gf_free(str_wc);</span>
+<span class="lineNum">     709 </span>            : 
+<span class="lineNum">     710 </span><span class="lineCov">         16 :         return dst;</span>
+<span class="lineNum">     711 </span>            : }
+<span class="lineNum">     712 </span>            : 
+<span class="lineNum">     713 </span>            : 
+<span class="lineNum">     714 </span>            : #if defined(WIN32)
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span>            : GF_EXPORT
+<span class="lineNum">     717 </span>            : wchar_t* gf_utf8_to_wcs(const char* str)
+<span class="lineNum">     718 </span>            : {
+<span class="lineNum">     719 </span>            :         size_t source_len;
+<span class="lineNum">     720 </span>            :         wchar_t* result;
+<span class="lineNum">     721 </span>            :         if (str == 0) return 0;
+<span class="lineNum">     722 </span>            :         source_len = strlen(str);
+<span class="lineNum">     723 </span>            :         result = gf_calloc(source_len + 1, sizeof(wchar_t));
+<span class="lineNum">     724 </span>            :         if (!result)
+<span class="lineNum">     725 </span>            :                 return 0;
+<span class="lineNum">     726 </span>            :         if (gf_utf8_mbstowcs(result, source_len, &amp;str) == (size_t)-1) {
+<span class="lineNum">     727 </span>            :                 gf_free(result);
+<span class="lineNum">     728 </span>            :                 return 0;
+<span class="lineNum">     729 </span>            :         }
+<span class="lineNum">     730 </span>            :         return result;
+<span class="lineNum">     731 </span>            : }
+<span class="lineNum">     732 </span>            : 
+<span class="lineNum">     733 </span>            : GF_EXPORT
+<span class="lineNum">     734 </span>            : char* gf_wcs_to_utf8(const wchar_t* str)
+<span class="lineNum">     735 </span>            : {
+<span class="lineNum">     736 </span>            :         size_t source_len;
+<span class="lineNum">     737 </span>            :         char* result;
+<span class="lineNum">     738 </span>            :         if (str == 0) return 0;
+<span class="lineNum">     739 </span>            :         source_len = wcslen(str);
+<span class="lineNum">     740 </span>            :         result = gf_calloc(source_len + 1, UTF8_MAX_BYTES_PER_CHAR);
+<span class="lineNum">     741 </span>            :         if (!result)
+<span class="lineNum">     742 </span>            :                 return 0;
+<span class="lineNum">     743 </span>            :         if (gf_utf8_wcstombs(result, source_len * UTF8_MAX_BYTES_PER_CHAR, &amp;str) &lt; 0) {
+<span class="lineNum">     744 </span>            :                 gf_free(result);
+<span class="lineNum">     745 </span>            :                 return 0;
+<span class="lineNum">     746 </span>            :         }
+<span class="lineNum">     747 </span>            :         return result;
+<span class="lineNum">     748 </span>            : }
+<span class="lineNum">     749 </span>            : #endif
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span>            : #endif /* GPAC_DISABLE_CORE_TOOLS */
+<span class="lineNum">     752 </span>            : 
+<span class="lineNum">     753 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

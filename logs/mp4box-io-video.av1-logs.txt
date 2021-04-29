@@ -1,0 +1,69 @@
+*** mp4box-io-video.av1 logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:36 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/video.av1" ***
+Import probing results for ./media/auxiliary_files/video.av1:
+File has 1 tracks
+- Track 1 type: Video - Codec AOM AV1 Video
+	Size 128x128 @ 25 FPS
+
+For more details, use `gpac -i video.av1 inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/video.av1.mp4  (add) hash: 
+File hash (SHA-1): AEB5FBC9D84B25C620B25BD303AD2626E93B10F5
+Hash OK for ./results/temp/video.av1.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/video.av1 -new ./results/temp/video.av1.mp4" ***
+Track Importing AOM AV1 Video - Width 128 Height 128 FPS 25000/1000
+
+
+*** Subtest "NALDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dnal 1 ./results/temp/video.av1.mp4 -out ./results/temp/nal.xml" ***
+
+Computing ./results/temp/nal.xml  (NALDump) hash: 
+File hash (SHA-1): EF65FC1E16D839D31F545B3FA2B77A234B09AC5E
+Hash fail, ref hash ./hash_refs/mp4box-io-video.av1-NALDump.hash was 3E67F4EACD9B0F8F60446411C68DD5B52A84FD32
+Computing ./results/temp/video.av1.1.tmp  (diso) hash: 
+File hash (SHA-1): 1C9AF1C5E636DF87C0F7658324FAC580B0F7F644
+Hash OK for ./results/temp/video.av1.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/video.av1.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:06.920
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand iso4 - version 1 - compatible brands: iso4 av01
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 25000
+Media Duration 00:00:06.920 
+Media Info: Language "Undetermined (und)" - Type "vide:av01" - 173 samples
+Visual Sample Entry Info: width=128 height=128 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=128 height=128
+	AOM AV1 stream - Resolution 128 x 128
+	version=1, profile=0, level_idx0=0, tier=0
+	high_bitdepth=0, twelve_bit=0, monochrome=0
+	chroma: subsampling_x=1, subsampling_y=1, sample_position=0
+	OBU#1 seq_header hash: 9AE0FB052BE37AFC30B4EDB97A0E024E0A099832
+	RFC6381 Codec Parameters: av01.0.00M.08.0.110
+	Track Meta type: "undefined" - 0 resource item(s)
+	Only one sync sample
+	Max sample duration: 1000 / 25000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/video.av1.mp4 -out ./results/temp/video.av1.1.tmp" ***
+
+Computing ./results/temp/video.av1.2.tmp  (dts) hash: 
+File hash (SHA-1): 40EFF4AFF72C9AEF97914F760CCDDD03F3769DD3
+Hash OK for ./results/temp/video.av1.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/video.av1.mp4 -out ./results/temp/video.av1.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/video.av1.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 5AB0E9BDE98A3DD5E204712A4A0562BCDAA1CD63
+Hash OK for ./results/temp/inspect.txt

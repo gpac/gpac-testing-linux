@@ -1,0 +1,46 @@
+*** dash-live-generation logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:36 ***
+
+
+*** Subtest "dash-input-preparation": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/counter/counter_30s_I25_baseline_1280x720_512kbps.264:dur=5 -add ./external_media/counter/counter_30s_audio.aac:dur=5 -new ./results/temp/file.mp4" ***
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+Track Importing MPEG-4 AVC - Width 1280 Height 720 FPS 100/4
+[MP4Mux] Imported 127 frames - media duration 5.08 - track duration 5.08
+AVC|H264 duration specified at import time, may have parsed more frames than imported
+AVC|H264 parsed 132 samples (150 NALUs) - Slices: 6 I 126 P 0 B - 1 SEI - 6 IDR
+AVC|H264 Max NALU size is 32815 - stream could be optimized by setting nal_length=2
+Track Importing AAC  - SampleRate 44100 Num Channels 1
+[MP4Mux] Imported 216 frames - media duration 5.01551 - track duration 5.015
+
+
+*** Subtest "dash-live": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -bs-switching single -mpd-refresh 10 -time-shift -1 -dash-ctx ./results/temp/dash_ctx -run-for 4000 -dynamic -profile live -dash-live 2000  ./results/temp/file.mp4#video ./results/temp/file.mp4#audio -out ./results/temp/file.mpd" ***
+Live DASH-ing - press 'q' to quit, 's' to save context and quit
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[Dasher] Input ./results/temp/file.mp4: max audio duration 221184/44100 in the period is less than duration 508/100, clamping will happen
+[Dasher] MPD Availability start time initialized to 1619739096384 ms
+[MPD] Generating MPD at time 2021-04-29T23:31:36.386Z
+[Dasher] AS-1 Rep 1 segment 1 done 1997 ms before UTC due time
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 2 end 2
+[Dasher] AS-1 Rep 2 segment 1 done 1992 ms before UTC due time
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.99692 end 2
+[Dasher] AS-1 Rep 1 segment 2 done 3996 ms before UTC due time
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 4 end 3
+[Dasher] AS-1 Rep 1 segment 3 done 5995 ms before UTC due time
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 5.01 end 4
+[Dasher] AS-1 Rep 2 segment 2 done 3988 ms before UTC due time
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 3.99383 end 3
+[Dasher] AS-1 Rep 2 segment 3 done 5994 ms before UTC due time
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 5.01551 end 4
+[Dasher] updated period DID1 duration 5015 MPD time 5015
+[MPD] Generating MPD at time 2021-04-29T23:31:36.390Z
+[Dasher] End of Period DID1
+[Dasher] End of MPD (no more active streams)
+
+Next generation scheduled in 5009 ms (DASH time 5015 ms)Done running, computing static MPD
+
+
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 94D3EE4E513CBFCB23573DB86971D9F2166C7541
+Hash fail, ref hash ./hash_refs/dash-live-generation-inspect.hash was F3385C58D4C1A2F3A680C5AC099815F8A1F9B489
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:deep:interleave=false:dur=2/1:log=./results/temp/inspect.txt" ***
+

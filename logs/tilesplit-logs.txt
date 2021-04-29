@@ -1,0 +1,47 @@
+*** tilesplit logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:46:41 ***
+
+
+*** Subtest "all-tiles": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_1280_720_I_25_tiled_1mb.hevc tilesplit @ -o ./results/temp/src.mp4" ***
+
+Computing ./results/temp/src.mp4  (all-tiles) hash: 
+File hash (SHA-1): B829F65C885313896EC54A598111902718770D41
+Hash fail, ref hash ./hash_refs/tilesplit-all-tiles.hash was C2C1F6DFD907636EC71D8F2317528DA116E61D2E
+
+*** Subtest "inspect-all": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/src.mp4 tileagg @ inspect:allp:deep:interleave=false:log=./results/temp/inspect_all.txt" ***
+
+Computing ./results/temp/inspect_all.txt  (inspect-all) hash: 
+File hash (SHA-1): FA91C8B52581B7AC99604BAEDAB2A72104AC7C13
+Hash OK for ./results/temp/inspect_all.txt
+Computing ./results/temp/drop.mp4  (all-tiles) hash: 
+File hash (SHA-1): C2C1F6DFD907636EC71D8F2317528DA116E61D2E
+Hash OK for ./results/temp/drop.mp4
+
+*** Subtest "drop-tiles": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./external_media/counter/counter_1280_720_I_25_tiled_1mb.hevc tilesplit:tiledrop=2,4,6 @ -o ./results/temp/drop.mp4" ***
+
+
+*** Subtest "inspect-drop": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/drop.mp4 tileagg @ inspect:allp:deep:interleave=false:log=./results/temp/inspect_drop.txt" ***
+
+Computing ./results/temp/inspect_drop.txt  (inspect-drop) hash: 
+File hash (SHA-1): 90B8A3435CCABA9E4EF2794FD637FC3C9D3F187A
+Hash OK for ./results/temp/inspect_drop.txt
+
+*** Subtest "dash": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -old-arch=no -i ./external_media/counter/counter_1280_720_I_25_tiled_1mb.hevc:#Bitrate=1m tilesplit @ -o ./results/temp/live.mpd" ***
+
+Computing ./results/temp/counter_1280_720_I_25_tiled_1mb_dash_track1_init.mp4  (init) hash: 
+File hash (SHA-1): 55953076355E7335834C94D75E26E84CD991B5B9
+Hash OK for ./results/temp/counter_1280_720_I_25_tiled_1mb_dash_track1_init.mp4
+Computing ./results/temp/live.mpd  (mpd) hash: 
+File hash (SHA-1): 774C99E494F0619BE224473A0C79EDA34A12ACFE
+Hash OK for ./results/temp/live.mpd
+Computing ./results/temp/counter_1280_720_I_25_tiled_1mb_dash_track1_20.m4s  (seg20_base) hash: 
+File hash (SHA-1): F5FE8F04BBAFE8146F5454E3FFD02364804E2EC4
+Hash OK for ./results/temp/counter_1280_720_I_25_tiled_1mb_dash_track1_20.m4s
+Computing ./results/temp/counter_1280_720_I_25_tiled_1mb_dash_track10_20.m4s  (seg20_t10) hash: 
+File hash (SHA-1): C7EE18F4953CD3781D0E1F170CD169F8BE9CF219
+Hash OK for ./results/temp/counter_1280_720_I_25_tiled_1mb_dash_track10_20.m4s
+
+*** Subtest "inspect-dash": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/live.mpd tileagg @ inspect:allp:deep:interleave=false:log=./results/temp/inspect_dash.txt" ***
+
+Computing ./results/temp/inspect_dash.txt  (inspect-dash) hash: 
+File hash (SHA-1): 4A930FCEC21D38AC7D319A9C7CF10FDC03184163
+Hash OK for ./results/temp/inspect_dash.txt

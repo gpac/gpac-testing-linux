@@ -1,0 +1,50 @@
+*** raw-aud-pcm logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:28 ***
+
+
+*** Subtest "dump-pcm": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/aud.mp4 -o ./results/temp/raw.pcm" ***
+
+Computing ./results/temp/raw.pcm  (dump-pcm) hash: 
+File hash (SHA-1): A7A9AD495B3A85BD3348562D3E0862C56C582B8D
+Hash fail, ref hash ./hash_refs/raw-aud-pcm-dump-pcm.hash was 2F628F8CBB5C7E2663FECDF10A383A253CCEB1B2
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.pcm:sr=48000:ch=2 inspect:fmt=@pn@-@cts@-@bo@@lf@:log=./results/temp/dump.txt" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 5C797810F0C2B56F55420D02AC91853533B3366E
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "dump-pcm": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.pcm -o ./results/temp/raw2.pcm" ***
+
+Computing ./results/temp/raw2.pcm  (dump-pcm) hash: 
+File hash (SHA-1): A7A9AD495B3A85BD3348562D3E0862C56C582B8D
+Hash fail, ref hash ./hash_refs/raw-aud-pcm-dump-pcm.hash was 2F628F8CBB5C7E2663FECDF10A383A253CCEB1B2
+
+*** Subtest "play": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.pcm:sr=48000:ch=2 aout:speed=10:vol=0 -graph" ***
+
+Filters connected:
+fin (src=./results/temp/raw.pcm:sr=48000:ch=2) (ptr=0x562af68caec0)
+-(PID raw.pcm) rfpcm (ptr=0x562af68e88e0)
+--(PID raw.pcm) resample (ptr=0x562af68f0c60)
+---(PID raw.pcm) aout (speed=10:vol=0) (ptr=0x562af68cda10)
+
+
+*** Subtest "inspect_reverseplay": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.pcm:sr=48000:ch=2 inspect:speed=-1:fmt=@pn@-@cts@-@bo@@lf@:log=./results/temp/dumpns.txt" ***
+
+Computing ./results/temp/dumpns.txt  (inspect_reverseplay) hash: 
+File hash (SHA-1): 139B3A946D6C7434F40BFDCEC87D6E446EB5CE2F
+Hash OK for ./results/temp/dumpns.txt
+
+*** Subtest "reverse_play": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.pcm:sr=48000:ch=2 aout:speed=-10:vol=0" ***
+
+
+*** Subtest "isobmff-write": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/raw.pcm:sr=48000:ch=2 -o ./results/temp/pcm.mp4:ase=v1" ***
+
+Computing ./results/temp/pcm.mp4  (isobmff-write) hash: 
+File hash (SHA-1): 644C1ED15F5EC021902E8163C9BBBB5CFF0A4B88
+Hash fail, ref hash ./hash_refs/raw-aud-pcm-isobmff-write.hash was D2B7156740D3CA3944A68E3B176FA96195241548
+
+*** Subtest "isobmff-read": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/pcm.mp4 inspect:deep:log=./results/temp/dump_isopcm.txt:test=nocrc" ***
+
+Computing ./results/temp/dump_isopcm.txt  (isobmff-read) hash: 
+File hash (SHA-1): B391DDDCD54323497E3C444AC3581BB9811E0784
+Hash OK for ./results/temp/dump_isopcm.txt

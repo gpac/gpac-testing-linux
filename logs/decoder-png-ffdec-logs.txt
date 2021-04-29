@@ -1,0 +1,49 @@
+*** decoder-png-ffdec logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:27 ***
+
+
+*** Subtest "decoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4 -o ./results/temp/test.rgb -graph -stats -blacklist=imgdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -372236416
+
+Filter stats - 6 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 6 tasks 621 us process time
+		1 packets sent 5000 bytes sent (1610.31 pck/sec 64.4122 mbps)
+		* output PID in.mp4: 2 packets sent
+	Filter fout (dst=./results/temp/test.rgb) : 1 input pids 0 output pids 3 tasks 209 us process time
+		1 packets processed 49152 bytes processed (4784.69 pck/sec 1881.42 mbps)
+		* input PID in.mp4: 1 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 9 tasks 702 us process time
+		2 packets processed 5000 bytes processed (2849 pck/sec 56.9801 mbps)
+		1 packets sent 15681 bytes sent (1424.5 pck/sec 178.701 mbps)
+		* input PID in.mp4: 2 packets received
+		* output PID in.mp4: 1 packets sent
+	Filter ffdec "ffdec:png" : 1 input pids 1 output pids 6 tasks 1009 us process time
+		1 packets processed 15681 bytes processed (991.08 pck/sec 124.329 mbps)
+		1 packets sent 65536 bytes sent (991.08 pck/sec 519.611 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 1 packets sent
+	Filter writegen : 1 input pids 1 output pids 7 tasks 111 us process time
+		1 packets processed 49152 bytes processed (9009.01 pck/sec 3542.49 mbps)
+		1 packets sent 49152 bytes sent (9009.01 pck/sec 3542.49 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 1 packets sent
+	Filter ffsws : 1 input pids 1 output pids 5 tasks 327 us process time
+		1 packets processed 65536 bytes processed (3058.1 pck/sec 1603.33 mbps)
+		1 packets sent 49152 bytes sent (3058.1 pck/sec 1202.5 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 1 packets sent
+Session stats - threads 1
+	Thread 1: run_time 3013 us active_time 2996 us nb_tasks 41
+
+Total: run_time 3013 us active_time 2996 us nb_tasks 41
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x55f2e5388ee0)
+-(PID in.mp4) mp4dmx (ptr=0x55f2e5396a30)
+--(PID in.mp4) ffdec "ffdec:png" (ptr=0x55f2e539f8b0)
+---(PID in.mp4) ffsws (ptr=0x55f2e53a9730)
+----(PID in.mp4) writegen (ptr=0x55f2e53a0980)
+-----(PID in.mp4) fout (dst=./results/temp/test.rgb) (ptr=0x55f2e5394260)
+
+Computing ./results/temp/test.rgb  (decoder) hash: 
+File hash (SHA-1): E158EF5365629F01C04F8A9C988AE5866B0A1569
+Hash OK for ./results/temp/test.rgb

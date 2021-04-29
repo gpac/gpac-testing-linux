@@ -1,0 +1,114 @@
+*** encoder-h263-ffenc logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:33:38 ***
+
+
+*** Subtest "encoder": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264 vcrop:wnd=0x0x128x96 @ -o ./results/temp/test.263 -graph -stats -blacklist=vtbdec,nvdec,ohevcdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID 350510976
+
+Filter stats - 7 filters
+	Filter fin (src=./media/auxiliary_files/enst_video.h264) : 0 input pids 1 output pids 13 tasks 720 us process time
+		10 packets sent 47679 bytes sent (13888.9 pck/sec 529.767 mbps)
+		* output PID enst_video.h264: 10 packets sent
+	Filter vcrop ID _0x559737dae200_ (wnd=0x0x128x96) : 1 input pids 1 output pids 177 tasks 512 us process time
+		173 packets processed 4251648 bytes processed (337891 pck/sec 66432 mbps)
+		173 hardware frames sent (337891 pck/sec)
+		* input PID enst_video.h264: 173 packets received
+		* output PID enst_video.h264: 173 packets sent
+	Filter fout (dst=./results/temp/test.263) : 1 input pids 0 output pids 175 tasks 715 us process time
+		173 packets processed 128697 bytes processed (241958 pck/sec 1439.97 mbps)
+		* input PID enst_video.h264: 173 packets received
+	Filter rfnalu : 1 input pids 1 output pids 92 tasks 1835 us process time
+		10 packets processed 47679 bytes processed (5449.59 pck/sec 207.865 mbps)
+		174 packets sent 47611 bytes sent (94822.9 pck/sec 207.568 mbps)
+		* input PID enst_video.h264: 10 packets received
+		* output PID enst_video.h264: 174 packets sent
+	Filter ffdec "ffdec:h264" : 1 input pids 1 output pids 178 tasks 12400 us process time
+		173 packets processed 47611 bytes processed (13951.6 pck/sec 30.7168 mbps)
+		173 packets sent 4251648 bytes sent (13951.6 pck/sec 2743 mbps)
+		* input PID enst_video.h264: 173 frames (174 packets) received
+		* output PID enst_video.h264: 173 packets sent
+	Filter ffenc "ffenc:h263" : 1 input pids 1 output pids 177 tasks 14381 us process time
+		173 packets processed 0 bytes processed (12029.8 pck/sec 0 mbps)
+		173 packets sent 128697 bytes sent (12029.8 pck/sec 71.5928 mbps)
+		* input PID enst_video.h264: 173 packets received
+		* output PID enst_video.h264: 173 packets sent
+	Filter writegen : 1 input pids 1 output pids 177 tasks 310 us process time
+		173 packets processed 128697 bytes processed (558065 pck/sec 3321.21 mbps)
+		173 packets sent 128697 bytes sent (558065 pck/sec 3321.21 mbps)
+		* input PID enst_video.h264: 173 packets received
+		* output PID enst_video.h264: 173 packets sent
+Session stats - threads 1
+	Thread 1: run_time 31250 us active_time 31169 us nb_tasks 1064
+
+Total: run_time 31250 us active_time 31169 us nb_tasks 1064
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_video.h264) (ptr=0x559737dab9b0)
+-(PID enst_video.h264) rfnalu (ptr=0x559737db4500)
+--(PID enst_video.h264) ffdec "ffdec:h264" (ptr=0x559737dc5480)
+---(PID enst_video.h264) vcrop (wnd=0x0x128x96) (ID=_0x559737dae200_)
+----(PID enst_video.h264) ffenc "ffenc:h263" (ptr=0x559737de77e0)
+-----(PID enst_video.h264) writegen (ptr=0x559737de8cf0)
+------(PID enst_video.h264) fout (dst=./results/temp/test.263) (ptr=0x559737daf5c0)
+
+
+*** Subtest "inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/test.263 inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump.txt:test=encx" ***
+
+Computing ./results/temp/dump.txt  (inspect) hash: 
+File hash (SHA-1): 76BBC35526E2E86BE2CA37EC30E136D279D9E7F2
+Hash OK for ./results/temp/dump.txt
+
+*** Subtest "encoder-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/in.mp4 vcrop:wnd=0x0x128x96 @ -o ./results/temp/mp4-test.263 -graph -stats -blacklist=vtbdec,nvdec,ohevcdec" ***
+System info: 7961 MB RAM - 2 cores - main thread ID -320487552
+
+Filter stats - 7 filters
+	Filter fin (src=./results/temp/in.mp4) : 0 input pids 1 output pids 5 tasks 658 us process time
+		1 packets sent 2746 bytes sent (1519.76 pck/sec 33.386 mbps)
+		* output PID in.mp4: 1 packets sent
+	Filter vcrop ID _0x55e2c772d1c0_ (wnd=0x0x128x96) : 1 input pids 1 output pids 16 tasks 347 us process time
+		12 packets processed 294912 bytes processed (34582.1 pck/sec 6799.12 mbps)
+		12 hardware frames sent (34582.1 pck/sec)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter fout (dst=./results/temp/mp4-test.263) : 1 input pids 0 output pids 14 tasks 151 us process time
+		12 packets processed 3766 bytes processed (79470.2 pck/sec 199.523 mbps)
+		* input PID in.mp4: 12 packets received
+	Filter mp4dmx : 1 input pids 1 output pids 8 tasks 787 us process time
+		1 packets processed 2746 bytes processed (1270.65 pck/sec 27.9136 mbps)
+		12 packets sent 1948 bytes sent (15247.8 pck/sec 19.8018 mbps)
+		* input PID in.mp4: 1 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter ffdec "ffdec:h264" : 1 input pids 1 output pids 17 tasks 1917 us process time
+		12 packets processed 1948 bytes processed (6259.78 pck/sec 8.12937 mbps)
+		12 packets sent 294912 bytes sent (6259.78 pck/sec 1230.72 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter ffenc "ffenc:h263" : 1 input pids 1 output pids 16 tasks 2023 us process time
+		12 packets processed 0 bytes processed (5931.78 pck/sec 0 mbps)
+		12 packets sent 3766 bytes sent (5931.78 pck/sec 14.8927 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+	Filter writegen : 1 input pids 1 output pids 16 tasks 89 us process time
+		12 packets processed 3766 bytes processed (134831 pck/sec 338.517 mbps)
+		12 packets sent 3766 bytes sent (134831 pck/sec 338.517 mbps)
+		* input PID in.mp4: 12 packets received
+		* output PID in.mp4: 12 packets sent
+Session stats - threads 1
+	Thread 1: run_time 6024 us active_time 6006 us nb_tasks 98
+
+Total: run_time 6024 us active_time 6006 us nb_tasks 98
+
+Filters connected:
+fin (src=./results/temp/in.mp4) (ptr=0x55e2c772a9b0)
+-(PID in.mp4) mp4dmx (ptr=0x55e2c7732b30)
+--(PID in.mp4) ffdec "ffdec:h264" (ptr=0x55e2c773e9a0)
+---(PID in.mp4) vcrop (wnd=0x0x128x96) (ID=_0x55e2c772d1c0_)
+----(PID in.mp4) ffenc "ffenc:h263" (ptr=0x55e2c7762480)
+-----(PID in.mp4) writegen (ptr=0x55e2c7763990)
+------(PID in.mp4) fout (dst=./results/temp/mp4-test.263) (ptr=0x55e2c772e590)
+
+
+*** Subtest "inspect-mp4": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/mp4-test.263 inspect:test=encode:fmt=@pn@-@dts@-@cts@@lf@:log=./results/temp/dump2.txt:test=encx" ***
+
+Computing ./results/temp/dump2.txt  (inspect-mp4) hash: 
+File hash (SHA-1): 5E2A53B37C3E4450E182D270FBC3F4B01F2A85E8
+Hash OK for ./results/temp/dump2.txt

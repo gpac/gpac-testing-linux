@@ -1,0 +1,75 @@
+*** dash-encode-mp4box-multi logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:31:24 ***
+
+
+*** Subtest "dash": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 1000 -profile live -out ./results/temp/file.mpd ./results/temp/source.mp4#video:@ffsws:osize=64x64@enc:c=avc:fintra=1:b=100k@@ffsws:osize=128x128@enc:c=avc:fintra=1:b=200k ./results/temp/source.mp4#audio -fgraph" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[AVC|H264] Possible Variable Frame Rate: VUI "fixed_frame_rate_flag" absent
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.08 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 1.08 end 2
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 0.981333 end 2
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.08 end 3
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 2.08 end 3
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3.08 end 4
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 3.08 end 4
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 1.984 end 3
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4.08 end 5
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 4.08 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.08 end 6
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 5.08 end 6
+[MP4Mux] Done writing segment 3 - estimated next fragment times start 2.98667 end 4
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6.08 end 7
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 6.08 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7.04 end 8
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 7.04 end 8
+[MP4Mux] Done writing segment 4 - estimated next fragment times start 3.98933 end 5
+[MP4Mux] Done writing segment 5 - estimated next fragment times start 4.992 end 6
+[MP4Mux] Done writing segment 6 - estimated next fragment times start 5.99467 end 7
+[MP4Mux] Done writing segment 7 - estimated next fragment times start 6.99733 end 8
+[MPD] Generating MPD at time 2021-04-29T23:31:25.297Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 8 - estimated next fragment times start 7.04 end 9
+
+Filters connected:
+fin (src=./results/temp/source.mp4:gpac:smode=splitx:tkid=video) (ID=_0x55b77a270ef0_)
+-(PID source.mp4) mp4dmx (ptr=0x55b77a27f150)
+--(PID V1) ffdec "ffdec:h264" (ptr=0x55b77a295320)
+---(PID V1) ffsws (osize=64x64) (ID=_0x55b77a274b10_)
+----(PID V1) ffenc "ffenc:libx264" (c=avc:fintra=1:b=100k) (ID=_0x55b77a275e70_)
+-----(PID V1) rfnalu (ptr=0x55b77a3e1630)
+------(PID V1) dasher (ID=_0x55b77a2a4a30_)
+-------(PID manifest_mpd) fout (dst=./results/temp/file.mpd:gpac:segdur=1000/1000:profile=live:buf=1500:!check_dur:pssh=v:subs_sidx=0) (ptr=0x55b77a26f2e0)
+-------(PID A2) mp4mx (ptr=0x55b77a9813d0)
+--------(PID A2) fout (dst=./results/temp/source_dash_track2_init.mp4:gfopt:segdur=1000/1000:profile=live:buf=1500:!check_dur:pssh=v:subs_sidx=0:frag:xps_inband=no:psshs=moov:mime=audio/mp4) (ptr=0x55b77a974c40)
+-------(PID V1) mp4mx (ptr=0x55b77a985340)
+--------(PID V1) fout (dst=./results/temp/source_dash_track1_init_rep1.mp4:gfopt:segdur=1000/1000:profile=live:buf=1500:!check_dur:pssh=v:subs_sidx=0:frag:xps_inband=no:psshs=moov:mime=video/mp4) (ptr=0x55b77a9776a0)
+-------(PID V1) mp4mx (ptr=0x55b77a989240)
+--------(PID V1) fout (dst=./results/temp/source_dash_track1_init_rep2.mp4:gfopt:segdur=1000/1000:profile=live:buf=1500:!check_dur:pssh=v:subs_sidx=0:frag:xps_inband=no:psshs=moov:mime=video/mp4) (ptr=0x55b77a97aee0)
+---(PID V1) ffsws (osize=128x128) (ID=_0x55b77a277830_)
+----(PID V1) ffenc "ffenc:libx264" (c=avc:fintra=1:b=200k) (ID=_0x55b77a278910_)
+-----(PID V1) rfnalu (ptr=0x55b77a500580)
+------(PID V1) dasher (ID=_0x55b77a2a4a30_)
+fin (src=./results/temp/source.mp4:gpac:smode=splitx:tkid=audio) (ID=_0x55b77a27a240_)
+-(PID source.mp4) mp4dmx (ptr=0x55b77a2848f0)
+--(PID A2) dasher (ID=_0x55b77a2a4a30_)
+
+
+Computing ./results/temp/source_dash_track2_init.mp4  (init-seg-aud) hash: 
+File hash (SHA-1): 074E9701ED8A23B13FD9D540AE3D4B2DFB933247
+Hash OK for ./results/temp/source_dash_track2_init.mp4
+Computing ./results/temp/source_dash_track1_init_rep1.mp4  (init-seg-vid-rep1) hash: 
+File hash (SHA-1): B14B81D554ACAF85D6DEA20B4AD690E230F6DFBE
+Hash fail, ref hash ./hash_refs/dash-encode-mp4box-multi-init-seg-vid-rep1.hash was A212C98340EC3E4F4C06D053C41E5DCDC7BA2EE4
+Computing ./results/temp/source_dash_track1_init_rep2.mp4  (init-seg-vid-rep2) hash: 
+File hash (SHA-1): 6F724D3115B995B4D5F6A101D9337DD0FB1B5102
+Hash fail, ref hash ./hash_refs/dash-encode-mp4box-multi-init-seg-vid-rep2.hash was EDA06845B479FB2C3FA9BFE3418D4B3D2BB494D9
+Computing ./results/temp/file.mpd  (mpd) hash: 
+File hash (SHA-1): 3DAB7772693EB5856B76EADB86E0E92FB6089425
+Hash fail, ref hash ./hash_refs/dash-encode-mp4box-multi-mpd.hash was 469CD41D9C21A68E3CD3A9D6451E259221592460
+Computing ./results/temp/inspect.txt  (inspect) hash: 
+File hash (SHA-1): 87B2B96365C6486C7B18964AA17563D74733AA64
+Hash fail, ref hash ./hash_refs/dash-encode-mp4box-multi-inspect.hash was 9997EB12B97FB7D5E423C8D9FA44B8DFA5690B9F
+
+*** Subtest "": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/file.mpd inspect:allp:interleave=false:fmt=%pn%-%dts%%lf%:log=./results/temp/inspect.txt" ***
+

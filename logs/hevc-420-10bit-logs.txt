@@ -1,0 +1,20 @@
+*** hevc-420-10bit logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:43:27 ***
+
+
+*** Subtest "import": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/rext/counter-bifs-1min-640x360-bipbop_420_10.hvc -new ./results/temp/test.mp4" ***
+Track Importing HEVC - Width 640 Height 360 FPS 25000/1000
+OpenGOP detected - adjusting file brand
+HEVC Import results: 1500 samples (1504 NALUs) - Slices: 47 I 0 P 1453 B - 0 SEI - 1 IDR
+HEVC Stream uses forward prediction - stream CTS offset: 7 frames
+HEVC Max NALU size is 5149 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/test.mp4  (import) hash: 
+File hash (SHA-1): 463D8D0F8A4BE43ACF454C3B41EBE49865AE41C2
+Hash OK for ./results/temp/test.mp4
+
+*** Subtest "decode": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -blacklist=vtbdec,ohevcdec,nvdec -i ./results/temp/test.mp4 -o ./results/temp/dump.yuvl:sstart=8:send=9" ***
+[hevc @ 0x55b9108295e0] high_precision_offsets_enabled_flag not yet implemented
+
+Computing ./results/temp/dump.yuvl  (decode) hash: 
+File hash (SHA-1): 1869F8C09870D92924A7D19EA7E2B57EC6107087
+Hash OK for ./results/temp/dump.yuvl

@@ -1,0 +1,58 @@
+*** mp4box-io-enst_audio.flac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:57 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/enst_audio.flac" ***
+Import probing results for ./external_media/import/enst_audio.flac:
+File has 1 tracks
+Duration: 7.018 s
+- Track 1 type: Audio - Codec Flac Audio
+	SampleRate 48000 - 2 channels
+
+For more details, use `gpac -i enst_audio.flac inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/enst_audio.flac.mp4  (add) hash: 
+File hash (SHA-1): 6DE0DB5FE7D719E90379DD91837FEF3E7E27DEA4
+Hash OK for ./results/temp/enst_audio.flac.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/enst_audio.flac -new ./results/temp/enst_audio.flac.mp4" ***
+Track Importing FLAC - SampleRate 48000 Num Channels 2
+
+Computing ./results/temp/enst_audio.flac.1.tmp  (diso) hash: 
+File hash (SHA-1): 7DF81652336123ABD235066EC75A8DADCAE27901
+Hash OK for ./results/temp/enst_audio.flac.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/enst_audio.flac.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:07.018
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 48000
+Media Duration 00:00:07.018 
+Media Info: Language "Undetermined (und)" - Type "soun:fLaC" - 74 samples
+Flac Audio - Sample Rate 48000 - 2 channel(s)
+	RFC6381 Codec Parameters: fLaC
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 4608 / 48000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/enst_audio.flac.mp4 -out ./results/temp/enst_audio.flac.1.tmp" ***
+
+Computing ./results/temp/enst_audio.flac.2.tmp  (dts) hash: 
+File hash (SHA-1): BA43CF90B45A501EB5EB3ED53556E1B4D32922EE
+Hash OK for ./results/temp/enst_audio.flac.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/enst_audio.flac.mp4 -out ./results/temp/enst_audio.flac.2.tmp" ***
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/enst_audio.flac.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): B133051EAB69A3FB00BD6BE88C4A89123E07DE40
+Hash OK for ./results/temp/inspect.txt

@@ -1,0 +1,71 @@
+*** mp4box-io-subtitle_fr.srt logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:33 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/subtitle_fr.srt" ***
+Import probing results for ./media/auxiliary_files/subtitle_fr.srt:
+File has 1 tracks
+- Track 1 type: Text - Codec Subtitle/text 3GPP/Apple Stream
+
+For more details, use `gpac -i subtitle_fr.srt inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/subtitle_fr.srt.mp4  (add) hash: 
+File hash (SHA-1): 5F918C898286815F10E89DDEA756E8AD6830C305
+Hash OK for ./results/temp/subtitle_fr.srt.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/subtitle_fr.srt -new ./results/temp/subtitle_fr.srt.mp4" ***
+Track Importing Timed Text - Text track 400 x 60 font Serif (size 18) layer 0
+
+Computing ./results/temp/subtitle_fr.srt.1.tmp  (diso) hash: 
+File hash (SHA-1): FE24AF95EBA4EC9DEA4763C8992F00C8FAFE5472
+Hash OK for ./results/temp/subtitle_fr.srt.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/subtitle_fr.srt.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.486
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 1000
+Media Duration 00:00:10.487 
+Media Info: Language "Undetermined (und)" - Type "text:tx3g" - 11 samples
+Unknown Text Stream
+ Size 400 x 60 - Translation X=0 Y=0 - Layer 0
+	RFC6381 Codec Parameters: tx3g
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1525 / 1000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/subtitle_fr.srt.mp4 -out ./results/temp/subtitle_fr.srt.1.tmp" ***
+
+Computing ./results/temp/subtitle_fr.srt.2.tmp  (dts) hash: 
+File hash (SHA-1): 8EE6B6297196CB0ABF27A62F3C5A2FDA1AE0DC1F
+Hash OK for ./results/temp/subtitle_fr.srt.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/subtitle_fr.srt.mp4 -out ./results/temp/subtitle_fr.srt.2.tmp" ***
+
+Computing ./results/temp/subtitle_fr.srt.mp4.hint  (hint) hash: 
+File hash (SHA-1): D81A24AF5E887FC9C531A5126C7BF6F9FBD2A091
+Hash OK for ./results/temp/subtitle_fr.srt.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/subtitle_fr.srt.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 84146CCC65DD868451176843884E4FF2FFF94F80
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/subtitle_fr.srt.mp4 -out ./results/temp/subtitle_fr.srt.mp4.hint" ***
+Hinting track ID 1 - Type "tx3g:tx3g" (3gpp-tt) - BW 0 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/subtitle_fr.srt.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/subtitle_fr.srt.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 55497D7063B96F44ABB041D7B6BC140BE628D9F6
+Hash OK for ./results/temp/subtitle_fr.srt.mp4.hint

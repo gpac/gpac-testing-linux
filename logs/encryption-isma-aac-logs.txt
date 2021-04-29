@@ -1,0 +1,76 @@
+*** encryption-isma-aac logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:34:15 ***
+
+Computing ./results/temp/isma-aac-crypted.mp4  (crypt) hash: 
+File hash (SHA-1): 660F233DFF7F7B37100071D489D64C13C51F298C
+Hash OK for ./results/temp/isma-aac-crypted.mp4
+
+*** Subtest "Encrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -crypt ./media/encryption/isma.xml -out ./results/temp/isma-aac-crypted.mp4 ./results/temp/source_media.mp4" ***
+[ISMACrypt] Encrypting stream PID1 - KMS: self
+
+Computing ./results/temp/isma-aac-decrypted.mp4  (decrypt) hash: 
+File hash (SHA-1): F7CFAAEDCF593450996465F690B9B80C976937A4
+Hash OK for ./results/temp/isma-aac-decrypted.mp4
+
+*** Subtest "Decrypt": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -decrypt ./media/encryption/isma.xml -out ./results/temp/isma-aac-decrypted.mp4 ./results/temp/isma-aac-crypted.mp4" ***
+
+Same Hash for ./results/temp/source_media.mp4 and ./results/temp/isma-aac-decrypted.mp4
+
+*** Subtest "DumpIsma": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dcr ./results/temp/isma-aac-crypted.mp4 -out ./results/temp/isamdump.xml" ***
+
+
+*** Subtest "HintIsma": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/isma-aac-crypted.mp4 -out ./results/temp/isma-aac-crypted_hint.mp4" ***
+Hinting track ID 1 - Type "enca:enca" (enc-mpeg4-generic) - BW 96 kbps
+
+
+*** Subtest "SetKMS": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -set-kms gpac:uri.isma ./results/temp/isma-aac-crypted.mp4 -out ./results/temp/isma_kms.mp4" ***
+
+
+*** Subtest "INFO": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/isma-aac-crypted.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:07.040
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: No visual capability required (0xff)
+Audio PL: AAC Profile @ Level 2 (0x29)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 48000
+Media Duration 00:00:07.040 
+Media Info: Language "Undetermined (und)" - Type "soun:enca" - 330 samples
+Unknown track type
+
+	Protected by ISMA E&A scheme iAEC (version 1)
+scheme location: urn:gpac:isma:encryption_scheme
+	KMS location: key in file
+	Selective Encryption: No
+	Initialization Vector size: 32 bits
+
+	RFC6381 Codec Parameters: mp4a.40.2
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1024 / 48000
+
+
+Computing ./results/temp/isma-aac-crypted_dashinit.mp4  (crypt-dash-init) hash: 
+File hash (SHA-1): EF9B5716D0942708DA8013FC5650E12C6E3F648A
+Hash OK for ./results/temp/isma-aac-crypted_dashinit.mp4
+Computing ./results/temp/isma-aac-crypted_dash1.m4s  (crypt-dash-seg) hash: 
+File hash (SHA-1): FC78057014781ED846AE289B1DB345E640A32672
+Hash OK for ./results/temp/isma-aac-crypted_dash1.m4s
+
+*** Subtest "DASH": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dash 4000 -profile live -out ./results/temp/test.mpd ./results/temp/isma-aac-crypted.mp4" ***
+[Dasher] No template assigned, using $File$_dash$FS$$Number$
+[Dasher] Protection scheme iAEC has no official DASH mapping, using URI "urn:gpac:dash:mp4protection:2018"
+[MP4Mux] Done writing segment 1 - estimated next fragment times start 3.98933 end 2
+[MPD] Generating MPD at time 2021-04-29T23:34:15.950Z
+[Dasher] End of Period 
+[Dasher] End of MPD (no more active streams)
+[MP4Mux] Done writing segment 2 - estimated next fragment times start 7.04 end 3
+
+

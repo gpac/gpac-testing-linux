@@ -1,0 +1,26 @@
+*** gsf-crypted logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:35:43 ***
+
+
+*** Subtest "gsf-mux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./media/auxiliary_files/enst_video.h264 reframer @ -o ./results/temp/dump.gsf:IV=0x279926496a7f5d25da69f2b3b2799a7f:key=0x279926496a7f5d25da69f2b3b2799a7f -graph -logs=container@debug" ***
+
+Filters connected:
+fin (src=./media/auxiliary_files/enst_video.h264) (ptr=0x563eec36de90)
+-(PID enst_video.h264) rfnalu (ptr=0x563eec376b20)
+--(PID enst_video.h264) reframer (ID=_0x563eec3706e0_)
+---(PID enst_video.h264) gsfmx (ptr=0x563eec388fc0)
+----(PID enst_video.h264) fout (dst=./results/temp/dump.gsf:IV=0x279926496a7f5d25da69f2b3b2799a7f:key=0x279926496a7f5d25da69f2b3b2799a7f) (ptr=0x563eec371860)
+
+Computing ./results/temp/dump.gsf  (gsf-mux) hash: 
+File hash (SHA-1): 2DC85FCB6D92A745871C13EF0C08889562D78D70
+Hash fail, ref hash ./hash_refs/gsf-crypted-gsf-mux.hash was A37DEFC4DBC7116590D93A8D1E395F8FB0617FAD
+
+*** Subtest "gsf-demux": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -strict-error -i ./results/temp/dump.gsf:key=0x279926496a7f5d25da69f2b3b2799a7f inspect:allp:deep:interleave=false:log=./results/temp/inspect.txt -graph" ***
+
+Filters connected:
+fin (src=./results/temp/dump.gsf:key=0x279926496a7f5d25da69f2b3b2799a7f) (ptr=0x5559f89f5ec0)
+-(PID dump.gsf) gsfdmx (ptr=0x5559f89fb9f0)
+--(PID dump.gsf) inspect (allp:deep:interleave=false:log=./results/temp/inspect.txt) (ptr=0x5559f89f8860)
+
+Computing ./results/temp/inspect.txt  (gsf-demux) hash: 
+File hash (SHA-1): 2E9FE06FD26CF8EE699C0701D5A12D9288E9BF60
+Hash OK for ./results/temp/inspect.txt

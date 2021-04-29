@@ -1,0 +1,1764 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - utils/bitstream.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">utils</a> - bitstream.c<span style="font-size: 80%;"> (source / <a href="bitstream.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">759</td>
+            <td class="headerCovTableEntry">830</td>
+            <td class="headerCovTableEntryHi">91.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">68</td>
+            <td class="headerCovTableEntry">68</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2020
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / common tools sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/bitstream.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : /*the default size for new streams allocation...*/
+<span class="lineNum">      29 </span>            : #define BS_MEM_BLOCK_ALLOC_SIZE         512
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : /*private types*/
+<span class="lineNum">      32 </span>            : enum
+<span class="lineNum">      33 </span>            : {
+<span class="lineNum">      34 </span>            :         GF_BITSTREAM_FILE_READ = GF_BITSTREAM_WRITE_DYN + 1,
+<span class="lineNum">      35 </span>            :         GF_BITSTREAM_FILE_WRITE,
+<span class="lineNum">      36 </span>            : };
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : struct __tag_bitstream
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span>            :         /*original stream data*/
+<span class="lineNum">      41 </span>            :         FILE *stream;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :         /*or original data*/
+<span class="lineNum">      44 </span>            :         char *original;
+<span class="lineNum">      45 </span>            :         /*the size of our buffer in bytes*/
+<span class="lineNum">      46 </span>            :         u64 size;
+<span class="lineNum">      47 </span>            :         /*current position in BYTES*/
+<span class="lineNum">      48 </span>            :         u64 position;
+<span class="lineNum">      49 </span>            :         /*the byte readen/written*/
+<span class="lineNum">      50 </span>            :         u32 current;
+<span class="lineNum">      51 </span>            :         /*the number of bits in the current byte*/
+<span class="lineNum">      52 </span>            :         u32 nbBits;
+<span class="lineNum">      53 </span>            :         /*the bitstream mode*/
+<span class="lineNum">      54 </span>            :         u32 bsmode;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :         void (*EndOfStream)(void *par);
+<span class="lineNum">      57 </span>            :         void *par;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :         char *cache_write;
+<span class="lineNum">      61 </span>            :         u32 cache_write_size, buffer_written;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :         Bool remove_emul_prevention_byte;
+<span class="lineNum">      64 </span>            :         u32 nb_zeros;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :         GF_Err (*on_block_out)(void *cbk, u8 *data, u32 block_size);
+<span class="lineNum">      67 </span>            :         void *usr_data;
+<span class="lineNum">      68 </span>            :         u64 bytes_out;
+<span class="lineNum">      69 </span>            :         u32 prevent_dispatch;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :         u64 cookie;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :         u8 *cache_read;
+<span class="lineNum">      74 </span>            :         u32 cache_read_size, cache_read_pos, cache_read_alloc;
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :         void (*on_log)(void *udta, const char *field_name, u32 nb_bits, u64 field_val, s32 idx1, s32 idx2, s32 idx3);
+<span class="lineNum">      77 </span>            :         void *log_udta;
+<a name="78"><span class="lineNum">      78 </span>            : };</a>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineCov">    2797466 : GF_Err gf_bs_reassign_buffer(GF_BitStream *bs, const u8 *buffer, u64 BufferSize)</span>
+<span class="lineNum">      81 </span>            : {
+<span class="lineNum">      82 </span><span class="lineCov">    2797466 :         if (!bs) return GF_BAD_PARAM;</span>
+<span class="lineNum">      83 </span><span class="lineCov">    2797466 :         if (bs-&gt;bsmode == GF_BITSTREAM_READ) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">    1843133 :                 bs-&gt;original = (char*)buffer;</span>
+<span class="lineNum">      85 </span><span class="lineCov">    1843133 :                 bs-&gt;size = BufferSize;</span>
+<span class="lineNum">      86 </span><span class="lineCov">    1843133 :                 bs-&gt;position = 0;</span>
+<span class="lineNum">      87 </span><span class="lineCov">    1843133 :                 bs-&gt;current = 0;</span>
+<span class="lineNum">      88 </span><span class="lineCov">    1843133 :                 bs-&gt;nbBits = 8;</span>
+<span class="lineNum">      89 </span>            :                 bs-&gt;current = 0;
+<span class="lineNum">      90 </span><span class="lineCov">    1843133 :                 bs-&gt;nb_zeros = 0;</span>
+<span class="lineNum">      91 </span><span class="lineCov">    1843133 :                 return GF_OK;</span>
+<span class="lineNum">      92 </span>            :         }
+<span class="lineNum">      93 </span><span class="lineCov">     954333 :         if (bs-&gt;bsmode==GF_BITSTREAM_WRITE) {</span>
+<span class="lineNum">      94 </span><span class="lineCov">     826558 :                 if (!buffer || !BufferSize) return GF_BAD_PARAM;</span>
+<span class="lineNum">      95 </span><span class="lineCov">     826558 :                 bs-&gt;original = (char*)buffer;</span>
+<span class="lineNum">      96 </span><span class="lineCov">     826558 :                 bs-&gt;size = BufferSize;</span>
+<span class="lineNum">      97 </span><span class="lineCov">     826558 :                 bs-&gt;position = 0;</span>
+<span class="lineNum">      98 </span><span class="lineCov">     826558 :                 bs-&gt;current = 0;</span>
+<span class="lineNum">      99 </span><span class="lineCov">     826558 :                 bs-&gt;nbBits = 0;</span>
+<span class="lineNum">     100 </span>            :                 bs-&gt;current = 0;
+<span class="lineNum">     101 </span><span class="lineCov">     826558 :                 return GF_OK;</span>
+<span class="lineNum">     102 </span>            :         }
+<span class="lineNum">     103 </span><span class="lineCov">     127775 :         if (bs-&gt;bsmode!=GF_BITSTREAM_WRITE_DYN) return GF_BAD_PARAM;</span>
+<span class="lineNum">     104 </span><span class="lineCov">     127775 :         if (bs-&gt;original) return GF_BAD_PARAM;</span>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">     110731 :         bs-&gt;position = 0;</span>
+<span class="lineNum">     107 </span><span class="lineCov">     110731 :         bs-&gt;current = 0;</span>
+<span class="lineNum">     108 </span><span class="lineCov">     110731 :         bs-&gt;nbBits = 0;</span>
+<span class="lineNum">     109 </span>            :         bs-&gt;current = 0;
+<span class="lineNum">     110 </span><span class="lineCov">     110731 :         bs-&gt;size = BufferSize ? BufferSize : BS_MEM_BLOCK_ALLOC_SIZE;</span>
+<span class="lineNum">     111 </span><span class="lineCov">     110731 :         if (buffer) {</span>
+<span class="lineNum">     112 </span><span class="lineCov">     110731 :                 bs-&gt;original = (char *) buffer;</span>
+<span class="lineNum">     113 </span>            :         } else {
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :                 bs-&gt;original = (char *) gf_malloc(sizeof(char) * ((u32) bs-&gt;size));</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :                 if (! bs-&gt;original) {</span>
+<span class="lineNum">     116 </span>            :                         return GF_OUT_OF_MEM;
+<span class="lineNum">     117 </span>            :                 }
+<span class="lineNum">     118 </span>            :         }
+<span class="lineNum">     119 </span>            :         return GF_OK;
+<span class="lineNum">     120 </span>            : }
+<a name="121"><span class="lineNum">     121 </span>            : </a>
+<span class="lineNum">     122 </span>            : GF_EXPORT
+<span class="lineNum">     123 </span><span class="lineCov">     552356 : GF_BitStream *gf_bs_new(const u8 *buffer, u64 BufferSize, u32 mode)</span>
+<span class="lineNum">     124 </span>            : {
+<span class="lineNum">     125 </span><span class="lineCov">     552356 :         GF_BitStream *tmp = (GF_BitStream *)gf_malloc(sizeof(GF_BitStream));</span>
+<span class="lineNum">     126 </span><span class="lineCov">     552356 :         if (!tmp) return NULL;</span>
+<span class="lineNum">     127 </span>            :         memset(tmp, 0, sizeof(GF_BitStream));
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span><span class="lineCov">     552356 :         tmp-&gt;original = (char*)buffer;</span>
+<span class="lineNum">     130 </span><span class="lineCov">     552356 :         tmp-&gt;size = BufferSize;</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">     552356 :         tmp-&gt;bsmode = mode;</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">     552356 :         switch (tmp-&gt;bsmode) {</span>
+<span class="lineNum">     135 </span><span class="lineCov">     311944 :         case GF_BITSTREAM_READ:</span>
+<span class="lineNum">     136 </span><span class="lineCov">     311944 :                 tmp-&gt;nbBits = 8;</span>
+<span class="lineNum">     137 </span><span class="lineCov">     311944 :                 tmp-&gt;current = 0;</span>
+<span class="lineNum">     138 </span><span class="lineCov">     311944 :                 break;</span>
+<span class="lineNum">     139 </span><span class="lineCov">     240412 :         case GF_BITSTREAM_WRITE:</span>
+<span class="lineNum">     140 </span>            :         case GF_BITSTREAM_WRITE_DYN:
+<span class="lineNum">     141 </span><span class="lineCov">     240412 :                 tmp-&gt;nbBits = 0;</span>
+<span class="lineNum">     142 </span><span class="lineCov">     240412 :                 if (! buffer) {</span>
+<span class="lineNum">     143 </span>            :                         /*if BufferSize is specified, use it. This is typically used when AvgSize of
+<span class="lineNum">     144 </span>            :                         some buffers is known, but some exceed it.*/
+<span class="lineNum">     145 </span><span class="lineCov">     239045 :                         if (BufferSize) {</span>
+<span class="lineNum">     146 </span>            :                                 tmp-&gt;size = BufferSize;
+<span class="lineNum">     147 </span>            :                         } else {
+<span class="lineNum">     148 </span><span class="lineCov">     239000 :                                 tmp-&gt;size = BS_MEM_BLOCK_ALLOC_SIZE;</span>
+<span class="lineNum">     149 </span>            :                         }
+<span class="lineNum">     150 </span><span class="lineCov">     239045 :                         tmp-&gt;original = (char *) gf_malloc(sizeof(char) * ((u32) tmp-&gt;size));</span>
+<span class="lineNum">     151 </span><span class="lineCov">     239045 :                         if (! tmp-&gt;original) {</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :                                 gf_free(tmp);</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                                 return NULL;</span>
+<span class="lineNum">     154 </span>            :                         }
+<span class="lineNum">     155 </span><span class="lineCov">     239045 :                         tmp-&gt;bsmode = GF_BITSTREAM_WRITE_DYN;</span>
+<span class="lineNum">     156 </span>            :                 } else {
+<span class="lineNum">     157 </span>            :                         tmp-&gt;original = (char*)buffer;
+<span class="lineNum">     158 </span>            :                         tmp-&gt;size = BufferSize;
+<span class="lineNum">     159 </span>            :                 }
+<span class="lineNum">     160 </span>            :                 break;
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :         default:</span>
+<span class="lineNum">     162 </span>            :                 /*the stream constructor is not the same...*/
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :                 gf_free(tmp);</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                 return NULL;</span>
+<span class="lineNum">     165 </span>            :         }
+<span class="lineNum">     166 </span>            :         return tmp;
+<span class="lineNum">     167 </span>            : }
+<a name="168"><span class="lineNum">     168 </span>            : </a>
+<span class="lineNum">     169 </span>            : GF_EXPORT
+<span class="lineNum">     170 </span><span class="lineCov">      10011 : GF_BitStream *gf_bs_from_file(FILE *f, u32 mode)</span>
+<span class="lineNum">     171 </span>            : {
+<span class="lineNum">     172 </span>            :         GF_BitStream *tmp;
+<span class="lineNum">     173 </span><span class="lineCov">      10011 :         if (!f) return NULL;</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">      10011 :         tmp = (GF_BitStream *)gf_malloc(sizeof(GF_BitStream));</span>
+<span class="lineNum">     176 </span><span class="lineCov">      10011 :         if (!tmp) return NULL;</span>
+<span class="lineNum">     177 </span>            :         memset(tmp, 0, sizeof(GF_BitStream));
+<span class="lineNum">     178 </span>            :         /*switch to internal mode*/
+<span class="lineNum">     179 </span><span class="lineCov">      10011 :         mode = (mode==GF_BITSTREAM_READ) ? GF_BITSTREAM_FILE_READ : GF_BITSTREAM_FILE_WRITE;</span>
+<span class="lineNum">     180 </span><span class="lineCov">      10011 :         tmp-&gt;bsmode = mode;</span>
+<span class="lineNum">     181 </span><span class="lineCov">      10011 :         tmp-&gt;current = 0;</span>
+<span class="lineNum">     182 </span><span class="lineCov">      10011 :         tmp-&gt;nbBits = (mode == GF_BITSTREAM_FILE_READ) ? 8 : 0;</span>
+<span class="lineNum">     183 </span><span class="lineCov">      10011 :         tmp-&gt;original = NULL;</span>
+<span class="lineNum">     184 </span><span class="lineCov">      10011 :         tmp-&gt;position = 0;</span>
+<span class="lineNum">     185 </span><span class="lineCov">      10011 :         tmp-&gt;stream = f;</span>
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            :         /*get the size of this file (for read streams)*/
+<span class="lineNum">     188 </span><span class="lineCov">      10011 :         tmp-&gt;position = gf_ftell(f);</span>
+<span class="lineNum">     189 </span><span class="lineCov">      10011 :         tmp-&gt;size = gf_fsize(f);</span>
+<span class="lineNum">     190 </span><span class="lineCov">      10011 :         gf_fseek(f, tmp-&gt;position, SEEK_SET);</span>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineCov">      10011 :         if (mode==GF_BITSTREAM_FILE_READ) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">       8091 :                 tmp-&gt;cache_read_alloc = gf_opts_get_int(&quot;core&quot;, &quot;bs-cache-size&quot;);</span>
+<span class="lineNum">     195 </span><span class="lineCov">       8091 :                 if (tmp-&gt;cache_read_alloc) {</span>
+<span class="lineNum">     196 </span><span class="lineCov">       8091 :                         tmp-&gt;cache_read_pos = tmp-&gt;cache_read_size = tmp-&gt;cache_read_alloc;</span>
+<span class="lineNum">     197 </span><span class="lineCov">       8091 :                         tmp-&gt;cache_read = gf_malloc(tmp-&gt;cache_read_alloc);</span>
+<span class="lineNum">     198 </span><span class="lineCov">       8091 :                         if (!tmp-&gt;cache_read) {</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :                                 gf_free(tmp);</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                                 return NULL;</span>
+<span class="lineNum">     201 </span>            :                         }
+<span class="lineNum">     202 </span>            :                 }
+<span class="lineNum">     203 </span>            :         }
+<span class="lineNum">     204 </span><span class="lineCov">      10011 :         if (mode == GF_BITSTREAM_FILE_WRITE) {</span>
+<span class="lineNum">     205 </span><span class="lineCov">       1920 :                 tmp-&gt;cache_write_size = gf_opts_get_int(&quot;core&quot;, &quot;bs-cache-size&quot;);</span>
+<span class="lineNum">     206 </span><span class="lineCov">       1920 :                 if (tmp-&gt;cache_write_size) {</span>
+<span class="lineNum">     207 </span><span class="lineCov">       1920 :                         tmp-&gt;cache_write = (char*)gf_malloc(tmp-&gt;cache_write_size);</span>
+<span class="lineNum">     208 </span><span class="lineCov">       1920 :                         if (!tmp-&gt;cache_write) {</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :                                 gf_free(tmp);</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :                                 return NULL;</span>
+<span class="lineNum">     211 </span>            :                         }
+<span class="lineNum">     212 </span><span class="lineCov">       1920 :                         tmp-&gt;buffer_written = 0;</span>
+<span class="lineNum">     213 </span>            :                 }
+<span class="lineNum">     214 </span>            :         }
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            :         return tmp;
+<span class="lineNum">     217 </span>            : }
+<a name="218"><span class="lineNum">     218 </span>            : </a>
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineCov">       4218 : GF_BitStream *gf_bs_new_cbk_buffer(GF_Err (*on_block_out)(void *cbk, u8 *data, u32 block_size), void *usr_data, u8 *buffer, u32 buffer_size)</span>
+<span class="lineNum">     221 </span>            : {
+<span class="lineNum">     222 </span>            :         GF_BitStream *tmp;
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span><span class="lineCov">       4218 :         if (!on_block_out) return NULL;</span>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineCov">       4218 :         tmp = (GF_BitStream *)gf_malloc(sizeof(GF_BitStream));</span>
+<span class="lineNum">     227 </span><span class="lineCov">       4218 :         if (!tmp) return NULL;</span>
+<span class="lineNum">     228 </span>            :         memset(tmp, 0, sizeof(GF_BitStream));
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineCov">       4218 :         if (buffer &amp;&amp; buffer_size) {</span>
+<span class="lineNum">     231 </span><span class="lineCov">       3157 :                 tmp-&gt;size = buffer_size;</span>
+<span class="lineNum">     232 </span><span class="lineCov">       3157 :                 tmp-&gt;original = buffer;</span>
+<span class="lineNum">     233 </span>            :         } else {
+<span class="lineNum">     234 </span><span class="lineCov">       1061 :                 tmp-&gt;size = buffer_size ? buffer_size : 10*BS_MEM_BLOCK_ALLOC_SIZE;</span>
+<span class="lineNum">     235 </span><span class="lineCov">       1061 :                 tmp-&gt;original = (char *) gf_malloc(sizeof(char) * ((u32) tmp-&gt;size));</span>
+<span class="lineNum">     236 </span><span class="lineCov">       1061 :                 if (! tmp-&gt;original) {</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :                         gf_free(tmp);</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :                         return NULL;</span>
+<span class="lineNum">     239 </span>            :                 }
+<span class="lineNum">     240 </span>            :         }
+<span class="lineNum">     241 </span><span class="lineCov">       4218 :         tmp-&gt;bsmode = GF_BITSTREAM_WRITE_DYN;</span>
+<span class="lineNum">     242 </span><span class="lineCov">       4218 :         tmp-&gt;on_block_out = on_block_out;</span>
+<span class="lineNum">     243 </span><span class="lineCov">       4218 :         tmp-&gt;usr_data = usr_data;</span>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">       4218 :         return tmp;</span>
+<a name="246"><span class="lineNum">     246 </span>            : }</a>
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span><span class="lineCov">        722 : GF_BitStream *gf_bs_new_cbk(GF_Err (*on_block_out)(void *cbk, u8 *data, u32 block_size), void *usr_data, u32 block_size)</span>
+<span class="lineNum">     249 </span>            : {
+<span class="lineNum">     250 </span><span class="lineCov">        722 :         return gf_bs_new_cbk_buffer(on_block_out, usr_data, NULL, block_size);</span>
+<a name="251"><span class="lineNum">     251 </span>            : </a>
+<span class="lineNum">     252 </span>            : }
+<span class="lineNum">     253 </span><span class="lineCov">       9933 : void gf_bs_prevent_dispatch(GF_BitStream *bs, Bool prevent_dispatch)</span>
+<span class="lineNum">     254 </span>            : {
+<span class="lineNum">     255 </span><span class="lineCov">       9933 :         if (!bs) return;</span>
+<span class="lineNum">     256 </span><span class="lineCov">       9933 :         if (prevent_dispatch) {</span>
+<span class="lineNum">     257 </span><span class="lineCov">       6150 :                 bs-&gt;prevent_dispatch ++;</span>
+<span class="lineNum">     258 </span><span class="lineCov">       6150 :                 return;</span>
+<span class="lineNum">     259 </span>            :         }
+<span class="lineNum">     260 </span><span class="lineCov">       3783 :         if (!bs-&gt;prevent_dispatch) return;</span>
+<span class="lineNum">     261 </span><span class="lineCov">       3783 :         bs-&gt;prevent_dispatch --;</span>
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span><span class="lineCov">       3783 :         if (bs-&gt;on_block_out &amp;&amp; !bs-&gt;prevent_dispatch) {</span>
+<span class="lineNum">     264 </span>            :                 assert(bs-&gt;position &gt;= bs-&gt;bytes_out);
+<span class="lineNum">     265 </span><span class="lineCov">       1337 :                 if (bs-&gt;position &gt; bs-&gt;bytes_out) {</span>
+<span class="lineNum">     266 </span><span class="lineCov">       1337 :                         bs-&gt;on_block_out(bs-&gt;usr_data, bs-&gt;original, (u32) (bs-&gt;position - bs-&gt;bytes_out));</span>
+<span class="lineNum">     267 </span><span class="lineCov">       1337 :                         bs-&gt;bytes_out = bs-&gt;position;</span>
+<span class="lineNum">     268 </span>            :                 }
+<span class="lineNum">     269 </span>            :         }
+<a name="270"><span class="lineNum">     270 </span>            : }</a>
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span><span class="lineCov">    1527237 : static void bs_flush_write_cache(GF_BitStream *bs)</span>
+<span class="lineNum">     273 </span>            : {
+<span class="lineNum">     274 </span><span class="lineCov">    1527237 :         if (bs-&gt;buffer_written) {</span>
+<span class="lineNum">     275 </span>            :                 u32 nb_write;
+<span class="lineNum">     276 </span><span class="lineCov">     234328 :                 nb_write = (u32) gf_fwrite(bs-&gt;cache_write, bs-&gt;buffer_written, bs-&gt;stream);</span>
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :                 //check we didn't rewind the bitstream
+<span class="lineNum">     279 </span><span class="lineCov">     234328 :                 if (bs-&gt;size == bs-&gt;position)</span>
+<span class="lineNum">     280 </span><span class="lineCov">     233961 :                         bs-&gt;size += nb_write;</span>
+<span class="lineNum">     281 </span><span class="lineCov">     234328 :                 bs-&gt;position += nb_write;</span>
+<span class="lineNum">     282 </span><span class="lineCov">     234328 :                 bs-&gt;buffer_written = 0;</span>
+<span class="lineNum">     283 </span>            :         }
+<span class="lineNum">     284 </span><span class="lineCov">    1527237 : }</span>
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            : 
+<a name="287"><span class="lineNum">     287 </span>            : </a>
+<span class="lineNum">     288 </span>            : GF_EXPORT
+<span class="lineNum">     289 </span><span class="lineCov">     566585 : void gf_bs_del(GF_BitStream *bs)</span>
+<span class="lineNum">     290 </span>            : {
+<span class="lineNum">     291 </span><span class="lineCov">     566585 :         if (!bs) return;</span>
+<span class="lineNum">     292 </span><span class="lineCov">     566585 :         if (bs-&gt;on_block_out &amp;&amp; bs-&gt;position&gt;bs-&gt;bytes_out) {</span>
+<span class="lineNum">     293 </span><span class="lineCov">        610 :                 bs-&gt;on_block_out(bs-&gt;usr_data, bs-&gt;original, (u32) (bs-&gt;position - bs-&gt;bytes_out) );</span>
+<span class="lineNum">     294 </span>            :         }
+<span class="lineNum">     295 </span>            :         /*if we are in dynamic mode (alloc done by the bitstream), free the buffer if still present*/
+<span class="lineNum">     296 </span><span class="lineCov">     566585 :         if ((bs-&gt;bsmode == GF_BITSTREAM_WRITE_DYN) &amp;&amp; bs-&gt;original) gf_free(bs-&gt;original);</span>
+<span class="lineNum">     297 </span><span class="lineCov">     566585 :         if (bs-&gt;cache_write) {</span>
+<span class="lineNum">     298 </span><span class="lineCov">       1920 :                 bs_flush_write_cache(bs);</span>
+<span class="lineNum">     299 </span><span class="lineCov">       1920 :                 gf_free(bs-&gt;cache_write);</span>
+<span class="lineNum">     300 </span>            :         }
+<span class="lineNum">     301 </span><span class="lineCov">     566585 :         if (bs-&gt;cache_read)</span>
+<span class="lineNum">     302 </span><span class="lineCov">       8091 :                 gf_free(bs-&gt;cache_read);</span>
+<span class="lineNum">     303 </span><span class="lineCov">     566585 :         gf_free(bs);</span>
+<span class="lineNum">     304 </span>            : }
+<a name="305"><span class="lineNum">     305 </span>            : </a>
+<span class="lineNum">     306 </span>            : GF_EXPORT
+<span class="lineNum">     307 </span><span class="lineCov">    1516939 : void gf_bs_enable_emulation_byte_removal(GF_BitStream *bs, Bool do_remove)</span>
+<span class="lineNum">     308 </span>            : {
+<span class="lineNum">     309 </span><span class="lineCov">    1516939 :         if (bs) {</span>
+<span class="lineNum">     310 </span><span class="lineCov">    1516939 :                 bs-&gt;remove_emul_prevention_byte = do_remove;</span>
+<span class="lineNum">     311 </span><span class="lineCov">    1516939 :                 bs-&gt;nb_zeros = 0;</span>
+<span class="lineNum">     312 </span>            :         }
+<span class="lineNum">     313 </span><span class="lineCov">    1516939 : }</span>
+<a name="314"><span class="lineNum">     314 </span>            : </a>
+<span class="lineNum">     315 </span>            : /*returns 1 if aligned wrt current mode, 0 otherwise*/
+<span class="lineNum">     316 </span><span class="lineCov">          1 : Bool gf_bs_is_align(GF_BitStream *bs)</span>
+<span class="lineNum">     317 </span>            : {
+<span class="lineNum">     318 </span><span class="lineCov">    4697168 :         switch (bs-&gt;bsmode) {</span>
+<span class="lineNum">     319 </span><span class="lineCov">    1524650 :         case GF_BITSTREAM_READ:</span>
+<span class="lineNum">     320 </span>            :         case GF_BITSTREAM_FILE_READ:
+<span class="lineNum">     321 </span><span class="lineCov">    1524650 :                 return ( (8 == bs-&gt;nbBits) ? GF_TRUE : GF_FALSE);</span>
+<span class="lineNum">     322 </span><span class="lineCov">    3172518 :         default:</span>
+<span class="lineNum">     323 </span><span class="lineCov">    3172518 :                 return !bs-&gt;nbBits;</span>
+<span class="lineNum">     324 </span>            :         }
+<a name="325"><span class="lineNum">     325 </span>            : }</a>
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineCov">    3156274 : static GFINLINE u8 gf_bs_load_byte(GF_BitStream *bs, Bool *is_eos)</span>
+<span class="lineNum">     328 </span>            : {
+<span class="lineNum">     329 </span>            :         u8 res;
+<span class="lineNum">     330 </span><span class="lineCov">    3156274 :         if (bs-&gt;cache_read) {</span>
+<span class="lineNum">     331 </span><span class="lineCov">    3156274 :                 if (bs-&gt;cache_read_pos == bs-&gt;cache_read_size) {</span>
+<span class="lineNum">     332 </span><span class="lineCov">     623798 :                         bs-&gt;cache_read_size = (u32) gf_fread(bs-&gt;cache_read, bs-&gt;cache_read_alloc, bs-&gt;stream);</span>
+<span class="lineNum">     333 </span><span class="lineCov">     623798 :                         bs-&gt;cache_read_pos = 0;</span>
+<span class="lineNum">     334 </span><span class="lineCov">     623798 :                         if (!bs-&gt;cache_read_size) {</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :                                 *is_eos = GF_TRUE;</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :                                 return 0;</span>
+<span class="lineNum">     337 </span>            :                         }
+<span class="lineNum">     338 </span>            :                 }
+<span class="lineNum">     339 </span><span class="lineCov">    3156274 :                 res = bs-&gt;cache_read[bs-&gt;cache_read_pos];</span>
+<span class="lineNum">     340 </span><span class="lineCov">    3156274 :                 bs-&gt;cache_read_pos++;</span>
+<span class="lineNum">     341 </span>            :         } else {
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :                 res = gf_fgetc(bs-&gt;stream);</span>
+<span class="lineNum">     343 </span>            :         }
+<span class="lineNum">     344 </span>            :         return res;
+<span class="lineNum">     345 </span>            : }
+<a name="346"><span class="lineNum">     346 </span>            : </a>
+<span class="lineNum">     347 </span>            : /*fetch a new byte in the bitstream switch between packets*/
+<span class="lineNum">     348 </span><span class="lineCov">   51990949 : static u8 BS_ReadByte(GF_BitStream *bs)</span>
+<span class="lineNum">     349 </span>            : {
+<span class="lineNum">     350 </span>            :         Bool is_eos;
+<span class="lineNum">     351 </span><span class="lineCov">   51990949 :         if (bs-&gt;bsmode == GF_BITSTREAM_READ) {</span>
+<span class="lineNum">     352 </span>            :                 u8 res;
+<span class="lineNum">     353 </span><span class="lineCov">   48846487 :                 if (bs-&gt;position &gt;= bs-&gt;size) {</span>
+<span class="lineNum">     354 </span><span class="lineCov">        569 :                         if (bs-&gt;EndOfStream) bs-&gt;EndOfStream(bs-&gt;par);</span>
+<span class="lineNum">     355 </span>            :                         return 0;
+<span class="lineNum">     356 </span>            :                 }
+<span class="lineNum">     357 </span><span class="lineCov">   48845918 :                 res = bs-&gt;original[bs-&gt;position++];</span>
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineCov">   48845918 :                 if (bs-&gt;remove_emul_prevention_byte) {</span>
+<span class="lineNum">     360 </span><span class="lineCov">    5034698 :                         if ((bs-&gt;nb_zeros==2) &amp;&amp; (res==0x03) &amp;&amp; (bs-&gt;position&lt;bs-&gt;size) &amp;&amp; (bs-&gt;original[bs-&gt;position]&lt;0x04)) {</span>
+<span class="lineNum">     361 </span><span class="lineCov">      20359 :                                 bs-&gt;nb_zeros = 0;</span>
+<span class="lineNum">     362 </span><span class="lineCov">      20359 :                                 res = bs-&gt;original[bs-&gt;position++];</span>
+<span class="lineNum">     363 </span>            :                         }
+<span class="lineNum">     364 </span><span class="lineCov">    5034698 :                         if (!res) bs-&gt;nb_zeros++;</span>
+<span class="lineNum">     365 </span><span class="lineCov">    4947314 :                         else bs-&gt;nb_zeros = 0;</span>
+<span class="lineNum">     366 </span>            :                 }
+<span class="lineNum">     367 </span>            :                 return res;
+<span class="lineNum">     368 </span>            :         }
+<span class="lineNum">     369 </span><span class="lineCov">    3144462 :         if (bs-&gt;cache_write)</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                 bs_flush_write_cache(bs);</span>
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span><span class="lineCov">    3144462 :         is_eos = gf_feof(bs-&gt;stream);</span>
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            :         /*we are in FILE mode, test for end of file*/
+<span class="lineNum">     375 </span><span class="lineCov">    3144462 :         if (!is_eos || bs-&gt;cache_read) {</span>
+<span class="lineNum">     376 </span>            :                 u8 res;
+<span class="lineNum">     377 </span><span class="lineCov">    3144462 :                 Bool loc_eos=GF_FALSE;</span>
+<span class="lineNum">     378 </span>            :                 assert(bs-&gt;position&lt;=bs-&gt;size);
+<span class="lineNum">     379 </span><span class="lineCov">    3144462 :                 bs-&gt;position++;</span>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span><span class="lineCov">    3144462 :                 res = gf_bs_load_byte(bs, &amp;loc_eos);</span>
+<span class="lineNum">     382 </span><span class="lineCov">    3144462 :                 if (loc_eos) goto bs_eof;</span>
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span><span class="lineCov">    3144462 :                 if (bs-&gt;remove_emul_prevention_byte) {</span>
+<span class="lineNum">     385 </span><span class="lineCov">    2087765 :                         if ((bs-&gt;nb_zeros==2) &amp;&amp; (res==0x03) &amp;&amp; (bs-&gt;position&lt;bs-&gt;size)) {</span>
+<span class="lineNum">     386 </span><span class="lineCov">      11812 :                                 u8 next = gf_bs_load_byte(bs, &amp;loc_eos);</span>
+<span class="lineNum">     387 </span><span class="lineCov">      11812 :                                 if (next &lt; 0x04) {</span>
+<span class="lineNum">     388 </span><span class="lineCov">      11812 :                                         bs-&gt;nb_zeros = 0;</span>
+<span class="lineNum">     389 </span>            :                                         res = next;
+<span class="lineNum">     390 </span><span class="lineCov">      11812 :                                         bs-&gt;position++;</span>
+<span class="lineNum">     391 </span>            :                                 } else {
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :                                         gf_bs_seek(bs, bs-&gt;position);</span>
+<span class="lineNum">     393 </span>            :                                 }
+<span class="lineNum">     394 </span>            :                         }
+<span class="lineNum">     395 </span><span class="lineCov">    2087765 :                         if (!res) bs-&gt;nb_zeros++;</span>
+<span class="lineNum">     396 </span><span class="lineCov">    1362331 :                         else bs-&gt;nb_zeros = 0;</span>
+<span class="lineNum">     397 </span>            :                 }
+<span class="lineNum">     398 </span><span class="lineCov">    3144462 :                 return res;</span>
+<span class="lineNum">     399 </span>            :         }
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 : bs_eof:</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :         if (bs-&gt;EndOfStream) {</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :                 bs-&gt;EndOfStream(bs-&gt;par);</span>
+<span class="lineNum">     404 </span>            :         } else {
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CORE, (&quot;[BS] Attempt to overread bitstream\n&quot;));</span>
+<span class="lineNum">     406 </span>            :         }
+<span class="lineNum">     407 </span>            :         assert(bs-&gt;position &lt;= 1+bs-&gt;size);
+<span class="lineNum">     408 </span>            :         return 0;
+<span class="lineNum">     409 </span>            : }
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span>            : #define NO_OPTS
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            : #ifndef NO_OPTS
+<span class="lineNum">     414 </span>            : static u32 bit_mask[] = {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
+<span class="lineNum">     415 </span>            : static u32 bits_mask[] = {0x0, 0x1, 0x3, 0x7, 0xF, 0x1F, 0x3F, 0x7F};
+<span class="lineNum">     416 </span>            : #endif
+<a name="417"><span class="lineNum">     417 </span>            : </a>
+<span class="lineNum">     418 </span>            : GF_EXPORT
+<span class="lineNum">     419 </span><span class="lineCov">  146430011 : u8 gf_bs_read_bit(GF_BitStream *bs)</span>
+<span class="lineNum">     420 </span>            : {
+<span class="lineNum">     421 </span><span class="lineCov">  146430011 :         if (bs-&gt;nbBits == 8) {</span>
+<span class="lineNum">     422 </span><span class="lineCov">   18744227 :                 bs-&gt;current = BS_ReadByte(bs);</span>
+<span class="lineNum">     423 </span><span class="lineCov">   18744227 :                 bs-&gt;nbBits = 0;</span>
+<span class="lineNum">     424 </span>            :         }
+<span class="lineNum">     425 </span>            : #ifdef NO_OPTS
+<span class="lineNum">     426 </span>            :         {
+<span class="lineNum">     427 </span>            :                 s32 ret;
+<span class="lineNum">     428 </span><span class="lineCov">  146430011 :                 bs-&gt;current &lt;&lt;= 1;</span>
+<span class="lineNum">     429 </span><span class="lineCov">  146430011 :                 bs-&gt;nbBits++;</span>
+<span class="lineNum">     430 </span><span class="lineCov">  146430011 :                 ret = (bs-&gt;current &amp; 0x100) &gt;&gt; 8;</span>
+<span class="lineNum">     431 </span><span class="lineCov">  146430011 :                 return (u8) ret;</span>
+<span class="lineNum">     432 </span>            :         }
+<span class="lineNum">     433 </span>            : #else
+<span class="lineNum">     434 </span>            :         return (u8) (bs-&gt;current &amp; bit_mask[bs-&gt;nbBits++]) ? 1 : 0;
+<span class="lineNum">     435 </span>            : #endif
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            : }
+<a name="438"><span class="lineNum">     438 </span>            : </a>
+<span class="lineNum">     439 </span>            : GF_EXPORT
+<span class="lineNum">     440 </span><span class="lineCov">   37728788 : u32 gf_bs_read_int(GF_BitStream *bs, u32 nBits)</span>
+<span class="lineNum">     441 </span>            : {
+<span class="lineNum">     442 </span>            :         u32 ret;
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            : #ifndef NO_OPTS
+<span class="lineNum">     445 </span>            :         if (nBits + bs-&gt;nbBits &lt;= 8) {
+<span class="lineNum">     446 </span>            :                 bs-&gt;nbBits += nBits;
+<span class="lineNum">     447 </span>            :                 ret = (bs-&gt;current &gt;&gt; (8 - bs-&gt;nbBits) ) &amp; bits_mask[nBits];
+<span class="lineNum">     448 </span>            :                 return ret;
+<span class="lineNum">     449 </span>            :         }
+<span class="lineNum">     450 </span>            : #endif
+<span class="lineNum">     451 </span>            :         ret = 0;
+<span class="lineNum">     452 </span><span class="lineCov">  220323437 :         while (nBits-- &gt; 0) {</span>
+<span class="lineNum">     453 </span><span class="lineCov">  144865861 :                 ret &lt;&lt;= 1;</span>
+<span class="lineNum">     454 </span><span class="lineCov">  144865861 :                 ret |= gf_bs_read_bit(bs);</span>
+<span class="lineNum">     455 </span>            :         }
+<span class="lineNum">     456 </span><span class="lineCov">   37728788 :         return ret;</span>
+<span class="lineNum">     457 </span>            : }
+<a name="458"><span class="lineNum">     458 </span>            : </a>
+<span class="lineNum">     459 </span>            : GF_EXPORT
+<span class="lineNum">     460 </span><span class="lineCov">   30927454 : u32 gf_bs_read_u8(GF_BitStream *bs)</span>
+<span class="lineNum">     461 </span>            : {
+<span class="lineNum">     462 </span>            :         assert(bs-&gt;nbBits==8);
+<span class="lineNum">     463 </span><span class="lineCov">   30927454 :         if (bs-&gt;cache_read &amp;&amp; (bs-&gt;cache_read_pos+1&lt;bs-&gt;cache_read_size) ) {</span>
+<span class="lineNum">     464 </span><span class="lineCov">     101132 :                 u32 ret = bs-&gt;cache_read[bs-&gt;cache_read_pos];</span>
+<span class="lineNum">     465 </span><span class="lineCov">     101132 :                 bs-&gt;cache_read_pos+=1;</span>
+<span class="lineNum">     466 </span><span class="lineCov">     101132 :                 bs-&gt;position+=1;</span>
+<span class="lineNum">     467 </span><span class="lineCov">     101132 :                 return ret;</span>
+<span class="lineNum">     468 </span>            :         }
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span><span class="lineCov">   30826322 :         return (u32) BS_ReadByte(bs);</span>
+<span class="lineNum">     471 </span>            : }
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span>            : #if 0
+<span class="lineNum">     474 </span>            : GF_EXPORT
+<span class="lineNum">     475 </span>            : u32 gf_bs_read_u8_until_delimiter(GF_BitStream *bs, u8 delimiter, u8* out, u32 max_length) {
+<span class="lineNum">     476 </span>            :         u32 i = 0;
+<span class="lineNum">     477 </span>            :         char token=0;
+<span class="lineNum">     478 </span>            :         u64 cur_pos = gf_bs_get_position(bs);
+<span class="lineNum">     479 </span>            : 
+<span class="lineNum">     480 </span>            :         if (!max_length) out = NULL;
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span>            :         while(gf_bs_available(bs) &amp;&amp; (!max_length || i &lt; max_length)) {
+<span class="lineNum">     483 </span>            :                 gf_bs_read_data(bs, &amp;token, 1);
+<span class="lineNum">     484 </span>            :                 if (token == delimiter) goto found;
+<span class="lineNum">     485 </span>            :                 if (out) out[i] = token;
+<span class="lineNum">     486 </span>            :                 i++;
+<span class="lineNum">     487 </span>            :         }
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            :         /* Delimiter not found */
+<span class="lineNum">     490 </span>            :         gf_bs_seek(bs, cur_pos);
+<span class="lineNum">     491 </span>            :         return 0;
+<span class="lineNum">     492 </span>            : 
+<span class="lineNum">     493 </span>            : found:
+<span class="lineNum">     494 </span>            :         return i;
+<span class="lineNum">     495 </span>            : }
+<span class="lineNum">     496 </span>            : #endif
+<a name="497"><span class="lineNum">     497 </span>            : </a>
+<span class="lineNum">     498 </span>            : GF_EXPORT
+<span class="lineNum">     499 </span><span class="lineCov">     395770 : u32 gf_bs_read_u16(GF_BitStream *bs)</span>
+<span class="lineNum">     500 </span>            : {
+<span class="lineNum">     501 </span>            :         u32 ret;
+<span class="lineNum">     502 </span>            :         assert(bs-&gt;nbBits==8);
+<span class="lineNum">     503 </span><span class="lineCov">     395770 :         if (bs-&gt;cache_read &amp;&amp; (bs-&gt;cache_read_pos+2&lt;bs-&gt;cache_read_size) ) {</span>
+<span class="lineNum">     504 </span><span class="lineCov">      39140 :                 ret = bs-&gt;cache_read[bs-&gt;cache_read_pos];</span>
+<span class="lineNum">     505 </span><span class="lineCov">      39140 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     506 </span><span class="lineCov">      39140 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+1];</span>
+<span class="lineNum">     507 </span><span class="lineCov">      39140 :                 bs-&gt;cache_read_pos+=2;</span>
+<span class="lineNum">     508 </span><span class="lineCov">      39140 :                 bs-&gt;position+=2;</span>
+<span class="lineNum">     509 </span><span class="lineCov">      39140 :                 return ret;</span>
+<span class="lineNum">     510 </span>            :         }
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span><span class="lineCov">     356630 :         ret = BS_ReadByte(bs);</span>
+<span class="lineNum">     513 </span><span class="lineCov">     356630 :         ret&lt;&lt;=8;</span>
+<span class="lineNum">     514 </span><span class="lineCov">     356630 :         ret |= BS_ReadByte(bs);</span>
+<span class="lineNum">     515 </span><span class="lineCov">     356630 :         return ret;</span>
+<span class="lineNum">     516 </span>            : }
+<span class="lineNum">     517 </span>            : 
+<a name="518"><span class="lineNum">     518 </span>            : </a>
+<span class="lineNum">     519 </span>            : GF_EXPORT
+<span class="lineNum">     520 </span><span class="lineCov">      62546 : u32 gf_bs_read_u24(GF_BitStream *bs)</span>
+<span class="lineNum">     521 </span>            : {
+<span class="lineNum">     522 </span>            :         u32 ret;
+<span class="lineNum">     523 </span>            :         assert(bs-&gt;nbBits==8);
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span><span class="lineCov">      62546 :         if (bs-&gt;cache_read &amp;&amp; (bs-&gt;cache_read_pos+3&lt;bs-&gt;cache_read_size) ) {</span>
+<span class="lineNum">     526 </span><span class="lineCov">      48174 :                 ret = bs-&gt;cache_read[bs-&gt;cache_read_pos];</span>
+<span class="lineNum">     527 </span><span class="lineCov">      48174 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     528 </span><span class="lineCov">      48174 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+1];</span>
+<span class="lineNum">     529 </span><span class="lineCov">      48174 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     530 </span><span class="lineCov">      48174 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+2];</span>
+<span class="lineNum">     531 </span><span class="lineCov">      48174 :                 bs-&gt;cache_read_pos+=3;</span>
+<span class="lineNum">     532 </span><span class="lineCov">      48174 :                 bs-&gt;position+=3;</span>
+<span class="lineNum">     533 </span><span class="lineCov">      48174 :                 return ret;</span>
+<span class="lineNum">     534 </span>            :         }
+<span class="lineNum">     535 </span>            : 
+<span class="lineNum">     536 </span><span class="lineCov">      14372 :         ret = BS_ReadByte(bs);</span>
+<span class="lineNum">     537 </span><span class="lineCov">      14372 :         ret&lt;&lt;=8;</span>
+<span class="lineNum">     538 </span><span class="lineCov">      14372 :         ret |= BS_ReadByte(bs);</span>
+<span class="lineNum">     539 </span><span class="lineCov">      14372 :         ret&lt;&lt;=8;</span>
+<span class="lineNum">     540 </span><span class="lineCov">      14372 :         ret |= BS_ReadByte(bs);</span>
+<span class="lineNum">     541 </span><span class="lineCov">      14372 :         return ret;</span>
+<span class="lineNum">     542 </span>            : }
+<a name="543"><span class="lineNum">     543 </span>            : </a>
+<span class="lineNum">     544 </span>            : GF_EXPORT
+<span class="lineNum">     545 </span><span class="lineCov">    2162323 : u32 gf_bs_read_u32(GF_BitStream *bs)</span>
+<span class="lineNum">     546 </span>            : {
+<span class="lineNum">     547 </span>            :         u32 ret;
+<span class="lineNum">     548 </span>            :         assert(bs-&gt;nbBits==8);
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span><span class="lineCov">    2162323 :         if (bs-&gt;cache_read &amp;&amp; (bs-&gt;cache_read_pos+4&lt;bs-&gt;cache_read_size) ) {</span>
+<span class="lineNum">     551 </span><span class="lineCov">    1746317 :                 ret = bs-&gt;cache_read[bs-&gt;cache_read_pos];</span>
+<span class="lineNum">     552 </span><span class="lineCov">    1746317 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     553 </span><span class="lineCov">    1746317 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+1];</span>
+<span class="lineNum">     554 </span><span class="lineCov">    1746317 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     555 </span><span class="lineCov">    1746317 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+2];</span>
+<span class="lineNum">     556 </span><span class="lineCov">    1746317 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     557 </span><span class="lineCov">    1746317 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+3];</span>
+<span class="lineNum">     558 </span><span class="lineCov">    1746317 :                 bs-&gt;cache_read_pos+=4;</span>
+<span class="lineNum">     559 </span><span class="lineCov">    1746317 :                 bs-&gt;position+=4;</span>
+<span class="lineNum">     560 </span><span class="lineCov">    1746317 :                 return ret;</span>
+<span class="lineNum">     561 </span>            :         }
+<span class="lineNum">     562 </span><span class="lineCov">     416006 :         ret = BS_ReadByte(bs);</span>
+<span class="lineNum">     563 </span><span class="lineCov">     416006 :         ret&lt;&lt;=8;</span>
+<span class="lineNum">     564 </span><span class="lineCov">     416006 :         ret |= BS_ReadByte(bs);</span>
+<span class="lineNum">     565 </span><span class="lineCov">     416006 :         ret&lt;&lt;=8;</span>
+<span class="lineNum">     566 </span><span class="lineCov">     416006 :         ret |= BS_ReadByte(bs);</span>
+<span class="lineNum">     567 </span><span class="lineCov">     416006 :         ret&lt;&lt;=8;</span>
+<span class="lineNum">     568 </span><span class="lineCov">     416006 :         ret |= BS_ReadByte(bs);</span>
+<span class="lineNum">     569 </span><span class="lineCov">     416006 :         return ret;</span>
+<span class="lineNum">     570 </span>            : }
+<a name="571"><span class="lineNum">     571 </span>            : </a>
+<span class="lineNum">     572 </span>            : GF_EXPORT
+<span class="lineNum">     573 </span><span class="lineCov">       8100 : u64 gf_bs_read_u64(GF_BitStream *bs)</span>
+<span class="lineNum">     574 </span>            : {
+<span class="lineNum">     575 </span>            :         u64 ret;
+<span class="lineNum">     576 </span>            : 
+<span class="lineNum">     577 </span><span class="lineCov">       8100 :         if (bs-&gt;cache_read &amp;&amp; (bs-&gt;cache_read_pos+8&lt;bs-&gt;cache_read_size) ) {</span>
+<span class="lineNum">     578 </span><span class="lineCov">       1719 :                 ret = bs-&gt;cache_read[bs-&gt;cache_read_pos];</span>
+<span class="lineNum">     579 </span><span class="lineCov">       1719 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     580 </span><span class="lineCov">       1719 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+1];</span>
+<span class="lineNum">     581 </span><span class="lineCov">       1719 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     582 </span><span class="lineCov">       1719 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+2];</span>
+<span class="lineNum">     583 </span><span class="lineCov">       1719 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     584 </span><span class="lineCov">       1719 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+3];</span>
+<span class="lineNum">     585 </span><span class="lineCov">       1719 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     586 </span><span class="lineCov">       1719 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+4];</span>
+<span class="lineNum">     587 </span><span class="lineCov">       1719 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     588 </span><span class="lineCov">       1719 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+5];</span>
+<span class="lineNum">     589 </span><span class="lineCov">       1719 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     590 </span><span class="lineCov">       1719 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+6];</span>
+<span class="lineNum">     591 </span><span class="lineCov">       1719 :                 ret&lt;&lt;=8;</span>
+<span class="lineNum">     592 </span><span class="lineCov">       1719 :                 ret |= bs-&gt;cache_read[bs-&gt;cache_read_pos+7];</span>
+<span class="lineNum">     593 </span><span class="lineCov">       1719 :                 bs-&gt;cache_read_pos+=8;</span>
+<span class="lineNum">     594 </span><span class="lineCov">       1719 :                 bs-&gt;position+=8;</span>
+<span class="lineNum">     595 </span><span class="lineCov">       1719 :                 return ret;</span>
+<span class="lineNum">     596 </span>            :         }
+<span class="lineNum">     597 </span><span class="lineCov">       6381 :         ret = gf_bs_read_u32(bs);</span>
+<span class="lineNum">     598 </span><span class="lineCov">       6381 :         ret&lt;&lt;=32;</span>
+<span class="lineNum">     599 </span><span class="lineCov">       6381 :         ret |= gf_bs_read_u32(bs);</span>
+<span class="lineNum">     600 </span><span class="lineCov">       6381 :         return ret;</span>
+<span class="lineNum">     601 </span>            : }
+<a name="602"><span class="lineNum">     602 </span>            : </a>
+<span class="lineNum">     603 </span>            : GF_EXPORT
+<span class="lineNum">     604 </span><span class="lineCov">      11159 : u64 gf_bs_read_long_int(GF_BitStream *bs, u32 nBits)</span>
+<span class="lineNum">     605 </span>            : {
+<span class="lineNum">     606 </span>            :         u64 ret = 0;
+<span class="lineNum">     607 </span><span class="lineCov">      11159 :         if (nBits&gt;64) {</span>
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 :                 gf_bs_read_long_int(bs, nBits-64);</span>
+<span class="lineNum">     609 </span>            :                 ret = gf_bs_read_long_int(bs, 64);
+<span class="lineNum">     610 </span>            :         } else {
+<span class="lineNum">     611 </span><span class="lineCov">     450701 :                 while (nBits-- &gt; 0) {</span>
+<span class="lineNum">     612 </span><span class="lineCov">     439542 :                         ret &lt;&lt;= 1;</span>
+<span class="lineNum">     613 </span><span class="lineCov">     439542 :                         ret |= gf_bs_read_bit(bs);</span>
+<span class="lineNum">     614 </span>            :                 }
+<span class="lineNum">     615 </span>            :         }
+<span class="lineNum">     616 </span><span class="lineCov">      11159 :         return ret;</span>
+<span class="lineNum">     617 </span>            : }
+<span class="lineNum">     618 </span>            : 
+<a name="619"><span class="lineNum">     619 </span>            : </a>
+<span class="lineNum">     620 </span>            : GF_EXPORT
+<span class="lineNum">     621 </span><span class="lineCov">      34860 : Float gf_bs_read_float(GF_BitStream *bs)</span>
+<span class="lineNum">     622 </span>            : {
+<span class="lineNum">     623 </span><span class="lineCov">      34860 :         char buf [4] = &quot;\0\0\0&quot;;</span>
+<span class="lineNum">     624 </span>            : #ifdef NO_OPTS
+<span class="lineNum">     625 </span>            :         s32 i;
+<span class="lineNum">     626 </span><span class="lineCov">    1150380 :         for (i = 0; i &lt; 32; i++)</span>
+<span class="lineNum">     627 </span><span class="lineCov">    1115520 :                 buf[3-i/8] |= gf_bs_read_bit(bs) &lt;&lt; (7 - i%8);</span>
+<span class="lineNum">     628 </span>            : #else
+<span class="lineNum">     629 </span>            :         buf[3] = gf_bs_read_int(bs, 8);
+<span class="lineNum">     630 </span>            :         buf[2] = gf_bs_read_int(bs, 8);
+<span class="lineNum">     631 </span>            :         buf[1] = gf_bs_read_int(bs, 8);
+<span class="lineNum">     632 </span>            :         buf[0] = gf_bs_read_int(bs, 8);
+<span class="lineNum">     633 </span>            : #endif
+<span class="lineNum">     634 </span><span class="lineCov">      34860 :         return (* (Float *) buf);</span>
+<span class="lineNum">     635 </span>            : }
+<a name="636"><span class="lineNum">     636 </span>            : </a>
+<span class="lineNum">     637 </span>            : GF_EXPORT
+<span class="lineNum">     638 </span><span class="lineCov">        142 : Double gf_bs_read_double(GF_BitStream *bs)</span>
+<span class="lineNum">     639 </span>            : {
+<span class="lineNum">     640 </span><span class="lineCov">        142 :         char buf [8] = &quot;\0\0\0\0\0\0\0&quot;;</span>
+<span class="lineNum">     641 </span>            :         s32 i;
+<span class="lineNum">     642 </span><span class="lineCov">       9230 :         for (i = 0; i &lt; 64; i++)</span>
+<span class="lineNum">     643 </span><span class="lineCov">       9088 :                 buf[7-i/8] |= gf_bs_read_bit(bs) &lt;&lt; (7 - i%8);</span>
+<span class="lineNum">     644 </span><span class="lineCov">        142 :         return (* (Double *) buf);</span>
+<span class="lineNum">     645 </span>            : }
+<a name="646"><span class="lineNum">     646 </span>            : </a>
+<span class="lineNum">     647 </span>            : GF_EXPORT
+<span class="lineNum">     648 </span><span class="lineCov">    2453229 : u32 gf_bs_read_data(GF_BitStream *bs, u8 *data, u32 nbBytes)</span>
+<span class="lineNum">     649 </span>            : {
+<span class="lineNum">     650 </span><span class="lineCov">    2453229 :         u64 orig = bs-&gt;position;</span>
+<span class="lineNum">     651 </span>            : 
+<span class="lineNum">     652 </span><span class="lineCov">    2453229 :         if (bs-&gt;position+nbBytes &gt; bs-&gt;size) return 0;</span>
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span><span class="lineCov">    2453227 :         if (gf_bs_is_align(bs) ) {</span>
+<span class="lineNum">     655 </span>            :                 s32 bytes_read, bytes_read_cache;
+<span class="lineNum">     656 </span><span class="lineCov">    2450244 :                 switch (bs-&gt;bsmode) {</span>
+<span class="lineNum">     657 </span><span class="lineCov">     464020 :                 case GF_BITSTREAM_READ:</span>
+<span class="lineNum">     658 </span>            :                 case GF_BITSTREAM_WRITE:
+<span class="lineNum">     659 </span>            :                 case GF_BITSTREAM_WRITE_DYN:
+<span class="lineNum">     660 </span><span class="lineCov">     464020 :                         memcpy(data, bs-&gt;original + bs-&gt;position, nbBytes);</span>
+<span class="lineNum">     661 </span><span class="lineCov">     464020 :                         bs-&gt;position += nbBytes;</span>
+<span class="lineNum">     662 </span><span class="lineCov">     464020 :                         return nbBytes;</span>
+<span class="lineNum">     663 </span><span class="lineCov">    1986224 :                 case GF_BITSTREAM_FILE_READ:</span>
+<span class="lineNum">     664 </span>            :                 case GF_BITSTREAM_FILE_WRITE:
+<span class="lineNum">     665 </span><span class="lineCov">    1986224 :                         if (bs-&gt;cache_write)</span>
+<span class="lineNum">     666 </span><span class="lineCov">     925007 :                                 bs_flush_write_cache(bs);</span>
+<span class="lineNum">     667 </span>            : 
+<span class="lineNum">     668 </span>            :                         bytes_read = bytes_read_cache = 0;
+<span class="lineNum">     669 </span><span class="lineCov">    1986224 :                         if (bs-&gt;cache_read) {</span>
+<span class="lineNum">     670 </span><span class="lineCov">    1061217 :                                 u32 csize = bs-&gt;cache_read_size-bs-&gt;cache_read_pos;</span>
+<span class="lineNum">     671 </span><span class="lineCov">    1061217 :                                 if (csize&gt;nbBytes) csize = nbBytes;</span>
+<span class="lineNum">     672 </span><span class="lineCov">    1061217 :                                 memcpy(data, bs-&gt;cache_read + bs-&gt;cache_read_pos, csize);</span>
+<span class="lineNum">     673 </span><span class="lineCov">    1061217 :                                 bs-&gt;cache_read_pos += csize;</span>
+<span class="lineNum">     674 </span><span class="lineCov">    1061217 :                                 nbBytes -= csize;</span>
+<span class="lineNum">     675 </span><span class="lineCov">    1061217 :                                 bytes_read_cache = csize;</span>
+<span class="lineNum">     676 </span>            :                         }
+<span class="lineNum">     677 </span><span class="lineCov">    1986224 :                         if (nbBytes) {</span>
+<span class="lineNum">     678 </span><span class="lineCov">    1966928 :                                 bytes_read = (s32) gf_fread(data + bytes_read_cache, nbBytes, bs-&gt;stream);</span>
+<span class="lineNum">     679 </span><span class="lineCov">    1966928 :                                 if (bytes_read&lt;0) return bytes_read_cache;</span>
+<span class="lineNum">     680 </span>            :                         }
+<span class="lineNum">     681 </span><span class="lineCov">    1986224 :                         bs-&gt;position += bytes_read + bytes_read_cache;</span>
+<span class="lineNum">     682 </span><span class="lineCov">    1986224 :                         return bytes_read + bytes_read_cache;</span>
+<span class="lineNum">     683 </span>            :                 default:
+<span class="lineNum">     684 </span>            :                         return 0;
+<span class="lineNum">     685 </span>            :                 }
+<span class="lineNum">     686 </span>            :         }
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span><span class="lineCov">     371207 :         while (nbBytes-- &gt; 0) {</span>
+<span class="lineNum">     689 </span><span class="lineCov">     368224 :                 *data++ = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">     690 </span>            :         }
+<span class="lineNum">     691 </span><span class="lineCov">       2983 :         return (u32) (bs-&gt;position - orig);</span>
+<span class="lineNum">     692 </span>            : 
+<span class="lineNum">     693 </span>            : }
+<span class="lineNum">     694 </span>            : 
+<a name="695"><span class="lineNum">     695 </span>            : </a>
+<span class="lineNum">     696 </span>            : 
+<span class="lineNum">     697 </span><span class="lineCov">   12757054 : static void BS_WriteByte(GF_BitStream *bs, u8 val)</span>
+<span class="lineNum">     698 </span>            : {
+<span class="lineNum">     699 </span>            :         /*we don't allow write on READ buffers*/
+<span class="lineNum">     700 </span><span class="lineCov">   12757054 :         if ( (bs-&gt;bsmode == GF_BITSTREAM_READ) || (bs-&gt;bsmode == GF_BITSTREAM_FILE_READ) ) {</span>
+<span class="lineNum">     701 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CORE, (&quot;[BS] Attempt to write on read bitstream\n&quot;));</span>
+<span class="lineNum">     702 </span>            :                 return;
+<span class="lineNum">     703 </span>            :         }
+<span class="lineNum">     704 </span><span class="lineCov">   12757054 :         if (!bs-&gt;original &amp;&amp; !bs-&gt;stream) {</span>
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CORE, (&quot;[BS] Attempt to write on unassigned bitstream\n&quot;));</span>
+<span class="lineNum">     706 </span>            :                 return;
+<span class="lineNum">     707 </span>            :         }
+<span class="lineNum">     708 </span>            :         /*we are in MEM mode*/
+<span class="lineNum">     709 </span><span class="lineCov">   12757054 :         if ( (bs-&gt;bsmode == GF_BITSTREAM_WRITE) || (bs-&gt;bsmode == GF_BITSTREAM_WRITE_DYN) ) {</span>
+<span class="lineNum">     710 </span>            :                 //if callback mode and dispatch is not blocked, dispatch
+<span class="lineNum">     711 </span><span class="lineCov">   12713305 :                 if (bs-&gt;on_block_out &amp;&amp; !bs-&gt;prevent_dispatch) {</span>
+<span class="lineNum">     712 </span>            :                         assert(bs-&gt;position &gt;= bs-&gt;bytes_out);
+<span class="lineNum">     713 </span><span class="lineCov">     761021 :                         if (bs-&gt;position - bs-&gt;bytes_out == bs-&gt;size) {</span>
+<span class="lineNum">     714 </span><span class="lineCov">          9 :                                 bs-&gt;on_block_out(bs-&gt;usr_data, bs-&gt;original, (u32) (bs-&gt;position - bs-&gt;bytes_out));</span>
+<span class="lineNum">     715 </span><span class="lineCov">          9 :                                 bs-&gt;bytes_out = bs-&gt;position;</span>
+<span class="lineNum">     716 </span>            :                         }
+<span class="lineNum">     717 </span><span class="lineCov">     761021 :                         if (bs-&gt;original)</span>
+<span class="lineNum">     718 </span><span class="lineCov">     761021 :                                 bs-&gt;original[bs-&gt;position - bs-&gt;bytes_out] = val;</span>
+<span class="lineNum">     719 </span><span class="lineCov">     761021 :                         bs-&gt;position++;</span>
+<span class="lineNum">     720 </span>            :                         assert(bs-&gt;position &gt;= bs-&gt;bytes_out);
+<span class="lineNum">     721 </span><span class="lineCov">     761021 :                         return;</span>
+<span class="lineNum">     722 </span>            :                 }
+<span class="lineNum">     723 </span>            :                 //otherwise store
+<span class="lineNum">     724 </span><span class="lineCov">   11952284 :                 if (bs-&gt;position - bs-&gt;bytes_out == bs-&gt;size) {</span>
+<span class="lineNum">     725 </span>            :                         /*no more space...*/
+<span class="lineNum">     726 </span><span class="lineCov">       1766 :                         if (bs-&gt;bsmode != GF_BITSTREAM_WRITE_DYN) return;</span>
+<span class="lineNum">     727 </span>            :                         /*gf_realloc if enough space...*/
+<span class="lineNum">     728 </span><span class="lineCov">       1766 :                         if (bs-&gt;size &gt; 0xFFFFFFFF) return;</span>
+<span class="lineNum">     729 </span><span class="lineCov">       1766 :                         bs-&gt;size = bs-&gt;size ? (bs-&gt;size * 2) : BS_MEM_BLOCK_ALLOC_SIZE;</span>
+<span class="lineNum">     730 </span><span class="lineCov">       1766 :                         bs-&gt;original = (char*)gf_realloc(bs-&gt;original, (u32)bs-&gt;size);</span>
+<span class="lineNum">     731 </span><span class="lineCov">       1766 :                         if (!bs-&gt;original) return;</span>
+<span class="lineNum">     732 </span>            :                 }
+<span class="lineNum">     733 </span><span class="lineCov">   11952284 :                 if (bs-&gt;original)</span>
+<span class="lineNum">     734 </span><span class="lineCov">   11952284 :                         bs-&gt;original[bs-&gt;position - bs-&gt;bytes_out] = val;</span>
+<span class="lineNum">     735 </span><span class="lineCov">   11952284 :                 bs-&gt;position++;</span>
+<span class="lineNum">     736 </span><span class="lineCov">   11952284 :                 return;</span>
+<span class="lineNum">     737 </span>            :         }
+<span class="lineNum">     738 </span><span class="lineCov">      43749 :         if (bs-&gt;cache_write) {</span>
+<span class="lineNum">     739 </span><span class="lineCov">      43749 :                 if (bs-&gt;buffer_written == bs-&gt;cache_write_size) {</span>
+<span class="lineNum">     740 </span><span class="lineNoCov">          0 :                         bs_flush_write_cache(bs);</span>
+<span class="lineNum">     741 </span>            :                 }
+<span class="lineNum">     742 </span><span class="lineCov">      43749 :                 bs-&gt;cache_write[bs-&gt;buffer_written] = val;</span>
+<span class="lineNum">     743 </span><span class="lineCov">      43749 :                 bs-&gt;buffer_written++;</span>
+<span class="lineNum">     744 </span><span class="lineCov">      43749 :                 if (bs-&gt;buffer_written == bs-&gt;cache_write_size) {</span>
+<span class="lineNum">     745 </span><span class="lineCov">       7111 :                         bs_flush_write_cache(bs);</span>
+<span class="lineNum">     746 </span>            :                 }
+<span class="lineNum">     747 </span>            :                 return;
+<span class="lineNum">     748 </span>            :         }
+<span class="lineNum">     749 </span>            :         /*we are in FILE mode, no pb for any gf_realloc...*/
+<span class="lineNum">     750 </span><span class="lineNoCov">          0 :         gf_fputc(val, bs-&gt;stream);</span>
+<span class="lineNum">     751 </span>            : 
+<span class="lineNum">     752 </span>            :         /*check we didn't rewind the stream*/
+<span class="lineNum">     753 </span><span class="lineNoCov">          0 :         if (bs-&gt;size == bs-&gt;position) bs-&gt;size++;</span>
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :         bs-&gt;position += 1;</span>
+<a name="755"><span class="lineNum">     755 </span>            : }</a>
+<span class="lineNum">     756 </span>            : 
+<span class="lineNum">     757 </span><span class="lineCov">   48583488 : static void BS_WriteBit(GF_BitStream *bs, u32 bit)</span>
+<span class="lineNum">     758 </span>            : {
+<span class="lineNum">     759 </span><span class="lineCov">   48583488 :         bs-&gt;current &lt;&lt;= 1;</span>
+<span class="lineNum">     760 </span><span class="lineCov">   48583488 :         bs-&gt;current |= bit;</span>
+<span class="lineNum">     761 </span><span class="lineCov">   48583488 :         if (++ bs-&gt;nbBits == 8) {</span>
+<span class="lineNum">     762 </span><span class="lineCov">    6072936 :                 bs-&gt;nbBits = 0;</span>
+<span class="lineNum">     763 </span><span class="lineCov">    6072936 :                 BS_WriteByte(bs, (u8) bs-&gt;current);</span>
+<span class="lineNum">     764 </span><span class="lineCov">    6072936 :                 bs-&gt;current = 0;</span>
+<span class="lineNum">     765 </span>            :         }
+<a name="766"><span class="lineNum">     766 </span><span class="lineCov">   48583488 : }</span></a>
+<span class="lineNum">     767 </span>            : 
+<span class="lineNum">     768 </span><span class="lineCov">    5584154 : static s32 bs_handle_nbits_overflow(GF_BitStream* bs, s32 nBits, s32 max_shift)</span>
+<span class="lineNum">     769 </span>            : {
+<span class="lineNum">     770 </span><span class="lineCov">    5584154 :         if (nBits &gt; max_shift) {</span>
+<span class="lineNum">     771 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_CORE, (&quot;[BS] Attempt to write %d bits, when max is %d\n&quot;, nBits, max_shift));</span>
+<span class="lineNum">     772 </span>            :         }
+<span class="lineNum">     773 </span><span class="lineCov">    5584154 :         while (nBits &gt; max_shift) {</span>
+<span class="lineNum">     774 </span><span class="lineNoCov">          0 :                 gf_bs_write_long_int(bs, 0, max_shift);</span>
+<span class="lineNum">     775 </span><span class="lineNoCov">          0 :                 nBits -= max_shift;</span>
+<span class="lineNum">     776 </span>            :         }
+<span class="lineNum">     777 </span>            : 
+<span class="lineNum">     778 </span><span class="lineCov">    5584154 :         return nBits;</span>
+<span class="lineNum">     779 </span>            : }
+<a name="780"><span class="lineNum">     780 </span>            : </a>
+<span class="lineNum">     781 </span>            : GF_EXPORT
+<span class="lineNum">     782 </span><span class="lineCov">    5556423 : void gf_bs_write_int(GF_BitStream *bs, s32 _value, s32 nBits)</span>
+<span class="lineNum">     783 </span>            : {
+<span class="lineNum">     784 </span>            :         u32 value, nb_shift;
+<span class="lineNum">     785 </span>            :         s32 max_shift = sizeof(s32) * 8;
+<span class="lineNum">     786 </span><span class="lineCov">    5556423 :         if (!nBits) return;</span>
+<span class="lineNum">     787 </span><span class="lineCov">    5503023 :         nBits = bs_handle_nbits_overflow(bs, nBits, max_shift);</span>
+<span class="lineNum">     788 </span>            :         //move to unsigned to avoid sanitizer warnings when we pass a value not codable on the given number of bits
+<span class="lineNum">     789 </span>            :         //we do this when setting bit fields to all 1's
+<span class="lineNum">     790 </span><span class="lineCov">    5503023 :         value = (u32) _value;</span>
+<span class="lineNum">     791 </span><span class="lineCov">    5503023 :         nb_shift = max_shift - nBits;</span>
+<span class="lineNum">     792 </span><span class="lineCov">    5503023 :         if (nb_shift)</span>
+<span class="lineNum">     793 </span><span class="lineCov">    4722604 :                 value &lt;&lt;= nb_shift;</span>
+<span class="lineNum">     794 </span>            : 
+<span class="lineNum">     795 </span><span class="lineCov">   48040133 :         while (--nBits &gt;= 0) {</span>
+<span class="lineNum">     796 </span>            :                 //but check value as signed
+<span class="lineNum">     797 </span><span class="lineCov">   42537110 :                 BS_WriteBit (bs, ((s32)value) &lt; 0);</span>
+<span class="lineNum">     798 </span><span class="lineCov">   42537110 :                 value &lt;&lt;= 1;</span>
+<span class="lineNum">     799 </span>            :         }
+<span class="lineNum">     800 </span>            : }
+<a name="801"><span class="lineNum">     801 </span>            : </a>
+<span class="lineNum">     802 </span>            : GF_EXPORT
+<span class="lineNum">     803 </span><span class="lineCov">      81408 : void gf_bs_write_long_int(GF_BitStream *bs, s64 _value, s32 nBits)</span>
+<span class="lineNum">     804 </span>            : {
+<span class="lineNum">     805 </span>            :         s32 max_shift = sizeof(s64) * 8;
+<span class="lineNum">     806 </span><span class="lineCov">      81408 :         if (!nBits) return;</span>
+<span class="lineNum">     807 </span><span class="lineCov">      81131 :         nBits = bs_handle_nbits_overflow(bs, nBits, max_shift);</span>
+<span class="lineNum">     808 </span>            : 
+<span class="lineNum">     809 </span>            :         //cf note in gf_bs_write_int
+<span class="lineNum">     810 </span><span class="lineCov">      81131 :         u64 value = (u64) _value;</span>
+<span class="lineNum">     811 </span><span class="lineCov">      81131 :         value &lt;&lt;= max_shift - nBits;</span>
+<span class="lineNum">     812 </span><span class="lineCov">    1456992 :         while (--nBits &gt;= 0) {</span>
+<span class="lineNum">     813 </span><span class="lineCov">    1294730 :                 BS_WriteBit (bs, ((s64)value) &lt; 0);</span>
+<span class="lineNum">     814 </span><span class="lineCov">    1294730 :                 value &lt;&lt;= 1;</span>
+<span class="lineNum">     815 </span>            :         }
+<span class="lineNum">     816 </span>            : }
+<a name="817"><span class="lineNum">     817 </span>            : </a>
+<span class="lineNum">     818 </span>            : GF_EXPORT
+<span class="lineNum">     819 </span><span class="lineCov">     558598 : void gf_bs_write_u8(GF_BitStream *bs, u32 value)</span>
+<span class="lineNum">     820 </span>            : {
+<span class="lineNum">     821 </span>            :         assert(!bs-&gt;nbBits);
+<span class="lineNum">     822 </span>            : 
+<span class="lineNum">     823 </span><span class="lineCov">     558598 :         if (bs-&gt;cache_write &amp;&amp; (bs-&gt;buffer_written+1 &lt; bs-&gt;cache_write_size) ) {</span>
+<span class="lineNum">     824 </span><span class="lineCov">      24073 :                 bs-&gt;cache_write[bs-&gt;buffer_written] = (u8) value;</span>
+<span class="lineNum">     825 </span><span class="lineCov">      24073 :                 bs-&gt;buffer_written += 1;</span>
+<span class="lineNum">     826 </span>            :         } else {
+<span class="lineNum">     827 </span><span class="lineCov">     534525 :                 BS_WriteByte(bs, (u8) value);</span>
+<span class="lineNum">     828 </span>            :         }
+<span class="lineNum">     829 </span><span class="lineCov">     558598 : }</span>
+<a name="830"><span class="lineNum">     830 </span>            : </a>
+<span class="lineNum">     831 </span>            : GF_EXPORT
+<span class="lineNum">     832 </span><span class="lineCov">     696253 : void gf_bs_write_u16(GF_BitStream *bs, u32 value)</span>
+<span class="lineNum">     833 </span>            : {
+<span class="lineNum">     834 </span>            :         assert(!bs-&gt;nbBits);
+<span class="lineNum">     835 </span><span class="lineCov">     696253 :         if (bs-&gt;cache_write &amp;&amp; (bs-&gt;buffer_written+2 &lt; bs-&gt;cache_write_size) ) {</span>
+<span class="lineNum">     836 </span><span class="lineCov">      17152 :                 bs-&gt;cache_write[bs-&gt;buffer_written] = (u8) ((value&gt;&gt;8)&amp;0xff);</span>
+<span class="lineNum">     837 </span><span class="lineCov">      17152 :                 bs-&gt;cache_write[bs-&gt;buffer_written+1] = (u8) ((value)&amp;0xff);</span>
+<span class="lineNum">     838 </span><span class="lineCov">      17152 :                 bs-&gt;buffer_written += 2;</span>
+<span class="lineNum">     839 </span>            :         } else {
+<span class="lineNum">     840 </span><span class="lineCov">     679101 :                 BS_WriteByte(bs, (u8) ((value&gt;&gt;8)&amp;0xff));</span>
+<span class="lineNum">     841 </span><span class="lineCov">     679101 :                 BS_WriteByte(bs, (u8) ((value)&amp;0xff));</span>
+<span class="lineNum">     842 </span>            :         }
+<span class="lineNum">     843 </span><span class="lineCov">     696253 : }</span>
+<a name="844"><span class="lineNum">     844 </span>            : </a>
+<span class="lineNum">     845 </span>            : GF_EXPORT
+<span class="lineNum">     846 </span><span class="lineCov">      61382 : void gf_bs_write_u24(GF_BitStream *bs, u32 value)</span>
+<span class="lineNum">     847 </span>            : {
+<span class="lineNum">     848 </span>            :         assert(!bs-&gt;nbBits);
+<span class="lineNum">     849 </span><span class="lineCov">      61382 :         if (bs-&gt;cache_write &amp;&amp; (bs-&gt;buffer_written+3 &lt; bs-&gt;cache_write_size) ) {</span>
+<span class="lineNum">     850 </span><span class="lineCov">      15913 :                 bs-&gt;cache_write[bs-&gt;buffer_written] = (u8) ((value&gt;&gt;16)&amp;0xff);</span>
+<span class="lineNum">     851 </span><span class="lineCov">      15913 :                 bs-&gt;cache_write[bs-&gt;buffer_written+1] = (u8) ((value&gt;&gt;8)&amp;0xff);</span>
+<span class="lineNum">     852 </span><span class="lineCov">      15913 :                 bs-&gt;cache_write[bs-&gt;buffer_written+2] = (u8) ((value)&amp;0xff);</span>
+<span class="lineNum">     853 </span><span class="lineCov">      15913 :                 bs-&gt;buffer_written += 3;</span>
+<span class="lineNum">     854 </span>            :         } else {
+<span class="lineNum">     855 </span><span class="lineCov">      45469 :                 BS_WriteByte(bs, (u8) ((value&gt;&gt;16)&amp;0xff));</span>
+<span class="lineNum">     856 </span><span class="lineCov">      45469 :                 BS_WriteByte(bs, (u8) ((value&gt;&gt;8)&amp;0xff));</span>
+<span class="lineNum">     857 </span><span class="lineCov">      45469 :                 BS_WriteByte(bs, (u8) ((value)&amp;0xff));</span>
+<span class="lineNum">     858 </span>            :         }
+<span class="lineNum">     859 </span><span class="lineCov">      61382 : }</span>
+<a name="860"><span class="lineNum">     860 </span>            : </a>
+<span class="lineNum">     861 </span>            : GF_EXPORT
+<span class="lineNum">     862 </span><span class="lineCov">    2084565 : void gf_bs_write_u32(GF_BitStream *bs, u32 value)</span>
+<span class="lineNum">     863 </span>            : {
+<span class="lineNum">     864 </span>            :         assert(!bs-&gt;nbBits);
+<span class="lineNum">     865 </span><span class="lineCov">    2084565 :         if (bs-&gt;cache_write &amp;&amp; (bs-&gt;buffer_written+4 &lt; bs-&gt;cache_write_size) ) {</span>
+<span class="lineNum">     866 </span><span class="lineCov">     920819 :                 bs-&gt;cache_write[bs-&gt;buffer_written] = (u8) ((value&gt;&gt;24)&amp;0xff);</span>
+<span class="lineNum">     867 </span><span class="lineCov">     920819 :                 bs-&gt;cache_write[bs-&gt;buffer_written+1] = (u8) ((value&gt;&gt;16)&amp;0xff);</span>
+<span class="lineNum">     868 </span><span class="lineCov">     920819 :                 bs-&gt;cache_write[bs-&gt;buffer_written+2] = (u8) ((value&gt;&gt;8)&amp;0xff);</span>
+<span class="lineNum">     869 </span><span class="lineCov">     920819 :                 bs-&gt;cache_write[bs-&gt;buffer_written+3] = (u8) ((value)&amp;0xff);</span>
+<span class="lineNum">     870 </span><span class="lineCov">     920819 :                 bs-&gt;buffer_written += 4;</span>
+<span class="lineNum">     871 </span>            :         } else {
+<span class="lineNum">     872 </span><span class="lineCov">    1163746 :                 BS_WriteByte(bs, (u8) ((value&gt;&gt;24)&amp;0xff));</span>
+<span class="lineNum">     873 </span><span class="lineCov">    1163746 :                 BS_WriteByte(bs, (u8) ((value&gt;&gt;16)&amp;0xff));</span>
+<span class="lineNum">     874 </span><span class="lineCov">    1163746 :                 BS_WriteByte(bs, (u8) ((value&gt;&gt;8)&amp;0xff));</span>
+<span class="lineNum">     875 </span><span class="lineCov">    1163746 :                 BS_WriteByte(bs, (u8) ((value)&amp;0xff));</span>
+<span class="lineNum">     876 </span>            :         }
+<span class="lineNum">     877 </span><span class="lineCov">    2084565 : }</span>
+<a name="878"><span class="lineNum">     878 </span>            : </a>
+<span class="lineNum">     879 </span>            : GF_EXPORT
+<span class="lineNum">     880 </span><span class="lineCov">       9038 : void gf_bs_write_u64(GF_BitStream *bs, u64 value)</span>
+<span class="lineNum">     881 </span>            : {
+<span class="lineNum">     882 </span>            :         assert(!bs-&gt;nbBits);
+<span class="lineNum">     883 </span><span class="lineCov">       9038 :         gf_bs_write_u32(bs, (u32) ((value&gt;&gt;32)&amp;0xffffffff));</span>
+<span class="lineNum">     884 </span><span class="lineCov">       9038 :         gf_bs_write_u32(bs, (u32) (value&amp;0xffffffff));</span>
+<span class="lineNum">     885 </span><span class="lineCov">       9038 : }</span>
+<a name="886"><span class="lineNum">     886 </span>            : </a>
+<span class="lineNum">     887 </span>            : GF_EXPORT
+<span class="lineNum">     888 </span><span class="lineCov">      21760 : u32 gf_bs_write_byte(GF_BitStream *bs, u8 byte, u32 repeat_count)</span>
+<span class="lineNum">     889 </span>            : {
+<span class="lineNum">     890 </span><span class="lineCov">      21760 :         if (!gf_bs_is_align(bs) || bs-&gt;cache_write) {</span>
+<span class="lineNum">     891 </span>            :                 u32 count = 0;
+<span class="lineNum">     892 </span><span class="lineCov">         58 :                 while (count&lt;repeat_count) {</span>
+<span class="lineNum">     893 </span><span class="lineCov">         29 :                         gf_bs_write_int(bs, byte, 8);</span>
+<span class="lineNum">     894 </span><span class="lineCov">         29 :                         count++;</span>
+<span class="lineNum">     895 </span>            :                 }
+<span class="lineNum">     896 </span>            :                 return count;
+<span class="lineNum">     897 </span>            :         }
+<span class="lineNum">     898 </span>            : 
+<span class="lineNum">     899 </span><span class="lineCov">      21731 :         switch (bs-&gt;bsmode) {</span>
+<span class="lineNum">     900 </span><span class="lineCov">      21720 :         case GF_BITSTREAM_WRITE:</span>
+<span class="lineNum">     901 </span><span class="lineCov">      21720 :                 if (bs-&gt;position + repeat_count &gt; bs-&gt;size)</span>
+<span class="lineNum">     902 </span>            :                         return 0;
+<span class="lineNum">     903 </span><span class="lineCov">      21720 :                 memset(bs-&gt;original + bs-&gt;position, byte, repeat_count);</span>
+<span class="lineNum">     904 </span><span class="lineCov">      21720 :                 bs-&gt;position += repeat_count;</span>
+<span class="lineNum">     905 </span><span class="lineCov">      21720 :                 return repeat_count;</span>
+<span class="lineNum">     906 </span><span class="lineCov">         11 :         case GF_BITSTREAM_WRITE_DYN:</span>
+<span class="lineNum">     907 </span>            :                 /*need to gf_realloc ...*/
+<span class="lineNum">     908 </span><span class="lineCov">         11 :                 if (bs-&gt;position+repeat_count&gt; bs-&gt;size) {</span>
+<span class="lineNum">     909 </span><span class="lineNoCov">          0 :                         u32 new_size = (u32) (bs-&gt;size*2);</span>
+<span class="lineNum">     910 </span><span class="lineNoCov">          0 :                         if (!new_size) new_size = BS_MEM_BLOCK_ALLOC_SIZE;</span>
+<span class="lineNum">     911 </span>            : 
+<span class="lineNum">     912 </span><span class="lineNoCov">          0 :                         if (bs-&gt;size + repeat_count &gt; 0xFFFFFFFF)</span>
+<span class="lineNum">     913 </span>            :                                 return 0;
+<span class="lineNum">     914 </span><span class="lineNoCov">          0 :                         while (new_size &lt; (u32) ( bs-&gt;size + repeat_count))</span>
+<span class="lineNum">     915 </span><span class="lineNoCov">          0 :                                 new_size *= 2;</span>
+<span class="lineNum">     916 </span><span class="lineNoCov">          0 :                         bs-&gt;original = (char*)gf_realloc(bs-&gt;original, sizeof(u32)*new_size);</span>
+<span class="lineNum">     917 </span><span class="lineNoCov">          0 :                         if (!bs-&gt;original)</span>
+<span class="lineNum">     918 </span>            :                                 return 0;
+<span class="lineNum">     919 </span><span class="lineNoCov">          0 :                         bs-&gt;size = new_size;</span>
+<span class="lineNum">     920 </span>            :                 }
+<span class="lineNum">     921 </span><span class="lineCov">         11 :                 memset(bs-&gt;original + bs-&gt;position, byte, repeat_count);</span>
+<span class="lineNum">     922 </span><span class="lineCov">         11 :                 bs-&gt;position += repeat_count;</span>
+<span class="lineNum">     923 </span><span class="lineCov">         11 :                 return repeat_count;</span>
+<span class="lineNum">     924 </span><span class="lineNoCov">          0 :         case GF_BITSTREAM_FILE_READ:</span>
+<span class="lineNum">     925 </span>            :         case GF_BITSTREAM_FILE_WRITE:
+<span class="lineNum">     926 </span><span class="lineNoCov">          0 :                 if (gf_fwrite(&amp;byte, repeat_count, bs-&gt;stream) != repeat_count)</span>
+<span class="lineNum">     927 </span>            :                         return 0;
+<span class="lineNum">     928 </span><span class="lineNoCov">          0 :                 if (bs-&gt;size == bs-&gt;position) bs-&gt;size += repeat_count;</span>
+<span class="lineNum">     929 </span><span class="lineNoCov">          0 :                 bs-&gt;position += repeat_count;</span>
+<span class="lineNum">     930 </span><span class="lineNoCov">          0 :                 return repeat_count;</span>
+<span class="lineNum">     931 </span>            :         default:
+<span class="lineNum">     932 </span>            :                 return 0;
+<span class="lineNum">     933 </span>            :         }
+<span class="lineNum">     934 </span>            : }
+<span class="lineNum">     935 </span>            : 
+<span class="lineNum">     936 </span>            : 
+<a name="937"><span class="lineNum">     937 </span>            : </a>
+<span class="lineNum">     938 </span>            : GF_EXPORT
+<span class="lineNum">     939 </span><span class="lineCov">     148203 : void gf_bs_write_float(GF_BitStream *bs, Float value)</span>
+<span class="lineNum">     940 </span>            : {
+<span class="lineNum">     941 </span>            :         u32 i;
+<span class="lineNum">     942 </span>            :         union
+<span class="lineNum">     943 </span>            :         {       float f;
+<span class="lineNum">     944 </span>            :                 char sz [4];
+<span class="lineNum">     945 </span>            :         } float_value;
+<span class="lineNum">     946 </span><span class="lineCov">     148203 :         float_value.f = value;</span>
+<span class="lineNum">     947 </span>            : 
+<span class="lineNum">     948 </span><span class="lineCov">    4890699 :         for (i = 0; i &lt; 32; i++)</span>
+<span class="lineNum">     949 </span><span class="lineCov">    4742496 :                 BS_WriteBit(bs, (float_value.sz [3 - i / 8] &amp; 1 &lt;&lt; (7 - i % 8)) != 0);</span>
+<span class="lineNum">     950 </span>            : 
+<span class="lineNum">     951 </span><span class="lineCov">     148203 : }</span>
+<a name="952"><span class="lineNum">     952 </span>            : </a>
+<span class="lineNum">     953 </span>            : GF_EXPORT
+<span class="lineNum">     954 </span><span class="lineCov">        143 : void gf_bs_write_double (GF_BitStream *bs, Double value)</span>
+<span class="lineNum">     955 </span>            : {
+<span class="lineNum">     956 </span>            :         u32 i;
+<span class="lineNum">     957 </span>            :         union
+<span class="lineNum">     958 </span>            :         {       Double d;
+<span class="lineNum">     959 </span>            :                 char sz [8];
+<span class="lineNum">     960 </span>            :         } double_value;
+<span class="lineNum">     961 </span><span class="lineCov">        143 :         double_value.d = value;</span>
+<span class="lineNum">     962 </span><span class="lineCov">       9295 :         for (i = 0; i &lt; 64; i++) {</span>
+<span class="lineNum">     963 </span><span class="lineCov">       9152 :                 BS_WriteBit(bs, (double_value.sz [7 - i / 8] &amp; 1 &lt;&lt; (7 - i % 8)) != 0);</span>
+<span class="lineNum">     964 </span>            :         }
+<span class="lineNum">     965 </span><span class="lineCov">        143 : }</span>
+<span class="lineNum">     966 </span>            : 
+<a name="967"><span class="lineNum">     967 </span>            : </a>
+<span class="lineNum">     968 </span>            : GF_EXPORT
+<span class="lineNum">     969 </span><span class="lineCov">    2224923 : u32 gf_bs_write_data(GF_BitStream *bs, const u8 *data, u32 nbBytes)</span>
+<span class="lineNum">     970 </span>            : {
+<span class="lineNum">     971 </span>            :         /*we need some feedback for this guy...*/
+<span class="lineNum">     972 </span><span class="lineCov">    2224923 :         u64 begin = bs-&gt;position;</span>
+<span class="lineNum">     973 </span><span class="lineCov">    2224923 :         if (!nbBytes) return 0;</span>
+<span class="lineNum">     974 </span>            : 
+<span class="lineNum">     975 </span><span class="lineCov">    2222180 :         if (gf_bs_is_align(bs)) {</span>
+<span class="lineNum">     976 </span><span class="lineCov">    2221799 :                 switch (bs-&gt;bsmode) {</span>
+<span class="lineNum">     977 </span><span class="lineCov">      73082 :                 case GF_BITSTREAM_WRITE:</span>
+<span class="lineNum">     978 </span><span class="lineCov">      73082 :                         if (bs-&gt;position+nbBytes &gt; bs-&gt;size) {</span>
+<span class="lineNum">     979 </span><span class="lineNoCov">          0 :                                 GF_LOG(GF_LOG_ERROR, GF_LOG_CORE, (&quot;[BS] Attempt to overwrite bitstream by %d bytes\n&quot;, bs-&gt;position + nbBytes - bs-&gt;size));</span>
+<span class="lineNum">     980 </span>            :                                 return 0;
+<span class="lineNum">     981 </span>            :                         }
+<span class="lineNum">     982 </span><span class="lineCov">      73082 :                         memcpy(bs-&gt;original + bs-&gt;position, data, nbBytes);</span>
+<span class="lineNum">     983 </span><span class="lineCov">      73082 :                         bs-&gt;position += nbBytes;</span>
+<span class="lineNum">     984 </span><span class="lineCov">      73082 :                         return nbBytes;</span>
+<span class="lineNum">     985 </span><span class="lineCov">     653062 :                 case GF_BITSTREAM_WRITE_DYN:</span>
+<span class="lineNum">     986 </span>            :                         //if callback mode and dispatch not disabled, dispatch bytes
+<span class="lineNum">     987 </span><span class="lineCov">     653062 :                         if (bs-&gt;on_block_out &amp;&amp; !bs-&gt;prevent_dispatch) {</span>
+<span class="lineNum">     988 </span>            :                                 assert(bs-&gt;position &gt;= bs-&gt;bytes_out);
+<span class="lineNum">     989 </span>            : 
+<span class="lineNum">     990 </span><span class="lineCov">     118250 :                                 if (bs-&gt;position - bs-&gt;bytes_out + nbBytes &lt;= bs-&gt;size) {</span>
+<span class="lineNum">     991 </span><span class="lineCov">     108806 :                                         memcpy(bs-&gt;original + bs-&gt;position - bs-&gt;bytes_out, data, nbBytes);</span>
+<span class="lineNum">     992 </span><span class="lineCov">     108806 :                                         bs-&gt;position += nbBytes;</span>
+<span class="lineNum">     993 </span>            :                                 } else {
+<span class="lineNum">     994 </span><span class="lineCov">       9444 :                                         if (bs-&gt;position &gt; bs-&gt;bytes_out)</span>
+<span class="lineNum">     995 </span><span class="lineCov">       6857 :                                                 bs-&gt;on_block_out(bs-&gt;usr_data, bs-&gt;original, (u32) (bs-&gt;position - bs-&gt;bytes_out) );</span>
+<span class="lineNum">     996 </span>            :                                         if (nbBytes)
+<span class="lineNum">     997 </span><span class="lineCov">       9444 :                                                 bs-&gt;on_block_out(bs-&gt;usr_data, (char *) data, nbBytes);</span>
+<span class="lineNum">     998 </span>            : 
+<span class="lineNum">     999 </span><span class="lineCov">       9444 :                                         bs-&gt;position += nbBytes;</span>
+<span class="lineNum">    1000 </span><span class="lineCov">       9444 :                                         bs-&gt;bytes_out = bs-&gt;position;</span>
+<span class="lineNum">    1001 </span>            :                                 }
+<span class="lineNum">    1002 </span>            :                                 assert(bs-&gt;position &gt;= bs-&gt;bytes_out);
+<span class="lineNum">    1003 </span>            :                                 return nbBytes;
+<span class="lineNum">    1004 </span>            :                         }
+<span class="lineNum">    1005 </span>            :                         //otherwise store
+<span class="lineNum">    1006 </span>            :                         /*need to gf_realloc ...*/
+<span class="lineNum">    1007 </span><span class="lineCov">     534812 :                         if (bs-&gt;position + nbBytes - bs-&gt;bytes_out &gt; bs-&gt;size) {</span>
+<span class="lineNum">    1008 </span><span class="lineCov">      17912 :                                 u32 new_size = (u32) (bs-&gt;size*2);</span>
+<span class="lineNum">    1009 </span><span class="lineCov">      17912 :                                 if (!new_size) new_size = BS_MEM_BLOCK_ALLOC_SIZE;</span>
+<span class="lineNum">    1010 </span>            : 
+<span class="lineNum">    1011 </span><span class="lineCov">      17912 :                                 if (bs-&gt;size + nbBytes &gt; 0xFFFFFFFF)</span>
+<span class="lineNum">    1012 </span>            :                                         return 0;
+<span class="lineNum">    1013 </span>            : 
+<span class="lineNum">    1014 </span><span class="lineCov">      36279 :                                 while (new_size &lt; (u32) ( bs-&gt;size + nbBytes))</span>
+<span class="lineNum">    1015 </span><span class="lineCov">      18367 :                                         new_size *= 2;</span>
+<span class="lineNum">    1016 </span><span class="lineCov">      17912 :                                 bs-&gt;original = (char*)gf_realloc(bs-&gt;original, sizeof(u32)*new_size);</span>
+<span class="lineNum">    1017 </span><span class="lineCov">      17912 :                                 if (!bs-&gt;original)</span>
+<span class="lineNum">    1018 </span>            :                                         return 0;
+<span class="lineNum">    1019 </span><span class="lineCov">      17912 :                                 bs-&gt;size = new_size;</span>
+<span class="lineNum">    1020 </span>            :                         }
+<span class="lineNum">    1021 </span><span class="lineCov">     534812 :                         memcpy(bs-&gt;original + bs-&gt;position - bs-&gt;bytes_out, data, nbBytes);</span>
+<span class="lineNum">    1022 </span><span class="lineCov">     534812 :                         bs-&gt;position += nbBytes;</span>
+<span class="lineNum">    1023 </span><span class="lineCov">     534812 :                         return nbBytes;</span>
+<span class="lineNum">    1024 </span><span class="lineCov">    1495654 :                 case GF_BITSTREAM_FILE_READ:</span>
+<span class="lineNum">    1025 </span>            :                 case GF_BITSTREAM_FILE_WRITE:
+<span class="lineNum">    1026 </span><span class="lineCov">    1495654 :                         if (bs-&gt;cache_write) {</span>
+<span class="lineNum">    1027 </span>            :                                 //if block fits in our write cache, write it
+<span class="lineNum">    1028 </span><span class="lineCov">    1495654 :                                 if (bs-&gt;buffer_written + nbBytes &lt; bs-&gt;cache_write_size) {</span>
+<span class="lineNum">    1029 </span><span class="lineCov">    1051884 :                                         memcpy(bs-&gt;cache_write+bs-&gt;buffer_written, data, nbBytes);</span>
+<span class="lineNum">    1030 </span><span class="lineCov">    1051884 :                                         bs-&gt;buffer_written+=nbBytes;</span>
+<span class="lineNum">    1031 </span><span class="lineCov">    1051884 :                                         return nbBytes;</span>
+<span class="lineNum">    1032 </span>            :                                 }
+<span class="lineNum">    1033 </span>            :                                 //otherwise flush cache and use file write
+<span class="lineNum">    1034 </span><span class="lineCov">     443770 :                                 bs_flush_write_cache(bs);</span>
+<span class="lineNum">    1035 </span>            :                         }
+<span class="lineNum">    1036 </span>            : 
+<span class="lineNum">    1037 </span><span class="lineCov">     443770 :                         if (gf_fwrite(data, nbBytes, bs-&gt;stream) != nbBytes) return 0;</span>
+<span class="lineNum">    1038 </span>            : 
+<span class="lineNum">    1039 </span><span class="lineCov">     443770 :                         if (bs-&gt;size == bs-&gt;position) bs-&gt;size += nbBytes;</span>
+<span class="lineNum">    1040 </span><span class="lineCov">     443770 :                         bs-&gt;position += nbBytes;</span>
+<span class="lineNum">    1041 </span><span class="lineCov">     443770 :                         return nbBytes;</span>
+<span class="lineNum">    1042 </span>            :                 default:
+<span class="lineNum">    1043 </span>            :                         return 0;
+<span class="lineNum">    1044 </span>            :                 }
+<span class="lineNum">    1045 </span>            :         }
+<span class="lineNum">    1046 </span>            : 
+<span class="lineNum">    1047 </span><span class="lineCov">      94590 :         while (nbBytes) {</span>
+<span class="lineNum">    1048 </span><span class="lineCov">      94209 :                 gf_bs_write_int(bs, (s32) *data, 8);</span>
+<span class="lineNum">    1049 </span><span class="lineCov">      94209 :                 data++;</span>
+<span class="lineNum">    1050 </span><span class="lineCov">      94209 :                 nbBytes--;</span>
+<span class="lineNum">    1051 </span>            :         }
+<span class="lineNum">    1052 </span><span class="lineCov">        381 :         return (u32) (bs-&gt;position - begin);</span>
+<span class="lineNum">    1053 </span>            : }
+<span class="lineNum">    1054 </span>            : 
+<a name="1055"><span class="lineNum">    1055 </span>            : /*align return the num of bits read in READ mode, 0 in WRITE*/</a>
+<span class="lineNum">    1056 </span>            : GF_EXPORT
+<span class="lineNum">    1057 </span><span class="lineCov">    4062533 : u8 gf_bs_align(GF_BitStream *bs)</span>
+<span class="lineNum">    1058 </span>            : {
+<span class="lineNum">    1059 </span><span class="lineCov">    4062533 :         u8 res = 8 - bs-&gt;nbBits;</span>
+<span class="lineNum">    1060 </span><span class="lineCov">    4062533 :         if ( (bs-&gt;bsmode == GF_BITSTREAM_READ) || (bs-&gt;bsmode == GF_BITSTREAM_FILE_READ)) {</span>
+<span class="lineNum">    1061 </span><span class="lineCov">    3491591 :                 if (res &gt; 0) {</span>
+<span class="lineNum">    1062 </span><span class="lineCov">     539870 :                         gf_bs_read_int(bs, res);</span>
+<span class="lineNum">    1063 </span>            :                 }
+<span class="lineNum">    1064 </span>            :                 return res;
+<span class="lineNum">    1065 </span>            :         }
+<span class="lineNum">    1066 </span><span class="lineCov">     570942 :         if (bs-&gt;nbBits &gt; 0) {</span>
+<span class="lineNum">    1067 </span><span class="lineCov">      35370 :                 gf_bs_write_int (bs, 0, res);</span>
+<span class="lineNum">    1068 </span><span class="lineCov">      35370 :                 return res;</span>
+<span class="lineNum">    1069 </span>            :         }
+<span class="lineNum">    1070 </span>            :         return 0;
+<span class="lineNum">    1071 </span>            : }
+<span class="lineNum">    1072 </span>            : 
+<span class="lineNum">    1073 </span>            : 
+<a name="1074"><span class="lineNum">    1074 </span>            : /*size available in the bitstream*/</a>
+<span class="lineNum">    1075 </span>            : GF_EXPORT
+<span class="lineNum">    1076 </span><span class="lineCov">   33131833 : u64 gf_bs_available(GF_BitStream *bs)</span>
+<span class="lineNum">    1077 </span>            : {
+<span class="lineNum">    1078 </span>            :         s64 cur, end;
+<span class="lineNum">    1079 </span>            : 
+<span class="lineNum">    1080 </span>            :         /*in WRITE mode only, this should not be called, but return something big in case ...*/
+<span class="lineNum">    1081 </span><span class="lineCov">   66263666 :         if ( (bs-&gt;bsmode == GF_BITSTREAM_WRITE)</span>
+<span class="lineNum">    1082 </span><span class="lineCov">   33131833 :                 || (bs-&gt;bsmode == GF_BITSTREAM_WRITE_DYN)</span>
+<span class="lineNum">    1083 </span>            :            )
+<span class="lineNum">    1084 </span>            :                 return (u64) -1;
+<span class="lineNum">    1085 </span>            : 
+<span class="lineNum">    1086 </span>            :         /*we are in MEM mode*/
+<span class="lineNum">    1087 </span><span class="lineCov">   33131833 :         if (bs-&gt;bsmode == GF_BITSTREAM_READ) {</span>
+<span class="lineNum">    1088 </span><span class="lineCov">   31710541 :                 if (bs-&gt;size &lt; bs-&gt;position)</span>
+<span class="lineNum">    1089 </span>            :                         return 0;
+<span class="lineNum">    1090 </span>            :                 else
+<span class="lineNum">    1091 </span><span class="lineCov">   31710541 :                         return (bs-&gt;size - bs-&gt;position);</span>
+<span class="lineNum">    1092 </span>            :         }
+<span class="lineNum">    1093 </span>            :         /*FILE READ: assume size hasn't changed, otherwise the user shall call gf_bs_get_refreshed_size*/
+<span class="lineNum">    1094 </span><span class="lineCov">    1421292 :         if (bs-&gt;bsmode==GF_BITSTREAM_FILE_READ) {</span>
+<span class="lineNum">    1095 </span><span class="lineCov">    1421292 :                 if (bs-&gt;position&gt;bs-&gt;size) return 0;</span>
+<span class="lineNum">    1096 </span><span class="lineCov">    1421292 :                 return (bs-&gt;size - bs-&gt;position);</span>
+<span class="lineNum">    1097 </span>            :         }
+<span class="lineNum">    1098 </span><span class="lineNoCov">          0 :         if (bs-&gt;cache_write)</span>
+<span class="lineNum">    1099 </span><span class="lineNoCov">          0 :                 bs_flush_write_cache(bs);</span>
+<span class="lineNum">    1100 </span>            : 
+<span class="lineNum">    1101 </span><span class="lineNoCov">          0 :         cur = gf_ftell(bs-&gt;stream);</span>
+<span class="lineNum">    1102 </span><span class="lineNoCov">          0 :         end = gf_fsize(bs-&gt;stream);</span>
+<span class="lineNum">    1103 </span><span class="lineNoCov">          0 :         gf_fseek(bs-&gt;stream, cur, SEEK_SET);</span>
+<span class="lineNum">    1104 </span>            : 
+<span class="lineNum">    1105 </span><span class="lineNoCov">          0 :         return (u64) (end - cur);</span>
+<span class="lineNum">    1106 </span>            : }
+<span class="lineNum">    1107 </span>            : 
+<span class="lineNum">    1108 </span>            : /*call this funct to set the buffer size to the nb of bytes written
+<span class="lineNum">    1109 </span>            : Used only in WRITE mode, as we don't know the real size during allocation...
+<a name="1110"><span class="lineNum">    1110 </span>            : return -1 for bad param or gf_malloc failed</a>
+<span class="lineNum">    1111 </span>            : return nbBytes cut*/
+<span class="lineNum">    1112 </span><span class="lineCov">     213092 : static s32 BS_CutBuffer(GF_BitStream *bs)</span>
+<span class="lineNum">    1113 </span>            : {
+<span class="lineNum">    1114 </span>            :         s32 nbBytes;
+<span class="lineNum">    1115 </span><span class="lineCov">     213092 :         if ( (bs-&gt;bsmode != GF_BITSTREAM_WRITE_DYN) &amp;&amp; (bs-&gt;bsmode != GF_BITSTREAM_WRITE)) return (u32) -1;</span>
+<span class="lineNum">    1116 </span>            :         /*Align our buffer or we're dead!*/
+<span class="lineNum">    1117 </span><span class="lineCov">     213092 :         gf_bs_align(bs);</span>
+<span class="lineNum">    1118 </span>            : 
+<span class="lineNum">    1119 </span><span class="lineCov">     213092 :         nbBytes = (u32) (bs-&gt;size - bs-&gt;position);</span>
+<span class="lineNum">    1120 </span><span class="lineCov">     213092 :         if (!nbBytes || (nbBytes == 0xFFFFFFFF) || (bs-&gt;position &gt;= 0xFFFFFFFF)) return 0;</span>
+<span class="lineNum">    1121 </span>            :         /*
+<span class="lineNum">    1122 </span>            :                 bs-&gt;original = (char*)gf_realloc(bs-&gt;original, (u32) bs-&gt;position);
+<span class="lineNum">    1123 </span>            :                 if (! bs-&gt;original) return (u32) -1;
+<span class="lineNum">    1124 </span>            :         */
+<span class="lineNum">    1125 </span>            :         /*just in case, re-adjust..*/
+<span class="lineNum">    1126 </span><span class="lineCov">     212870 :         bs-&gt;size = bs-&gt;position;</span>
+<span class="lineNum">    1127 </span><span class="lineCov">     212870 :         return nbBytes;</span>
+<span class="lineNum">    1128 </span>            : }
+<span class="lineNum">    1129 </span>            : 
+<a name="1130"><span class="lineNum">    1130 </span>            : /*For DYN mode, this gets the content out without cutting the buffer to the number of written bytes*/</a>
+<span class="lineNum">    1131 </span>            : GF_EXPORT
+<span class="lineNum">    1132 </span><span class="lineCov">     332181 : void gf_bs_get_content_no_truncate(GF_BitStream *bs, u8 **output, u32 *outSize, u32 *alloc_size)</span>
+<span class="lineNum">    1133 </span>            : {
+<span class="lineNum">    1134 </span>            :         /*only in WRITE MEM mode*/
+<span class="lineNum">    1135 </span><span class="lineCov">     332181 :         if (bs-&gt;bsmode != GF_BITSTREAM_WRITE_DYN) return;</span>
+<span class="lineNum">    1136 </span>            : 
+<span class="lineNum">    1137 </span><span class="lineCov">     332180 :         if (bs-&gt;on_block_out &amp;&amp; bs-&gt;position&gt;bs-&gt;bytes_out) {</span>
+<span class="lineNum">    1138 </span><span class="lineCov">       2965 :                 bs-&gt;on_block_out(bs-&gt;usr_data, bs-&gt;original, (u32) (bs-&gt;position - bs-&gt;bytes_out) );</span>
+<span class="lineNum">    1139 </span>            :         }
+<span class="lineNum">    1140 </span>            : 
+<span class="lineNum">    1141 </span><span class="lineCov">     332180 :         if (!bs-&gt;position &amp;&amp; !bs-&gt;nbBits) {</span>
+<span class="lineNum">    1142 </span><span class="lineCov">      12322 :                 if (!alloc_size) {</span>
+<span class="lineNum">    1143 </span><span class="lineCov">      12285 :                         *output = NULL;</span>
+<span class="lineNum">    1144 </span><span class="lineCov">      12285 :                         gf_free(bs-&gt;original);</span>
+<span class="lineNum">    1145 </span>            :                 } else {
+<span class="lineNum">    1146 </span><span class="lineCov">         37 :                         *alloc_size = (u32) bs-&gt;size;</span>
+<span class="lineNum">    1147 </span><span class="lineCov">         37 :                         *output = bs-&gt;original;</span>
+<span class="lineNum">    1148 </span>            :                 }
+<span class="lineNum">    1149 </span><span class="lineCov">      12322 :                 *outSize = 0;</span>
+<span class="lineNum">    1150 </span>            :         } else {
+<span class="lineNum">    1151 </span><span class="lineCov">     319858 :                 if (alloc_size) {</span>
+<span class="lineNum">    1152 </span>            :                         /*Align our buffer or we're dead!*/
+<span class="lineNum">    1153 </span><span class="lineCov">     106766 :                         gf_bs_align(bs);</span>
+<span class="lineNum">    1154 </span><span class="lineCov">     106766 :                         *alloc_size = (u32) bs-&gt;size;</span>
+<span class="lineNum">    1155 </span><span class="lineCov">     106766 :                         *outSize = (u32) bs-&gt;position;</span>
+<span class="lineNum">    1156 </span><span class="lineCov">     106766 :                         *output = bs-&gt;original;</span>
+<span class="lineNum">    1157 </span>            :                 } else {
+<span class="lineNum">    1158 </span><span class="lineCov">     213092 :                         s32 copy = BS_CutBuffer(bs);</span>
+<span class="lineNum">    1159 </span><span class="lineCov">     213092 :                         if (copy &lt; 0) {</span>
+<span class="lineNum">    1160 </span><span class="lineNoCov">          0 :                                 *output = NULL;</span>
+<span class="lineNum">    1161 </span>            :                         } else
+<span class="lineNum">    1162 </span><span class="lineCov">     213092 :                                 *output = bs-&gt;original;</span>
+<span class="lineNum">    1163 </span><span class="lineCov">     213092 :                         *outSize = (u32) bs-&gt;size;</span>
+<span class="lineNum">    1164 </span>            :                 }
+<span class="lineNum">    1165 </span>            :         }
+<span class="lineNum">    1166 </span><span class="lineCov">     332180 :         bs-&gt;original = NULL;</span>
+<span class="lineNum">    1167 </span><span class="lineCov">     332180 :         bs-&gt;size = 0;</span>
+<span class="lineNum">    1168 </span><span class="lineCov">     332180 :         bs-&gt;position = 0;</span>
+<span class="lineNum">    1169 </span>            : }
+<span class="lineNum">    1170 </span>            : 
+<a name="1171"><span class="lineNum">    1171 </span>            : /*For DYN mode, this gets the content out*/</a>
+<span class="lineNum">    1172 </span>            : GF_EXPORT
+<span class="lineNum">    1173 </span><span class="lineCov">     217721 : void gf_bs_get_content(GF_BitStream *bs, u8 **output, u32 *outSize)</span>
+<span class="lineNum">    1174 </span>            : {
+<span class="lineNum">    1175 </span><span class="lineCov">     217721 :         gf_bs_get_content_no_truncate(bs, output, outSize, NULL);</span>
+<span class="lineNum">    1176 </span><span class="lineCov">     217721 : }</span>
+<span class="lineNum">    1177 </span>            : 
+<span class="lineNum">    1178 </span>            : /*      Skip nbytes.
+<span class="lineNum">    1179 </span>            :         Align
+<span class="lineNum">    1180 </span>            :         If READ (MEM or FILE) mode, just read n times 8 bit
+<span class="lineNum">    1181 </span>            :         If WRITE (MEM or FILE) mode, write n times 0 on 8 bit
+<a name="1182"><span class="lineNum">    1182 </span>            : */</a>
+<span class="lineNum">    1183 </span>            : GF_EXPORT
+<span class="lineNum">    1184 </span><span class="lineCov">     912901 : void gf_bs_skip_bytes(GF_BitStream *bs, u64 nbBytes)</span>
+<span class="lineNum">    1185 </span>            : {
+<span class="lineNum">    1186 </span><span class="lineCov">     912901 :         if (!bs || !nbBytes) return;</span>
+<span class="lineNum">    1187 </span>            : 
+<span class="lineNum">    1188 </span><span class="lineCov">     912700 :         gf_bs_align(bs);</span>
+<span class="lineNum">    1189 </span>            : 
+<span class="lineNum">    1190 </span>            :         /*special case for file skipping...*/
+<span class="lineNum">    1191 </span><span class="lineCov">     912700 :         if ((bs-&gt;bsmode == GF_BITSTREAM_FILE_WRITE) || (bs-&gt;bsmode == GF_BITSTREAM_FILE_READ)) {</span>
+<span class="lineNum">    1192 </span><span class="lineCov">      81813 :                 if (bs-&gt;cache_write)</span>
+<span class="lineNum">    1193 </span><span class="lineNoCov">          0 :                         bs_flush_write_cache(bs);</span>
+<span class="lineNum">    1194 </span>            : 
+<span class="lineNum">    1195 </span><span class="lineCov">      81813 :                 if (bs-&gt;cache_read) {</span>
+<span class="lineNum">    1196 </span><span class="lineCov">      81813 :                         u32 csize = bs-&gt;cache_read_size - bs-&gt;cache_read_pos;</span>
+<span class="lineNum">    1197 </span><span class="lineCov">      81813 :                         if (csize&gt;=nbBytes) {</span>
+<span class="lineNum">    1198 </span><span class="lineCov">      33085 :                                 bs-&gt;cache_read_pos += (u32) nbBytes;</span>
+<span class="lineNum">    1199 </span><span class="lineCov">      33085 :                                 bs-&gt;position += nbBytes;</span>
+<span class="lineNum">    1200 </span><span class="lineCov">      33085 :                                 return;</span>
+<span class="lineNum">    1201 </span>            :                         }
+<span class="lineNum">    1202 </span><span class="lineCov">      48728 :                         nbBytes -= csize;</span>
+<span class="lineNum">    1203 </span><span class="lineCov">      48728 :                         bs-&gt;position += csize;</span>
+<span class="lineNum">    1204 </span><span class="lineCov">      48728 :                         bs-&gt;cache_read_pos = bs-&gt;cache_read_size;</span>
+<span class="lineNum">    1205 </span>            :                 }
+<span class="lineNum">    1206 </span>            :                 //weird msys2 bug resulting in broken seek on some files ?!?  -the bug is not happening when doing absolute seek
+<span class="lineNum">    1207 </span>            : //              gf_fseek(bs-&gt;stream, nbBytes, SEEK_CUR);
+<span class="lineNum">    1208 </span><span class="lineCov">      48728 :                 bs-&gt;position += nbBytes;</span>
+<span class="lineNum">    1209 </span><span class="lineCov">      48728 :                 if (bs-&gt;bsmode == GF_BITSTREAM_FILE_READ) {</span>
+<span class="lineNum">    1210 </span><span class="lineCov">      48728 :                         if (bs-&gt;position &gt; bs-&gt;size) bs-&gt;position = bs-&gt;size;</span>
+<span class="lineNum">    1211 </span>            :                 }
+<span class="lineNum">    1212 </span><span class="lineCov">      48728 :                 gf_fseek(bs-&gt;stream, bs-&gt;position, SEEK_SET);</span>
+<span class="lineNum">    1213 </span><span class="lineCov">      48728 :                 return;</span>
+<span class="lineNum">    1214 </span>            :         }
+<span class="lineNum">    1215 </span>            : 
+<span class="lineNum">    1216 </span>            :         /*special case for reading*/
+<span class="lineNum">    1217 </span><span class="lineCov">     830887 :         if (bs-&gt;bsmode == GF_BITSTREAM_READ) {</span>
+<span class="lineNum">    1218 </span><span class="lineCov">     830887 :                 if (bs-&gt;remove_emul_prevention_byte) {</span>
+<span class="lineNum">    1219 </span><span class="lineCov">      25735 :                         while (nbBytes) {</span>
+<span class="lineNum">    1220 </span><span class="lineCov">      23604 :                                 gf_bs_read_u8(bs);</span>
+<span class="lineNum">    1221 </span><span class="lineCov">      23604 :                                 nbBytes--;</span>
+<span class="lineNum">    1222 </span>            :                         }
+<span class="lineNum">    1223 </span>            :                 } else {
+<span class="lineNum">    1224 </span><span class="lineCov">     828756 :                         bs-&gt;position += nbBytes;</span>
+<span class="lineNum">    1225 </span>            :                 }
+<span class="lineNum">    1226 </span>            :                 return;
+<span class="lineNum">    1227 </span>            :         }
+<span class="lineNum">    1228 </span>            :         /*for writing we must do it this way, otherwise pb in dynamic buffers*/
+<span class="lineNum">    1229 </span><span class="lineNoCov">          0 :         while (nbBytes) {</span>
+<span class="lineNum">    1230 </span><span class="lineNoCov">          0 :                 gf_bs_write_int(bs, 0, 8);</span>
+<span class="lineNum">    1231 </span><span class="lineNoCov">          0 :                 nbBytes--;</span>
+<span class="lineNum">    1232 </span>            :         }
+<span class="lineNum">    1233 </span>            : }
+<span class="lineNum">    1234 </span>            : 
+<span class="lineNum">    1235 </span>            : #ifdef GPAC_ENABLE_BIFS_PMF
+<span class="lineNum">    1236 </span>            : 
+<span class="lineNum">    1237 </span>            : void gf_bs_rewind_bits(GF_BitStream *bs, u64 nbBits)
+<span class="lineNum">    1238 </span>            : {
+<span class="lineNum">    1239 </span>            :         u64 nbBytes;
+<span class="lineNum">    1240 </span>            :         if (bs-&gt;bsmode != GF_BITSTREAM_READ) return;
+<span class="lineNum">    1241 </span>            : 
+<span class="lineNum">    1242 </span>            :         nbBits -= (bs-&gt;nbBits);
+<span class="lineNum">    1243 </span>            :         nbBytes = (nbBits+8)&gt;&gt;3;
+<span class="lineNum">    1244 </span>            :         nbBits = nbBytes*8 - nbBits;
+<span class="lineNum">    1245 </span>            :         gf_bs_align(bs);
+<span class="lineNum">    1246 </span>            :         assert(bs-&gt;position &gt;= nbBytes);
+<span class="lineNum">    1247 </span>            :         bs-&gt;position -= nbBytes + 1;
+<span class="lineNum">    1248 </span>            :         gf_bs_read_int(bs, (u32)nbBits);
+<span class="lineNum">    1249 </span>            :         return;
+<span class="lineNum">    1250 </span>            : }
+<span class="lineNum">    1251 </span>            : 
+<span class="lineNum">    1252 </span>            : #endif
+<a name="1253"><span class="lineNum">    1253 </span>            : </a>
+<span class="lineNum">    1254 </span>            : /*seek from beginning of stream: use internally even when non aligned!*/
+<span class="lineNum">    1255 </span><span class="lineCov">    2433626 : static GF_Err BS_SeekIntern(GF_BitStream *bs, u64 offset)</span>
+<span class="lineNum">    1256 </span>            : {
+<span class="lineNum">    1257 </span>            :         u32 i;
+<span class="lineNum">    1258 </span>            :         /*if mem, do it */
+<span class="lineNum">    1259 </span><span class="lineCov">    2433626 :         if ((bs-&gt;bsmode == GF_BITSTREAM_READ) || (bs-&gt;bsmode == GF_BITSTREAM_WRITE) || (bs-&gt;bsmode == GF_BITSTREAM_WRITE_DYN)) {</span>
+<span class="lineNum">    1260 </span><span class="lineCov">    1155057 :                 if (offset &gt; 0xFFFFFFFF) return GF_IO_ERR;</span>
+<span class="lineNum">    1261 </span><span class="lineCov">    1155057 :                 if (!bs-&gt;original) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1262 </span>            :                 /*0 for write, read will be done automatically*/
+<span class="lineNum">    1263 </span><span class="lineCov">    1117739 :                 if (offset &gt;= bs-&gt;size) {</span>
+<span class="lineNum">    1264 </span><span class="lineCov">      28449 :                         if ( (bs-&gt;bsmode == GF_BITSTREAM_READ) || (bs-&gt;bsmode == GF_BITSTREAM_WRITE) ) {</span>
+<span class="lineNum">    1265 </span><span class="lineCov">      24970 :                                 if (offset &gt; bs-&gt;size) {</span>
+<span class="lineNum">    1266 </span><span class="lineNoCov">          0 :                                         GF_LOG(GF_LOG_WARNING, GF_LOG_CORE, (&quot;[BS] Attempt to seek to %d after end of bitstream %d, assuming seek to end\n&quot;, offset, bs-&gt;size));</span>
+<span class="lineNum">    1267 </span>            :                                 }
+<span class="lineNum">    1268 </span><span class="lineCov">      24970 :                                 bs-&gt;position = bs-&gt;size;</span>
+<span class="lineNum">    1269 </span><span class="lineCov">      24970 :                                 bs-&gt;nbBits = (bs-&gt;bsmode == GF_BITSTREAM_READ) ? 8 : 0;</span>
+<span class="lineNum">    1270 </span><span class="lineCov">      24970 :                                 return GF_OK;</span>
+<span class="lineNum">    1271 </span>            :                         }
+<span class="lineNum">    1272 </span>            :                         /*in DYN, gf_realloc ...*/
+<span class="lineNum">    1273 </span><span class="lineCov">       3479 :                         bs-&gt;original = (char*)gf_realloc(bs-&gt;original, (u32) (offset + 1));</span>
+<span class="lineNum">    1274 </span><span class="lineCov">       3479 :                         if (!bs-&gt;original)</span>
+<span class="lineNum">    1275 </span>            :                                 return GF_OUT_OF_MEM;
+<span class="lineNum">    1276 </span><span class="lineCov">       3479 :                         for (i = 0; i &lt; (u32) (offset + 1 - bs-&gt;size); i++) {</span>
+<span class="lineNum">    1277 </span><span class="lineCov">       3479 :                                 bs-&gt;original[bs-&gt;size + i] = 0;</span>
+<span class="lineNum">    1278 </span>            :                         }
+<span class="lineNum">    1279 </span><span class="lineCov">       3479 :                         bs-&gt;size = offset + 1;</span>
+<span class="lineNum">    1280 </span>            :                 }
+<span class="lineNum">    1281 </span><span class="lineCov">    1092769 :                 bs-&gt;current = bs-&gt;original[offset];</span>
+<span class="lineNum">    1282 </span><span class="lineCov">    1092769 :                 bs-&gt;position = offset;</span>
+<span class="lineNum">    1283 </span><span class="lineCov">    1092769 :                 bs-&gt;nbBits = (bs-&gt;bsmode == GF_BITSTREAM_READ) ? 8 : 0;</span>
+<span class="lineNum">    1284 </span><span class="lineCov">    1092769 :                 return GF_OK;</span>
+<span class="lineNum">    1285 </span>            :         }
+<span class="lineNum">    1286 </span>            : 
+<span class="lineNum">    1287 </span><span class="lineCov">    1278569 :         if (bs-&gt;cache_write)</span>
+<span class="lineNum">    1288 </span><span class="lineCov">      74714 :                 bs_flush_write_cache(bs);</span>
+<span class="lineNum">    1289 </span>            : 
+<span class="lineNum">    1290 </span><span class="lineCov">    1278569 :         if (bs-&gt;cache_read) {</span>
+<span class="lineNum">    1291 </span><span class="lineCov">    1203855 :                 bs-&gt;cache_read_pos = bs-&gt;cache_read_size;</span>
+<span class="lineNum">    1292 </span>            :         }
+<span class="lineNum">    1293 </span>            : 
+<span class="lineNum">    1294 </span><span class="lineCov">    1278569 :         gf_fseek(bs-&gt;stream, offset, SEEK_SET);</span>
+<span class="lineNum">    1295 </span>            : 
+<span class="lineNum">    1296 </span><span class="lineCov">    1278569 :         bs-&gt;position = offset;</span>
+<span class="lineNum">    1297 </span><span class="lineCov">    1278569 :         bs-&gt;current = 0;</span>
+<span class="lineNum">    1298 </span>            :         /*setup NbBits so that next acccess to the buffer will trigger read/write*/
+<span class="lineNum">    1299 </span><span class="lineCov">    1278569 :         bs-&gt;nbBits = (bs-&gt;bsmode == GF_BITSTREAM_FILE_READ) ? 8 : 0;</span>
+<span class="lineNum">    1300 </span><span class="lineCov">    1278569 :         return GF_OK;</span>
+<span class="lineNum">    1301 </span>            : }
+<span class="lineNum">    1302 </span>            : 
+<a name="1303"><span class="lineNum">    1303 </span>            : /*seek from beginning of stream: align before anything else*/</a>
+<span class="lineNum">    1304 </span>            : GF_EXPORT
+<span class="lineNum">    1305 </span><span class="lineCov">    2486493 : GF_Err gf_bs_seek(GF_BitStream *bs, u64 offset)</span>
+<span class="lineNum">    1306 </span>            : {
+<span class="lineNum">    1307 </span><span class="lineCov">    2486493 :         if (bs-&gt;on_block_out) {</span>
+<span class="lineNum">    1308 </span>            :                 GF_Err e;
+<span class="lineNum">    1309 </span><span class="lineCov">       5009 :                 if (offset &lt; bs-&gt;bytes_out) {</span>
+<span class="lineNum">    1310 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_CORE, (&quot;[BS] Attempt to seek on byte range already forwarded\n&quot;));</span>
+<span class="lineNum">    1311 </span>            :                         return GF_BAD_PARAM;
+<span class="lineNum">    1312 </span>            :                 }
+<span class="lineNum">    1313 </span>            :                 /*warning: we allow offset = bs-&gt;size for WRITE buffers*/
+<span class="lineNum">    1314 </span><span class="lineCov">       5009 :                 if (offset - bs-&gt;bytes_out &gt; bs-&gt;size)</span>
+<span class="lineNum">    1315 </span>            :                         return GF_BAD_PARAM;
+<span class="lineNum">    1316 </span><span class="lineCov">       5009 :                 gf_bs_align(bs);</span>
+<span class="lineNum">    1317 </span><span class="lineCov">       5009 :                 e = BS_SeekIntern(bs, offset - bs-&gt;bytes_out);</span>
+<span class="lineNum">    1318 </span><span class="lineCov">       5009 :                 bs-&gt;position += bs-&gt;bytes_out;</span>
+<span class="lineNum">    1319 </span><span class="lineCov">       5009 :                 return e;</span>
+<span class="lineNum">    1320 </span>            :         }
+<span class="lineNum">    1321 </span><span class="lineCov">    2481484 :         if (bs-&gt;cache_write)</span>
+<span class="lineNum">    1322 </span><span class="lineCov">      74714 :                 bs_flush_write_cache(bs);</span>
+<span class="lineNum">    1323 </span>            : 
+<span class="lineNum">    1324 </span>            :         /*warning: we allow offset = bs-&gt;size for WRITE buffers*/
+<span class="lineNum">    1325 </span><span class="lineCov">    2481484 :         if (offset &gt; bs-&gt;size) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1326 </span>            : 
+<span class="lineNum">    1327 </span><span class="lineCov">    2428617 :         gf_bs_align(bs);</span>
+<span class="lineNum">    1328 </span><span class="lineCov">    2428617 :         return BS_SeekIntern(bs, offset);</span>
+<span class="lineNum">    1329 </span>            : }
+<span class="lineNum">    1330 </span>            : 
+<a name="1331"><span class="lineNum">    1331 </span>            : /*peek bits (as int!!) from orig position (ON BYTE BOUNDARIES, from 0) - only for read ...*/</a>
+<span class="lineNum">    1332 </span>            : GF_EXPORT
+<span class="lineNum">    1333 </span><span class="lineCov">     259486 : u32 gf_bs_peek_bits(GF_BitStream *bs, u32 numBits, u64 byte_offset)</span>
+<span class="lineNum">    1334 </span>            : {
+<span class="lineNum">    1335 </span>            :         u64 curPos;
+<span class="lineNum">    1336 </span>            :         u32 curBits, ret, current, nb_zeros;
+<span class="lineNum">    1337 </span>            : 
+<span class="lineNum">    1338 </span><span class="lineCov">     259486 :         if ( (bs-&gt;bsmode != GF_BITSTREAM_READ) &amp;&amp; (bs-&gt;bsmode != GF_BITSTREAM_FILE_READ)) return 0;</span>
+<span class="lineNum">    1339 </span><span class="lineCov">     259486 :         if (!numBits || (bs-&gt;size &lt; bs-&gt;position + byte_offset)) return 0;</span>
+<span class="lineNum">    1340 </span>            : 
+<span class="lineNum">    1341 </span>            :         /*store our state*/
+<span class="lineNum">    1342 </span>            :         curPos = bs-&gt;position;
+<span class="lineNum">    1343 </span><span class="lineCov">     259442 :         curBits = bs-&gt;nbBits;</span>
+<span class="lineNum">    1344 </span><span class="lineCov">     259442 :         current = bs-&gt;current;</span>
+<span class="lineNum">    1345 </span><span class="lineCov">     259442 :         nb_zeros = bs-&gt;nb_zeros;</span>
+<span class="lineNum">    1346 </span>            : 
+<span class="lineNum">    1347 </span><span class="lineCov">     259442 :         if (byte_offset) {</span>
+<span class="lineNum">    1348 </span><span class="lineCov">       6396 :                 if (bs-&gt;remove_emul_prevention_byte) {</span>
+<span class="lineNum">    1349 </span><span class="lineNoCov">          0 :                         while (byte_offset) {</span>
+<span class="lineNum">    1350 </span><span class="lineNoCov">          0 :                                 gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1351 </span><span class="lineNoCov">          0 :                                 byte_offset--;</span>
+<span class="lineNum">    1352 </span>            :                         }
+<span class="lineNum">    1353 </span>            :                 } else {
+<span class="lineNum">    1354 </span><span class="lineCov">       6396 :                         gf_bs_seek(bs, bs-&gt;position + byte_offset);</span>
+<span class="lineNum">    1355 </span>            :                 }
+<span class="lineNum">    1356 </span>            :         }
+<span class="lineNum">    1357 </span><span class="lineCov">     259442 :         ret = gf_bs_read_int(bs, numBits);</span>
+<span class="lineNum">    1358 </span>            : 
+<span class="lineNum">    1359 </span>            :         /*restore our cache - position*/
+<span class="lineNum">    1360 </span><span class="lineCov">     259442 :         gf_bs_seek(bs, curPos);</span>
+<span class="lineNum">    1361 </span>            :         /*to avoid re-reading our bits ...*/
+<span class="lineNum">    1362 </span><span class="lineCov">     259442 :         bs-&gt;nbBits = curBits;</span>
+<span class="lineNum">    1363 </span><span class="lineCov">     259442 :         bs-&gt;current = current;</span>
+<span class="lineNum">    1364 </span><span class="lineCov">     259442 :         bs-&gt;nb_zeros = nb_zeros;</span>
+<span class="lineNum">    1365 </span><span class="lineCov">     259442 :         return ret;</span>
+<span class="lineNum">    1366 </span>            : }
+<a name="1367"><span class="lineNum">    1367 </span>            : </a>
+<span class="lineNum">    1368 </span>            : GF_EXPORT
+<span class="lineNum">    1369 </span><span class="lineCov">       9287 : u64 gf_bs_get_refreshed_size(GF_BitStream *bs)</span>
+<span class="lineNum">    1370 </span>            : {
+<span class="lineNum">    1371 </span>            :         s64 offset;
+<span class="lineNum">    1372 </span>            : 
+<span class="lineNum">    1373 </span><span class="lineCov">       9287 :         switch (bs-&gt;bsmode) {</span>
+<span class="lineNum">    1374 </span><span class="lineCov">       6950 :         case GF_BITSTREAM_READ:</span>
+<span class="lineNum">    1375 </span>            :         case GF_BITSTREAM_WRITE:
+<span class="lineNum">    1376 </span><span class="lineCov">       6950 :                 return bs-&gt;size;</span>
+<span class="lineNum">    1377 </span>            : 
+<span class="lineNum">    1378 </span><span class="lineCov">       2337 :         default:</span>
+<span class="lineNum">    1379 </span><span class="lineCov">       2337 :                 if (bs-&gt;cache_write)</span>
+<span class="lineNum">    1380 </span><span class="lineNoCov">          0 :                         bs_flush_write_cache(bs);</span>
+<span class="lineNum">    1381 </span>            : 
+<span class="lineNum">    1382 </span><span class="lineCov">       2337 :                 if (bs-&gt;stream) {</span>
+<span class="lineNum">    1383 </span><span class="lineCov">       2337 :                         offset = gf_ftell(bs-&gt;stream);</span>
+<span class="lineNum">    1384 </span><span class="lineCov">       2337 :                         bs-&gt;size = gf_fsize(bs-&gt;stream);</span>
+<span class="lineNum">    1385 </span><span class="lineCov">       2337 :                         gf_fseek(bs-&gt;stream, offset, SEEK_SET);</span>
+<span class="lineNum">    1386 </span>            :                 }
+<span class="lineNum">    1387 </span><span class="lineCov">       2337 :                 return bs-&gt;size;</span>
+<span class="lineNum">    1388 </span>            :         }
+<span class="lineNum">    1389 </span>            : }
+<a name="1390"><span class="lineNum">    1390 </span>            : </a>
+<span class="lineNum">    1391 </span>            : GF_EXPORT
+<span class="lineNum">    1392 </span><span class="lineCov">    3210970 : u64 gf_bs_get_size(GF_BitStream *bs)</span>
+<span class="lineNum">    1393 </span>            : {
+<span class="lineNum">    1394 </span><span class="lineCov">    3210970 :         if (bs-&gt;cache_write) {</span>
+<span class="lineNum">    1395 </span><span class="lineCov">    2068057 :                 if (bs-&gt;size == bs-&gt;position)</span>
+<span class="lineNum">    1396 </span><span class="lineCov">    1122768 :                         return bs-&gt;size + bs-&gt;buffer_written;</span>
+<span class="lineNum">    1397 </span>            :                 else
+<span class="lineNum">    1398 </span>            :                         return bs-&gt;size;
+<span class="lineNum">    1399 </span>            :         }
+<span class="lineNum">    1400 </span><span class="lineCov">    1142913 :         if (bs-&gt;on_block_out)</span>
+<span class="lineNum">    1401 </span><span class="lineCov">        874 :                 return bs-&gt;position;</span>
+<span class="lineNum">    1402 </span><span class="lineCov">    1142039 :         return bs-&gt;size;</span>
+<span class="lineNum">    1403 </span>            : }
+<a name="1404"><span class="lineNum">    1404 </span>            : </a>
+<span class="lineNum">    1405 </span>            : GF_EXPORT
+<span class="lineNum">    1406 </span><span class="lineCov">    8445919 : u64 gf_bs_get_position(GF_BitStream *bs)</span>
+<span class="lineNum">    1407 </span>            : {
+<span class="lineNum">    1408 </span><span class="lineCov">    8445919 :         if (bs-&gt;cache_write)</span>
+<span class="lineNum">    1409 </span><span class="lineCov">    1571711 :                 return bs-&gt;position + bs-&gt;buffer_written;</span>
+<span class="lineNum">    1410 </span><span class="lineCov">    6874208 :         return bs-&gt;position;</span>
+<span class="lineNum">    1411 </span>            : }
+<a name="1412"><span class="lineNum">    1412 </span>            : </a>
+<span class="lineNum">    1413 </span>            : GF_EXPORT
+<span class="lineNum">    1414 </span><span class="lineCov">       1437 : u8 gf_bs_bits_available(GF_BitStream *bs)</span>
+<span class="lineNum">    1415 </span>            : {
+<span class="lineNum">    1416 </span><span class="lineCov">       1437 :         if (bs-&gt;size &gt; bs-&gt;position) return 8;</span>
+<span class="lineNum">    1417 </span><span class="lineCov">         88 :         if (bs-&gt;nbBits &lt; 8) return (8-bs-&gt;nbBits);</span>
+<span class="lineNum">    1418 </span>            :         return 0;
+<span class="lineNum">    1419 </span>            : }
+<a name="1420"><span class="lineNum">    1420 </span>            : </a>
+<span class="lineNum">    1421 </span>            : GF_EXPORT
+<span class="lineNum">    1422 </span><span class="lineCov">     127592 : void gf_bs_set_eos_callback(GF_BitStream *bs, void (*EndOfStream)(void *par), void *par)</span>
+<span class="lineNum">    1423 </span>            : {
+<span class="lineNum">    1424 </span><span class="lineCov">     127592 :         bs-&gt;EndOfStream = EndOfStream;</span>
+<span class="lineNum">    1425 </span><span class="lineCov">     127592 :         bs-&gt;par = par;</span>
+<span class="lineNum">    1426 </span><span class="lineCov">     127592 : }</span>
+<span class="lineNum">    1427 </span>            : 
+<a name="1428"><span class="lineNum">    1428 </span>            : </a>
+<span class="lineNum">    1429 </span>            : GF_EXPORT
+<span class="lineNum">    1430 </span><span class="lineCov">      58634 : u64 gf_bs_read_u64_le(GF_BitStream *bs)</span>
+<span class="lineNum">    1431 </span>            : {
+<span class="lineNum">    1432 </span>            :         u64 ret, v;
+<span class="lineNum">    1433 </span><span class="lineCov">      58634 :         ret = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1434 </span><span class="lineCov">      58634 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1435 </span><span class="lineCov">      58634 :         v&lt;&lt;=8;</span>
+<span class="lineNum">    1436 </span><span class="lineCov">      58634 :         ret |= v;</span>
+<span class="lineNum">    1437 </span><span class="lineCov">      58634 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1438 </span><span class="lineCov">      58634 :         v&lt;&lt;=16;</span>
+<span class="lineNum">    1439 </span><span class="lineCov">      58634 :         ret |= v;</span>
+<span class="lineNum">    1440 </span><span class="lineCov">      58634 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1441 </span><span class="lineCov">      58634 :         v&lt;&lt;=24;</span>
+<span class="lineNum">    1442 </span><span class="lineCov">      58634 :         ret |= v;</span>
+<span class="lineNum">    1443 </span><span class="lineCov">      58634 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1444 </span><span class="lineCov">      58634 :         v&lt;&lt;=32;</span>
+<span class="lineNum">    1445 </span><span class="lineCov">      58634 :         ret |= v;</span>
+<span class="lineNum">    1446 </span><span class="lineCov">      58634 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1447 </span><span class="lineCov">      58634 :         v&lt;&lt;=40;</span>
+<span class="lineNum">    1448 </span><span class="lineCov">      58634 :         ret |= v;</span>
+<span class="lineNum">    1449 </span><span class="lineCov">      58634 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1450 </span><span class="lineCov">      58634 :         v&lt;&lt;=48;</span>
+<span class="lineNum">    1451 </span><span class="lineCov">      58634 :         ret |= v;</span>
+<span class="lineNum">    1452 </span><span class="lineCov">      58634 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1453 </span><span class="lineCov">      58634 :         v&lt;&lt;=56;</span>
+<span class="lineNum">    1454 </span><span class="lineCov">      58634 :         ret |= v;</span>
+<span class="lineNum">    1455 </span><span class="lineCov">      58634 :         return ret;</span>
+<span class="lineNum">    1456 </span>            : }
+<a name="1457"><span class="lineNum">    1457 </span>            : </a>
+<span class="lineNum">    1458 </span>            : GF_EXPORT
+<span class="lineNum">    1459 </span><span class="lineCov">      58777 : u32 gf_bs_read_u32_le(GF_BitStream *bs)</span>
+<span class="lineNum">    1460 </span>            : {
+<span class="lineNum">    1461 </span>            :         u32 ret, v;
+<span class="lineNum">    1462 </span><span class="lineCov">      58777 :         ret = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1463 </span><span class="lineCov">      58777 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1464 </span><span class="lineCov">      58777 :         v&lt;&lt;=8;</span>
+<span class="lineNum">    1465 </span><span class="lineCov">      58777 :         ret |= v;</span>
+<span class="lineNum">    1466 </span><span class="lineCov">      58777 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1467 </span><span class="lineCov">      58777 :         v&lt;&lt;=16;</span>
+<span class="lineNum">    1468 </span><span class="lineCov">      58777 :         ret |= v;</span>
+<span class="lineNum">    1469 </span><span class="lineCov">      58777 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1470 </span><span class="lineCov">      58777 :         v&lt;&lt;=24;</span>
+<span class="lineNum">    1471 </span><span class="lineCov">      58777 :         ret |= v;</span>
+<span class="lineNum">    1472 </span><span class="lineCov">      58777 :         return ret;</span>
+<span class="lineNum">    1473 </span>            : }
+<a name="1474"><span class="lineNum">    1474 </span>            : </a>
+<span class="lineNum">    1475 </span>            : GF_EXPORT
+<span class="lineNum">    1476 </span><span class="lineCov">        113 : u16 gf_bs_read_u16_le(GF_BitStream *bs)</span>
+<span class="lineNum">    1477 </span>            : {
+<span class="lineNum">    1478 </span>            :         u32 ret, v;
+<span class="lineNum">    1479 </span><span class="lineCov">        113 :         ret = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1480 </span><span class="lineCov">        113 :         v = gf_bs_read_int(bs, 8);</span>
+<span class="lineNum">    1481 </span><span class="lineCov">        113 :         v&lt;&lt;=8;</span>
+<span class="lineNum">    1482 </span><span class="lineCov">        113 :         ret |= v;</span>
+<span class="lineNum">    1483 </span><span class="lineCov">        113 :         return ret;</span>
+<span class="lineNum">    1484 </span>            : }
+<a name="1485"><span class="lineNum">    1485 </span>            : </a>
+<span class="lineNum">    1486 </span>            : GF_EXPORT
+<span class="lineNum">    1487 </span><span class="lineCov">          1 : void gf_bs_write_u64_le(GF_BitStream *bs, u64 val)</span>
+<span class="lineNum">    1488 </span>            : {
+<span class="lineNum">    1489 </span><span class="lineCov">          1 :         gf_bs_write_int(bs, val &amp; 0xFF, 8);</span>
+<span class="lineNum">    1490 </span><span class="lineCov">          1 :         gf_bs_write_int(bs, (val&gt;&gt;8) &amp; 0xFF, 8);</span>
+<span class="lineNum">    1491 </span><span class="lineCov">          1 :         gf_bs_write_int(bs, (val&gt;&gt;16) &amp; 0xFF, 8);</span>
+<span class="lineNum">    1492 </span><span class="lineCov">          1 :         gf_bs_write_int(bs, (val&gt;&gt;24) &amp; 0xFF, 8);</span>
+<span class="lineNum">    1493 </span><span class="lineCov">          1 :         gf_bs_write_int(bs, (val&gt;&gt;32) &amp; 0xFF, 8);</span>
+<span class="lineNum">    1494 </span><span class="lineCov">          1 :         gf_bs_write_int(bs, (val&gt;&gt;40) &amp; 0xFF, 8);</span>
+<span class="lineNum">    1495 </span><span class="lineCov">          1 :         gf_bs_write_int(bs, (val&gt;&gt;48) &amp; 0xFF, 8);</span>
+<span class="lineNum">    1496 </span><span class="lineCov">          1 :         gf_bs_write_int(bs, (val&gt;&gt;56) &amp; 0xFF, 8);</span>
+<span class="lineNum">    1497 </span><span class="lineCov">          1 : }</span>
+<a name="1498"><span class="lineNum">    1498 </span>            : </a>
+<span class="lineNum">    1499 </span>            : GF_EXPORT
+<span class="lineNum">    1500 </span><span class="lineCov">        211 : void gf_bs_write_u32_le(GF_BitStream *bs, u32 val)</span>
+<span class="lineNum">    1501 </span>            : {
+<span class="lineNum">    1502 </span><span class="lineCov">        211 :         gf_bs_write_int(bs, val &amp; 0xFF, 8);</span>
+<span class="lineNum">    1503 </span><span class="lineCov">        211 :         gf_bs_write_int(bs, val&gt;&gt;8, 8);</span>
+<span class="lineNum">    1504 </span><span class="lineCov">        211 :         gf_bs_write_int(bs, val&gt;&gt;16, 8);</span>
+<span class="lineNum">    1505 </span><span class="lineCov">        211 :         gf_bs_write_int(bs, val&gt;&gt;24, 8);</span>
+<span class="lineNum">    1506 </span><span class="lineCov">        211 : }</span>
+<a name="1507"><span class="lineNum">    1507 </span>            : </a>
+<span class="lineNum">    1508 </span>            : GF_EXPORT
+<span class="lineNum">    1509 </span><span class="lineCov">         59 : void gf_bs_write_u16_le(GF_BitStream *bs, u32 val)</span>
+<span class="lineNum">    1510 </span>            : {
+<span class="lineNum">    1511 </span><span class="lineCov">         59 :         gf_bs_write_int(bs, val &amp; 0xFF, 8);</span>
+<span class="lineNum">    1512 </span><span class="lineCov">         59 :         gf_bs_write_int(bs, val&gt;&gt;8, 8);</span>
+<span class="lineNum">    1513 </span><span class="lineCov">         59 : }</span>
+<a name="1514"><span class="lineNum">    1514 </span>            : </a>
+<span class="lineNum">    1515 </span>            : GF_EXPORT
+<span class="lineNum">    1516 </span><span class="lineCov">         21 : u32 gf_bs_get_bit_offset(GF_BitStream *bs)</span>
+<span class="lineNum">    1517 </span>            : {
+<span class="lineNum">    1518 </span><span class="lineCov">         21 :         if (bs-&gt;bsmode==GF_BITSTREAM_READ) return (u32) ( (bs-&gt;position - 1) * 8 + bs-&gt;nbBits);</span>
+<span class="lineNum">    1519 </span><span class="lineNoCov">          0 :         return (u32) ( (bs-&gt;position ) * 8 + bs-&gt;nbBits);</span>
+<span class="lineNum">    1520 </span>            : }
+<a name="1521"><span class="lineNum">    1521 </span>            : </a>
+<span class="lineNum">    1522 </span>            : GF_EXPORT
+<span class="lineNum">    1523 </span><span class="lineCov">    1044109 : u32 gf_bs_get_bit_position(GF_BitStream *bs)</span>
+<span class="lineNum">    1524 </span>            : {
+<span class="lineNum">    1525 </span><span class="lineCov">    1044109 :         return bs-&gt;nbBits;</span>
+<span class="lineNum">    1526 </span>            : }
+<a name="1527"><span class="lineNum">    1527 </span>            : </a>
+<span class="lineNum">    1528 </span>            : GF_EXPORT
+<span class="lineNum">    1529 </span><span class="lineCov">          1 : u32 gf_bs_read_vluimsbf5(GF_BitStream *bs)</span>
+<span class="lineNum">    1530 </span>            : {
+<span class="lineNum">    1531 </span>            :         u32 nb_words = 0;
+<span class="lineNum">    1532 </span><span class="lineCov">          1 :         while (gf_bs_read_int(bs, 1)) nb_words++;</span>
+<span class="lineNum">    1533 </span><span class="lineCov">          1 :         nb_words++;</span>
+<span class="lineNum">    1534 </span><span class="lineCov">          1 :         return gf_bs_read_int(bs, 4*nb_words);</span>
+<span class="lineNum">    1535 </span>            : }
+<a name="1536"><span class="lineNum">    1536 </span>            : </a>
+<span class="lineNum">    1537 </span>            : GF_EXPORT
+<span class="lineNum">    1538 </span><span class="lineCov">       7685 : void gf_bs_truncate(GF_BitStream *bs)</span>
+<span class="lineNum">    1539 </span>            : {
+<span class="lineNum">    1540 </span><span class="lineCov">       7685 :         bs-&gt;size = bs-&gt;position;</span>
+<span class="lineNum">    1541 </span><span class="lineCov">       7685 : }</span>
+<span class="lineNum">    1542 </span>            : 
+<a name="1543"><span class="lineNum">    1543 </span>            : </a>
+<span class="lineNum">    1544 </span>            : GF_EXPORT
+<span class="lineNum">    1545 </span><span class="lineCov">       3709 : GF_Err gf_bs_transfer(GF_BitStream *dst, GF_BitStream *src, Bool keep_src)</span>
+<span class="lineNum">    1546 </span>            : {
+<span class="lineNum">    1547 </span>            :         u8 *data;
+<span class="lineNum">    1548 </span>            :         u32 data_len, written;
+<span class="lineNum">    1549 </span>            : 
+<span class="lineNum">    1550 </span><span class="lineCov">       3709 :         data = NULL;</span>
+<span class="lineNum">    1551 </span><span class="lineCov">       3709 :         data_len = 0;</span>
+<span class="lineNum">    1552 </span><span class="lineCov">       3709 :         gf_bs_get_content(src, &amp;data, &amp;data_len);</span>
+<span class="lineNum">    1553 </span><span class="lineCov">       3709 :         if (!data || !data_len)</span>
+<span class="lineNum">    1554 </span>            :         {
+<span class="lineNum">    1555 </span><span class="lineCov">          1 :                 if (data) {</span>
+<span class="lineNum">    1556 </span><span class="lineNoCov">          0 :                         if (keep_src) {</span>
+<span class="lineNum">    1557 </span><span class="lineNoCov">          0 :                                 src-&gt;original = data;</span>
+<span class="lineNum">    1558 </span><span class="lineNoCov">          0 :                                 src-&gt;size = data_len;</span>
+<span class="lineNum">    1559 </span>            :                         } else {
+<span class="lineNum">    1560 </span><span class="lineNoCov">          0 :                                 gf_free(data);</span>
+<span class="lineNum">    1561 </span>            :                         }
+<span class="lineNum">    1562 </span>            :                         return GF_IO_ERR;
+<span class="lineNum">    1563 </span>            :                 }
+<span class="lineNum">    1564 </span>            :                 return GF_OK;
+<span class="lineNum">    1565 </span>            :         }
+<span class="lineNum">    1566 </span><span class="lineCov">       3708 :         written = gf_bs_write_data(dst, data, data_len);</span>
+<span class="lineNum">    1567 </span><span class="lineCov">       3708 :         if (keep_src) {</span>
+<span class="lineNum">    1568 </span><span class="lineCov">        210 :                 src-&gt;original = data;</span>
+<span class="lineNum">    1569 </span><span class="lineCov">        210 :                 src-&gt;size = data_len;</span>
+<span class="lineNum">    1570 </span>            :         } else {
+<span class="lineNum">    1571 </span><span class="lineCov">       3498 :                 gf_free(data);</span>
+<span class="lineNum">    1572 </span>            :         }
+<span class="lineNum">    1573 </span><span class="lineCov">       3708 :         if (written&lt;data_len) return GF_IO_ERR;</span>
+<span class="lineNum">    1574 </span><span class="lineCov">       3708 :         return GF_OK;</span>
+<span class="lineNum">    1575 </span>            : }
+<a name="1576"><span class="lineNum">    1576 </span>            : </a>
+<span class="lineNum">    1577 </span>            : GF_EXPORT
+<span class="lineNum">    1578 </span><span class="lineCov">        455 : void gf_bs_flush(GF_BitStream *bs)</span>
+<span class="lineNum">    1579 </span>            : {
+<span class="lineNum">    1580 </span><span class="lineCov">        455 :         if (!bs-&gt;stream) return;</span>
+<span class="lineNum">    1581 </span><span class="lineCov">          1 :         if (bs-&gt;bsmode != GF_BITSTREAM_FILE_WRITE) return;</span>
+<span class="lineNum">    1582 </span>            : 
+<span class="lineNum">    1583 </span><span class="lineCov">          1 :         if (bs-&gt;cache_write)</span>
+<span class="lineNum">    1584 </span><span class="lineCov">          1 :                 bs_flush_write_cache(bs);</span>
+<span class="lineNum">    1585 </span>            : 
+<span class="lineNum">    1586 </span><span class="lineCov">          1 :         gf_fflush(bs-&gt;stream);</span>
+<span class="lineNum">    1587 </span>            : }
+<span class="lineNum">    1588 </span>            : 
+<span class="lineNum">    1589 </span>            : #if 0 //unused
+<span class="lineNum">    1590 </span>            : /*!
+<span class="lineNum">    1591 </span>            : \brief Reassigns FILE object for stream-based bitstreams
+<span class="lineNum">    1592 </span>            :  *
+<span class="lineNum">    1593 </span>            :  *Reassigns FILE object for stream-based bitstreams. Automatically sets the stream position to the bitstream position
+<span class="lineNum">    1594 </span>            : \param bs the target bitstream
+<span class="lineNum">    1595 </span>            : \param stream the new stream to assign
+<span class="lineNum">    1596 </span>            :  */
+<span class="lineNum">    1597 </span>            : void gf_bs_reassign(GF_BitStream *bs, FILE *stream)
+<span class="lineNum">    1598 </span>            : {
+<span class="lineNum">    1599 </span>            :         if (!bs) return;
+<span class="lineNum">    1600 </span>            :         switch (bs-&gt;bsmode) {
+<span class="lineNum">    1601 </span>            :         case GF_BITSTREAM_FILE_WRITE:
+<span class="lineNum">    1602 </span>            :         case GF_BITSTREAM_FILE_READ:
+<span class="lineNum">    1603 </span>            :                 bs-&gt;stream = stream;
+<span class="lineNum">    1604 </span>            :                 if (gf_ftell(stream) != bs-&gt;position)
+<span class="lineNum">    1605 </span>            :                         gf_bs_seek(bs, bs-&gt;position);
+<span class="lineNum">    1606 </span>            :                 break;
+<span class="lineNum">    1607 </span>            :         }
+<span class="lineNum">    1608 </span>            : }
+<a name="1609"><span class="lineNum">    1609 </span>            : #endif</a>
+<span class="lineNum">    1610 </span>            : 
+<span class="lineNum">    1611 </span><span class="lineCov">      11329 : u64 gf_bs_set_cookie(GF_BitStream *bs, u64 cookie)</span>
+<span class="lineNum">    1612 </span>            : {
+<span class="lineNum">    1613 </span>            :         u64 res = 0;
+<span class="lineNum">    1614 </span><span class="lineCov">      11329 :         if (bs) {</span>
+<span class="lineNum">    1615 </span><span class="lineCov">      11329 :                 res = bs-&gt;cookie;</span>
+<span class="lineNum">    1616 </span><span class="lineCov">      11329 :                 bs-&gt;cookie = cookie;</span>
+<span class="lineNum">    1617 </span>            :         }
+<span class="lineNum">    1618 </span><span class="lineCov">      11329 :         return res;</span>
+<a name="1619"><span class="lineNum">    1619 </span>            : }</a>
+<span class="lineNum">    1620 </span>            : 
+<span class="lineNum">    1621 </span><span class="lineCov">     171493 : u64 gf_bs_get_cookie(GF_BitStream *bs)</span>
+<span class="lineNum">    1622 </span>            : {
+<span class="lineNum">    1623 </span><span class="lineCov">     171493 :         if (!bs) return 0;</span>
+<span class="lineNum">    1624 </span><span class="lineCov">     171493 :         return bs-&gt;cookie;</span>
+<span class="lineNum">    1625 </span>            : }
+<a name="1626"><span class="lineNum">    1626 </span>            : </a>
+<span class="lineNum">    1627 </span>            : GF_EXPORT
+<span class="lineNum">    1628 </span><span class="lineCov">          3 : GF_Err gf_bs_insert_data(GF_BitStream *bs, u8 *data, u32 size, u64 offset)</span>
+<span class="lineNum">    1629 </span>            : {
+<span class="lineNum">    1630 </span>            :         u64 cur_r, cur_w, pos;
+<span class="lineNum">    1631 </span>            :         u32 nb_io;
+<span class="lineNum">    1632 </span>            : 
+<span class="lineNum">    1633 </span><span class="lineCov">          3 :         if (bs-&gt;on_block_out) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1634 </span>            : 
+<span class="lineNum">    1635 </span><span class="lineCov">          3 :         pos = bs-&gt;position;</span>
+<span class="lineNum">    1636 </span><span class="lineCov">          3 :         nb_io = gf_bs_write_data(bs, data, size);</span>
+<span class="lineNum">    1637 </span><span class="lineCov">          3 :         if (nb_io != size) goto exit;</span>
+<span class="lineNum">    1638 </span>            : 
+<span class="lineNum">    1639 </span><span class="lineCov">          3 :         cur_w = bs-&gt;position;</span>
+<span class="lineNum">    1640 </span><span class="lineCov">          3 :         gf_bs_seek(bs, pos);</span>
+<span class="lineNum">    1641 </span>            :         cur_r = pos;
+<span class="lineNum">    1642 </span>            :         pos = cur_w;
+<span class="lineNum">    1643 </span><span class="lineCov">          3 :         while (cur_r &gt; offset) {</span>
+<span class="lineNum">    1644 </span>            :                 u8 block[8196];
+<span class="lineNum">    1645 </span>            :                 u32 move_bytes = 8196;
+<span class="lineNum">    1646 </span><span class="lineCov">         32 :                 if (cur_r - offset &lt; move_bytes)</span>
+<span class="lineNum">    1647 </span><span class="lineCov">          2 :                         move_bytes = (u32) (cur_r - offset);</span>
+<span class="lineNum">    1648 </span>            : 
+<span class="lineNum">    1649 </span><span class="lineCov">         32 :                 gf_bs_seek(bs, cur_r - move_bytes);</span>
+<span class="lineNum">    1650 </span><span class="lineCov">         32 :                 nb_io = gf_bs_read_data(bs, block, move_bytes);</span>
+<span class="lineNum">    1651 </span><span class="lineCov">         32 :                 if (nb_io != move_bytes) goto exit;</span>
+<span class="lineNum">    1652 </span><span class="lineCov">         32 :                 gf_bs_seek(bs, cur_w - move_bytes);</span>
+<span class="lineNum">    1653 </span><span class="lineCov">         32 :                 nb_io = gf_bs_write_data(bs, block, move_bytes);</span>
+<span class="lineNum">    1654 </span><span class="lineCov">         32 :                 if (nb_io != move_bytes) goto exit;</span>
+<span class="lineNum">    1655 </span>            :                 cur_r -= move_bytes;
+<span class="lineNum">    1656 </span>            :                 cur_w -= move_bytes;
+<span class="lineNum">    1657 </span>            :         }
+<span class="lineNum">    1658 </span>            : 
+<span class="lineNum">    1659 </span><span class="lineCov">          3 :         gf_bs_seek(bs, offset);</span>
+<span class="lineNum">    1660 </span><span class="lineCov">          3 :         nb_io = gf_bs_write_data(bs, data, size);</span>
+<span class="lineNum">    1661 </span><span class="lineCov">          3 :         if (nb_io != size) goto exit;</span>
+<span class="lineNum">    1662 </span>            : 
+<span class="lineNum">    1663 </span><span class="lineCov">          3 :         gf_bs_seek(bs, pos);</span>
+<span class="lineNum">    1664 </span><span class="lineCov">          3 :         return GF_OK;</span>
+<span class="lineNum">    1665 </span>            : 
+<span class="lineNum">    1666 </span><span class="lineNoCov">          0 : exit:</span>
+<span class="lineNum">    1667 </span><span class="lineNoCov">          0 :         gf_bs_seek(bs, pos);</span>
+<span class="lineNum">    1668 </span><span class="lineNoCov">          0 :         return GF_IO_ERR;</span>
+<span class="lineNum">    1669 </span>            : }
+<a name="1670"><span class="lineNum">    1670 </span>            : </a>
+<span class="lineNum">    1671 </span>            : 
+<span class="lineNum">    1672 </span><span class="lineCov">       9633 : GF_Err gf_bs_set_logger(GF_BitStream *bs, void (*on_bs_log)(void *udta, const char *field_name, u32 nb_bits, u64 field_val, s32 idx1, s32 idx2, s32 idx3), void *udta)</span>
+<span class="lineNum">    1673 </span>            : {
+<span class="lineNum">    1674 </span><span class="lineCov">       9633 :         if (!bs) return GF_BAD_PARAM;</span>
+<span class="lineNum">    1675 </span><span class="lineCov">       9633 :         bs-&gt;on_log = on_bs_log;</span>
+<span class="lineNum">    1676 </span><span class="lineCov">       9633 :         bs-&gt;log_udta = udta;</span>
+<span class="lineNum">    1677 </span><span class="lineCov">       9633 :         return GF_OK;</span>
+<span class="lineNum">    1678 </span>            : }
+<a name="1679"><span class="lineNum">    1679 </span>            : </a>
+<span class="lineNum">    1680 </span>            : #ifndef GPAC_DISABLE_AVPARSE_LOGS
+<span class="lineNum">    1681 </span><span class="lineCov">   21076936 : void gf_bs_log_idx(GF_BitStream *bs, u32 nBits, const char *fname, s64 val, s32 idx1, s32 idx2, s32 idx3)</span>
+<span class="lineNum">    1682 </span>            : {
+<span class="lineNum">    1683 </span>            :         assert(bs);
+<span class="lineNum">    1684 </span><span class="lineCov">   21076936 :         if (bs-&gt;on_log) bs-&gt;on_log(bs-&gt;log_udta, fname, nBits, val, idx1, idx2, idx3);</span>
+<span class="lineNum">    1685 </span><span class="lineCov">   21076936 : }</span>
+<span class="lineNum">    1686 </span>            : #endif
+<span class="lineNum">    1687 </span>            : 
+<span class="lineNum">    1688 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,673 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - compositor/camera.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">compositor</a> - camera.c<span style="font-size: 80%;"> (source / <a href="camera.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">271</td>
+            <td class="headerCovTableEntry">326</td>
+            <td class="headerCovTableEntryMed">83.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2000-2012
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / Scene Compositor sub-project
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/internal/camera.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #include &lt;gpac/options.h&gt;
+<span class="lineNum">      29 </span>            : #include &quot;visual_manager.h&quot;
+<span class="lineNum">      30 </span>            : 
+<a name="31"><span class="lineNum">      31 </span>            : #define FORCE_CAMERA_3D</a>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineCov">        684 : void camera_invalidate(GF_Camera *cam)</span>
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            :         /*forces recompute of default viewpoint*/
+<span class="lineNum">      36 </span><span class="lineCov">        684 :         cam-&gt;had_viewpoint = 2;</span>
+<span class="lineNum">      37 </span><span class="lineCov">        684 :         cam-&gt;had_nav_info = GF_TRUE;</span>
+<span class="lineNum">      38 </span><span class="lineCov">        684 :         cam-&gt;flags = CAM_IS_DIRTY;</span>
+<span class="lineNum">      39 </span>            : //      cam-&gt;navigate_mode = GF_NAVIGATE_NONE;
+<a name="40"><span class="lineNum">      40 </span><span class="lineCov">        684 : }</span></a>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineCov">       2477 : static void camera_frustum_from_matrix(GF_Camera *cam, GF_Matrix *mx)</span>
+<span class="lineNum">      43 </span>            : {
+<span class="lineNum">      44 </span>            :         u32 i;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_LEFT_PLANE].normal.x = mx-&gt;m[3] + mx-&gt;m[0];</span>
+<span class="lineNum">      47 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_LEFT_PLANE].normal.y = mx-&gt;m[7] + mx-&gt;m[4];</span>
+<span class="lineNum">      48 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_LEFT_PLANE].normal.z = mx-&gt;m[11] + mx-&gt;m[8];</span>
+<span class="lineNum">      49 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_LEFT_PLANE].d = mx-&gt;m[15] + mx-&gt;m[12];</span>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_RIGHT_PLANE].normal.x = mx-&gt;m[3] - mx-&gt;m[0];</span>
+<span class="lineNum">      52 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_RIGHT_PLANE].normal.y = mx-&gt;m[7] - mx-&gt;m[4];</span>
+<span class="lineNum">      53 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_RIGHT_PLANE].normal.z = mx-&gt;m[11] - mx-&gt;m[8];</span>
+<span class="lineNum">      54 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_RIGHT_PLANE].d = mx-&gt;m[15] - mx-&gt;m[12];</span>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_BOTTOM_PLANE].normal.x = mx-&gt;m[3] + mx-&gt;m[1];</span>
+<span class="lineNum">      57 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_BOTTOM_PLANE].normal.y = mx-&gt;m[7] + mx-&gt;m[5];</span>
+<span class="lineNum">      58 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_BOTTOM_PLANE].normal.z = mx-&gt;m[11] + mx-&gt;m[9];</span>
+<span class="lineNum">      59 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_BOTTOM_PLANE].d = mx-&gt;m[15] + mx-&gt;m[13];</span>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_TOP_PLANE].normal.x = mx-&gt;m[3] - mx-&gt;m[1];</span>
+<span class="lineNum">      62 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_TOP_PLANE].normal.y = mx-&gt;m[7] - mx-&gt;m[5];</span>
+<span class="lineNum">      63 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_TOP_PLANE].normal.z = mx-&gt;m[11] - mx-&gt;m[9];</span>
+<span class="lineNum">      64 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_TOP_PLANE].d = mx-&gt;m[15] - mx-&gt;m[13];</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_FAR_PLANE].normal.x = mx-&gt;m[3] - mx-&gt;m[2];</span>
+<span class="lineNum">      67 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_FAR_PLANE].normal.y = mx-&gt;m[7] - mx-&gt;m[6];</span>
+<span class="lineNum">      68 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_FAR_PLANE].normal.z = mx-&gt;m[11] - mx-&gt;m[10];</span>
+<span class="lineNum">      69 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_FAR_PLANE].d = mx-&gt;m[15] - mx-&gt;m[14];</span>
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_NEAR_PLANE].normal.x = mx-&gt;m[3] + mx-&gt;m[2];</span>
+<span class="lineNum">      72 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_NEAR_PLANE].normal.y = mx-&gt;m[7] + mx-&gt;m[6];</span>
+<span class="lineNum">      73 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_NEAR_PLANE].normal.z = mx-&gt;m[11] + mx-&gt;m[10];</span>
+<span class="lineNum">      74 </span><span class="lineCov">       2477 :         cam-&gt;planes[FRUS_NEAR_PLANE].d = mx-&gt;m[15] + mx-&gt;m[14];</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">      17339 :         for (i=0; i&lt;6; ++i) {</span>
+<span class="lineNum">      77 </span>            : #ifdef GPAC_FIXED_POINT
+<span class="lineNum">      78 </span>            :                 /*after some testing, it's just safer to move back to float here, the smallest drift will
+<span class="lineNum">      79 </span>            :                 result in completely wrong culling...*/
+<span class="lineNum">      80 </span>            :                 Float vx, vy, vz, nor;
+<span class="lineNum">      81 </span>            :                 vx = FIX2FLT(cam-&gt;planes[i].normal.x);
+<span class="lineNum">      82 </span>            :                 vy = FIX2FLT(cam-&gt;planes[i].normal.y);
+<span class="lineNum">      83 </span>            :                 vz = FIX2FLT(cam-&gt;planes[i].normal.z);
+<span class="lineNum">      84 </span>            :                 nor = (Float) sqrt(vx*vx + vy*vy + vz*vz);
+<span class="lineNum">      85 </span>            :                 vx /= nor;
+<span class="lineNum">      86 </span>            :                 vy /= nor;
+<span class="lineNum">      87 </span>            :                 vz /= nor;
+<span class="lineNum">      88 </span>            :                 cam-&gt;planes[i].d = FLT2FIX (FIX2FLT(cam-&gt;planes[i].d) / nor);
+<span class="lineNum">      89 </span>            :                 cam-&gt;planes[i].normal.x = FLT2FIX(vx);
+<span class="lineNum">      90 </span>            :                 cam-&gt;planes[i].normal.y = FLT2FIX(vy);
+<span class="lineNum">      91 </span>            :                 cam-&gt;planes[i].normal.z = FLT2FIX(vz);
+<span class="lineNum">      92 </span>            : #else
+<span class="lineNum">      93 </span><span class="lineCov">      14862 :                 Float len = (Float)(1.0f / gf_vec_len(cam-&gt;planes[i].normal));</span>
+<span class="lineNum">      94 </span><span class="lineCov">      14862 :                 cam-&gt;planes[i].normal = gf_vec_scale(cam-&gt;planes[i].normal, len);</span>
+<span class="lineNum">      95 </span><span class="lineCov">      14862 :                 cam-&gt;planes[i].d *= len;</span>
+<span class="lineNum">      96 </span>            : #endif
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :                 /*compute p-vertex idx*/
+<span class="lineNum">      99 </span><span class="lineCov">      14862 :                 cam-&gt;p_idx[i] = gf_plane_get_p_vertex_idx(&amp;cam-&gt;planes[i]);</span>
+<span class="lineNum">     100 </span>            :         }
+<span class="lineNum">     101 </span><span class="lineCov">       2477 : }</span>
+<a name="102"><span class="lineNum">     102 </span>            : </a>
+<span class="lineNum">     103 </span>            : /*based on  Copyright (C) 1995  Stephen Chenney (schenney@cs.berkeley.edu)*/
+<span class="lineNum">     104 </span><span class="lineCov">        158 : SFRotation camera_get_orientation(SFVec3f pos, SFVec3f target, SFVec3f up)</span>
+<span class="lineNum">     105 </span>            : {
+<span class="lineNum">     106 </span>            :         SFVec3f dir, tmp, v, axis, new_y;
+<span class="lineNum">     107 </span>            :         SFVec4f norm, inv_norm, y_quat, ny_quat, rot_y, rot;
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineCov">        158 :         gf_vec_diff(dir, target, pos);</span>
+<span class="lineNum">     110 </span><span class="lineCov">        158 :         gf_vec_norm(&amp;dir);</span>
+<span class="lineNum">     111 </span><span class="lineCov">        158 :         tmp = gf_vec_scale(dir, gf_vec_dot(up, dir));</span>
+<span class="lineNum">     112 </span><span class="lineCov">        158 :         gf_vec_diff(v, up, tmp);</span>
+<span class="lineNum">     113 </span><span class="lineCov">        158 :         gf_vec_norm(&amp;v);</span>
+<span class="lineNum">     114 </span><span class="lineCov">        158 :         axis.x = dir.y;</span>
+<span class="lineNum">     115 </span><span class="lineCov">        158 :         axis.y = -dir.x;</span>
+<span class="lineNum">     116 </span><span class="lineCov">        158 :         axis.z = 0;</span>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineCov">        158 :         if (gf_vec_dot(axis, axis) &lt; FIX_EPSILON) {</span>
+<span class="lineNum">     119 </span><span class="lineCov">        107 :                 if (dir.z&gt; 0) {</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :                         norm.x = 0;</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :                         norm.y = FIX_ONE;</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :                         norm.z = 0;</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :                         norm.q = 0;</span>
+<span class="lineNum">     124 </span>            :                 } else {
+<span class="lineNum">     125 </span><span class="lineCov">        106 :                         norm.x = 0;</span>
+<span class="lineNum">     126 </span><span class="lineCov">        106 :                         norm.y = 0;</span>
+<span class="lineNum">     127 </span><span class="lineCov">        106 :                         norm.z = 0;</span>
+<span class="lineNum">     128 </span><span class="lineCov">        106 :                         norm.q = FIX_ONE;</span>
+<span class="lineNum">     129 </span>            :                 }
+<span class="lineNum">     130 </span>            :         } else {
+<span class="lineNum">     131 </span><span class="lineCov">         51 :                 gf_vec_norm(&amp;axis);</span>
+<span class="lineNum">     132 </span><span class="lineCov">         51 :                 norm = gf_quat_from_axis_cos(axis, -dir.z);</span>
+<span class="lineNum">     133 </span>            :         }
+<span class="lineNum">     134 </span>            :         /* Find the inverse rotation. */
+<span class="lineNum">     135 </span><span class="lineCov">        158 :         inv_norm.x = -norm.x;</span>
+<span class="lineNum">     136 </span><span class="lineCov">        158 :         inv_norm.y = -norm.y;</span>
+<span class="lineNum">     137 </span><span class="lineCov">        158 :         inv_norm.z = -norm.z;</span>
+<span class="lineNum">     138 </span><span class="lineCov">        158 :         inv_norm.q = norm.q;</span>
+<span class="lineNum">     139 </span>            :         /* Rotate the y. */
+<span class="lineNum">     140 </span><span class="lineCov">        158 :         y_quat.x = y_quat.z = y_quat.q = 0;</span>
+<span class="lineNum">     141 </span><span class="lineCov">        158 :         y_quat.y = FIX_ONE;</span>
+<span class="lineNum">     142 </span><span class="lineCov">        158 :         ny_quat = gf_quat_multiply(&amp;norm, &amp;y_quat);</span>
+<span class="lineNum">     143 </span><span class="lineCov">        158 :         ny_quat = gf_quat_multiply(&amp;ny_quat, &amp;inv_norm);</span>
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span><span class="lineCov">        158 :         new_y.x = ny_quat.x;</span>
+<span class="lineNum">     146 </span><span class="lineCov">        158 :         new_y.y = ny_quat.y;</span>
+<span class="lineNum">     147 </span><span class="lineCov">        158 :         new_y.z = ny_quat.z;</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineCov">        158 :         tmp = gf_vec_cross(new_y, v);</span>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineCov">        158 :         if (gf_vec_dot(tmp, tmp) &lt; FIX_EPSILON) {</span>
+<span class="lineNum">     152 </span>            :                 /* The old and new may be pointing in the same or opposite. Need
+<span class="lineNum">     153 </span>            :                 ** to generate a vector perpendicular to the old or new y.
+<span class="lineNum">     154 </span>            :                 */
+<span class="lineNum">     155 </span><span class="lineCov">        142 :                 tmp.x = 0;</span>
+<span class="lineNum">     156 </span><span class="lineCov">        142 :                 tmp.y = -v.z;</span>
+<span class="lineNum">     157 </span><span class="lineCov">        142 :                 tmp.z = v.y;</span>
+<span class="lineNum">     158 </span><span class="lineCov">        142 :                 if (gf_vec_dot(tmp, tmp) &lt; FIX_EPSILON) {</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :                         tmp.x = v.z;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :                         tmp.y = 0;</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :                         tmp.z = -v.x;</span>
+<span class="lineNum">     162 </span>            :                 }
+<span class="lineNum">     163 </span>            :         }
+<span class="lineNum">     164 </span><span class="lineCov">        158 :         gf_vec_norm(&amp;tmp);</span>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineCov">        158 :         rot_y = gf_quat_from_axis_cos(tmp, gf_vec_dot(new_y, v));</span>
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            :         /* rot_y holds the rotation about the initial camera direction needed
+<span class="lineNum">     169 </span>            :         ** to align the up vectors in the final position.
+<span class="lineNum">     170 </span>            :         */
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            :         /* Put the 2 rotations together. */
+<span class="lineNum">     173 </span><span class="lineCov">        158 :         rot = gf_quat_multiply(&amp;rot_y, &amp;norm);</span>
+<span class="lineNum">     174 </span><span class="lineCov">        158 :         return gf_quat_to_rotation(&amp;rot);</span>
+<span class="lineNum">     175 </span>            : }
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : #define FAR_PLANE_2D    -10000
+<a name="178"><span class="lineNum">     178 </span>            : #define NEAR_PLANE_2D   1000</a>
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span><span class="lineCov">        587 : void camera_set_2d(GF_Camera *cam)</span>
+<span class="lineNum">     181 </span>            : {
+<span class="lineNum">     182 </span><span class="lineCov">        587 :         cam-&gt;is_3D = GF_FALSE;</span>
+<span class="lineNum">     183 </span>            : #ifdef FORCE_CAMERA_3D
+<span class="lineNum">     184 </span><span class="lineCov">        587 :         cam-&gt;position.x = cam-&gt;position.y = 0;</span>
+<span class="lineNum">     185 </span><span class="lineCov">        587 :         cam-&gt;position.z = INT2FIX(NEAR_PLANE_2D);</span>
+<span class="lineNum">     186 </span><span class="lineCov">        587 :         cam-&gt;up.x = cam-&gt;up.z = 0;</span>
+<span class="lineNum">     187 </span><span class="lineCov">        587 :         cam-&gt;up.y = FIX_ONE;</span>
+<span class="lineNum">     188 </span><span class="lineCov">        587 :         cam-&gt;target.x = cam-&gt;target.y = cam-&gt;target.z = 0;</span>
+<span class="lineNum">     189 </span><span class="lineCov">        587 :         cam-&gt;vp_position = cam-&gt;position;</span>
+<span class="lineNum">     190 </span><span class="lineCov">        587 :         cam-&gt;vp_orientation.x = cam-&gt;vp_orientation.y = 0;</span>
+<span class="lineNum">     191 </span><span class="lineCov">        587 :         cam-&gt;vp_orientation.q = 0;</span>
+<span class="lineNum">     192 </span><span class="lineCov">        587 :         cam-&gt;vp_orientation.y = FIX_ONE;</span>
+<span class="lineNum">     193 </span><span class="lineCov">        587 :         cam-&gt;vp_fov = cam-&gt;fieldOfView = FLT2FIX(0.785398);</span>
+<span class="lineNum">     194 </span><span class="lineCov">        587 :         cam-&gt;vp_dist = INT2FIX(NEAR_PLANE_2D);</span>
+<span class="lineNum">     195 </span><span class="lineCov">        587 :         cam-&gt;end_zoom = FIX_ONE;</span>
+<span class="lineNum">     196 </span>            : #endif
+<a name="197"><span class="lineNum">     197 </span><span class="lineCov">        587 : }</span></a>
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span><span class="lineCov">      10367 : void camera_update_stereo(GF_Camera *cam, GF_Matrix2D *user_transform, Bool center_coords, Fixed horizontal_shift, Fixed nominal_view_distance, Fixed view_distance_offset, u32 camlay)</span>
+<span class="lineNum">     200 </span>            : {
+<span class="lineNum">     201 </span>            :         Fixed vlen, h, w, ar;
+<span class="lineNum">     202 </span>            :         SFVec3f corner, center;
+<span class="lineNum">     203 </span>            :         GF_Matrix post_model_view;
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span><span class="lineCov">      18257 :         if (! (cam-&gt;flags &amp; CAM_IS_DIRTY)) return;</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineCov">       2477 :         ar = gf_divfix(cam-&gt;width, cam-&gt;height);</span>
+<span class="lineNum">     208 </span><span class="lineCov">       2477 :         gf_mx_init(post_model_view);</span>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineCov">       2477 :         if (cam-&gt;is_3D) {</span>
+<span class="lineNum">     211 </span><span class="lineCov">       1277 :                 if (!cam-&gt;z_far) {</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :                         cam-&gt;z_near = FIX_ONE / 100;</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                         cam-&gt;z_far = FIX_ONE * 100;</span>
+<span class="lineNum">     214 </span>            :                 }
+<span class="lineNum">     215 </span>            :                 /*setup perspective*/
+<span class="lineNum">     216 </span><span class="lineCov">       1277 :                 if (camlay==GF_3D_CAMERA_OFFAXIS) {</span>
+<span class="lineNum">     217 </span>            :                         Fixed left, right, top, bottom, shift, wd2, ndfl, viewing_distance;
+<span class="lineNum">     218 </span>            :                         SFVec3f eye, pos, tar, disp;
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            :                         viewing_distance = nominal_view_distance;
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">        830 :                         wd2 = gf_mulfix(cam-&gt;z_near, gf_tan(cam-&gt;fieldOfView/2));</span>
+<span class="lineNum">     223 </span><span class="lineCov">        830 :                         ndfl = gf_divfix(cam-&gt;z_near, viewing_distance);</span>
+<span class="lineNum">     224 </span>            :                         /*compute h displacement*/
+<span class="lineNum">     225 </span><span class="lineCov">        830 :                         shift = gf_mulfix(horizontal_shift, ndfl);</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            :                         top = wd2;
+<span class="lineNum">     228 </span>            :                         bottom = -top;
+<span class="lineNum">     229 </span><span class="lineCov">        830 :                         left = -gf_mulfix(ar, wd2) - shift;</span>
+<span class="lineNum">     230 </span><span class="lineCov">        830 :                         right = gf_mulfix(ar, wd2) - shift;</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineCov">        830 :                         gf_mx_init(cam-&gt;projection);</span>
+<span class="lineNum">     233 </span><span class="lineCov">        830 :                         cam-&gt;projection.m[0] = gf_divfix(2*cam-&gt;z_near, (right-left));</span>
+<span class="lineNum">     234 </span><span class="lineCov">        830 :                         cam-&gt;projection.m[5] = gf_divfix(2*cam-&gt;z_near, (top-bottom));</span>
+<span class="lineNum">     235 </span><span class="lineCov">        830 :                         cam-&gt;projection.m[8] = gf_divfix(right+left, right-left);</span>
+<span class="lineNum">     236 </span><span class="lineCov">        830 :                         cam-&gt;projection.m[9] = gf_divfix(top+bottom, top-bottom);</span>
+<span class="lineNum">     237 </span><span class="lineCov">        830 :                         cam-&gt;projection.m[10] = gf_divfix(cam-&gt;z_far+cam-&gt;z_near, cam-&gt;z_near-cam-&gt;z_far);</span>
+<span class="lineNum">     238 </span><span class="lineCov">        830 :                         cam-&gt;projection.m[11] = -FIX_ONE;</span>
+<span class="lineNum">     239 </span><span class="lineCov">        830 :                         cam-&gt;projection.m[14] = 2*gf_muldiv(cam-&gt;z_near, cam-&gt;z_far, cam-&gt;z_near-cam-&gt;z_far);</span>
+<span class="lineNum">     240 </span><span class="lineCov">        830 :                         cam-&gt;projection.m[15] = 0;</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">        830 :                         gf_vec_diff(eye, cam-&gt;target, cam-&gt;position);</span>
+<span class="lineNum">     243 </span><span class="lineCov">        830 :                         gf_vec_norm(&amp;eye);</span>
+<span class="lineNum">     244 </span><span class="lineCov">        830 :                         disp = gf_vec_cross(eye, cam-&gt;up);</span>
+<span class="lineNum">     245 </span><span class="lineCov">        830 :                         gf_vec_norm(&amp;disp);</span>
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineCov">        830 :                         gf_vec_diff(center, cam-&gt;world_bbox.center, cam-&gt;position);</span>
+<span class="lineNum">     248 </span><span class="lineCov">        830 :                         vlen = gf_vec_len(center);</span>
+<span class="lineNum">     249 </span><span class="lineCov">        830 :                         shift = gf_mulfix(horizontal_shift, gf_divfix(vlen, viewing_distance));</span>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">        830 :                         pos = gf_vec_scale(disp, shift);</span>
+<span class="lineNum">     252 </span><span class="lineCov">        830 :                         gf_vec_add(pos, pos, cam-&gt;position);</span>
+<span class="lineNum">     253 </span><span class="lineCov">        830 :                         gf_vec_add(tar, pos, eye);</span>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :                         /*setup modelview*/
+<span class="lineNum">     256 </span><span class="lineCov">        830 :                         gf_mx_lookat(&amp;cam-&gt;modelview, pos, tar, cam-&gt;up);</span>
+<span class="lineNum">     257 </span>            :                 } else {
+<span class="lineNum">     258 </span><span class="lineCov">        447 :                         gf_mx_perspective(&amp;cam-&gt;projection, cam-&gt;fieldOfView, ar, cam-&gt;z_near, cam-&gt;z_far);</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            :                         /*setup modelview*/
+<span class="lineNum">     261 </span><span class="lineCov">        447 :                         gf_mx_lookat(&amp;cam-&gt;modelview, cam-&gt;position, cam-&gt;target, cam-&gt;up);</span>
+<span class="lineNum">     262 </span>            :                 }
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">       1277 :                 if (!center_coords) {</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :                         gf_mx_add_scale(&amp;post_model_view, FIX_ONE, -FIX_ONE, FIX_ONE);</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :                         gf_mx_add_translation(&amp;post_model_view, -cam-&gt;width / 2, -cam-&gt;height / 2, 0);</span>
+<span class="lineNum">     267 </span>            :                 }
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            :                 /*compute center and radius - CHECK ME!*/
+<span class="lineNum">     270 </span><span class="lineCov">       1277 :                 vlen = cam-&gt;z_far - cam-&gt;z_near;</span>
+<span class="lineNum">     271 </span><span class="lineCov">       1277 :                 h = gf_mulfix(vlen , gf_tan(cam-&gt;fieldOfView / 2));</span>
+<span class="lineNum">     272 </span><span class="lineCov">       1277 :                 w = gf_mulfix(h, ar);</span>
+<span class="lineNum">     273 </span>            :                 center.x = 0;
+<span class="lineNum">     274 </span>            :                 center.y = 0;
+<span class="lineNum">     275 </span><span class="lineCov">       1277 :                 center.z = cam-&gt;z_near + vlen / 2;</span>
+<span class="lineNum">     276 </span>            :                 corner.x = w;
+<span class="lineNum">     277 </span>            :                 corner.y = h;
+<span class="lineNum">     278 </span>            :                 corner.z = vlen;
+<span class="lineNum">     279 </span><span class="lineCov">       1277 :                 gf_vec_diff(corner, corner, center);</span>
+<span class="lineNum">     280 </span><span class="lineCov">       1277 :                 cam-&gt;radius = gf_vec_len(corner);</span>
+<span class="lineNum">     281 </span><span class="lineCov">       1277 :                 gf_vec_diff(cam-&gt;center, cam-&gt;target, cam-&gt;position);</span>
+<span class="lineNum">     282 </span><span class="lineCov">       1277 :                 gf_vec_norm(&amp;cam-&gt;center);</span>
+<span class="lineNum">     283 </span><span class="lineCov">       1277 :                 cam-&gt;center = gf_vec_scale(cam-&gt;center, cam-&gt;z_near + vlen/2);</span>
+<span class="lineNum">     284 </span><span class="lineCov">       1277 :                 gf_vec_add(cam-&gt;center, cam-&gt;center, cam-&gt;position);</span>
+<span class="lineNum">     285 </span>            :         } else {
+<span class="lineNum">     286 </span>            :                 GF_BBox b;
+<span class="lineNum">     287 </span>            :                 Fixed hw, hh;
+<span class="lineNum">     288 </span><span class="lineCov">       1200 :                 hw = cam-&gt;width / 2;</span>
+<span class="lineNum">     289 </span><span class="lineCov">       1200 :                 hh = cam-&gt;height / 2;</span>
+<span class="lineNum">     290 </span><span class="lineCov">       1200 :                 cam-&gt;z_near = INT2FIX(NEAR_PLANE_2D);</span>
+<span class="lineNum">     291 </span><span class="lineCov">       1200 :                 cam-&gt;z_far = INT2FIX(FAR_PLANE_2D);</span>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            :                 /*setup ortho*/
+<span class="lineNum">     294 </span><span class="lineCov">       1200 :                 gf_mx_ortho(&amp;cam-&gt;projection, -hw, hw, -hh, hh, cam-&gt;z_near, cam-&gt;z_far);</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :                 /*setup modelview*/
+<span class="lineNum">     297 </span><span class="lineCov">       2400 :                 gf_mx_init(cam-&gt;modelview);</span>
+<span class="lineNum">     298 </span>            : #ifdef FORCE_CAMERA_3D
+<span class="lineNum">     299 </span><span class="lineCov">       1200 :                 if (! (cam-&gt;flags &amp; CAM_NO_LOOKAT))</span>
+<span class="lineNum">     300 </span><span class="lineCov">       1200 :                         gf_mx_lookat(&amp;cam-&gt;modelview, cam-&gt;position, cam-&gt;target, cam-&gt;up);</span>
+<span class="lineNum">     301 </span>            : #endif
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span><span class="lineCov">       1200 :                 if (!center_coords) {</span>
+<span class="lineNum">     304 </span><span class="lineCov">          1 :                         gf_mx_add_scale(&amp;post_model_view, FIX_ONE, -FIX_ONE, FIX_ONE);</span>
+<span class="lineNum">     305 </span><span class="lineCov">          1 :                         gf_mx_add_translation(&amp;post_model_view, -hw, -hh, 0);</span>
+<span class="lineNum">     306 </span>            :                 }
+<span class="lineNum">     307 </span><span class="lineCov">       1200 :                 if (user_transform) {</span>
+<span class="lineNum">     308 </span>            : #ifdef FORCE_CAMERA_3D
+<span class="lineNum">     309 </span><span class="lineCov">        138 :                         if (! (cam-&gt;flags &amp; CAM_NO_LOOKAT)) {</span>
+<span class="lineNum">     310 </span>            :                                 GF_Matrix mx;
+<span class="lineNum">     311 </span><span class="lineCov">        138 :                                 gf_mx_from_mx2d(&amp;mx, user_transform);</span>
+<span class="lineNum">     312 </span><span class="lineCov">        138 :                                 mx.m[10] = mx.m[0];</span>
+<span class="lineNum">     313 </span><span class="lineCov">        138 :                                 gf_mx_add_matrix(&amp;post_model_view, &amp;mx);</span>
+<span class="lineNum">     314 </span>            :                         } else
+<span class="lineNum">     315 </span>            : #endif
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :                                 gf_mx_add_matrix_2d(&amp;post_model_view, user_transform);</span>
+<span class="lineNum">     317 </span>            :                 }
+<span class="lineNum">     318 </span><span class="lineCov">       1200 :                 if (cam-&gt;end_zoom != FIX_ONE) gf_mx_add_scale(&amp;post_model_view, cam-&gt;end_zoom, cam-&gt;end_zoom, cam-&gt;end_zoom);</span>
+<span class="lineNum">     319 </span><span class="lineCov">       1200 :                 if (cam-&gt;flags &amp; CAM_HAS_VIEWPORT) gf_mx_add_matrix(&amp;post_model_view, &amp;cam-&gt;viewport);</span>
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            :                 /*compute center &amp; radius*/
+<span class="lineNum">     322 </span><span class="lineCov">       1200 :                 b.max_edge.x = hw;</span>
+<span class="lineNum">     323 </span><span class="lineCov">       1200 :                 b.max_edge.y = hh;</span>
+<span class="lineNum">     324 </span><span class="lineCov">       1200 :                 b.min_edge.x = -hw;</span>
+<span class="lineNum">     325 </span><span class="lineCov">       1200 :                 b.min_edge.y = -hh;</span>
+<span class="lineNum">     326 </span><span class="lineCov">       1200 :                 b.min_edge.z = b.max_edge.z = (cam-&gt;z_near+cam-&gt;z_far) / 2;</span>
+<span class="lineNum">     327 </span><span class="lineCov">       1200 :                 gf_bbox_refresh(&amp;b);</span>
+<span class="lineNum">     328 </span><span class="lineCov">       1200 :                 cam-&gt;center = b.center;</span>
+<span class="lineNum">     329 </span><span class="lineCov">       1200 :                 cam-&gt;radius = b.radius;</span>
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span><span class="lineCov">       1200 :                 if (camlay==GF_3D_CAMERA_OFFAXIS)</span>
+<span class="lineNum">     332 </span>            :                         camlay=GF_3D_CAMERA_LINEAR;
+<span class="lineNum">     333 </span>            :         }
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span><span class="lineCov">       2477 :         if (camlay == GF_3D_CAMERA_CIRCULAR) {</span>
+<span class="lineNum">     336 </span>            :                 GF_Matrix mx;
+<span class="lineNum">     337 </span>            :                 Fixed viewing_distance = nominal_view_distance;
+<span class="lineNum">     338 </span>            :                 SFVec3f pos, target;
+<span class="lineNum">     339 </span>            :                 Fixed angle;
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                 gf_vec_diff(center, cam-&gt;world_bbox.center, cam-&gt;position);</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :                 vlen = gf_vec_len(center);</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                 vlen += gf_mulfix(view_distance_offset, gf_divfix(vlen, nominal_view_distance));</span>
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :                 gf_vec_diff(pos, cam-&gt;target, cam-&gt;position);</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                 gf_vec_norm(&amp;pos);</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :                 pos = gf_vec_scale(pos, vlen);</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                 gf_vec_add(target, pos, cam-&gt;position);</span>
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                 gf_mx_init(mx);</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                 gf_mx_add_translation(&amp;mx, target.x, target.y, target.z);</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :                 angle = gf_atan2(horizontal_shift, viewing_distance);</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                 gf_mx_add_rotation(&amp;mx, angle, cam-&gt;up.x, cam-&gt;up.y, cam-&gt;up.z);</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                 gf_mx_add_translation(&amp;mx, -target.x, -target.y, -target.z);</span>
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                 pos = cam-&gt;position;</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                 gf_mx_apply_vec(&amp;mx, &amp;pos);</span>
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :                 gf_mx_lookat(&amp;cam-&gt;modelview, pos, target, cam-&gt;up);</span>
+<span class="lineNum">     360 </span><span class="lineCov">       2477 :         } else if (camlay == GF_3D_CAMERA_LINEAR) {</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                 Fixed viewing_distance = nominal_view_distance + view_distance_offset;</span>
+<span class="lineNum">     362 </span>            :                 GF_Vec eye, disp, pos, tar;
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :                 gf_vec_diff(center, cam-&gt;world_bbox.center, cam-&gt;position);</span>
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :                 vlen = gf_vec_len(center);</span>
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :                 vlen += gf_mulfix(view_distance_offset, gf_divfix(vlen, nominal_view_distance));</span>
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :                 gf_vec_diff(eye, cam-&gt;target, cam-&gt;position);</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                 gf_vec_norm(&amp;eye);</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                 tar = gf_vec_scale(eye, vlen);</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :                 gf_vec_add(tar, tar, cam-&gt;position);</span>
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :                 disp = gf_vec_cross(eye, cam-&gt;up);</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :                 gf_vec_norm(&amp;disp);</span>
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :                 disp= gf_vec_scale(disp, gf_divfix(gf_mulfix(vlen, horizontal_shift), viewing_distance));</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :                 gf_vec_add(pos, cam-&gt;position, disp);</span>
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :                 gf_mx_lookat(&amp;cam-&gt;modelview, pos, tar, cam-&gt;up);</span>
+<span class="lineNum">     380 </span>            :         }
+<span class="lineNum">     381 </span><span class="lineCov">       2477 :         gf_mx_add_matrix(&amp;cam-&gt;modelview, &amp;post_model_view);</span>
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            :         /*compute frustum planes*/
+<span class="lineNum">     384 </span><span class="lineCov">       2477 :         gf_mx_copy(cam-&gt;unprojection, cam-&gt;projection);</span>
+<span class="lineNum">     385 </span><span class="lineCov">       2477 :         gf_mx_add_matrix_4x4(&amp;cam-&gt;unprojection, &amp;cam-&gt;modelview);</span>
+<span class="lineNum">     386 </span><span class="lineCov">       2477 :         camera_frustum_from_matrix(cam, &amp;cam-&gt;unprojection);</span>
+<span class="lineNum">     387 </span>            :         /*also compute reverse PM for unprojections*/
+<span class="lineNum">     388 </span><span class="lineCov">       2477 :         gf_mx_inverse_4x4(&amp;cam-&gt;unprojection);</span>
+<span class="lineNum">     389 </span><span class="lineCov">       2477 :         cam-&gt;flags &amp;= ~CAM_IS_DIRTY;</span>
+<a name="390"><span class="lineNum">     390 </span>            : }</a>
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span><span class="lineCov">       9537 : void camera_update(GF_Camera *cam, GF_Matrix2D *user_transform, Bool center_coords)</span>
+<span class="lineNum">     393 </span>            : {
+<a name="394"><span class="lineNum">     394 </span><span class="lineCov">       9537 :         camera_update_stereo(cam, user_transform, center_coords, 0, 0, 0, GF_3D_CAMERA_STRAIGHT);</span></a>
+<span class="lineNum">     395 </span><span class="lineCov">       9537 : }</span>
+<span class="lineNum">     396 </span><span class="lineCov">        878 : void camera_set_vectors(GF_Camera *cam, SFVec3f pos, SFRotation ori, Fixed fov)</span>
+<span class="lineNum">     397 </span>            : {
+<span class="lineNum">     398 </span>            :         Fixed sin_a, cos_a, icos_a, tmp;
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span><span class="lineCov">        878 :         cam-&gt;fieldOfView = fov;</span>
+<span class="lineNum">     401 </span><span class="lineCov">        878 :         cam-&gt;last_pos = cam-&gt;position;</span>
+<span class="lineNum">     402 </span><span class="lineCov">        878 :         cam-&gt;position = pos;</span>
+<span class="lineNum">     403 </span>            :         /*compute up &amp; target vectors in local system*/
+<span class="lineNum">     404 </span><span class="lineCov">        878 :         sin_a = gf_sin(ori.q);</span>
+<span class="lineNum">     405 </span><span class="lineCov">        878 :         cos_a = gf_cos(ori.q);</span>
+<span class="lineNum">     406 </span><span class="lineCov">        878 :         icos_a = FIX_ONE - cos_a;</span>
+<span class="lineNum">     407 </span><span class="lineCov">        878 :         tmp = gf_mulfix(icos_a, ori.z);</span>
+<span class="lineNum">     408 </span><span class="lineCov">        878 :         cam-&gt;target.x = gf_mulfix(ori.x, tmp) + gf_mulfix(sin_a, ori.y);</span>
+<span class="lineNum">     409 </span><span class="lineCov">        878 :         cam-&gt;target.y = gf_mulfix(ori.y, tmp) - gf_mulfix(sin_a, ori.x);</span>
+<span class="lineNum">     410 </span><span class="lineCov">        878 :         cam-&gt;target.z = gf_mulfix(ori.z, tmp) + cos_a;</span>
+<span class="lineNum">     411 </span><span class="lineCov">        878 :         gf_vec_norm(&amp;cam-&gt;target);</span>
+<span class="lineNum">     412 </span><span class="lineCov">        878 :         cam-&gt;target = gf_vec_scale(cam-&gt;target, -cam-&gt;vp_dist);</span>
+<span class="lineNum">     413 </span><span class="lineCov">        878 :         gf_vec_add(cam-&gt;target, cam-&gt;target, pos);</span>
+<span class="lineNum">     414 </span><span class="lineCov">        878 :         tmp = gf_mulfix(icos_a, ori.y);</span>
+<span class="lineNum">     415 </span><span class="lineCov">        878 :         cam-&gt;up.x = gf_mulfix(ori.x, tmp) - gf_mulfix(sin_a, ori.z);</span>
+<span class="lineNum">     416 </span><span class="lineCov">        878 :         cam-&gt;up.y = gf_mulfix(ori.y, tmp) + cos_a;</span>
+<span class="lineNum">     417 </span><span class="lineCov">        878 :         cam-&gt;up.z = gf_mulfix(ori.z, tmp) + gf_mulfix(sin_a, ori.x);</span>
+<span class="lineNum">     418 </span><span class="lineCov">        878 :         gf_vec_norm(&amp;cam-&gt;up);</span>
+<span class="lineNum">     419 </span><span class="lineCov">        878 :         cam-&gt;flags |= CAM_IS_DIRTY;</span>
+<a name="420"><span class="lineNum">     420 </span><span class="lineCov">        878 : }</span></a>
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span><span class="lineCov">        627 : void camera_reset_viewpoint(GF_Camera *cam, Bool animate)</span>
+<span class="lineNum">     423 </span>            : {
+<span class="lineNum">     424 </span><span class="lineCov">        627 :         if (!animate || (cam-&gt;had_viewpoint==2) ) {</span>
+<span class="lineNum">     425 </span><span class="lineCov">        623 :                 camera_set_vectors(cam, cam-&gt;vp_position, cam-&gt;vp_orientation, cam-&gt;vp_fov);</span>
+<span class="lineNum">     426 </span><span class="lineCov">        623 :                 cam-&gt;last_pos = cam-&gt;vp_position;</span>
+<span class="lineNum">     427 </span><span class="lineCov">        623 :                 cam-&gt;anim_len = 0;</span>
+<span class="lineNum">     428 </span><span class="lineCov">        623 :                 return;</span>
+<span class="lineNum">     429 </span>            :         }
+<span class="lineNum">     430 </span>            : #ifndef FORCE_CAMERA_3D
+<span class="lineNum">     431 </span>            :         if (cam-&gt;is_3D)
+<span class="lineNum">     432 </span>            : #endif
+<span class="lineNum">     433 </span>            :         {
+<span class="lineNum">     434 </span><span class="lineCov">          4 :                 cam-&gt;start_pos = cam-&gt;position;</span>
+<span class="lineNum">     435 </span><span class="lineCov">          4 :                 cam-&gt;start_ori = camera_get_orientation(cam-&gt;position, cam-&gt;target, cam-&gt;up);</span>
+<span class="lineNum">     436 </span><span class="lineCov">          4 :                 cam-&gt;start_fov = cam-&gt;fieldOfView;</span>
+<span class="lineNum">     437 </span><span class="lineCov">          4 :                 cam-&gt;end_pos = cam-&gt;vp_position;</span>
+<span class="lineNum">     438 </span><span class="lineCov">          4 :                 cam-&gt;end_ori = cam-&gt;vp_orientation;</span>
+<span class="lineNum">     439 </span><span class="lineCov">          4 :                 cam-&gt;end_fov = cam-&gt;vp_fov;</span>
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span><span class="lineCov">          4 :                 cam-&gt;flags |= CAM_IS_DIRTY;</span>
+<span class="lineNum">     442 </span><span class="lineCov">          4 :                 cam-&gt;anim_start = 0;</span>
+<span class="lineNum">     443 </span><span class="lineCov">          4 :                 cam-&gt;anim_len = 1000;</span>
+<span class="lineNum">     444 </span>            :         }
+<span class="lineNum">     445 </span>            : #ifndef FORCE_CAMERA_3D
+<span class="lineNum">     446 </span>            :         else {
+<span class="lineNum">     447 </span>            :                 cam-&gt;start_zoom = FIX_ONE;
+<span class="lineNum">     448 </span>            :                 cam-&gt;start_trans.x = cam-&gt;start_trans.y = 0;
+<span class="lineNum">     449 </span>            :                 cam-&gt;start_rot.x = cam-&gt;start_rot.y = 0;
+<span class="lineNum">     450 </span>            :                 cam-&gt;flags |= CAM_IS_DIRTY;
+<span class="lineNum">     451 </span>            :                 /*no animation on 3D viewports*/
+<span class="lineNum">     452 </span>            :                 cam-&gt;anim_start = cam-&gt;anim_len = 0;
+<span class="lineNum">     453 </span>            :         }
+<span class="lineNum">     454 </span>            : #endif
+<a name="455"><span class="lineNum">     455 </span>            : }</a>
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span><span class="lineCov">         76 : void camera_move_to(GF_Camera *cam, SFVec3f pos, SFVec3f target, SFVec3f up)</span>
+<span class="lineNum">     458 </span>            : {
+<span class="lineNum">     459 </span><span class="lineCov">         76 :         if (!cam-&gt;anim_len) {</span>
+<span class="lineNum">     460 </span><span class="lineCov">         76 :                 cam-&gt;start_pos = cam-&gt;position;</span>
+<span class="lineNum">     461 </span><span class="lineCov">         76 :                 cam-&gt;start_ori = camera_get_orientation(cam-&gt;position, cam-&gt;target, cam-&gt;up);</span>
+<span class="lineNum">     462 </span><span class="lineCov">         76 :                 cam-&gt;start_fov = cam-&gt;fieldOfView;</span>
+<span class="lineNum">     463 </span>            :         }
+<span class="lineNum">     464 </span><span class="lineCov">         76 :         cam-&gt;end_pos = pos;</span>
+<span class="lineNum">     465 </span><span class="lineCov">         76 :         cam-&gt;end_ori = camera_get_orientation(pos, target, up);</span>
+<span class="lineNum">     466 </span><span class="lineCov">         76 :         cam-&gt;end_fov = cam-&gt;fieldOfView;</span>
+<span class="lineNum">     467 </span>            : 
+<span class="lineNum">     468 </span><span class="lineCov">         76 :         cam-&gt;flags |= CAM_IS_DIRTY;</span>
+<span class="lineNum">     469 </span><span class="lineCov">         76 :         cam-&gt;anim_start = 0;</span>
+<span class="lineNum">     470 </span><span class="lineCov">         76 :         cam-&gt;anim_len = 100;</span>
+<a name="471"><span class="lineNum">     471 </span><span class="lineCov">         76 : }</span></a>
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineCov">        285 : void camera_stop_anim(GF_Camera *cam)</span>
+<span class="lineNum">     474 </span>            : {
+<span class="lineNum">     475 </span><span class="lineCov">        285 :         cam-&gt;anim_len = 0;</span>
+<a name="476"><span class="lineNum">     476 </span><span class="lineCov">        285 : }</span></a>
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span><span class="lineCov">          1 : void camera_jump(GF_Camera *cam)</span>
+<span class="lineNum">     479 </span>            : {
+<span class="lineNum">     480 </span>            :         /*no &quot;double-jump&quot; :)*/
+<span class="lineNum">     481 </span><span class="lineCov">          1 :         if (cam-&gt;jumping) return;</span>
+<span class="lineNum">     482 </span><span class="lineCov">          1 :         cam-&gt;anim_start = 0;</span>
+<span class="lineNum">     483 </span><span class="lineCov">          1 :         cam-&gt;anim_len = 1000;</span>
+<span class="lineNum">     484 </span><span class="lineCov">          1 :         cam-&gt;jumping = GF_TRUE;</span>
+<span class="lineNum">     485 </span><span class="lineCov">          1 :         cam-&gt;flags |= CAM_IS_DIRTY;</span>
+<span class="lineNum">     486 </span>            : }
+<a name="487"><span class="lineNum">     487 </span>            : </a>
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span><span class="lineCov">       8742 : Bool camera_animate(GF_Camera *cam, void *_compositor)</span>
+<span class="lineNum">     490 </span>            : {
+<span class="lineNum">     491 </span>            :         u32 now;
+<span class="lineNum">     492 </span>            :         Fixed frac;
+<span class="lineNum">     493 </span>            :         GF_Compositor *compositor = (GF_Compositor *) _compositor;
+<span class="lineNum">     494 </span><span class="lineCov">       8742 :         if (!cam-&gt;anim_len) return GF_FALSE;</span>
+<span class="lineNum">     495 </span>            : 
+<span class="lineNum">     496 </span><span class="lineCov">        106 :         now = gf_sc_get_clock(compositor);</span>
+<span class="lineNum">     497 </span>            : 
+<span class="lineNum">     498 </span><span class="lineCov">        106 :         if (cam-&gt;jumping) {</span>
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :                 if (!cam-&gt;anim_start) {</span>
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :                         cam-&gt;anim_start = now;</span>
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :                         cam-&gt;dheight = 0;</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :                         return GF_TRUE;</span>
+<span class="lineNum">     503 </span>            :                 }
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :                 cam-&gt;position.y -= cam-&gt;dheight;</span>
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :                 cam-&gt;target.y -= cam-&gt;dheight;</span>
+<span class="lineNum">     506 </span>            : 
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :                 now -= cam-&gt;anim_start;</span>
+<span class="lineNum">     508 </span><span class="lineNoCov">          0 :                 if (now &gt; cam-&gt;anim_len) {</span>
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :                         cam-&gt;anim_len = 0;</span>
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :                         cam-&gt;jumping = GF_FALSE;</span>
+<span class="lineNum">     511 </span><span class="lineNoCov">          0 :                         cam-&gt;flags |= CAM_IS_DIRTY;</span>
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :                         return GF_TRUE;</span>
+<span class="lineNum">     513 </span>            :                 }
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :                 frac = FLT2FIX ( ((Float) now) / cam-&gt;anim_len);</span>
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 :                 if (frac&gt;FIX_ONE / 2) frac = FIX_ONE - frac;</span>
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :                 cam-&gt;dheight = gf_mulfix(cam-&gt;avatar_size.y, frac);</span>
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :                 cam-&gt;position.y += cam-&gt;dheight;</span>
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :                 cam-&gt;target.y += cam-&gt;dheight;</span>
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 :                 cam-&gt;flags |= CAM_IS_DIRTY;</span>
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :                 return GF_TRUE;</span>
+<span class="lineNum">     521 </span>            :         }
+<span class="lineNum">     522 </span>            : 
+<span class="lineNum">     523 </span><span class="lineCov">        106 :         if (!cam-&gt;anim_start) {</span>
+<span class="lineNum">     524 </span><span class="lineCov">          7 :                 cam-&gt;anim_start = now;</span>
+<span class="lineNum">     525 </span>            :                 frac = 0;
+<span class="lineNum">     526 </span>            :         } else {
+<span class="lineNum">     527 </span><span class="lineCov">         99 :                 now -= cam-&gt;anim_start;</span>
+<span class="lineNum">     528 </span><span class="lineCov">         99 :                 if (now &gt; cam-&gt;anim_len) {</span>
+<span class="lineNum">     529 </span><span class="lineCov">          4 :                         cam-&gt;anim_len = 0;</span>
+<span class="lineNum">     530 </span>            : #ifndef FORCE_CAMERA_3D
+<span class="lineNum">     531 </span>            :                         if (cam-&gt;is_3D)
+<span class="lineNum">     532 </span>            : #endif
+<span class="lineNum">     533 </span>            :                         {
+<span class="lineNum">     534 </span><span class="lineCov">          4 :                                 camera_set_vectors(cam, cam-&gt;end_pos, cam-&gt;end_ori, cam-&gt;end_fov);</span>
+<span class="lineNum">     535 </span><span class="lineCov">          4 :                                 cam-&gt;end_zoom = FIX_ONE;</span>
+<span class="lineNum">     536 </span>            :                         }
+<span class="lineNum">     537 </span>            : #ifndef FORCE_CAMERA_3D
+<span class="lineNum">     538 </span>            :                         else {
+<span class="lineNum">     539 </span>            :                                 cam-&gt;flags |= CAM_IS_DIRTY;
+<span class="lineNum">     540 </span>            :                         }
+<span class="lineNum">     541 </span>            : #endif
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span><span class="lineCov">          4 :                         if (cam-&gt;flags &amp; CF_STORE_VP) {</span>
+<span class="lineNum">     544 </span><span class="lineCov">          2 :                                 cam-&gt;flags &amp;= ~CF_STORE_VP;</span>
+<span class="lineNum">     545 </span><span class="lineCov">          2 :                                 cam-&gt;vp_position = cam-&gt;position;</span>
+<span class="lineNum">     546 </span><span class="lineCov">          2 :                                 cam-&gt;vp_fov = cam-&gt;fieldOfView;</span>
+<span class="lineNum">     547 </span><span class="lineCov">          2 :                                 cam-&gt;vp_orientation = camera_get_orientation(cam-&gt;position, cam-&gt;target, cam-&gt;up);</span>
+<span class="lineNum">     548 </span>            :                         }
+<span class="lineNum">     549 </span>            :                         return GF_TRUE;
+<span class="lineNum">     550 </span>            :                 } else {
+<span class="lineNum">     551 </span><span class="lineCov">         95 :                         frac = FLT2FIX( ((Float) now) / cam-&gt;anim_len);</span>
+<span class="lineNum">     552 </span>            :                 }
+<span class="lineNum">     553 </span>            :         }
+<span class="lineNum">     554 </span>            : 
+<span class="lineNum">     555 </span>            : #ifndef FORCE_CAMERA_3D
+<span class="lineNum">     556 </span>            :         if (cam-&gt;is_3D)
+<span class="lineNum">     557 </span>            : #endif
+<span class="lineNum">     558 </span>            :         {
+<span class="lineNum">     559 </span>            :                 SFVec3f pos, dif;
+<span class="lineNum">     560 </span>            :                 SFRotation rot;
+<span class="lineNum">     561 </span>            :                 Fixed fov;
+<span class="lineNum">     562 </span><span class="lineCov">        102 :                 rot = gf_sg_sfrotation_interpolate(cam-&gt;start_ori, cam-&gt;end_ori, frac);</span>
+<span class="lineNum">     563 </span><span class="lineCov">        102 :                 gf_vec_diff(dif, cam-&gt;end_pos, cam-&gt;start_pos);</span>
+<span class="lineNum">     564 </span><span class="lineCov">        102 :                 dif = gf_vec_scale(dif, frac);</span>
+<span class="lineNum">     565 </span><span class="lineCov">        102 :                 gf_vec_add(pos, cam-&gt;start_pos, dif);</span>
+<span class="lineNum">     566 </span><span class="lineCov">        102 :                 fov = gf_mulfix(cam-&gt;end_fov - cam-&gt;start_fov, frac) + cam-&gt;start_fov;</span>
+<span class="lineNum">     567 </span><span class="lineCov">        102 :                 cam-&gt;end_zoom = frac + gf_mulfix((FIX_ONE-frac), cam-&gt;start_zoom);</span>
+<span class="lineNum">     568 </span><span class="lineCov">        102 :                 camera_set_vectors(cam, pos, rot, fov);</span>
+<span class="lineNum">     569 </span>            :         }
+<span class="lineNum">     570 </span><span class="lineCov">        102 :         return GF_TRUE;</span>
+<span class="lineNum">     571 </span>            : }
+<a name="572"><span class="lineNum">     572 </span>            : </a>
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span><span class="lineCov">       4045 : SFVec3f camera_get_pos_dir(GF_Camera *cam)</span>
+<span class="lineNum">     575 </span>            : {
+<span class="lineNum">     576 </span>            :         SFVec3f v;
+<span class="lineNum">     577 </span><span class="lineCov">       4045 :         gf_vec_diff(v, cam-&gt;position, cam-&gt;target);</span>
+<span class="lineNum">     578 </span><span class="lineCov">       4045 :         gf_vec_norm(&amp;v);</span>
+<a name="579"><span class="lineNum">     579 </span><span class="lineCov">       4045 :         return v;</span></a>
+<span class="lineNum">     580 </span>            : }
+<span class="lineNum">     581 </span><span class="lineCov">       4035 : SFVec3f camera_get_target_dir(GF_Camera *cam)</span>
+<span class="lineNum">     582 </span>            : {
+<span class="lineNum">     583 </span>            :         SFVec3f v;
+<span class="lineNum">     584 </span><span class="lineCov">       4035 :         gf_vec_diff(v, cam-&gt;target, cam-&gt;position);</span>
+<span class="lineNum">     585 </span><span class="lineCov">       4035 :         gf_vec_norm(&amp;v);</span>
+<a name="586"><span class="lineNum">     586 </span><span class="lineCov">       4035 :         return v;</span></a>
+<span class="lineNum">     587 </span>            : }
+<span class="lineNum">     588 </span><span class="lineCov">       3953 : SFVec3f camera_get_right_dir(GF_Camera *cam)</span>
+<span class="lineNum">     589 </span>            : {
+<span class="lineNum">     590 </span>            :         SFVec3f v, pos;
+<span class="lineNum">     591 </span><span class="lineCov">       3953 :         pos = camera_get_pos_dir(cam);</span>
+<span class="lineNum">     592 </span><span class="lineCov">       3953 :         v = gf_vec_cross(cam-&gt;up, pos );</span>
+<span class="lineNum">     593 </span><span class="lineCov">       3953 :         gf_vec_norm(&amp;v);</span>
+<span class="lineNum">     594 </span><span class="lineCov">       3953 :         return v;</span>
+<span class="lineNum">     595 </span>            : }
+<span class="lineNum">     596 </span>            : 
+<span class="lineNum">     597 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

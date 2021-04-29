@@ -1,0 +1,44 @@
+*** mp4box-patch_box logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:07 ***
+
+
+*** Subtest "add-box": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/enst_video.h264 -patch ./media/boxpatch/box_add.xml -new ./results/temp/add.mp4" ***
+Track Importing MPEG-4 AVC - Width 128 Height 128 FPS 4000000/160000
+AVC|H264 Import results: 173 samples (179 NALUs) - Slices: 3 I 96 P 75 B - 1 SEI - 2 IDR
+AVC|H264 Stream uses forward prediction - stream CTS offset: 2 frames
+AVC|H264 Max NALU size is 3277 - stream could be optimized by setting nal_length=2
+
+Computing ./results/temp/add.mp4  (add-box) hash: 
+File hash (SHA-1): DEFD2CF490D586E200C7EEDCD447BB132CDC82F5
+Hash OK for ./results/temp/add.mp4
+
+*** Subtest "rem-box": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -patch ./media/boxpatch/box_rem.xml ./results/temp/add.mp4 -out ./results/temp/rem.mp4" ***
+[iso file] Unknown box type GPAC in parent trak
+
+Computing ./results/temp/rem.mp4  (rem-box) hash: 
+File hash (SHA-1): 11B6FC2FB9EFE54F635C1EFE25B46DD855EA7D4A
+Hash OK for ./results/temp/rem.mp4
+
+*** Subtest "add-box-root": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -patch ./media/boxpatch/box_add_root.xml ./results/temp/rem.mp4 -out ./results/temp/add-root.mp4" ***
+
+Computing ./results/temp/add-root.mp4  (add-box-root) hash: 
+File hash (SHA-1): AB1EF4A7D1C703F2D31B7567BA9EEA7D51B1D3C6
+Hash OK for ./results/temp/add-root.mp4
+
+*** Subtest "rem-box-root": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -patch ./media/boxpatch/box_rem_root.xml ./results/temp/add-root.mp4 -out ./results/temp/rem-root.mp4" ***
+[iso file] Unknown top-level box type GPAC
+
+Computing ./results/temp/rem-root.mp4  (rem-box-root) hash: 
+File hash (SHA-1): 11B6FC2FB9EFE54F635C1EFE25B46DD855EA7D4A
+Hash OK for ./results/temp/rem-root.mp4
+
+*** Subtest "add-box-root-flat": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -flat -patch ./media/boxpatch/box_add_root.xml ./results/temp/rem-root.mp4 -out ./results/temp/add-root-flat.mp4" ***
+
+Computing ./results/temp/add-root-flat.mp4  (add-box-root-flat) hash: 
+File hash (SHA-1): 355D33C4401F5A62B4DFB01CFD7DAD6E3A8EC76E
+Hash OK for ./results/temp/add-root-flat.mp4
+
+*** Subtest "add-box-root-streamable": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -inter 0 -patch ./media/boxpatch/box_add_root.xml ./results/temp/rem-root.mp4 -out ./results/temp/add-root-streamable.mp4" ***
+
+Computing ./results/temp/add-root-streamable.mp4  (add-box-root-streamable) hash: 
+File hash (SHA-1): 0B1E50ACE440E58A06D43F4C2264AF150AD4330A
+Hash OK for ./results/temp/add-root-streamable.mp4

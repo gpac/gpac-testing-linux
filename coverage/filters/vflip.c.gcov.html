@@ -1,0 +1,584 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - filters/vflip.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">filters</a> - vflip.c<span style="font-size: 80%;"> (source / <a href="vflip.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">184</td>
+            <td class="headerCovTableEntry">218</td>
+            <td class="headerCovTableEntryMed">84.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-04-29 23:48:07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  *                      GPAC - Multimedia Framework C SDK
+<span class="lineNum">       3 </span>            :  *
+<span class="lineNum">       4 </span>            :  *                      Authors: Samir Mustapha - Jean Le Feuvre
+<span class="lineNum">       5 </span>            :  *                      Copyright (c) Telecom ParisTech 2019-2021
+<span class="lineNum">       6 </span>            :  *                                      All rights reserved
+<span class="lineNum">       7 </span>            :  *
+<span class="lineNum">       8 </span>            :  *  This file is part of GPAC / video flip filter
+<span class="lineNum">       9 </span>            :  *
+<span class="lineNum">      10 </span>            :  *  GPAC is free software; you can redistribute it and/or modify
+<span class="lineNum">      11 </span>            :  *  it under the terms of the GNU Lesser General Public License as published by
+<span class="lineNum">      12 </span>            :  *  the Free Software Foundation; either version 2, or (at your option)
+<span class="lineNum">      13 </span>            :  *  any later version.
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *  GPAC is distributed in the hope that it will be useful,
+<span class="lineNum">      16 </span>            :  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      17 </span>            :  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      18 </span>            :  *  GNU Lesser General Public License for more details.
+<span class="lineNum">      19 </span>            :  *
+<span class="lineNum">      20 </span>            :  *  You should have received a copy of the GNU Lesser General Public
+<span class="lineNum">      21 </span>            :  *  License along with this library; see the file COPYING.  If not, write to
+<span class="lineNum">      22 </span>            :  *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  */
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;gpac/filters.h&gt;
+<span class="lineNum">      27 </span>            : #include &lt;gpac/list.h&gt;
+<span class="lineNum">      28 </span>            : #include &lt;gpac/constants.h&gt;
+<span class="lineNum">      29 </span>            : #include &lt;gpac/network.h&gt;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : typedef struct
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :         //options
+<span class="lineNum">      34 </span>            :         u32 mode;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :         //internal data
+<span class="lineNum">      37 </span>            :         Bool initialized;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :         GF_FilterPid *ipid, *opid;
+<span class="lineNum">      40 </span>            :         u32 w, h, stride, s_pfmt;
+<span class="lineNum">      41 </span>            :         u32 bps;
+<span class="lineNum">      42 </span>            :         GF_Fraction ar;
+<span class="lineNum">      43 </span>            :         Bool passthrough;
+<span class="lineNum">      44 </span>            :         u32 dst_width, dst_height;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :         u32 dst_stride[5];
+<span class="lineNum">      47 </span>            :         u32 src_stride[5];
+<span class="lineNum">      48 </span>            :         u32 nb_planes, nb_src_planes, out_size, out_src_size, src_uv_height, dst_uv_height;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :         Bool use_reference;
+<span class="lineNum">      51 </span>            :         Bool packed_422;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :         char *line_buffer_vf; //vertical flip
+<span class="lineNum">      55 </span>            :         char *line_buffer_hf; //horizontal flip
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : } GF_VFlipCtx;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            : enum
+<span class="lineNum">      60 </span>            : {
+<span class="lineNum">      61 </span>            :         VFLIP_OFF = 0,
+<span class="lineNum">      62 </span>            :         VFLIP_VERT,
+<span class="lineNum">      63 </span>            :         VFLIP_HORIZ,
+<span class="lineNum">      64 </span>            :         VFLIP_BOTH,
+<span class="lineNum">      65 </span>            : };
+<span class="lineNum">      66 </span>            : 
+<a name="67"><span class="lineNum">      67 </span>            : </a>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span><span class="lineCov">     884736 : static void swap_2Ys_YUVpixel(GF_VFlipCtx *ctx, u8 *line_src, u8 *line_dst, u32 FourBytes_start_index)</span>
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :         u32 isFirstY_indexOne;
+<span class="lineNum">      72 </span><span class="lineCov">     884736 :         switch (ctx-&gt;s_pfmt) {</span>
+<span class="lineNum">      73 </span>            :         case GF_PIXEL_YUYV:
+<span class="lineNum">      74 </span>            :         case GF_PIXEL_YVYU:
+<span class="lineNum">      75 </span>            :                 isFirstY_indexOne= (u32) 0;
+<span class="lineNum">      76 </span>            :                 break;
+<span class="lineNum">      77 </span><span class="lineCov">     442368 :         case GF_PIXEL_UYVY:</span>
+<span class="lineNum">      78 </span>            :         case GF_PIXEL_VYUY:
+<span class="lineNum">      79 </span>            :                 isFirstY_indexOne= (u32) 1;
+<span class="lineNum">      80 </span>            :                 break;
+<span class="lineNum">      81 </span>            :         default:
+<span class="lineNum">      82 </span>            :                 return;
+<span class="lineNum">      83 </span>            :         }
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :         //Y2_dst = Y1_src
+<span class="lineNum">      86 </span><span class="lineCov">     884736 :         line_dst[FourBytes_start_index + 2 + isFirstY_indexOne]=line_src[FourBytes_start_index + 0 + isFirstY_indexOne];</span>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :         //Y1_dst = Y2_src
+<span class="lineNum">      89 </span><span class="lineCov">     884736 :         line_dst[FourBytes_start_index + 0 + isFirstY_indexOne]=line_src[FourBytes_start_index + 2 + isFirstY_indexOne];</span>
+<a name="90"><span class="lineNum">      90 </span>            : }</a>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span><span class="lineCov">     110592 : static void horizontal_flip_per_line(GF_VFlipCtx *ctx, u8 *line_src, u8 *line_dst, u32 plane_idx, u32 wiB)</span>
+<span class="lineNum">      93 </span>            : {
+<span class="lineNum">      94 </span>            :         u32 j, line_size = wiB;
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">     110592 :         if (ctx-&gt;s_pfmt == GF_PIXEL_RGB || ctx-&gt;s_pfmt == GF_PIXEL_BGR || ctx-&gt;s_pfmt == GF_PIXEL_XRGB || ctx-&gt;s_pfmt == GF_PIXEL_RGBX || ctx-&gt;s_pfmt == GF_PIXEL_XBGR || ctx-&gt;s_pfmt == GF_PIXEL_BGRX){</span>
+<span class="lineNum">      97 </span>            :                 //to avoid &quot;3*j &gt; line_size - 3*j - 3&quot; or &quot;4*j &gt; line_size - 4*j - 4&quot;
+<span class="lineNum">      98 </span>            :                 //jmax=line_size/(2*3) or jmax=line_size/(2*4)
+<span class="lineNum">      99 </span><span class="lineCov">    1347840 :                 for (j=0; j &lt; line_size/(2*ctx-&gt;bps); j++) {</span>
+<span class="lineNum">     100 </span>            :                         u8 pix[4];
+<span class="lineNum">     101 </span><span class="lineCov">    1327104 :                         memcpy(pix, line_src + line_size - ctx-&gt;bps*(j+1), ctx-&gt;bps);</span>
+<span class="lineNum">     102 </span><span class="lineCov">    1327104 :                         memcpy(line_dst + line_size - ctx-&gt;bps*(j+1), line_src + ctx-&gt;bps*j, ctx-&gt;bps);</span>
+<span class="lineNum">     103 </span><span class="lineCov">    1327104 :                         memcpy(line_dst + ctx-&gt;bps*j, pix, ctx-&gt;bps);</span>
+<span class="lineNum">     104 </span>            :                 }
+<span class="lineNum">     105 </span><span class="lineCov">      89856 :         } else if (ctx-&gt;packed_422) {</span>
+<span class="lineNum">     106 </span>            :                 //If the source data is assigned to the output packet during the destination pack allocation
+<span class="lineNum">     107 </span>            :                 //i.e dst_planes[0]= src_planes[0], line_src is going to change while reading it as far as writing on line_dst=line_src
+<span class="lineNum">     108 </span>            :                 //To avoid this situation, ctx-&gt;line_buffer_hf keeps the values of line_src
+<span class="lineNum">     109 </span><span class="lineCov">      13824 :                 memcpy(ctx-&gt;line_buffer_hf, line_src, wiB);</span>
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :                 //reversing of 4-bytes sequences
+<span class="lineNum">     112 </span><span class="lineCov">      13824 :                 u32 fourBytesSize = wiB/4;</span>
+<span class="lineNum">     113 </span><span class="lineCov">     898560 :                 for (j=0; j &lt; fourBytesSize; j++) {</span>
+<span class="lineNum">     114 </span>            :                         //buffer = last 4 columns
+<span class="lineNum">     115 </span><span class="lineCov">     884736 :                         u32 last_4bytes_index = wiB-4-(4*j);</span>
+<span class="lineNum">     116 </span>            :                         u32 p, first_4bytes_index = 4*j;
+<span class="lineNum">     117 </span><span class="lineCov">    4423680 :                         for (p = 0; p &lt; 4; p++) {</span>
+<span class="lineNum">     118 </span><span class="lineCov">    3538944 :                                 line_dst[first_4bytes_index+p] = ctx-&gt;line_buffer_hf[last_4bytes_index+p];</span>
+<span class="lineNum">     119 </span>            :                         }
+<span class="lineNum">     120 </span>            :                         //exchanging of Ys within a yuv pixel
+<span class="lineNum">     121 </span><span class="lineCov">     884736 :                         swap_2Ys_YUVpixel(ctx, line_dst, line_dst, first_4bytes_index);</span>
+<span class="lineNum">     122 </span>            :                 }
+<span class="lineNum">     123 </span>            :         } else {
+<span class="lineNum">     124 </span>            :                 //nv12/21
+<span class="lineNum">     125 </span>            :                 //second plane is U-plane={u1,v1, u2,v2...}
+<span class="lineNum">     126 </span><span class="lineCov">      76032 :                 if (ctx-&gt;nb_planes==2 &amp;&amp; plane_idx==1){</span>
+<span class="lineNum">     127 </span><span class="lineCov">       3456 :                         if (ctx-&gt;bps==1) {</span>
+<span class="lineNum">     128 </span>            :                                 //to avoid &quot;line_size - 2*j - 2 &gt; 2*j&quot;, jmax=line_size/4
+<span class="lineNum">     129 </span><span class="lineCov">     110592 :                                 for (j=0; j &lt; line_size/4; j++) {</span>
+<span class="lineNum">     130 </span>            :                                         u8 u_comp, v_comp;
+<span class="lineNum">     131 </span><span class="lineCov">     110592 :                                         u_comp = line_src[line_size - 2*j - 2];</span>
+<span class="lineNum">     132 </span><span class="lineCov">     110592 :                                         v_comp = line_src[line_size - 2*j - 1];</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">     110592 :                                         line_dst[line_size - 2*j - 2] = line_src[2*j];</span>
+<span class="lineNum">     135 </span><span class="lineCov">     110592 :                                         line_dst[line_size - 2*j - 1] = line_src[2*j + 1];</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">     110592 :                                         line_dst[2*j] = u_comp;</span>
+<span class="lineNum">     138 </span><span class="lineCov">     110592 :                                         line_dst[2*j + 1] = v_comp;</span>
+<span class="lineNum">     139 </span>            :                                 }
+<span class="lineNum">     140 </span>            :                         } else {
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :                                 for (j=0; j &lt; line_size/4; j++) {</span>
+<span class="lineNum">     142 </span>            :                                         u16 u_comp, v_comp;
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                                         u_comp = line_src[line_size - 2*j - 2];</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                                         v_comp = line_src[line_size - 2*j - 1];</span>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :                                         ((u16 *)line_dst)[line_size - 2*j - 2] = ((u16 *)line_src)[2*j];</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                                         ((u16 *)line_dst)[line_size - 2*j - 1] = ((u16 *)line_src)[2*j + 1];</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :                                         ((u16 *)line_dst)[2*j] = u_comp;</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                                         ((u16 *)line_dst)[2*j + 1] = v_comp;</span>
+<span class="lineNum">     151 </span>            :                                 }
+<span class="lineNum">     152 </span>            :                         }
+<span class="lineNum">     153 </span><span class="lineCov">      72576 :                 } else if (ctx-&gt;bps==1) {</span>
+<span class="lineNum">     154 </span><span class="lineCov">      44928 :                         u32 wx = line_size/2;</span>
+<span class="lineNum">     155 </span>            :                         u8 tmp;
+<span class="lineNum">     156 </span><span class="lineCov">    2477952 :                         for (j=0; j &lt; wx; j++) {</span>
+<span class="lineNum">     157 </span>            :                                 //tmp = last column
+<span class="lineNum">     158 </span><span class="lineCov">    2433024 :                                 tmp = line_src[line_size-1-j];</span>
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            :                                 //last column = first column
+<span class="lineNum">     161 </span><span class="lineCov">    2433024 :                                 line_dst[line_size-1-j] = line_src[j];</span>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :                                 //first column = tmp
+<span class="lineNum">     164 </span><span class="lineCov">    2433024 :                                 line_dst[j]=tmp;</span>
+<span class="lineNum">     165 </span>            :                         }
+<span class="lineNum">     166 </span>            :                 } else {
+<span class="lineNum">     167 </span><span class="lineCov">      27648 :                         line_size /= 2;</span>
+<span class="lineNum">     168 </span><span class="lineCov">      27648 :                         u32 wx = line_size/2;</span>
+<span class="lineNum">     169 </span>            :                         u16 tmp;
+<span class="lineNum">     170 </span><span class="lineCov">    1465344 :                         for (j=0; j &lt; wx; j++) {</span>
+<span class="lineNum">     171 </span>            :                                 //tmp = last column
+<span class="lineNum">     172 </span><span class="lineCov">    1437696 :                                 tmp = (u16) ( ((u16 *)line_src) [line_size-1-j] );</span>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :                                 //last column = first column
+<span class="lineNum">     175 </span><span class="lineCov">    1437696 :                                 ((u16 *)line_dst) [line_size-1-j] = ((u16*)line_src)[j];</span>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :                                 //first column = tmp
+<span class="lineNum">     178 </span><span class="lineCov">    1437696 :                                 ((u16 *)line_dst) [j]=tmp;</span>
+<span class="lineNum">     179 </span>            :                         }
+<span class="lineNum">     180 </span>            :                 }
+<span class="lineNum">     181 </span>            :         }
+<a name="182"><span class="lineNum">     182 </span><span class="lineCov">     110592 : }</span></a>
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineCov">        972 : static void horizontal_flip(GF_VFlipCtx *ctx, u8 *src_plane, u8 *dst_plane, u32 height, u32 plane_idx, u32 wiB, u32 *src_stride)</span>
+<span class="lineNum">     185 </span>            : {
+<span class="lineNum">     186 </span>            :         u32 i;
+<span class="lineNum">     187 </span><span class="lineCov">     111564 :         for (i=0; i&lt;height; i++) {</span>
+<span class="lineNum">     188 </span><span class="lineCov">     110592 :                 u8 *src_first_line = src_plane + i * src_stride[plane_idx];</span>
+<span class="lineNum">     189 </span><span class="lineCov">     110592 :                 u8 *dst_first_line = dst_plane + i * ctx-&gt;dst_stride[plane_idx];</span>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">     110592 :                 horizontal_flip_per_line(ctx, src_first_line, dst_first_line, plane_idx, wiB);</span>
+<span class="lineNum">     192 </span>            :         }
+<a name="193"><span class="lineNum">     193 </span><span class="lineCov">        972 : }</span></a>
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineCov">        972 : static void vertical_flip(GF_VFlipCtx *ctx, u8 *src_plane, u8 *dst_plane, u32 height, u32 plane_idx, u32 wiB){</span>
+<span class="lineNum">     196 </span>            :         u32 hy, i;
+<span class="lineNum">     197 </span><span class="lineCov">        972 :         hy = height/2;</span>
+<span class="lineNum">     198 </span><span class="lineCov">      56268 :         for (i=0; i&lt;hy; i++) {</span>
+<span class="lineNum">     199 </span><span class="lineCov">      55296 :                 u8 *src_first_line = src_plane+ i*ctx-&gt;src_stride[plane_idx];</span>
+<span class="lineNum">     200 </span><span class="lineCov">      55296 :                 u8 *src_last_line  = src_plane+ (height  - 1 - i) * ctx-&gt;src_stride[plane_idx];</span>
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineCov">      55296 :                 u8 *dst_first_line = dst_plane+ i*ctx-&gt;dst_stride[plane_idx];</span>
+<span class="lineNum">     203 </span><span class="lineCov">      55296 :                 u8 *dst_last_line  = dst_plane+ (height  - 1 - i) * ctx-&gt;dst_stride[plane_idx];</span>
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span><span class="lineCov">      55296 :                 memcpy(ctx-&gt;line_buffer_vf, src_last_line, wiB);</span>
+<span class="lineNum">     206 </span>            :                 memcpy(dst_last_line, src_first_line, wiB);
+<span class="lineNum">     207 </span><span class="lineCov">      55296 :                 memcpy(dst_first_line, ctx-&gt;line_buffer_vf, wiB);</span>
+<span class="lineNum">     208 </span>            :         }
+<a name="209"><span class="lineNum">     209 </span><span class="lineCov">        972 : }</span></a>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineCov">       2160 : static GF_Err vflip_process(GF_Filter *filter)</span>
+<span class="lineNum">     212 </span>            : {
+<span class="lineNum">     213 </span>            :         const char *data;
+<span class="lineNum">     214 </span>            :         u8 *output;
+<span class="lineNum">     215 </span>            :         u32 size;
+<span class="lineNum">     216 </span>            :         u32 i;
+<span class="lineNum">     217 </span>            :         u32 wiB, height; //wiB: width in Bytes of a plane
+<span class="lineNum">     218 </span>            :         u8 *src_planes[5];
+<span class="lineNum">     219 </span>            :         u8 *dst_planes[5];
+<span class="lineNum">     220 </span>            :         GF_FilterPacket *dst_pck;
+<span class="lineNum">     221 </span>            :         GF_FilterFrameInterface *frame_ifce;
+<span class="lineNum">     222 </span><span class="lineCov">       2160 :         GF_VFlipCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     223 </span><span class="lineCov">       2160 :         GF_FilterPacket *pck = gf_filter_pid_get_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineCov">       2160 :         if (!pck) {</span>
+<span class="lineNum">     226 </span><span class="lineCov">       1080 :                 if (gf_filter_pid_is_eos(ctx-&gt;ipid)) {</span>
+<span class="lineNum">     227 </span><span class="lineCov">         40 :                         gf_filter_pid_set_eos(ctx-&gt;opid);</span>
+<span class="lineNum">     228 </span><span class="lineCov">         40 :                         return GF_EOS;</span>
+<span class="lineNum">     229 </span>            :                 }
+<span class="lineNum">     230 </span>            :                 return GF_OK;
+<span class="lineNum">     231 </span>            :         }
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineCov">       1080 :         if (ctx-&gt;passthrough) {</span>
+<span class="lineNum">     234 </span><span class="lineCov">         27 :                 gf_filter_pck_forward(pck, ctx-&gt;opid);</span>
+<span class="lineNum">     235 </span><span class="lineCov">         27 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     236 </span><span class="lineCov">         27 :                 return GF_OK;</span>
+<span class="lineNum">     237 </span>            :         }
+<span class="lineNum">     238 </span><span class="lineCov">       1053 :         data = gf_filter_pck_get_data(pck, &amp;size);</span>
+<span class="lineNum">     239 </span><span class="lineCov">       1053 :         frame_ifce = gf_filter_pck_get_frame_interface(pck);</span>
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :         memset(src_planes, 0, sizeof(src_planes));
+<span class="lineNum">     242 </span>            :         memset(dst_planes, 0, sizeof(dst_planes));
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span><span class="lineCov">       1053 :         if (data) {</span>
+<span class="lineNum">     245 </span><span class="lineCov">       1053 :                 src_planes[0] = (u8 *) data;</span>
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineCov">       1053 :                 if (ctx-&gt;nb_src_planes==1) {</span>
+<span class="lineNum">     248 </span><span class="lineCov">        459 :                 } else if (ctx-&gt;nb_src_planes==2) {</span>
+<span class="lineNum">     249 </span><span class="lineCov">        108 :                         src_planes[1] = src_planes[0] + ctx-&gt;src_stride[0]*ctx-&gt;h;</span>
+<span class="lineNum">     250 </span><span class="lineCov">        351 :                 } else if (ctx-&gt;nb_src_planes==3) {</span>
+<span class="lineNum">     251 </span><span class="lineCov">        351 :                         src_planes[1] = src_planes[0] + ctx-&gt;src_stride[0] * ctx-&gt;h;</span>
+<span class="lineNum">     252 </span><span class="lineCov">        351 :                         src_planes[2] = src_planes[1] + ctx-&gt;src_stride[1] * ctx-&gt;src_uv_height;</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :                 } else if (ctx-&gt;nb_src_planes==4) {</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :                         src_planes[1] = src_planes[0] + ctx-&gt;src_stride[0] * ctx-&gt;h;</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :                         src_planes[2] = src_planes[1] + ctx-&gt;src_stride[1] * ctx-&gt;src_uv_height;</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :                         src_planes[3] = src_planes[2] + ctx-&gt;src_stride[2] * ctx-&gt;src_uv_height;</span>
+<span class="lineNum">     257 </span>            :                 }
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :         } else if (frame_ifce &amp;&amp; frame_ifce-&gt;get_plane) {</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                 for (i=0; i&lt;4; i++) {</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :                         if (frame_ifce-&gt;get_plane(frame_ifce, i, (const u8 **) &amp;src_planes[i], &amp;ctx-&gt;src_stride[i])!=GF_OK)</span>
+<span class="lineNum">     261 </span>            :                                 break;
+<span class="lineNum">     262 </span>            :                 }
+<span class="lineNum">     263 </span>            :         } else {
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :                 GF_LOG(GF_LOG_ERROR, GF_LOG_MEDIA, (&quot;[VFlip] No data associated with packet, not supported\n&quot;));</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :                 gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :                 return GF_NOT_SUPPORTED;</span>
+<span class="lineNum">     267 </span>            :         }
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineCov">       1053 :         ctx-&gt;bps = gf_pixel_get_bytes_per_pixel(ctx-&gt;s_pfmt);</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span><span class="lineCov">       1053 :         if (frame_ifce){</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :                 dst_pck = gf_filter_pck_new_alloc(ctx-&gt;opid, ctx-&gt;out_size, &amp;output);</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :                 if (dst_pck)</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :                         gf_filter_pck_merge_properties(pck, dst_pck);</span>
+<span class="lineNum">     276 </span>            :         } else {
+<span class="lineNum">     277 </span><span class="lineCov">       1053 :                 dst_pck = gf_filter_pck_new_clone(ctx-&gt;opid, pck, &amp;output);</span>
+<span class="lineNum">     278 </span>            :         }
+<span class="lineNum">     279 </span><span class="lineCov">       1053 :         if (!dst_pck) return GF_OUT_OF_MEM;</span>
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span><span class="lineCov">       1053 :         dst_planes[0] = output;</span>
+<span class="lineNum">     282 </span><span class="lineCov">       1053 :         if (ctx-&gt;nb_planes==1) {</span>
+<span class="lineNum">     283 </span><span class="lineCov">        459 :         } else if (ctx-&gt;nb_planes==2) {</span>
+<span class="lineNum">     284 </span><span class="lineCov">        108 :                 dst_planes[1] = output + ctx-&gt;dst_stride[0] * ctx-&gt;dst_height;</span>
+<span class="lineNum">     285 </span><span class="lineCov">        351 :         } else if (ctx-&gt;nb_planes==3) {</span>
+<span class="lineNum">     286 </span><span class="lineCov">        351 :                 dst_planes[1] = output + ctx-&gt;dst_stride[0] * ctx-&gt;dst_height;</span>
+<span class="lineNum">     287 </span><span class="lineCov">        351 :                 dst_planes[2] = dst_planes[1] + ctx-&gt;dst_stride[1]*ctx-&gt;dst_uv_height;</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :         } else if (ctx-&gt;nb_planes==4) {</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :                 dst_planes[1] = output + ctx-&gt;dst_stride[0] * ctx-&gt;dst_height;</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :                 dst_planes[2] = dst_planes[1] + ctx-&gt;dst_stride[1]*ctx-&gt;dst_uv_height;</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                 dst_planes[3] = dst_planes[2] + ctx-&gt;dst_stride[2]*ctx-&gt;dst_uv_height;</span>
+<span class="lineNum">     292 </span>            :         }
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :         //computing of height and wiB
+<span class="lineNum">     295 </span>            :         //YUYV variations need *2 on horizontal dimension
+<span class="lineNum">     296 </span><span class="lineCov">       1863 :         for (i=0; i&lt;ctx-&gt;nb_planes; i++) {</span>
+<span class="lineNum">     297 </span><span class="lineCov">       1863 :                 if (i==0) {</span>
+<span class="lineNum">     298 </span><span class="lineCov">       1053 :                         if (ctx-&gt;packed_422) {</span>
+<span class="lineNum">     299 </span><span class="lineCov">        216 :                                 wiB = ctx-&gt;bps * ctx-&gt;dst_width *2;</span>
+<span class="lineNum">     300 </span>            :                         } else {
+<span class="lineNum">     301 </span><span class="lineCov">        837 :                                 wiB = ctx-&gt;bps * ctx-&gt;dst_width;</span>
+<span class="lineNum">     302 </span>            :                         }
+<span class="lineNum">     303 </span><span class="lineCov">       1053 :                         height = ctx-&gt;h;</span>
+<span class="lineNum">     304 </span>            :                 }else {
+<span class="lineNum">     305 </span>            :                         //nv12/21
+<span class="lineNum">     306 </span><span class="lineCov">        810 :                         if (i==1 &amp;&amp; ctx-&gt;nb_planes==2) {</span>
+<span class="lineNum">     307 </span>            :                                 //half vertical res (/2)
+<span class="lineNum">     308 </span>            :                                 //half horizontal res (/2) but two chroma packed per pixel (*2)
+<span class="lineNum">     309 </span><span class="lineCov">        108 :                                 wiB = ctx-&gt;bps * ctx-&gt;dst_width;</span>
+<span class="lineNum">     310 </span><span class="lineCov">        108 :                                 height = ctx-&gt;h / 2;</span>
+<span class="lineNum">     311 </span><span class="lineCov">        702 :                         } else if (ctx-&gt;nb_planes&gt;=3) {</span>
+<span class="lineNum">     312 </span>            :                                 u32 div_x, div_y;
+<span class="lineNum">     313 </span>            :                                 //alpha/depth/other plane, treat as luma plane
+<span class="lineNum">     314 </span><span class="lineCov">        702 :                                 if (i==3 &amp;&amp; ctx-&gt;nb_planes==4) {</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :                                         wiB = ctx-&gt;bps * ctx-&gt;dst_width;</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :                                         height = ctx-&gt;h;</span>
+<span class="lineNum">     317 </span><span class="lineCov">        702 :                                 }else if (i==1 || i==2) {</span>
+<span class="lineNum">     318 </span><span class="lineCov">        702 :                                         div_x = (ctx-&gt;src_stride[1]==ctx-&gt;src_stride[0]) ? 1 : 2;</span>
+<span class="lineNum">     319 </span><span class="lineCov">        702 :                                         div_y = (ctx-&gt;src_uv_height==ctx-&gt;h) ? 1 : 2;</span>
+<span class="lineNum">     320 </span><span class="lineCov">        702 :                                         height = ctx-&gt;dst_height;</span>
+<span class="lineNum">     321 </span><span class="lineCov">        702 :                                         height /= div_y;</span>
+<span class="lineNum">     322 </span><span class="lineCov">        702 :                                         wiB = ctx-&gt;bps * ctx-&gt;dst_width;</span>
+<span class="lineNum">     323 </span><span class="lineCov">        702 :                                         wiB /= div_x;</span>
+<span class="lineNum">     324 </span>            :                                 }
+<span class="lineNum">     325 </span>            :                         }
+<span class="lineNum">     326 </span>            :                 }
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            :                 //processing according selected mode
+<span class="lineNum">     329 </span><span class="lineCov">       1863 :                 if (ctx-&gt;mode==VFLIP_VERT){</span>
+<span class="lineNum">     330 </span><span class="lineCov">        891 :                         vertical_flip(ctx, src_planes[i], dst_planes[i], height, i, wiB);</span>
+<span class="lineNum">     331 </span><span class="lineCov">        972 :                 }else if (ctx-&gt;mode==VFLIP_HORIZ){</span>
+<span class="lineNum">     332 </span><span class="lineCov">        891 :                         horizontal_flip(ctx, src_planes[i], dst_planes[i], height, i, wiB, ctx-&gt;src_stride);</span>
+<span class="lineNum">     333 </span><span class="lineCov">         81 :                 }else if (ctx-&gt;mode==VFLIP_BOTH){</span>
+<span class="lineNum">     334 </span><span class="lineCov">         81 :                         vertical_flip(ctx, src_planes[i], dst_planes[i], height, i, wiB);</span>
+<span class="lineNum">     335 </span><span class="lineCov">         81 :                         horizontal_flip(ctx, dst_planes[i], dst_planes[i], height, i, wiB, ctx-&gt;dst_stride);</span>
+<span class="lineNum">     336 </span>            :                 }
+<span class="lineNum">     337 </span>            :         }
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span><span class="lineCov">       1053 :         gf_filter_pck_send(dst_pck);</span>
+<span class="lineNum">     340 </span><span class="lineCov">       1053 :         gf_filter_pid_drop_packet(ctx-&gt;ipid);</span>
+<span class="lineNum">     341 </span><span class="lineCov">       1053 :         return GF_OK;</span>
+<span class="lineNum">     342 </span>            : }
+<a name="343"><span class="lineNum">     343 </span>            : </a>
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span><span class="lineCov">         40 : static GF_Err vflip_configure_pid(GF_Filter *filter, GF_FilterPid *pid, Bool is_remove)</span>
+<span class="lineNum">     346 </span>            : {
+<span class="lineNum">     347 </span>            :         const GF_PropertyValue *p;
+<span class="lineNum">     348 </span>            :         u32 w, h, stride, pfmt;
+<span class="lineNum">     349 </span>            :         GF_Fraction sar;
+<span class="lineNum">     350 </span><span class="lineCov">         40 :         GF_VFlipCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span><span class="lineCov">         40 :         if (is_remove) {</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                 if (ctx-&gt;opid) {</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                         gf_filter_pid_remove(ctx-&gt;opid);</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :                         ctx-&gt;opid = NULL;</span>
+<span class="lineNum">     356 </span>            :                 }
+<span class="lineNum">     357 </span>            :                 return GF_OK;
+<span class="lineNum">     358 </span>            :         }
+<span class="lineNum">     359 </span><span class="lineCov">         40 :         if (! gf_filter_pid_check_caps(pid))</span>
+<span class="lineNum">     360 </span>            :                 return GF_NOT_SUPPORTED;
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span><span class="lineCov">         40 :         if (!ctx-&gt;opid) {</span>
+<span class="lineNum">     363 </span><span class="lineCov">         40 :                 ctx-&gt;opid = gf_filter_pid_new(filter);</span>
+<span class="lineNum">     364 </span>            :         }
+<span class="lineNum">     365 </span>            :         //copy properties at init or reconfig
+<span class="lineNum">     366 </span><span class="lineCov">         40 :         gf_filter_pid_copy_properties(ctx-&gt;opid, pid);</span>
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineCov">         40 :         if (!ctx-&gt;ipid) {</span>
+<span class="lineNum">     369 </span><span class="lineCov">         40 :                 ctx-&gt;ipid = pid;</span>
+<span class="lineNum">     370 </span>            :         }
+<span class="lineNum">     371 </span>            :         w = h = pfmt = stride = 0;
+<span class="lineNum">     372 </span><span class="lineCov">         40 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_WIDTH);</span>
+<span class="lineNum">     373 </span><span class="lineCov">         40 :         if (p) w = p-&gt;value.uint;</span>
+<span class="lineNum">     374 </span><span class="lineCov">         40 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_HEIGHT);</span>
+<span class="lineNum">     375 </span><span class="lineCov">         40 :         if (p) h = p-&gt;value.uint;</span>
+<span class="lineNum">     376 </span><span class="lineCov">         40 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_STRIDE);</span>
+<span class="lineNum">     377 </span><span class="lineCov">         40 :         if (p) stride = p-&gt;value.uint;</span>
+<span class="lineNum">     378 </span><span class="lineCov">         40 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_PIXFMT);</span>
+<span class="lineNum">     379 </span><span class="lineCov">         40 :         if (p) pfmt = p-&gt;value.uint;</span>
+<span class="lineNum">     380 </span><span class="lineCov">         40 :         p = gf_filter_pid_get_property(pid, GF_PROP_PID_SAR);</span>
+<span class="lineNum">     381 </span><span class="lineCov">         40 :         if (p) sar = p-&gt;value.frac;</span>
+<span class="lineNum">     382 </span>            :         else sar.den = sar.num = 1;
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span><span class="lineCov">         40 :         if (!w || !h || !pfmt) {</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :                 ctx-&gt;passthrough = GF_TRUE;</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :                 return GF_OK;</span>
+<span class="lineNum">     387 </span>            :         }
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span><span class="lineCov">         40 :         if ((ctx-&gt;w == w) &amp;&amp; (ctx-&gt;h == h) &amp;&amp; (ctx-&gt;s_pfmt == pfmt) &amp;&amp; (ctx-&gt;stride == stride)) {</span>
+<span class="lineNum">     390 </span>            :                 //nothing to reconfigure
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :                 ctx-&gt;passthrough = GF_TRUE;</span>
+<span class="lineNum">     392 </span><span class="lineCov">         40 :         } else if (ctx-&gt;mode==VFLIP_OFF) {</span>
+<span class="lineNum">     393 </span><span class="lineCov">          1 :                 ctx-&gt;passthrough = GF_TRUE;</span>
+<span class="lineNum">     394 </span>            :         } else {
+<span class="lineNum">     395 </span>            :                 Bool res;
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span><span class="lineCov">         39 :                 ctx-&gt;w = w;</span>
+<span class="lineNum">     398 </span><span class="lineCov">         39 :                 ctx-&gt;h = h;</span>
+<span class="lineNum">     399 </span><span class="lineCov">         39 :                 ctx-&gt;s_pfmt = pfmt;</span>
+<span class="lineNum">     400 </span><span class="lineCov">         39 :                 ctx-&gt;stride = stride;</span>
+<span class="lineNum">     401 </span><span class="lineCov">         39 :                 ctx-&gt;dst_width  = w;</span>
+<span class="lineNum">     402 </span><span class="lineCov">         39 :                 ctx-&gt;dst_height = h;</span>
+<span class="lineNum">     403 </span><span class="lineCov">         39 :                 ctx-&gt;passthrough = GF_FALSE;</span>
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            :                 //get layout info for source
+<span class="lineNum">     406 </span><span class="lineCov">         39 :                 memset(ctx-&gt;src_stride, 0, sizeof(ctx-&gt;src_stride));</span>
+<span class="lineNum">     407 </span><span class="lineCov">         39 :                 if (ctx-&gt;stride) ctx-&gt;src_stride[0] = ctx-&gt;stride;</span>
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span><span class="lineCov">         39 :                 res = gf_pixel_get_size_info(pfmt, w, h, &amp;ctx-&gt;out_src_size, &amp;ctx-&gt;src_stride[0], &amp;ctx-&gt;src_stride[1], &amp;ctx-&gt;nb_src_planes, &amp;ctx-&gt;src_uv_height);</span>
+<span class="lineNum">     410 </span><span class="lineCov">         39 :                 if (!res) {</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MEDIA, (&quot;[VFlip] Failed to query source pixel format characteristics\n&quot;));</span>
+<span class="lineNum">     412 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">     413 </span>            :                 }
+<span class="lineNum">     414 </span><span class="lineCov">         39 :                 if (ctx-&gt;nb_src_planes==3) ctx-&gt;src_stride[2] = ctx-&gt;src_stride[1];</span>
+<span class="lineNum">     415 </span><span class="lineCov">         39 :                 if (ctx-&gt;nb_src_planes==4) ctx-&gt;src_stride[3] = ctx-&gt;src_stride[0];</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            :                 //get layout info for dest
+<span class="lineNum">     419 </span><span class="lineCov">         39 :                 memset(ctx-&gt;dst_stride, 0, sizeof(ctx-&gt;dst_stride));</span>
+<span class="lineNum">     420 </span><span class="lineCov">         39 :                 res = gf_pixel_get_size_info(pfmt, ctx-&gt;dst_width, ctx-&gt;dst_height, &amp;ctx-&gt;out_size, &amp;ctx-&gt;dst_stride[0], &amp;ctx-&gt;dst_stride[1], &amp;ctx-&gt;nb_planes, &amp;ctx-&gt;dst_uv_height);</span>
+<span class="lineNum">     421 </span><span class="lineCov">         39 :                 if (!res) {</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :                         GF_LOG(GF_LOG_ERROR, GF_LOG_MEDIA, (&quot;[VFlip] Failed to query output pixel format characteristics\n&quot;));</span>
+<span class="lineNum">     423 </span>            :                         return GF_NOT_SUPPORTED;
+<span class="lineNum">     424 </span>            :                 }
+<span class="lineNum">     425 </span><span class="lineCov">         39 :                 if (ctx-&gt;nb_planes==3) ctx-&gt;dst_stride[2] = ctx-&gt;dst_stride[1];</span>
+<span class="lineNum">     426 </span><span class="lineCov">         39 :                 if (ctx-&gt;nb_planes==4) ctx-&gt;dst_stride[3] = ctx-&gt;dst_stride[0];</span>
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span><span class="lineCov">         39 :                 ctx-&gt;w = w;</span>
+<span class="lineNum">     430 </span><span class="lineCov">         39 :                 ctx-&gt;h = h;</span>
+<span class="lineNum">     431 </span><span class="lineCov">         39 :                 ctx-&gt;s_pfmt = pfmt;</span>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineCov">         39 :                 GF_LOG(GF_LOG_INFO, GF_LOG_MEDIA, (&quot;[VFlip] Configured output full frame size %dx%d\n&quot;, ctx-&gt;w, ctx-&gt;h));</span>
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span><span class="lineCov">         39 :                 ctx-&gt;line_buffer_vf = gf_realloc(ctx-&gt;line_buffer_vf, sizeof(char)*ctx-&gt;dst_stride[0] );</span>
+<span class="lineNum">     436 </span><span class="lineCov">         39 :                 ctx-&gt;line_buffer_hf = gf_realloc(ctx-&gt;line_buffer_hf, sizeof(char)*ctx-&gt;src_stride[0] );</span>
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span><span class="lineCov">         39 :                 ctx-&gt;packed_422 = GF_FALSE;</span>
+<span class="lineNum">     439 </span><span class="lineCov">         39 :                 switch (pfmt) {</span>
+<span class="lineNum">     440 </span>            :                 //for YUV 422, adjust to multiple of 2 on horizontal dim
+<span class="lineNum">     441 </span><span class="lineCov">          8 :                 case GF_PIXEL_YUYV:</span>
+<span class="lineNum">     442 </span>            :                 case GF_PIXEL_YVYU:
+<span class="lineNum">     443 </span>            :                 case GF_PIXEL_UYVY:
+<span class="lineNum">     444 </span>            :                 case GF_PIXEL_VYUY:
+<span class="lineNum">     445 </span><span class="lineCov">          8 :                         ctx-&gt;packed_422 = GF_TRUE;</span>
+<span class="lineNum">     446 </span><span class="lineCov">          8 :                         break;</span>
+<span class="lineNum">     447 </span>            :                 }
+<span class="lineNum">     448 </span>            :         }
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span><span class="lineCov">         40 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_WIDTH, &amp;PROP_UINT(ctx-&gt;dst_width));</span>
+<span class="lineNum">     451 </span><span class="lineCov">         40 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_HEIGHT, &amp;PROP_UINT(ctx-&gt;dst_height));</span>
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span><span class="lineCov">         40 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STRIDE, &amp;PROP_UINT(ctx-&gt;dst_stride[0] ));</span>
+<span class="lineNum">     454 </span><span class="lineCov">         40 :         if (ctx-&gt;nb_planes&gt;1)</span>
+<span class="lineNum">     455 </span><span class="lineCov">         17 :                 gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_STRIDE_UV, &amp;PROP_UINT(ctx-&gt;dst_stride[1]));</span>
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span><span class="lineCov">         40 :         gf_filter_pid_set_property(ctx-&gt;opid, GF_PROP_PID_SAR, &amp;PROP_FRAC(sar) );</span>
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            :         //an access unit corresponds to a single packet
+<span class="lineNum">     460 </span><span class="lineCov">         40 :         gf_filter_pid_set_framing_mode(pid, GF_TRUE);</span>
+<span class="lineNum">     461 </span><span class="lineCov">         40 :         return GF_OK;</span>
+<a name="462"><span class="lineNum">     462 </span>            : }</a>
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span><span class="lineCov">         40 : void vflip_finalize(GF_Filter *filter)</span>
+<span class="lineNum">     465 </span>            : {
+<span class="lineNum">     466 </span><span class="lineCov">         40 :         GF_VFlipCtx *ctx = gf_filter_get_udta(filter);</span>
+<span class="lineNum">     467 </span><span class="lineCov">         40 :         if (ctx-&gt;line_buffer_vf) gf_free(ctx-&gt;line_buffer_vf);</span>
+<span class="lineNum">     468 </span><span class="lineCov">         40 :         if (ctx-&gt;line_buffer_hf) gf_free(ctx-&gt;line_buffer_hf);</span>
+<span class="lineNum">     469 </span><span class="lineCov">         40 : }</span>
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            : #define OFFS(_n)        #_n, offsetof(GF_VFlipCtx, _n)
+<span class="lineNum">     473 </span>            : static GF_FilterArgs VFlipArgs[] =
+<span class="lineNum">     474 </span>            : {
+<span class="lineNum">     475 </span>            :                 { OFFS(mode), &quot;flip mode\n&quot;
+<span class="lineNum">     476 </span>            :                 &quot;- off: no flipping (passthrough)\n&quot;
+<span class="lineNum">     477 </span>            :                 &quot;- vert: vertical flip\n&quot;
+<span class="lineNum">     478 </span>            :                 &quot;- horiz: horizontal flip\n&quot;
+<span class="lineNum">     479 </span>            :                 &quot;- both: horizontal and vertical flip&quot;
+<span class="lineNum">     480 </span>            :                 &quot;&quot;, GF_PROP_UINT, &quot;vert&quot;, &quot;off|vert|horiz|both&quot;, GF_FS_ARG_UPDATE | GF_FS_ARG_HINT_ADVANCED},
+<span class="lineNum">     481 </span>            :                 {0}
+<span class="lineNum">     482 </span>            : };
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span>            : static const GF_FilterCapability VFlipCaps[] =
+<span class="lineNum">     485 </span>            : {
+<span class="lineNum">     486 </span>            :                 CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_STREAM_TYPE, GF_STREAM_VISUAL),
+<span class="lineNum">     487 </span>            :                 CAP_UINT(GF_CAPS_INPUT_OUTPUT,GF_PROP_PID_CODECID, GF_CODECID_RAW)
+<span class="lineNum">     488 </span>            : };
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            : GF_FilterRegister VFlipRegister = {
+<span class="lineNum">     491 </span>            :                 .name = &quot;vflip&quot;,
+<span class="lineNum">     492 </span>            :                 GF_FS_SET_DESCRIPTION(&quot;Video flip&quot;)
+<span class="lineNum">     493 </span>            :                 GF_FS_SET_HELP(&quot;Filter used to flip video frames vertically, horizontally, in both directions or no flip&quot;)
+<span class="lineNum">     494 </span>            :                 .private_size = sizeof(GF_VFlipCtx),
+<span class="lineNum">     495 </span>            :                 .flags = GF_FS_REG_EXPLICIT_ONLY,
+<span class="lineNum">     496 </span>            :                 .args = VFlipArgs,
+<span class="lineNum">     497 </span>            :                 .configure_pid = vflip_configure_pid,
+<span class="lineNum">     498 </span>            :                 SETCAPS(VFlipCaps),
+<span class="lineNum">     499 </span>            :                 .process = vflip_process,
+<span class="lineNum">     500 </span>            :                 .finalize = vflip_finalize,
+<span class="lineNum">     501 </span>            : };
+<span class="lineNum">     502 </span>            : 
+<a name="503"><span class="lineNum">     503 </span>            : </a>
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span><span class="lineCov">       2877 : const GF_FilterRegister *vflip_register(GF_FilterSession *session)</span>
+<span class="lineNum">     506 </span>            : {
+<span class="lineNum">     507 </span><span class="lineCov">       2877 :         return &amp;VFlipRegister;</span>
+<span class="lineNum">     508 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

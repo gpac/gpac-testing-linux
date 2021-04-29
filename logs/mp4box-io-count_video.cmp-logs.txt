@@ -1,0 +1,90 @@
+*** mp4box-io-count_video.cmp logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:27 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./media/auxiliary_files/count_video.cmp" ***
+Import probing results for ./media/auxiliary_files/count_video.cmp:
+File has 1 tracks
+- Track 1 type: Video - Codec MPEG-4 Visual part 2
+	Size 120x96 @ 25 FPS PAR: 1:1
+
+For more details, use `gpac -i count_video.cmp inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/count_video.cmp.mp4  (add) hash: 
+File hash (SHA-1): 334B79F0C1699DBD594FF799A5638C1D37B7BDAB
+Hash OK for ./results/temp/count_video.cmp.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./media/auxiliary_files/count_video.cmp -new ./results/temp/count_video.cmp.mp4" ***
+Track Importing MPEG-4 Visual Part 2 - Width 120 Height 96 FPS 25000/1000 SAR 1/1
+Indicated Profile: Advanced Simple Profile @ Level 5
+MPEG-4 (Part 2) Import results: 250 VOPs (10 Is - 80 Ps - 160 Bs)
+	2 max consecutive B-frames
+
+Computing ./results/temp/count_video.cmp.1.tmp  (diso) hash: 
+File hash (SHA-1): 2EA7DC523776A01C1E8AC6FCB966EF4EFE596A7C
+Hash OK for ./results/temp/count_video.cmp.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/count_video.cmp.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 00:00:10.000
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+File has root IOD (9 bytes)
+Scene PL 0xff - Graphics PL 0xff - OD PL 0xff
+Visual PL: Advanced Simple Profile @ Level 5 (0xf5)
+Audio PL: No audio capability required (0xff)
+No streams included in root OD
+
+# Track 1 Info - ID 1 - TimeScale 25000
+Media Duration 00:00:10.000 
+Track has 1 edits: track duration is 00:00:10.000
+Media Info: Language "Undetermined (und)" - Type "vide:mp4v" - 250 samples
+Visual Sample Entry Info: width=120 height=96 (depth=24 bits)
+Visual Track layout: x=0 y=0 width=120 height=96
+MPEG-4 Visual Size 120 x 96 - Advanced Simple Profile @ Level 5
+Pixel Aspect Ratio 1:1 - Indicated track size 120 x 96
+	RFC6381 Codec Parameters: mp4v.20.f5
+	Track Meta type: "undefined" - 0 resource item(s)
+	Average GOP length: 27 samples
+	Max sample duration: 1000 / 25000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/count_video.cmp.mp4 -out ./results/temp/count_video.cmp.1.tmp" ***
+
+Computing ./results/temp/count_video.cmp.2.tmp  (dts) hash: 
+File hash (SHA-1): C4E36EBACABCBF9124B083CC794C45B87016CD33
+Hash OK for ./results/temp/count_video.cmp.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/count_video.cmp.mp4 -out ./results/temp/count_video.cmp.2.tmp" ***
+
+
+*** Subtest "avi-dump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -avi ./results/temp/count_video.cmp.mp4 -out ./results/temp/test.avi" ***
+[31m`-avi` option deprecated, use `-mux`
+[0m
+Computing ./results/temp/test.avi  (avi-dump) hash: 
+
+	Error: Requested URL is not valid or cannot be found
+Computing ./results/temp/count_video.cmp.mp4.hint  (hint) hash: 
+File hash (SHA-1): 2B2EFB1B760D6B9B7530DE06029AEDD077620A7E
+Hash OK for ./results/temp/count_video.cmp.mp4.hint
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/count_video.cmp.mp4 -out ./results/temp/count_video.cmp.mp4.hint" ***
+Hinting track ID 1 - Type "mp4v:mp4v" (mpeg4-generic) - BW 117 kbps
+
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/count_video.cmp.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): 920A094B6448E1303BD8655C8BAAAACC3CBD0E60
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/count_video.cmp.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/count_video.cmp.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 4D1B91FA480F6DD248EDC478D4117748BED98A00
+Hash OK for ./results/temp/count_video.cmp.mp4.hint

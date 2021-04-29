@@ -1,0 +1,71 @@
+*** mp4box-io-german.srt logs (GPAC version 1.1.0-DEV-revUNKNOWN-HEAD ) - test date 29/04/2021 23:38:58 ***
+
+
+*** Subtest "RawMediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./external_media/import/german.srt" ***
+Import probing results for ./external_media/import/german.srt:
+File has 1 tracks
+- Track 1 type: Text - Codec Subtitle/text 3GPP/Apple Stream
+
+For more details, use `gpac -i german.srt inspect[:deep][:analyze=on|bs]`
+
+Computing ./results/temp/german.srt.mp4  (add) hash: 
+File hash (SHA-1): 4C78A35F41BBC68E260A3AF8D16BE0BB9BF9E9DE
+Hash OK for ./results/temp/german.srt.mp4
+
+*** Subtest "MediaImport": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -add ./external_media/import/german.srt -new ./results/temp/german.srt.mp4" ***
+Track Importing Timed Text - Text track 400 x 60 font Serif (size 18) layer 0
+
+Computing ./results/temp/german.srt.1.tmp  (diso) hash: 
+File hash (SHA-1): 5F3BE5087B1BEEB0FFC87E2963C0D98B40565CE0
+Hash OK for ./results/temp/german.srt.1.tmp
+
+*** Subtest "MediaInfo": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -info ./results/temp/german.srt.mp4" ***
+# File Meta type: "undefined" - 0 resource item(s)
+# Movie Info - 1 track - TimeScale 600
+Duration 01:45:05.640
+Fragmented: no
+Progressive (moov before mdat)
+Major Brand isom - version 1 - compatible brands: isom
+Created: UNKNOWN DATE
+# Movie Meta type: "undefined" - 0 resource item(s)
+
+# Track 1 Info - ID 1 - TimeScale 1000
+Media Duration 01:45:05.641 
+Media Info: Language "Undetermined (und)" - Type "text:tx3g" - 71 samples
+Unknown Text Stream
+ Size 400 x 60 - Translation X=0 Y=0 - Layer 0
+	RFC6381 Codec Parameters: tx3g
+	Track Meta type: "undefined" - 0 resource item(s)
+	All samples are sync
+	Max sample duration: 1157089 / 1000
+
+
+
+*** Subtest "XMLDump": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -diso ./results/temp/german.srt.mp4 -out ./results/temp/german.srt.1.tmp" ***
+
+Computing ./results/temp/german.srt.2.tmp  (dts) hash: 
+File hash (SHA-1): 881BDFC23E772A62CA1CCB77FF7098037958BCD0
+Hash OK for ./results/temp/german.srt.2.tmp
+
+*** Subtest "MediaTime": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -dts ./results/temp/german.srt.mp4 -out ./results/temp/german.srt.2.tmp" ***
+
+Computing ./results/temp/german.srt.mp4.hint  (hint) hash: 
+File hash (SHA-1): 03C7D86A2BA33792EEBD13B465A82723854B3ADB
+Hash OK for ./results/temp/german.srt.mp4.hint
+
+*** Subtest "mp4-inspect": executing "gpac  -mem-track -noprog -for-test -old-arch -no-reassign -p=0 -i ./results/temp/german.srt.mp4 inspect:deep:dur=1:log=./results/temp/inspect.txt" ***
+
+Computing ./results/temp/inspect.txt  (mp4-inspect) hash: 
+File hash (SHA-1): FA3BC1A649649F6ECA2186AB6E192DBD4A626BAE
+Hash OK for ./results/temp/inspect.txt
+
+*** Subtest "RTPHint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -hint ./results/temp/german.srt.mp4 -out ./results/temp/german.srt.mp4.hint" ***
+Hinting track ID 1 - Type "tx3g:tx3g" (3gpp-tt) - BW 0 kbps
+
+
+*** Subtest "RTPUnhint": executing "MP4Box -noprog -for-test -old-arch  -mem-track -p=0 -unhint ./results/temp/german.srt.mp4.hint" ***
+Removing hint track ID 65536
+
+Computing ./results/temp/german.srt.mp4.hint  (unhint) hash: 
+File hash (SHA-1): 3922FF2C58252725CF8ED75353887EE40E93D9F4
+Hash OK for ./results/temp/german.srt.mp4.hint
